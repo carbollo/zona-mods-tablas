@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="46">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>0</ID>
+      <Description>"H - inf HP"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[enable]
+alloc(hp, 128)
+label(hp_ret)
+
+hp:
+  mov [ecx+000005A0], (float)2000
+  mov edx,[ecx+000005A0]
+jmp hp_ret
+
+trl.exe+EB148:
+  jmp hp
+  nop
+hp_ret:
+
+[disable]
+trl.exe+EB148:
+  mov edx,[ecx+000005A0]
+dealloc(*)
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>5</ID>
+      <Description>"K - easy Kills"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscan(enemy_hit, D9 80 B0 13 00 00 D8 57)
+registersymbol(enemy_hit)
+alloc(enemy_hit_new, 256)
+label(enemy_hp_threshold)
+label(enemy_hit_new_code)
+label(enemy_hit_ret)
+
+enemy_hit_new:
+enemy_hp_threshold:
+  db 00 00 00 00
+enemy_hit_new_code:
+  mov [enemy_hp_threshold],(float)10.0
+  fld dword ptr [eax+000013B0]
+  fcom [enemy_hp_threshold]
+  jl enemy_hit_ret
+  push enemy_hp_threshold
+  pop dword ptr [eax+000013B0]
+jmp enemy_hit_ret
+
+enemy_hit:
+  jmp enemy_hit_new_code
+  nop
+enemy_hit_ret:
+
+
+[DISABLE]
+enemy_hit:
+  db D9 80 B0 13 00 00
+unregistersymbol(*)
+dealloc(*)
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>2</ID>
+      <Description>"B - inf Bullets"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[enable]
+trl.exe+14D3D7:
+  nop
+  nop
+
+[disable]
+trl.exe+14D3D7:
+  dec al
+
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>4</ID>
+      <Description>"F - inf Flashlight"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[enable]
+trl.exe+12D1CE:
+  nop
+  nop
+  nop
+
+[disable]
+trl.exe+12D1CE:
+  fsubr dword ptr [esi+70]
+
+
+
+
+</AssemblerScript>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+  <Comments>Version: Retail, 1.2
+</Comments>
+</CheatTable>

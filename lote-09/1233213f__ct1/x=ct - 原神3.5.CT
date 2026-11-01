@@ -1,0 +1,3727 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>352704</ID>
+      <Description>"激活一次"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+
+-- helpers
+function GetProcessName()
+    local m = enumModules();
+    if (#m &gt; 0) then
+        return m[1].Name;
+    end
+    return nil;
+end
+function GetWindowName()
+    if GetProcessName() == "GenshinImpact.exe" then
+       return "Genshin Impact"
+    else
+       --return "原神"
+       return "??"
+    end
+end
+function IsGenshinForeground()
+    if getWindowCaption(getForegroundWindow()) == GetWindowName() then
+        return true
+    end
+    return false
+end
+-- end
+
+-- aobs
+if (active_no_fog) and not readInteger("aob_fog") then
+   aob = AOBScan("48 8B 47 ? 48 8B 5C 24 ? F3 0F 11 B0 ? ? 00 00","+X-C-W") -- -4F call
+   if (aob) then if (aob.getCount() &gt; 1) then registerSymbol("aob_fog", aob[7], true) end aob.Destroy(); aob = nil; end
+end
+if (active_attack_speed) and not readInteger("aob_setanimspeed") then
+   autoAssemble("aobscanmodule(aob_setanimspeed,UserAssembly.dll,48 8B 7C 24 ? 48 85 C9 74 ? 0F 28 CE E8 ? ? ? ? 4C 8B 05 ? ? ? ?) //+D reassemble \nregistersymbol(aob_setanimspeed)")
+end
+if (active_attack_speed) and not readInteger("aob_getanimator") then
+   autoAssemble("aobscanmodule(aob_getanimator,UserAssembly.dll,48 8B 81 F8 02 00 00 C3 CC) //+0 call \nregistersymbol(aob_getanimator)")
+end
+if active_constellation and not readInteger("aob_uint32") then
+   autoAssemble("aobscanmodule(aob_uint32,UserAssembly.dll,48 8D 54 24 20 0F 10 4F 28)//-17\nregistersymbol(aob_uint32)")
+end
+if active_constellation and not readInteger("aob_il2cpparray") then
+   autoAssemble("aobscanmodule(aob_il2cpparray,UserAssembly.dll,40 53 48 83 EC ? 45 33 C0 48 8B DA)//+0\nregistersymbol(aob_il2cpparray)")
+end
+if active_damage_extra and not readInteger("aob_eventmanager") then
+   --aob = AOBScan("45 33 C0 48 8B D7 48 8B C8 48 8B 5C 24 30 48 8B 74 24 38 48 83 C4 20","+X-C-W") -- -7E reassemble
+   --if (aob) then if (aob.getCount() &gt; 1) then registerSymbol("aob_eventmanager", aob[4], true) end aob.Destroy(); aob = nil; end
+   autoAssemble("aobscanmodule(aob_eventmanager,UserAssembly.dll,45 33 C0 48 8B D7 48 8B C8 E8 ? ? ? ? 48 8B 0D ? ? ? ? E8 ? ? ? ? 48 85 C0 0F 84 ? ? ? ? 45 33 C0)//+E reassemble \nregistersymbol(aob_eventmanager)")
+end
+if active_damage_extra and not readInteger("aob_eventallocate") then
+   autoAssemble("aobscanmodule(aob_eventallocate,UserAssembly.dll,e8 ? ? ? ? 48 8b f8 48 85 c0 74 ? 8b d6 48 8b c8 e8 ? ? ? ? 45 33 c0)//+0 reassemble \nregistersymbol(aob_eventallocate)")
+end
+if active_damage_extra and not readInteger("aob_eventallocatemethod") then
+   autoAssemble("aobscanmodule(aob_eventallocatemethod,UserAssembly.dll,33 D2 48 39 08 48 0F 44 D0 48 85 D2 0F 85 ? ? ? ? 48 8B 0D ? ? ? ? E8 ? ? ? ? 4C 8B 03) //+12 reassemble //f3 0f 59 c9 0f 2f f9 0f 82 ? ? ? ? 48 8b 05)//+6C reassemble \nregistersymbol(aob_eventallocatemethod)")
+end
+if active_damage_extra and not readInteger("aob_eventcrash") then
+   autoAssemble("aobscanmodule(aob_eventcrash,UserAssembly.dll,8B 51 ? 48 8B CB E8 ? ? ? ? 48 8B 07 48 85 C0) //+6 reassemble //C7 43 ? 21 00 00 00 66 C7 43 ? ? ? 48 8B 5C 24 ?)//-78 call \nregistersymbol(aob_eventcrash)")
+end
+if active_damage_extra and not readInteger("aob_fireevent") then
+   autoAssemble("aobscanmodule(aob_fireevent,UserAssembly.dll,45 33 C0 48 8B D3 48 8B CF E8 ? ? ? ? 48 8B 5C 24 ? 48 8B 7C 24 ? 48 83 C4 28) //+9 reassemble // 48 8B 5C 24 ? 48 8B 74 24 ? 48 83 C4 ? 5F C3 80 7F ? 00 75 ? 48 85 DB)//-7A call \nregistersymbol(aob_fireevent)")
+end
+if (active_damage_extra or active_god) and not readInteger("aob_combat") then
+   autoAssemble("aobscanmodule(aob_combat,UserAssembly.dll,e8 ? ? ? ? 48 8b c8 48 85 c0 75 ? 48 8b 0d ? ? ? ? e8 ? ? ? ? 48 8b d8)//+0 reassemble \nregistersymbol(aob_combat)")
+end
+if (active_damage_extra or active_god) and not readInteger("aob_combatmethod") then
+   autoAssemble("aobscanmodule(aob_combatmethod,UserAssembly.dll,48 8b 15 ? ? ? ? 48 8b cb e8 ? ? ? ? 48 8b 15 ? ? ? ? 48 8b cf 4c 8b f0)//+0 reassemble \nregistersymbol(aob_combatmethod)")
+end
+if (active_god or active_damage_extra) and not readInteger("aob_getsafefloat") then
+   aob = AOBScan("4C 8B 03 41 0F 28 D8 0F 28 D0","+X-C-W") -- -5 reassemble
+   if (aob) then if (aob.getCount() &gt; 1) then registerSymbol("aob_getsafefloat", aob[0], true) end aob.Destroy(); aob = nil; end
+end
+if active_map_tp and not readInteger("aob_getheight") then
+   autoAssemble("aobscanmodule(aob_getheight,UserAssembly.dll,E9 ? ? ? ? E8 ? ? ? ? 44 8B C0 0F 28 CE)//-72\nregistersymbol(aob_getheight)")
+end
+if active_map_tp and not readInteger("aob_getgroundwaterheight") then
+   aob = AOBScan("0F 28 74 24 ? 0F 28 7C 24 ? 48 83 C4 48 E9 ? ? ? ? E8 ? ? ? ? 44 8B C0","+X-C-W") -- -64
+   if (aob) then if (aob.getCount() &gt; 1) then registerSymbol("aob_getgroundwaterheight", aob[1], true) end aob.Destroy(); aob = nil; end
+end
+if active_map_tp and not readInteger("aob_worldrelpos") then
+   aob = AOBScan("E9 ? ? ? ? F2 0F 10 03 48 8B 05 ? ? ? ? 8B 5B ? F2 0F 11 44 24","+X-C-W") -- -82
+   if (aob) then if (aob.getCount() &gt; 1) then registerSymbol("aob_worldrelpos", aob[2], true) end aob.Destroy(); aob = nil; end
+end
+if active_map_tp and not readInteger("aob_mapmanager") then
+   autoAssemble("aobscanmodule(aob_mapmanager,UserAssembly.dll,48 8B 5C 24 ? 48 8B 08 48 85 C9 0F 84 ? ? ? ? 8B 51 ? 48 8D 4C 24 ?)//-42\nregistersymbol(aob_mapmanager)")
+end
+if (active_attack_speed or active_damage_extra or active_god or active_map_tp or active_no_clip or active_instant_kill) and not readInteger("aob_entitymanager") then
+   autoAssemble("aobscanmodule(aob_entitymanager,UserAssembly.dll,48 8B 0D ? ? ? ? E8 ? ? ? ? 48 85 C0 74 ? 48 8B 80 ? ? 00 00 48 85 C0 74 ? F3 44 0F 10 80 ? ? 00 00 EB ? E8) //+0 //singleton +7\nregistersymbol(aob_entitymanager)")
+end
+if active_no_clip and not readInteger("aob_maincamera") then
+   autoAssemble("aobscanmodule(aob_maincamera,UserAssembly.dll,8B 4F ? F2 0F 10 07 89 4C 24 ? 48 8D 4C 24 ? F2 0F 11 44 24 ? E8) //-D\nregistersymbol(aob_maincamera)")
+end
+if (active_no_grass) and not readInteger("aob_setgrass") then
+   aob = AOBScan("40 53 48 83 EC 20 48 8B 0D ? ? ? ? 0F B6 DA 83 B9 ? ? 00 00 00 75","+X-C-W") -- +0 call
+   if (aob) then if (aob.getCount() &gt; 1) then registerSymbol("aob_setgrass", aob[1], true) end aob.Destroy(); aob = nil; end
+end
+if (active_god or active_map_tp or active_no_clip) and not readInteger("aob_avatarentity") then
+   autoAssemble("aobscanmodule(aob_avatarentity,UserAssembly.dll,48 8B D0 48 85 C0 74 ? 48 8B 02 48 8D 4C 24 30 4C 8B 80 ? ? 00 00) //-15\nregistersymbol(aob_avatarentity)")
+end
+if (active_map_tp or active_no_clip) and not readInteger("aob_getrelativeposition") then
+   autoAssemble("aobscanmodule(aob_getrelativeposition,UserAssembly.dll,48 8B D3 48 8D 4C 24 ? E8 ? ? ? ? F2 0F 10 00 8B 40 ? 48 8B 5C 24 ? F2) //+8\nregistersymbol(aob_getrelativeposition)")
+end
+if (active_map_tp or active_no_clip or active_destroy or active_instant_kill) and not readInteger("aob_getavatarpos") then
+   autoAssemble("aobscanmodule(aob_getavatarpos,UserAssembly.dll,E8 ? ? ? ? 48 8D 4D ? E8 ? ? ? ? 48 8B 0D ? ? ? ? F2 0F 10 00 F2 0F 11 45 ?) //+9\nregistersymbol(aob_getavatarpos)")
+end
+if active_no_clip and not readInteger("aob_deltatime") then
+   autoAssemble("aobscanmodule(aob_deltatime,UserAssembly.dll,40 53 48 83 EC ? 48 8B 59 ? E8 ? ? ? ? 48 85 DB 74 ? 48 8B 03) //+A\nregistersymbol(aob_deltatime)")
+end
+if active_no_clip and not readInteger("aob_rigidbody") then
+   autoAssemble("aobscanmodule(aob_rigidbody,UserAssembly.dll,48 8B D7 33 C9 E8 ? ? ? ? F3 0F 58 C6 F3 0F 11 83 ? ? 00 00) //+8C\nregistersymbol(aob_rigidbody)")
+end
+if active_no_clip and not readInteger("aob_getforward") then
+   autoAssemble("aobscanmodule(aob_getforward,UserAssembly.dll,F2 0F 10 00 F2 0F 11 83 ? ? 00 00 8B 40 ? 89 83 ? ? 00 00 EB ? 48 8B 4B ? 48) //-5\nregistersymbol(aob_getforward)")
+end
+if active_no_clip and not readInteger("aob_getright") then
+   autoAssemble("aobscanmodule(aob_getright,UserAssembly.dll,4C 8D 4C 24 ? F2 0F 11 7C 24 ? 4C 8D 44 24 ? 89 7C 24 ? 48 8D 54 24) //-5\nregistersymbol(aob_getright)")
+end
+if active_no_clip and not readInteger("aob_getup") then
+   autoAssemble("aobscanmodule(aob_getup,UserAssembly.dll,48 8B 57 ? F2 44 0F 10 10 8B 70 ? 48 85 D2) //-5\nregistersymbol(aob_getup)")
+end
+if (active_map_tp or active_no_clip) and not readInteger("aob_setrelativeposition") then
+   aob = AOBScan("F2 0F 10 00 48 8D 55 ? 8B 40 ? 45 33 C0 F2 0F 11 45 ? 89 45 ? e8","+X-C-W") -- +16 reassemble
+   if (aob) then if (aob.getCount() &gt; 1) then registerSymbol("aob_setrelativeposition", aob[3], true) end aob.Destroy(); aob = nil; end
+end
+if (active_destroy or active_instant_kill) and not readInteger("aob_distance") then
+   autoAssemble("aobscanmodule(aob_distance,UserAssembly.dll,0F 2F 87 ? ? ? ? 0F 87 ? ? ? ? 4C 8B ? ? ? ? ? BA ? ? ? ? 48 8B CB) //-5\nregistersymbol(aob_distance)")
+end
+if (active_damage_extra or active_destroy or active_instant_kill) and not readInteger("aob_getabsoluteposition") then
+   autoAssemble("aobscanmodule(aob_getabsoluteposition,UserAssembly.dll,E8 ? ? ? ? EB ? F2 0F 10 87 ? ? 00 00 8B 87 ? ? 00 00 EB ? 48)//+1F\nregistersymbol(aob_getabsoluteposition)")
+end
+if (active_damage_extra or active_instant_kill) and not readInteger("aob_getentitybyid") then
+   autoAssemble("aobscanmodule(aob_getentitybyid,UserAssembly.dll,8B 53 ? 48 8B C8 E8 ? ? ? ? 48 8B D0 48 8B CB E8 ? ? ? ? 84)//+6\nregistersymbol(aob_getentitybyid)")
+end
+if active_profile and not readInteger("aob_profilepage") then
+   aob = AOBScan("5B E9 ? ? ? ? 48 8B 8B ? ? 00 00 33 D2 E8 ? ? ? ? 84 C0 75 ? 48 8B CB E8 ? ? ? ? 4C 8B 05 ? ? ? ? 48 8B C8 48 8B 93 ? ? 00 00 E8 ? ? ? ? 33 D2 48 8B C8 48 8B D8 E8 ? ? ? ? 84 C0 75 ? 48 85 DB 74 ? 48 8B 15 ? ? ? ? 48 8B CB E8 ? ? ? ? 33 D2","+X-C-W")
+   if (aob) then if (aob.getCount() &gt; 1) then registerSymbol("aob_profilepage", aob[1], true) end aob.Destroy(); aob = nil; end
+end
+if active_profile and not readInteger("aob_objectfind") then
+   autoAssemble("aobscanmodule(aob_objectfind,UnityPlayer.dll,48 8B 53 38 48 8D 4C 24 68 E8 ? ? ? ? 48 8B 00)//-50\nregistersymbol(aob_objectfind)")
+end
+if active_profile and not readInteger("aob_settext") then
+   autoAssemble("aobscanmodule(aob_settext,UserAssembly.dll,74 ? 48 8B 03 48 8B CB 48 89 BB ? ? 00 00 48 8B 90 ? ? 00 00)//-2D\nregistersymbol(aob_settext)")
+end
+if active_auto_dialog and not readInteger("aob_freeclick") then
+   if IsOS() then
+      autoAssemble("aobscanmodule(aob_freeclick,UserAssembly.dll,48 8B 8B ? ? 00 00 48 85 C9 0F 84 ? ? ? ? 45 33 C0 B2 01 E8 ? ? ? ? 48 8B 7C 24 ? 48 83 C4 ? 5B)//-121 call\nregistersymbol(aob_freeclick)")
+   else
+      autoAssemble("aobscanmodule(aob_freeclick,UserAssembly.dll,? ? ? ? ? ? ? ? ? 48 8B 8B ? ? 00 00 48 85 C9 0F 84 ? ? ? ? 45 33 C0 B2 01 E8 ? ? ? ? 48 8B 7C 24 ? 48 83 C4 ? 5B)//-121 call\nregistersymbol(aob_freeclick)")
+   end
+end
+if active_auto_dialog and not readInteger("aob_il2cppvaluebox") then
+   autoAssemble("aobscanmodule(aob_il2cppvaluebox,UserAssembly.dll,0F 84 ? ? ? ? 48 8B 01 48 8B 90 ? ? 00 00 FF 90 ? ? 00 00 48 8B 0D ? ? ? ? 48 8D 54 24 ? 48 8B 5F ? 89 74 24 ? E8)//+2A call \nregistersymbol(aob_il2cppvaluebox)")
+end
+if active_auto_dialog and not readInteger("aob_selectdialog") then
+   if IsOS() then
+      autoAssemble("aobscanmodule(aob_selectdialog,UserAssembly.dll,0F 84 ? ? ? ? 41 0F 10 06 4C 8D 44 24 ? 48 8B D3 F2 41 0F 10 4E ? 48 8B C8)//-57 call \nregistersymbol(aob_selectdialog)")
+   else
+       autoAssemble("aobscanmodule(aob_selectdialog,UserAssembly.dll,? ? ? 0F 84 ? ? ? ? 41 0F 10 06 4C 8D 44 24 ? 48 8B D3 F2 41 0F 10 4E ? 48 8B C8)//-57 call \nregistersymbol(aob_selectdialog)")
+   end
+end
+if active_fast_dialog and not readInteger("aob_settimescale") then
+   aob = AOBScan("0F 28 74 24 20 48 83 C4 38 E9 ? ? ? ? CC CC CC CC CC CC CC CC CC CC CC 48 83 EC 28 E8 ? ? ? ? 8B 80 ? ? 00 00 48 83 C4 28","+X-C-W") -- -17 call
+   if (aob) then if (aob.getCount() &gt; 1) then registerSymbol("aob_settimescale", aob[1], true) end aob.Destroy(); aob = nil; end
+end
+if active_fast_dialog and not readInteger("aob_gettimescale") then
+   autoAssemble("aobscanmodule(aob_gettimescale,UnityPlayer.dll,48 83 EC 28 E8 ? ? ? ? F3 0F 10 80 FC 00 00 00 48 83 C4 28)//+0\nregistersymbol(aob_gettimescale)")
+end
+if active_skip_cutscene and not readInteger("aob_mediaplayerskip") then
+   autoAssemble("aobscanmodule(aob_mediaplayerskip,UserAssembly.dll,48 8B 4B 10 33 D2 E8 ? ? ? ? 84 C0 75 ? 48 8B 4B 10 48 85 C9 74 ? E8 ? ? ? ? 83 F8 05 75 ? 48 8B 4B 10)//+30\nregistersymbol(aob_mediaplayerskip)")
+end
+if active_skip_dialog and not readInteger("aob_curtainclickcontinuefinish") then
+   if IsOS() then
+      autoAssemble("aobscanmodule(aob_curtainclickcontinuefinish,UserAssembly.dll,F3 0F 11 7B 18 0F 28 7C 24 20 F3 0F 11 73 1C 0F 28 74 24 30)//+33 call \nregistersymbol(aob_curtainclickcontinuefinish)")
+   else
+      autoAssemble("aobscanmodule(aob_curtainclickcontinuefinish,UserAssembly.dll,? ? ? F3 0F 11 7B 18 0F 28 7C 24 20 F3 0F 11 73 1C 0F 28 74 24 30)//+33 call \nregistersymbol(aob_curtainclickcontinuefinish)")
+   end
+end
+-- end
+
+-- No Clip
+function NoClipTimer()
+  if (timer_forward ~= nil) then
+      timer_forward.destroy();
+      timer_forward = nil;
+  end
+  if (timer_backward ~= nil) then
+      timer_backward.destroy();
+      timer_backward = nil;
+  end
+  if (timer_right ~= nil) then
+      timer_right.destroy();
+      timer_right = nil;
+  end
+  if (timer_left ~= nil) then
+      timer_left.destroy();
+      timer_left = nil;
+  end
+  if (timer_up ~= nil) then
+      timer_up.destroy();
+      timer_up = nil;
+  end
+  if (timer_down ~= nil) then
+      timer_down.destroy();
+      timer_down = nil;
+  end
+
+  timer_forward = createTimer();
+  timer_forward.Interval = 20;
+  timer_forward.OnTimer = function (t)
+      if active_no_clip then
+        if isKeyPressed(button_noclip_forward) then if IsGenshinForeground() then writeInteger('check_forward', 1); end else writeInteger('check_forward', 0); end
+      end
+  end
+
+  timer_backward = createTimer();
+  timer_backward.Interval = 20;
+  timer_backward.OnTimer = function (t)
+      if active_no_clip then
+        if isKeyPressed(button_noclip_backward) then if IsGenshinForeground() then writeInteger('check_backward', 1); end else writeInteger('check_backward', 0); end
+      end
+  end
+
+  timer_right = createTimer();
+  timer_right.Interval = 20;
+  timer_right.OnTimer = function (t)
+      if active_no_clip then
+        if isKeyPressed(button_noclip_right) then if IsGenshinForeground() then writeInteger('check_right', 1); end else writeInteger('check_right', 0); end
+      end
+  end
+
+  timer_left = createTimer();
+  timer_left.Interval = 20;
+  timer_left.OnTimer = function (t)
+      if active_no_clip then
+        if isKeyPressed(button_noclip_left) then if IsGenshinForeground() then writeInteger('check_left', 1); end else writeInteger('check_left', 0); end
+      end
+  end
+
+  timer_up = createTimer();
+  timer_up.Interval = 20;
+  timer_up.OnTimer = function (t)
+      if active_no_clip then
+        if isKeyPressed(button_noclip_up) then if IsGenshinForeground() then writeInteger('check_up', 1); end else writeInteger('check_up', 0); end
+      end
+  end
+
+  timer_down = createTimer();
+  timer_down.Interval = 20;
+  timer_down.OnTimer = function (t)
+      if active_no_clip then
+        if isKeyPressed(button_noclip_down) then if IsGenshinForeground() then writeInteger('check_down', 1); end else writeInteger('check_down', 0); end
+      end
+  end
+end
+NoClipTimer()
+-- end
+
+{$asm}
+//aobscanmodule(aob_singleton,UserAssembly.dll,E9 ? ? ? ? CC CC 40 53 48 83 EC 20 48 8B 19 80 BB ? ? 00 00 00 75 ? 48 8B CB E8 ? ? ? ? 48 8B 83 ? 00 00 00 48 8B 18 80 BB ? ? 00 00 00 75 ? 48 8B CB E8 ? ? ? ? 48 8B 83 C8 00 00 00 48 8B 00 48 83 C4 20 5B C3)
+//aobscanmodule(aob_profilepage,UserAssembly.dll,41 B? 01 00 00 00 40 88 6C 24 ? 41 0F B6 D0)//-5
+[DISABLE]
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352705</ID>
+      <Description>"禁用所有功能"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+local alist = getAddressList()
+if alist.Count &gt;= 1 then
+   for i=0,alist.Count-1 do
+       alist[i].Active = false
+   end
+end
+{$asm}
+[DISABLE]
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352706</ID>
+      <Description>"宝箱"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(aob_chest1,UserAssembly.dll,75 ? 40 84 ED 74 ? 44 38 ? ? ? 00 00 75)
+aobscanmodule(aob_chest2,UserAssembly.dll,48 83 C4 30 5E C3 80 BE ? ? 00 00 00 74)
+registersymbol(aob_chest1 aob_chest2)
+
+aob_chest1:
+  db 74
+
+aob_chest1+5:
+  db 75
+
+aob_chest1+E:
+  db 74
+
+aob_chest2+D:
+  db 77
+
+[DISABLE]
+aob_chest1:
+  db 75
+
+aob_chest1+5:
+  db 74
+
+aob_chest1+E:
+  db 75
+
+aob_chest2+D:
+  db 74
+
+unregistersymbol(*)
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352707</ID>
+      <Description>"血条和等级"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(aob_hp_bar,UserAssembly.dll,76 ? C6 83 E1 00 00 00 01)
+aobscanmodule(aob_hp_bar2,UserAssembly.dll,48 8B ? ? ? 00 00 48 85 C9 0F ? ? ? ? ? E8 ? ? ? ? 0F 2F C6 0F ? ? ? ? ? 48)
+registersymbol(aob_hp_bar aob_hp_bar2)
+
+aob_hp_bar:
+    db 74 //je
+
+aob_hp_bar2+19:
+    db 84 //je
+
+[DISABLE]
+aob_hp_bar:
+    db 76
+    //jna
+
+aob_hp_bar2+19:
+    db 87
+    //ja
+
+unregistersymbol(*)
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352708</ID>
+      <Description>"元素视野"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(aob_elemental_sight,UserAssembly.dll,80 7B ? 00 0F 57 FF 75 ? F3)
+registersymbol(aob_elemental_sight)
+
+aob_elemental_sight+3:
+  db 01
+
+[DISABLE]
+aob_elemental_sight+3:
+  db 00
+
+unregistersymbol(*)
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352709</ID>
+      <Description>"攻击元素(闪退)"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+active_attack_element = true
+local alist = getAddressList()
+if alist.Count &gt;= 1 then
+   local req = alist.getMemoryRecordByDescription("ACTIVATE ONCE")
+   if req ~= nil then
+      req.Active = false
+      sleep(100)
+      req.Active = true
+   end
+end
+function ParseElement(str)
+  str = string.lower(str)
+  if str == "physical" then
+     return 0
+  elseif str == "pyro" then
+     return 1
+  elseif str == "hydro" then
+     return 2
+  elseif str == "dendro" then
+     return 3
+  elseif str == "electro" then
+     return 4
+  elseif str == "cryo" then
+     return 5
+  elseif str == "frozen" then
+     return 6
+  elseif str == "anemo" then
+     return 7
+  elseif str == "geo" then
+     return 8
+  elseif str == "antifire" then
+     return 9
+  elseif str == "vehiclemuteice" then
+     return 10
+  elseif str == "mushroom" then
+     return 11
+  elseif str == "overdose" then
+     return 12
+  elseif str == "wood" then
+     return 13
+  else
+     return 0
+  end
+end
+{$asm}
+aobscanmodule(aob_attack_element,UserAssembly.dll,48 8B 0D ? ? ? ? 48 89 5C 24 ? 4C 89 74 24 ? E8 ? ? ? ? 44 8B 77 ?)
+registersymbol(aob_attack_element og_attack_element set_attack_element)
+alloc(newmem_attack_element,1000,aob_attack_element)
+alloc(og_attack_element,10)
+alloc(set_attack_element,4)
+alloc(element_counter,4)
+label(return_attack_element quit_attack_element)
+
+newmem_attack_element:
+  cmp ebp,02000000
+  jl @f
+  cmp ebp,03000000
+  jge @f
+
+begin:
+  mov r8,[rsi+118]
+  mov eax,[element_counter]
+{$luacode ele=ecx count=eax}
+local split=StrSplit(UDF1.p2featedit162.Text, ",")
+if count &gt; table.length(split) then
+   count=1
+end
+if split[count] then
+   ele=ParseElement(string.lower(split[count]))
+end
+count=count+1
+{$asm}
+  mov [element_counter],eax
+  mov [r8+20],ecx
+  jmp quit_attack_element
+
+quit_attack_element:
+  reassemble(aob_attack_element)
+  jmp return_attack_element
+
+og_attack_element:
+  readmem(aob_attack_element,7)
+
+set_attack_element:
+  dd #0
+element_counter:
+  dd 1
+
+aob_attack_element:
+  jmp newmem_attack_element
+  nop 2
+return_attack_element:
+
+[DISABLE]
+{$lua}
+if (timer_attack_element ~= nil) then
+    timer_attack_element.destroy();
+    timer_attack_element = nil;
+end
+{$asm}
+aob_attack_element:
+  readmem(og_attack_element,7)
+
+unregistersymbol(*)
+dealloc(*)
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352710</ID>
+      <Description>"弱点攻击"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(aob_headshot,UserAssembly.dll,83 BB ? ? 00 00 01 F3 0F 11 44 24 ? 0F 84 ? ? ? ? 89 7C 24 ? 45 0F 28 FC)
+registersymbol(aob_headshot og_headshot)
+alloc(newmem_headshot,1024,aob_headshot)
+alloc(og_headshot,8)
+label(return_headshot)
+
+newmem_headshot:
+  mov [rbx+000000F8],#1
+  mov [rbx+00000080],#1
+
+  cmp dword ptr [rbx+00000080],01
+  jmp return_headshot
+
+og_headshot:
+  readmem(aob_headshot,7)
+
+aob_headshot:
+  jmp newmem_headshot
+  nop 2
+return_headshot:
+
+[DISABLE]
+aob_headshot:
+  readmem(og_headshot,7)
+
+unregistersymbol(*)
+dealloc(*)
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352711</ID>
+      <Description>"攻击速度"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+active_attack_speed = true
+local alist = getAddressList()
+if alist.Count &gt;= 1 then
+   local req = alist.getMemoryRecordByDescription("ACTIVATE ONCE")
+   if req ~= nil then
+      req.Active = false
+      sleep(100)
+      req.Active = true
+   end
+end
+--aob = AOBScan("0F 29 44 24 ? 0F 29 4C 24 ? 89 74 24 ? E8 ? ? ? ? 4C 8D 9C 24 ? ? 00 00","+X-C-W") -- -61 call
+--if (aob) then if (aob.getCount() &gt; 1) then registerSymbol("aob_attackspeed", aob[2], true) end aob.Destroy(); aob = nil; end
+{$asm}
+aobscanmodule(aob_attackspeed,UserAssembly.dll,0F 29 45 ? 0F 29 4D ? 89 45 ? E8 ? ? ? ? 0F 28 B4 24 ? ? 00 00)
+registersymbol(aob_attackspeed og_attackspeed set_attackspeed fast)
+alloc(newmem_attackspeed,2000,aob_attackspeed)
+alloc(og_attackspeed,10)
+alloc(set_attackspeed,4)
+alloc(save1,40)
+alloc(save2,40)
+alloc(avatar_id,4)
+alloc(attack_tag,8)
+alloc(infinity,4)
+alloc(fast,4)
+label(return_attackspeed quit_attackspeed)
+
+newmem_attackspeed:
+  //backup
+  mov [save1],rcx
+  mov [save2],rdx
+
+  mov r9,[r15+14]
+  mov [avatar_id],r9
+  cmp [avatar_id],2000000
+  jge quit_attackspeed
+  cmp [avatar_id],1000000
+  jl quit_attackspeed
+
+label_check_tag:
+  mov r9,[r8+1C]
+  mov [attack_tag],r9
+  cmp [attack_tag],#1638193991
+  je correct_tag
+  cmp [attack_tag],#-584054938
+  je correct_tag
+  cmp [attack_tag],#1498431743
+  je correct_tag
+
+wrong_tag:
+  cmp [fast],(float)0
+  je quit_attackspeed
+  mov r9,[r15+14]
+  mov [avatar_id],r9
+  cmp [avatar_id],2000000
+  jge quit_attackspeed
+  cmp [avatar_id],1000000
+  jl quit_attackspeed
+
+  mov [fast],(float)0
+
+  //get Animator
+  xor edx,edx
+  mov rcx,[r15+28]
+  //mov [set1],r15
+  call aob_getanimator
+
+  //set AnimSpeed
+  movss xmm1,[r8+18]
+  xor r8,r8
+  mov rcx,rax
+  reassemble(aob_setanimspeed+D)
+  jmp quit_attackspeed
+
+correct_tag:
+  mov [fast],(float)1
+  mov r9,[r8+10]
+  mov [infinity],r9
+  cmp [infinity],0000807F
+  je quit_attackspeed
+
+  //get Animator
+  xor edx,edx
+  mov rcx,[r15+28]
+  call aob_getanimator
+
+  //set AnimSpeed
+  xor r8,r8
+  movss xmm1,[set_attackspeed]
+  mov rcx,rax
+  reassemble(aob_setanimspeed+D)
+  jmp quit_attackspeed
+
+quit_attackspeed:
+  //restore
+  xor r9,r9
+  mov rcx,[save1]
+  mov rdx,[save2]
+
+  reassemble(aob_attackspeed-7)
+  reassemble(aob_attackspeed+B)
+  jmp return_attackspeed
+
+og_attackspeed:
+  readmem(aob_attackspeed+B,5)
+
+set_attackspeed:
+  dd (float)2
+fast:
+  dd (float)0
+
+aob_attackspeed+B:
+  jmp newmem_attackspeed
+return_attackspeed:
+
+[DISABLE]
+aob_attackspeed+B:
+  readmem(og_attackspeed,5)
+
+unregistersymbol(*)
+dealloc(*)
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352712</ID>
+      <Description>"Constellation Modifier 命座"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript/>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352713</ID>
+      <Description>"Damage Multiplier"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(aob_damage,UserAssembly.dll,F3 ?? ?? ?? 48 83 ?? ?? 5B C3 E8 ?? ?? ?? ?? 48 8B ?? 33 ?? E8 ?? ?? ?? ?? ?? E8 ?? ?? ?? ?? ?? 49 8B)
+registersymbol(aob_damage og_damage set_damage)
+alloc(newmem_damage,1000,aob_damage)
+alloc(og_damage,10)
+alloc(set_damage,4)
+label(return_damage quit_damage)
+
+newmem_damage:
+  {cmp [rax],(float)4
+  je @f
+  cmp [rax],(float)3
+  je @f
+  cmp [rax],(float)0
+  je @f}
+  cmp [rax],(float)-1
+  je @f
+  cmp [rax],(float)150
+  je @f
+  movss xmm0,[set_damage]
+  add rsp,20
+  jmp return_damage
+
+quit_damage:
+  movss xmm0,[rax]
+  add rsp,20
+  jmp return_damage
+
+og_damage:
+  readmem(aob_damage,8)
+
+set_damage:
+  dd (float)100
+
+aob_damage:
+  jmp newmem_damage
+  nop 3
+return_damage:
+
+[DISABLE]
+aob_damage:
+  readmem(og_damage,8)
+
+unregistersymbol(*)
+dealloc(*)
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352714</ID>
+      <Description>"Damage Shield Multiplier"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(aob_damage_shield,UserAssembly.dll,F3 0F 11 4B 28 41)
+registersymbol(aob_damage_shield og_damage_shield set_damage_shield)
+alloc(newmem_damage_shield,1000,aob_damage_shield)
+alloc(og_damage_shield,10)
+alloc(set_damage_shield,4)
+label(return_damage_shield quit_damage_shield)
+
+newmem_damage_shield:
+  mulss xmm1,[set_damage_shield]
+  jmp quit_damage_shield
+
+quit_damage_shield:
+  //movss [rbx+24],xmm1
+  movss [rbx+28],xmm1
+  jmp return_damage_shield
+
+og_damage_shield:
+  readmem(aob_damage_shield,5)
+
+set_damage_shield:
+  dd (float)500
+
+aob_damage_shield:
+  jmp newmem_damage_shield
+return_damage_shield:
+
+[DISABLE]
+aob_damage_shield:
+  readmem(og_damage_shield,5)
+
+unregistersymbol(*)
+dealloc(*)
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352715</ID>
+      <Description>"Double Attack"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(aob_double_atk,UnityPlayer.dll,8B 47 ? 89 47 ? 8B 47 ? 89 47 ? 8B 47 ? 89 47 ? 66 C7 47)
+registersymbol(aob_double_atk)
+
+aob_double_atk:
+  db 10
+
+[DISABLE]
+aob_double_atk:
+  db 8B
+
+unregistersymbol(*)
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352716</ID>
+      <Description>"Extra Damage"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+active_damage_extra = true
+local alist = getAddressList()
+if alist.Count &gt;= 1 then
+   local req = alist.getMemoryRecordByDescription("ACTIVATE ONCE")
+   if req ~= nil then
+      req.Active = false
+      sleep(100)
+      req.Active = true
+   end
+end
+{$asm}
+aobscanmodule(aob_extra_damage,UserAssembly.dll,48 8B D3 48 8B 4F ? 4C 8B C6 E8 ? ? ? ?)
+registersymbol(aob_extra_damage og_extra_damage set_extra_damage set_one_punch)
+alloc(newmem_extra_damage,3000,aob_extra_damage)
+alloc(og_extra_damage,10)
+alloc(set_extra_damage,4)
+alloc(set_one_punch,4)
+alloc(entity_id,4)
+alloc(entity_used,4)
+alloc(float_point,4)
+alloc(save1,40)
+alloc(save2,40)
+alloc(save3,40)
+alloc(divider,4)
+alloc(entity_pos,20)
+alloc(combat_hp,20)
+label(return_extra_damage quit_extra_damage)
+
+newmem_extra_damage:
+  cmp ebp,2000000
+  jl quit_extra_damage
+  cmp ebp,3000000
+  jge quit_extra_damage
+  cmp [entity_id],ebp
+  je increase_used
+  mov [entity_used],0
+  mov [entity_id],ebp
+  jmp reset_used
+
+increase_used:
+  cmp [entity_used],1
+  jge skip_this_one
+  jmp _1000000
+
+skip_this_one:
+  mov [entity_used],0
+  jmp quit_extra_damage
+
+reset_used:
+  inc [entity_used]
+  jmp _1000000
+
+_1000000:
+  mov [float_point],(float)2.5
+  cmp [set_extra_damage],(float)1000000
+  jg @f
+  jmp begin
+
+_2000000:
+  mov [float_point],(float)5
+  cmp [set_extra_damage],(float)2000000
+  jg @f
+  jmp begin
+
+_3000000:
+  mov [float_point],(float)7.5
+  cmp [set_extra_damage],(float)3000000
+  jg @f
+  jmp begin
+
+_4000000:
+  mov [float_point],(float)10
+  cmp [set_extra_damage],(float)4000000
+  jg @f
+  jmp begin
+
+_5000000:
+  mov [float_point],(float)12.5
+  cmp [set_extra_damage],(float)5000000
+  jg @f
+  jmp begin
+
+_6000000:
+  mov [float_point],(float)15
+  cmp [set_extra_damage],(float)6000000
+  jg @f
+  jmp begin
+
+_7000000:
+  mov [float_point],(float)17.5
+  cmp [set_extra_damage],(float)7000000
+  jg @f
+  jmp begin
+
+_8000000:
+  mov [float_point],(float)20
+  cmp [set_extra_damage],(float)8000000
+  jg @f
+  jmp begin
+
+_9000000:
+  mov [float_point],(float)22.5
+  cmp [set_extra_damage],(float)9000000
+  jg @f
+  jmp begin
+
+_10000000:
+  mov [float_point],(float)27
+  cmp [set_extra_damage],(float)10000000
+  jg @f
+  jmp begin
+
+begin:
+  push r12
+  push r13
+  mov [save1],rsi
+  mov [save2],ebp
+  mov [save3],rdi
+
+  //get EntityManager
+  reassemble(aob_entitymanager)
+  reassemble(aob_entitymanager+7)
+
+  //get Entity
+  xor r8,r8
+  mov edx,ebp
+  mov rcx,rax
+  reassemble(aob_getentitybyid+6)
+  mov r13,rax
+
+  //allocateEvent
+  reassemble(aob_eventallocatemethod+12)
+  reassemble(aob_eventallocate)
+  mov r12,rax
+
+  //eventCrash
+  mov rcx,r12
+  mov edx,ebp
+  xor r8,r8
+  reassemble(aob_eventcrash+6) //call aob_eventcrash-75
+
+  mov [r12+30],(float)10000000
+
+  cmp [set_one_punch],1
+  je one_punch
+  movss xmm0,[set_extra_damage]
+  divss xmm0,[divider]
+  addss xmm0,[float_point]
+  movss [r12+34],xmm0
+  jmp continue
+
+one_punch:
+  //get Combat
+  reassemble(aob_combatmethod)
+  mov rcx,r13
+  reassemble(aob_combat)
+  mov rax,[rax+138]
+
+  //get SafeFloat
+  xor edx,edx
+  lea rcx,[rax+10]
+  reassemble(aob_getsafefloat-5)
+
+  mov [float_point],(float)5
+  divss xmm0,[divider]
+  addss xmm0,[float_point]
+  movss [r12+34],xmm0
+  jmp continue
+
+continue:
+  //get AbsolutePosition
+  xor r8,r8
+  mov rdx,r13
+  lea rcx,[entity_pos]
+  reassemble(aob_getabsoluteposition+1F)
+  movups xmm0,[rax]
+  movups [r12+38],xmm0
+
+  //get EventManager
+  reassemble(aob_eventmanager+E)
+  reassemble(aob_entitymanager+7)
+
+  //fireEvent
+  xor r9,r9
+  xor r8,r8
+  mov rdx,r12
+  mov rcx,rax
+  reassemble(aob_fireevent+9) //call aob_fireevent-77
+
+end:
+  mov rsi,[save1]
+  mov ebp,[save2]
+  mov rdi,[save3]
+  pop r12
+  pop r13
+  jmp quit_extra_damage
+  //jmp return_extra_damage+8
+
+quit_extra_damage:
+  reassemble(aob_extra_damage+F)
+  reassemble(aob_extra_damage+12)
+  jmp return_extra_damage
+
+og_extra_damage:
+  readmem(aob_extra_damage+F,5)
+
+set_extra_damage:
+  dd (float)1000
+set_one_punch:
+  dd 0
+divider:
+  dd (float)0.4
+
+aob_extra_damage+F:
+  jmp newmem_extra_damage
+return_extra_damage:
+
+[DISABLE]
+aob_extra_damage+F:
+  readmem(og_extra_damage,5)
+
+unregistersymbol(*)
+dealloc(*)
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352717</ID>
+      <Description>"One Punch Damage"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+writeInteger("set_one_punch",1)
+{$asm}
+[DISABLE]
+{$lua}
+writeInteger("set_one_punch",0)
+{$asm}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352718</ID>
+      <Description>"God Mode"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+active_god = true
+local alist = getAddressList()
+if alist.Count &gt;= 1 then
+   local req = alist.getMemoryRecordByDescription("ACTIVATE ONCE")
+   if req ~= nil then
+      req.Active = false
+      sleep(100)
+      req.Active = true
+   end
+end
+{$asm}
+aobscanmodule(aob_godmode,UserAssembly.dll,B9 ? ? 00 00 E8 ? ? ? ? 84 C0 75 ? 40 84 FF 74 ?)
+registersymbol(aob_godmode og_godmode set_godmode set_godconditional set_friendlyfire)
+alloc(newmem_godmode,2000,aob_godmode)
+alloc(og_godmode,10)
+alloc(set_godconditional,4)
+alloc(set_godmode,4)
+alloc(set_friendlyfire,4)
+alloc(save1,40)
+alloc(save2,40)
+alloc(save3,40)
+alloc(combat_maxhp,20)
+alloc(combat_hp,20)
+alloc(value,4)
+alloc(invert,4)
+label(return_godmode quit_godmode)
+
+newmem_godmode:
+  mov [save1],rcx
+  mov [save2],rbx
+  mov [save3],r8
+
+  //get EntityManager
+  reassemble(aob_entitymanager)
+  reassemble(aob_entitymanager+7)
+
+  //get AvatarEntity
+  xor edx,edx
+  mov rcx,rax
+  reassemble(aob_avatarentity-15)
+
+  cmp [save2],rax
+  jne not_god
+
+  cmp [set_godmode],0
+  je god
+
+  //get Combat
+  reassemble(aob_combatmethod)
+  mov rcx,rax
+  reassemble(aob_combat)
+  mov rax,[rax+138]
+
+  //get SafeFloat
+  xor edx,edx
+  lea rcx,[rax+10]
+  reassemble(aob_getsafefloat-5)
+  movss [combat_maxhp],xmm0
+
+  //get SafeFloat
+  xor edx,edx
+  lea rcx,[rax+20]
+  reassemble(aob_getsafefloat-5)
+
+  divss xmm0,[combat_maxhp]
+  mulss xmm0,[value]
+  mulss xmm0,[invert]
+  addss xmm0,[value]
+  mulss xmm0,[invert]
+  addss xmm0,[value]
+
+  comiss xmm0,[set_godconditional]
+  ja not_god
+  jmp god
+
+god:
+  mov rcx,[save1]
+  xor al,al
+  jmp skip_original
+
+not_god:
+  mov rcx,[save1]
+  mov rbx,[save2]
+  mov r8,[save3]
+  cmp [set_friendlyfire],0
+  je quit_godmode
+  cmp [rbx+15C],01
+  je friendly
+  cmp [rbx+15C],2E
+  je friendly
+  jmp quit_godmode
+
+friendly:
+  mov al,01
+  jmp skip_original
+
+skip_original:
+  mov rbx,[rsp+30]
+  mov rsi,[rsp+38]
+  add rsp,20
+  pop rdi
+  ret
+
+quit_godmode:
+  reassemble(aob_godmode-A)
+  jmp return_godmode
+
+og_godmode:
+  readmem(aob_godmode-A,7)
+
+set_godmode:
+  dd 0
+set_godconditional:
+  dd (float)5000
+set_friendlyfire:
+  dd 0
+value:
+  dd (float)100
+invert:
+  dd (float)-1
+
+aob_godmode-A:
+  jmp newmem_godmode
+  nop 2
+return_godmode:
+
+[DISABLE]
+aob_godmode-A:
+  readmem(og_godmode,7)
+
+unregistersymbol(*)
+dealloc(*)
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352719</ID>
+      <Description>"God Mode Environment"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(aob_god_mode_environment,UserAssembly.dll,48 85 FF 0F ? ? ? ? ? 80 BF ? ? 00 00 00 0F 84 ? ? ? ? 48 89 74 24)
+registersymbol(aob_god_mode_environment)
+aob_god_mode_environment+11:
+  db 85
+
+[DISABLE]
+aob_god_mode_environment+11:
+  db 84
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352720</ID>
+      <Description>"Gravity"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(aob_gravity,UnityPlayer.dll,8B 83 ? ? 00 00 89 83 ? ? 00 00 8B 83 ? ? 00 00 89 83 ? ? 00 00 EB ? 8B)
+alloc(newmem_gravity,1024,aob_gravity)
+alloc(og_gravity,10)
+alloc(set_gravity,4)
+alloc(set_list,80)
+registersymbol(aob_gravity og_gravity set_gravity)
+label(return_gravity quit_gravity)
+
+newmem_gravity:
+  mov eax,[set_gravity]
+  jmp quit_gravity
+
+quit_gravity:
+  //mov eax,[rbx+00000084]
+  jmp return_gravity
+
+set_gravity:
+  dd (float)0
+
+og_gravity:
+  readmem(aob_gravity,6)
+
+aob_gravity:
+  jmp newmem_gravity
+  nop
+return_gravity:
+
+[DISABLE]
+aob_gravity:
+  readmem(og_gravity,6)
+
+unregistersymbol(*)
+dealloc(*)
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352721</ID>
+      <Description>"Hit Multiplier"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(aob_hit_multiplier,UserAssembly.dll,48 8B CF E8 ? ? ? ? 48 8B 5C 24 50 48 8B 6C 24 60 48 83 C4 30 41 5F 5F 5E C3)
+registersymbol(aob_hit_multiplier og_hit_multiplier set_hit_multiplier set_hit_multiplier_temp)
+alloc(newmem_hit_multiplier,1000,aob_hit_multiplier)
+alloc(og_hit_multiplier,10)
+alloc(set_hit_multiplier,4)
+alloc(set_hit_multiplier_temp,20)
+label(return_hit_multiplier quit_hit_multiplier)
+
+newmem_hit_multiplier:
+  cmp ebp,2000000
+  jl @f
+  cmp ebp,3000000
+  jge @f
+  dec [set_hit_multiplier_temp]
+  cmp [set_hit_multiplier_temp],#0
+  jg aob_hit_multiplier-5
+  mov eax,[set_hit_multiplier]
+  mov [set_hit_multiplier_temp],eax
+
+quit_hit_multiplier:
+  reassemble(aob_hit_multiplier+8)
+  jmp return_hit_multiplier
+
+og_hit_multiplier:
+  readmem(aob_hit_multiplier+8,5)
+
+set_hit_multiplier:
+  dd #2
+set_hit_multiplier_temp:
+  dd #2
+
+aob_hit_multiplier+8:
+  jmp newmem_hit_multiplier
+return_hit_multiplier:
+
+[DISABLE]
+aob_hit_multiplier+8:
+  readmem(og_hit_multiplier,5)
+
+unregistersymbol(*)
+dealloc(*)
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352722</ID>
+      <Description>"Instant Bow"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(aob_instant_bow,UserAssembly.dll,F3 0F 58 C7 0F 28 CE E8 ? ? ? ? 4C 8B 03 0F 28 D0)
+registersymbol(aob_instant_bow)
+
+aob_instant_bow+11:
+  db C2
+
+[DISABLE]
+aob_instant_bow+11:
+  db D0
+
+unregistersymbol(*)
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352723</ID>
+      <Description>"Instant Burst"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(aob_instant_burst,UserAssembly.dll,0F 10 70 ? 83 B9 ? ? 00 00 00 75 ? E8 ? ? ? ? 48 8D 4C 24 ? 66 0F 7F 74 24 ? E8 ? ? ? ? 48 8B 83 ? ? 00 00 0F 28 F0 48 85 C0 74 ? 0F 10 48 ? 48 8D 4C 24 ? 0F 29 4C 24 ? E8 ? ? ? ? F3 0F 5E F0)
+registersymbol(aob_instant_burst)
+
+aob_instant_burst+1:
+  db 11
+
+[DISABLE]
+aob_instant_burst+1:
+  db 10
+
+unregistersymbol(*)
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352724</ID>
+      <Description>"Instant Party Info"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(aob_party_info,UserAssembly.dll,F3 0F 10 B3 E0 01 00 00 0F 2F)
+registersymbol(aob_party_info og_party_info set_party_info)
+alloc(newmem_party_info,1000,aob_party_info)
+alloc(og_party_info,10)
+alloc(set_party_info,4)
+label(return_party_info quit_party_info)
+
+newmem_party_info:
+    movss xmm10,[set_party_info]
+    movss [rbx+000001E0],xmm10
+    jmp quit_party_info
+
+quit_party_info:
+    movss xmm6,[rbx+000001E0]
+    jmp return_party_info
+
+og_party_info:
+    readmem(aob_party_info,8)
+
+set_party_info:
+    dd (float)3
+
+aob_party_info:
+    jmp newmem_party_info
+    nop 3
+return_party_info:
+
+[DISABLE]
+aob_party_info:
+    readmem(og_party_info,8)
+
+unregistersymbol(*)
+dealloc(*)
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352725</ID>
+      <Description>"Disable Collision"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(aob_collision,UserAssembly.dll,48 8B C4 55 56 41 57 48 8D A8 ? ? ? ?)//48 8B 8E ? ? 00 00 33 D2 F3 44 0F 11 8E ? ? 00 00 E8 ? ? ? ? 84 C0)
+registersymbol(aob_collision og_collision)
+alloc(newmem_collision,1000,aob_collision)
+alloc(og_collision,10)
+label(return_collision)
+
+newmem_collision:
+  ret
+
+og_collision:
+  readmem(aob_collision,5)
+
+aob_collision:
+  jmp newmem_collision
+return_collision:
+
+[DISABLE]
+aob_collision:
+  readmem(og_collision,5)
+
+unregistersymbol(*)
+dealloc(*)
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352726</ID>
+      <Description>"Position Sync"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(aob_possync,UserAssembly.dll,48 8B CF 48 89 5C 24 ? E8 ? ? ? ? 48 8B D8 48 85 C0 0F 84 ? ? ? ? 8B D5 48 8B C8 E8 ? ? ? ? 8B)
+registersymbol(aob_possync og_possync)
+alloc(newmem_possync,1000,aob_possync)
+alloc(og_possync,10)
+label(return_possync quit_possync)
+
+newmem_possync:
+  mov r9,r14
+
+  mov r9,[r9+20] // pos
+  movss xmm0,[set_avatar_pos]
+  movss xmm1,[set_avatar_pos+4]
+  movss xmm2,[set_avatar_pos+8]
+  movss [r9+20],xmm0
+  movss [r9+24],xmm1
+  movss [r9+28],xmm2
+
+  mov r9,r14
+  mov r9,[r9+30] // velocity
+  mov [r9+20],(float)0.01
+  mov [r9+24],(float)0
+  mov [r9+28],(float)-0.01
+
+  cmp [set_no_clip],(float)2
+  jl @f
+  mov [r9+38],5 // motion
+  jmp quit_possync
+
+slow:
+  mov [r9+38],4
+
+quit_possync:
+  mov rcx,rdi
+  mov [rsp+40],rbx
+  jmp return_possync
+
+og_possync:
+  readmem(aob_possync,8)
+
+aob_possync:
+  jmp newmem_possync
+  nop 3
+return_possync:
+
+[DISABLE]
+aob_possync:
+  readmem(og_possync,8)
+
+unregistersymbol(*)
+dealloc(*)
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352727</ID>
+      <Description>"No Clip"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+active_no_clip = true
+local alist = getAddressList()
+if alist.Count &gt;= 1 then
+   local req = alist.getMemoryRecordByDescription("OnGameUpdate")
+   if req ~= nil then
+      req.Active = true
+   end
+   req = alist.getMemoryRecordByDescription("Disable Collision")
+   if req ~= nil then
+      req.Active = true
+   end
+   req = alist.getMemoryRecordByDescription("Position Sync")
+   if req ~= nil then
+      req.Active = true
+   end
+end
+writeInteger("active_no_clip",1)
+{$asm}
+[DISABLE]
+{$lua}
+local alist = getAddressList()
+if alist.Count &gt;= 1 then
+   local req = alist.getMemoryRecordByDescription("Disable Collision")
+   if req ~= nil then
+      req.Active = false
+   end
+   req = alist.getMemoryRecordByDescription("Position Sync")
+   if req ~= nil then
+      req.Active = false
+   end
+end
+writeInteger("active_no_clip",0)
+{$asm}
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352728</ID>
+      <Description>"No Dash Cooldown"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(aob_dash_cooldown,UserAssembly.dll,41 FF 90 ? ? 00 00 84 C0 74 ? 80 BB ? ? 00 00 00)
+registersymbol(aob_dash_cooldown)
+
+aob_dash_cooldown+11:
+  db 02 0F 95
+
+[DISABLE]
+aob_dash_cooldown+11:
+  db 00 0F 94
+
+unregistersymbol(*)
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352729</ID>
+      <Description>"No Skill Cooldown"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(aob_cooldown,UserAssembly.dll,75 ? 32 C0 48 8B 5C 24 ? 48 83 C4 ? 5F C3 48 8B 03 48 8B CB 48 8B 90 ? ? 00 00)
+registersymbol(aob_cooldown og_cooldown)
+alloc(newmem_cooldown,1000,aob_cooldown)
+alloc(og_cooldown,10)
+label(quit_cooldown return_cooldown)
+
+newmem_cooldown:
+  cmp [rdx+20],(float)1
+  jle @f
+  mov [rdx+20],(float)0
+
+quit_cooldown:
+  mov rdx,[rax+00000200]
+  jmp return_cooldown
+
+og_cooldown:
+  readmem(aob_cooldown+15,7)
+
+aob_cooldown+15:
+  jmp newmem_cooldown
+  nop 2
+return_cooldown:
+
+[DISABLE]
+aob_cooldown+15:
+  readmem(og_cooldown,7)
+
+unregistersymbol(*)
+dealloc(*)
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352730</ID>
+      <Description>"Permanent Buff Duration"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(aob_buff,UserAssembly.dll,84 D2 0F 28 CE)
+registersymbol(aob_buff og_buff set_buff)
+alloc(newmem_buff,1000,aob_buff)
+alloc(og_buff,10)
+alloc(set_buff,4)
+alloc(buff_limit,4)
+alloc(buff_min,4)
+label(return_buff quit_buff)
+
+newmem_buff:
+  movss xmm1,[buff_min]
+  comiss xmm6,xmm1
+  jbe @f
+  movss xmm1,[buff_limit]
+  comiss xmm6,xmm1
+  jae @f
+  mulss xmm6,[set_buff]
+  jmp quit_buff
+
+quit_buff:
+  reassemble(aob_buff)
+  reassemble(aob_buff+2)
+  jmp return_buff
+
+og_buff:
+  readmem(aob_buff,5)
+
+set_buff:
+  dd (float)1.02
+buff_limit:
+  dd (float)200
+buff_min:
+  dd (float)90
+
+aob_buff:
+  jmp newmem_buff
+return_buff:
+
+[DISABLE]
+aob_buff:
+  readmem(og_buff,5)
+
+unregistersymbol(*)
+dealloc(*)
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352731</ID>
+      <Description>"Player Coordinates"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{$lua}
+local alist = getAddressList()
+if alist.Count &gt;= 1 then
+   local req = alist.getMemoryRecordByDescription("Mob Vacuum")
+   if req ~= nil and req.Active then
+      req.Active = false
+   end
+end
+{$asm}
+[ENABLE]
+aobscanmodule(aob_player_coordinates,UnityPlayer.dll,F3 0F 58 47 50 48)
+aobscanmodule(aob_real_player_coordinates,UnityPlayer.dll,F2 0F 11 49 04 8B)
+alloc(newmem_player_coordinates,1000,aob_player_coordinates)
+alloc(player_x,4)
+alloc(player_y,4)
+alloc(player_z,4)
+alloc(newmem_real_player_coordinates,1000,aob_real_player_coordinates)
+label(ptr_player_coordinates return_player_coordinates)
+label(ptr_real_player_coordinates return_real_player_coordinates)
+registersymbol(aob_player_coordinates ptr_player_coordinates player_x player_y player_z)
+registersymbol(aob_real_player_coordinates ptr_real_player_coordinates)
+
+newmem_player_coordinates:
+  mov [ptr_player_coordinates],rdi
+  push rdx
+  mov rdx,[ptr_player_coordinates]
+  mov rdx,[rdx+78]
+  mov rdx,[rdx+8]
+  mov rdx,[rdx+A0]
+  mov [player_x],rdx
+  mov rdx,[ptr_player_coordinates]
+  mov rdx,[rdx+78]
+  mov rdx,[rdx+8]
+  mov rdx,[rdx+A4]
+  mov [player_y],rdx
+  mov rdx,[ptr_player_coordinates]
+  mov rdx,[rdx+78]
+  mov rdx,[rdx+8]
+  mov rdx,[rdx+A8]
+  mov [player_z],rdx
+  pop rdx
+  addss xmm0,[rdi+50]
+  jmp return_player_coordinates
+
+ptr_player_coordinates:
+  dq
+
+aob_player_coordinates:
+  jmp newmem_player_coordinates
+return_player_coordinates:
+
+newmem_real_player_coordinates:
+  movsd [rcx+04],xmm1
+  mov [ptr_real_player_coordinates],rcx
+  jmp return_real_player_coordinates
+
+ptr_real_player_coordinates:
+  dq
+
+aob_real_player_coordinates:
+  jmp newmem_real_player_coordinates
+return_real_player_coordinates:
+
+[DISABLE]
+aob_player_coordinates:
+  db F3 0F 58 47 50
+
+aob_real_player_coordinates:
+  db F2 0F 11 49 04
+
+unregistersymbol(*)
+dealloc(*)
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352732</ID>
+      <Description>"Rapid Animation"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(aob_rapid_fire,UserAssembly.dll,F3 0F 10 77 ? 48 8B CF 0F 28 F8)
+registersymbol(aob_rapid_fire og_rapid_fire set_rapid_fire)
+alloc(newmem_rapid_fire,2000,aob_rapid_fire)
+alloc(og_rapid_fire,10)
+alloc(set_rapid_fire,4)
+alloc(check_done,4)
+alloc(rapid_counter,4)
+label(return_rapid_fire)
+
+newmem_rapid_fire:
+  mov rcx,r15
+  cmp [rcx+14],02000000
+  jge quit_rapid_fire
+  cmp [rcx+14],01000000
+  jl quit_rapid_fire
+
+label_check_tag:
+  cmp [rdi+1C],#1638193991
+  je label_check_done
+  cmp [rdi+1C],#-584054938
+  je label_check_done
+  cmp [rdi+1C],#1498431743
+  je label_check_done
+  jmp quit_rapid_fire
+
+label_check_done:
+  cmp [rdi+0C],(float)0.125
+  ja rapid
+  mov [rapid_counter],#0
+  jmp quit_rapid_fire
+
+rapid:
+  inc [rapid_counter]
+  mov rcx,[rapid_counter]
+  cmp rcx,[set_rapid_fire]
+  jge quit_rapid_fire
+  jmp return_rapid_fire
+
+quit_rapid_fire:
+  movss xmm6,[rdi+0C]
+  jmp return_rapid_fire
+
+og_rapid_fire:
+  readmem(aob_rapid_fire,5)
+
+set_rapid_fire:
+  dd #5
+rapid_counter:
+  dd #0
+check_done:
+  dd #0
+
+aob_rapid_fire:
+  jmp newmem_rapid_fire
+return_rapid_fire:
+
+[DISABLE]
+aob_rapid_fire:
+  readmem(og_rapid_fire,5)
+
+unregistersymbol(*)
+dealloc(*)
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352733</ID>
+      <Description>"Run Speed"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(aob_speed_walk,UnityPlayer.dll,42 89 44 02 38 B8 ? ? 00 00 48 83 C4 ? 5F C3 CC)
+registersymbol(aob_speed_walk og_speed_walk set_speed_walk)
+alloc(newmem_speed_walk,1000,aob_speed_walk)
+alloc(og_speed_walk,10)
+alloc(set_speed_walk,4)
+label(return_speed_walk quit_speed_walk)
+
+newmem_speed_walk:
+  cmp rdx,108
+  jne quit_speed_walk
+  mov eax,[set_speed_walk]
+
+quit_speed_walk:
+  mov [rdx+r8+38],eax
+  jmp return_speed_walk
+
+og_speed_walk:
+  readmem(aob_speed_walk,5)
+
+set_speed_walk:
+  dd (floaT)1
+
+aob_speed_walk:
+  jmp newmem_speed_walk
+return_speed_walk:
+
+[DISABLE]
+aob_speed_walk:
+  readmem(og_speed_walk,5)
+
+unregistersymbol(*)
+dealloc(*)
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352734</ID>
+      <Description>"Stats Multiplier"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(aob_stats,UserAssembly.dll,F3 0F 10 43 ? F3 0F 58 07 48 8B 44 24 ? F3)
+alloc(newmem_stats,1000,aob_stats)
+alloc(og_stamina,10)
+alloc(set_stats,4)
+registersymbol(aob_stats og_stamina set_stats)
+label(return_stats quit_stats)
+
+newmem_stats:
+  movss xmm0,[set_stats]
+  jmp quit_stats
+
+quit_stats:
+  //movss xmm0,[rbx+40]
+  jmp return_stats
+
+set_stats:
+  dd (float)100
+
+og_stamina:
+  readmem(aob_stats,5)
+
+aob_stats:
+  jmp newmem_stats
+return_stats:
+
+[DISABLE]
+aob_stats:
+  readmem(og_stamina,5)
+
+unregistersymbol(*)
+dealloc(*)
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352735</ID>
+      <Description>"Unlimited Fly"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(aob_fly,UserAssembly.dll,83 78 ? 01 76 ? 83 78 ? 00 0F 94 C0 48 83 C4 ? 5B C3 E8 ? ? ? ? 48 8B C8)
+registersymbol(aob_fly)
+
+aobscanmodule(aob_fly2,UserAssembly.dll,0F 95 ? 88 87 ? ? ? ? 84 C0 0F ? ? ? ? ? 38)
+registersymbol(aob_fly2)
+
+aob_fly+9:
+  db 01
+
+aob_fly2+1:
+  db 9D
+
+[DISABLE]
+aob_fly+9:
+  db 00
+
+aob_fly2+1:
+  db 95
+
+unregistersymbol(*)
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352736</ID>
+      <Description>"Unlimited Stamina"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(aob_stamina,UserAssembly.dll,48 8B D9 E8 ? ? ? ? 84 C0 75 ? 89 7B 38 48 8B 5C 24 ? 48 83 C4 ? 5F C3 CC)
+registersymbol(aob_stamina og_stamina)
+alloc(newmem_stamina,1000,aob_stamina)
+alloc(og_stamina,10)
+label(return_stamina quit_stamina)
+
+newmem_stamina:
+  cmp edi,00000006
+  je @f
+  cmp edi,00000007
+  je @f
+  cmp edi,00000008
+  je @f
+  cmp edi,00000009
+  je @f
+  cmp edi,0000000A
+  je @f
+  cmp edi,0000000B
+  je @f
+  cmp edi,0000000D
+  je @f
+  cmp edi,0000000E
+  je @f
+  cmp edi,0000000F
+  je @f
+  cmp edi,00000010
+  je @f
+  cmp edi,00000011
+  je @f
+  cmp edi,00000021
+  je @f
+  cmp edi,00000029
+  je @f
+  cmp edi,00000029
+  je @f
+  cmp edi,00000030
+  je unlimit_stamina2
+  cmp edi,00000031
+  je unlimit_stamina2
+  jmp quit_stamina
+
+unlimit_stamina1:
+  //mov [rbx+38],00000005
+  mov edi,00000005
+  jmp quit_stamina
+
+unlimit_stamina2:
+  //mov [rbx+38],0000002F
+  mov edi,0000002F
+  jmp quit_stamina
+
+quit_stamina:
+  reassemble(aob_stamina+C)
+  reassemble(aob_stamina+F)
+  jmp return_stamina
+
+og_stamina:
+  readmem(aob_stamina+C,8)
+
+aob_stamina+C:
+  jmp newmem_stamina
+  nop 3
+return_stamina:
+
+[DISABLE]
+aob_stamina+C:
+  readmem(og_stamina,8)
+
+unregistersymbol(*)
+dealloc(*)
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352737</ID>
+      <Description>"Always Critical Damage"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(aob_critical,UserAssembly.dll,80 7B ? 00 48 89 BC 24 ? ? 00 00 75 ? F3 0F 10 83 ? ? 00 00)
+registersymbol(aob_critical og_critical)
+alloc(newmem_critical,1000,aob_critical)
+alloc(og_critical,10)
+label(return_critical)
+
+newmem_critical:
+  mov [rbx+2C],#1
+  cmp byte ptr [rbx+2C],00
+  mov [rsp+00000090],rdi
+  jmp return_critical
+
+og_critical:
+  readmem(aob_critical,12)
+
+aob_critical:
+  jmp newmem_critical
+  nop 7
+return_critical:
+
+[DISABLE]
+aob_critical:
+  readmem(og_critical,12)
+
+unregistersymbol(*)
+dealloc(*)
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352738</ID>
+      <Description>"Camera Zoom"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(aob_camera_zoom,UserAssembly.dll,75 ? E8 ? ? ? ? 0F 28 ? 0F 28 ? E8 ? ? ? ? 0F 28 ? 24 ? 0F 28 ? 24 ? F2 0F 11 83 ? ? 00 00 48 8B 5C 24 ? 48 83 C4 ? 5F C3)
+registersymbol(aob_camera_zoom og_camera_zoom set_camera_max set_camera_min set_camera_speed set_camera_fixed)
+alloc(newmem_camera_zoom,1000,aob_camera_zoom)
+alloc(og_camera_zoom,10)
+alloc(set_camera_max,8)
+alloc(set_camera_min,8)
+alloc(set_camera_speed,8)
+alloc(set_camera_fixed,8)
+label(return_camera_zoom quit_camera_zoom)
+
+newmem_camera_zoom:
+  movsd xmm15,[set_camera_min]
+  movsd [rbx+000002C8],xmm15
+
+  movsd xmm15,[rbx+00000348]
+  mulsd xmm15,[set_camera_speed]
+  movsd [rbx+00000348],xmm15
+
+  movsd xmm15,[set_camera_fixed]
+  movsd [rbx+00000270],xmm15
+
+  movsd xmm15,[set_camera_max]
+  movsd [rbx+000002A8],xmm15
+  jmp quit_camera_zoom
+
+quit_camera_zoom:
+  movsd [rbx+00000298],xmm0
+  jmp return_camera_zoom
+
+og_camera_zoom:
+  readmem(aob_camera_zoom+1C,8)
+
+set_camera_max:
+  dq (double)2
+set_camera_min:
+  dq (double)0.75
+set_camera_speed:
+  dq (double)1
+set_camera_fixed:
+  dq (double)0
+
+aob_camera_zoom+1C:
+  jmp newmem_camera_zoom
+  nop 3
+return_camera_zoom:
+
+[DISABLE]
+{$lua}
+writeDouble("set_camera_fixed",0)
+sleep(100)
+writeDouble("set_camera_max",1)
+sleep(100)
+writeDouble("set_camera_min",1)
+{$asm}
+aob_camera_zoom+1C:
+  readmem(og_camera_zoom,8)
+
+unregistersymbol(*)
+dealloc(*)
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352739</ID>
+      <Description>"Character Skin"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(aob_skin,UserAssembly.dll,8B ?8 39 ? ? ? 00 00 74 ? 89 ? ? ? 00 00 48 8B ? ? ? ? ? 48 8B)
+registersymbol(aob_skin og_skin set_jean set_barbara set_diluc set_amber set_ningguang set_fischl set_mona set_keqing set_rosaria)
+alloc(newmem_skin,1000,aob_skin)
+label(og_skin return_skin quit_skin)
+label(skin_jean skin_barbara skin_diluc skin_amber skin_ningguang skin_fischl skin_mona skin_keqing skin_rosaria set_ayaka set_lisa)
+label(set_jean set_barbara set_diluc set_amber set_ningguang set_fischl set_mona set_keqing set_rosaria set_ayaka set_lisa)
+
+newmem_skin:
+  cmp r13,#201
+  je skin_ayaka
+  cmp r13,#301
+  je skin_jean
+  cmp r13,#601
+  je skin_lisa
+  cmp r13,#1401
+  je skin_barbara
+  cmp r13,#1601
+  je skin_diluc
+  cmp r13,#2101
+  je skin_amber
+  cmp r13,#2701
+  je skin_ningguang
+  cmp r13,#3101
+  je skin_fischl
+  cmp r13,#4101
+  je skin_mona
+  cmp r13,#4201
+  je skin_keqing
+  cmp r13,#4501
+  je skin_rosaria
+  jmp quit_skin
+
+skin_ayaka:
+  mov ebx,[set_ayaka]
+  jmp quit_skin
+skin_jean:
+  mov ebx,[set_jean]
+  jmp quit_skin
+skin_lisa:
+  mov ebx,[set_lisa]
+  jmp quit_skin
+skin_barbara:
+  mov ebx,[set_barbara]
+  jmp quit_skin
+skin_diluc:
+  mov ebx,[set_diluc]
+  jmp quit_skin
+skin_amber:
+  mov ebx,[set_amber]
+  jmp quit_skin
+skin_ningguang:
+  mov ebx,[set_ningguang]
+  jmp quit_skin
+skin_fischl:
+  mov ebx,[set_fischl]
+  jmp quit_skin
+skin_mona:
+  mov ebx,[set_mona]
+  jmp quit_skin
+skin_keqing:
+  mov ebx,[set_keqing]
+  jmp quit_skin
+skin_rosaria:
+  mov ebx,[set_rosaria]
+  jmp quit_skin
+quit_skin:
+  cmp [rdi+00000090],ebx
+  jmp return_skin
+
+og_skin:
+  readmem(aob_skin+2,6)
+
+set_ayaka:
+  dd #0
+set_jean:
+  dd #0
+set_lisa:
+  dd #0
+set_barbara:
+  dd #0
+set_diluc:
+  dd #0
+set_amber:
+  dd #0
+set_ningguang:
+  dd #0
+set_fischl:
+  dd #0
+set_mona:
+  dd #0
+set_keqing:
+  dd #0
+set_rosaria:
+  dd #0
+
+aob_skin+2:
+  jmp newmem_skin
+  nop
+return_skin:
+
+[DISABLE]
+aob_skin+2:
+  readmem(og_skin,6)
+
+unregistersymbol(*)
+dealloc(*)
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352740</ID>
+      <Description>"Field of View"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(aob_fov,UserAssembly.dll,F3 0F 11 47 ? F2 0F 10 4B ? F3 0F 10 53)
+registersymbol(aob_fov og_fov set_fov)
+alloc(newmem_fov,1024,aob_fov)
+alloc(og_fov,8)
+alloc(set_fov,4)
+label(return_fov quit_fov)
+
+newmem_fov:
+  movss xmm0,[set_fov]
+  jmp quit_fov
+
+quit_fov:
+  movss [rdi+50],xmm0
+  jmp return_fov
+
+og_fov:
+  readmem(aob_fov,5)
+
+set_fov:
+  dd (float)80
+
+aob_fov:
+  jmp newmem_fov
+return_fov:
+{$lua}
+writeFloat("set_fov",60)
+{$asm}
+[DISABLE]
+aob_fov:
+  readmem(og_fov,5)
+
+unregistersymbol(*)
+dealloc(*)
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352741</ID>
+      <Description>"No Character Blur"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(aob_character_blur,UserAssembly.dll,F3 0F 10 9B ? ? 00 00 F3 0F 5C C3)
+registersymbol(aob_character_blur og_character_blur)
+alloc(newmem_character_blur,1024,aob_character_blur)
+alloc(og_character_blur,8)
+alloc(set_character_blur,4)
+label(return_character_blur quit_character_blur)
+
+newmem_character_blur:
+  movss xmm3,[set_character_blur]
+  jmp quit_character_blur
+
+quit_character_blur:
+  movss [rbx+00000124],xmm3
+  jmp return_character_blur
+
+og_character_blur:
+  readmem(aob_character_blur,8)
+
+set_character_blur:
+  dd (float)1
+
+aob_character_blur:
+  jmp newmem_character_blur
+  nop 3
+return_character_blur:
+
+[DISABLE]
+aob_character_blur:
+  readmem(og_character_blur,8)
+
+unregistersymbol(*)
+dealloc(*)
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352742</ID>
+      <Description>"No Fog"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+active_no_fog = true
+local alist = getAddressList()
+if alist.Count &gt;= 1 then
+   local req = alist.getMemoryRecordByDescription("OnGameUpdate")
+   if req ~= nil then
+      req.Active = true
+   end
+end
+writeInteger("active_no_fog",0)
+{$asm}
+[DISABLE]
+{$lua}
+writeInteger("active_no_fog",1)
+{$asm}
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352743</ID>
+      <Description>"Wind Glider"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(aob_wind_glider,UserAssembly.dll,39 B7 ? ? 00 00 0F ? ? ? ? ? 89 B7 ? ? 00 00)
+registersymbol(aob_wind_glider og_wind_glider set_wind_glider)
+alloc(newmem_wind_glider,1000,aob_wind_glider)
+alloc(og_wind_glider,10)
+alloc(set_wind_glider,4)
+label(return_wind_glider quit_wind_glider)
+
+newmem_wind_glider:
+  mov esi,[set_wind_glider]
+  jmp quit_wind_glider
+
+quit_wind_glider:
+  cmp [rdi+0000008C],esi
+  jmp return_wind_glider
+
+og_wind_glider:
+  readmem(aob_wind_glider,6)
+
+set_wind_glider:
+  dd #140009
+
+aob_wind_glider:
+  jmp newmem_wind_glider
+  nop
+return_wind_glider:
+
+[DISABLE]
+aob_wind_glider:
+  readmem(og_wind_glider,6)
+
+unregistersymbol(*)
+dealloc(*)
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352744</ID>
+      <Description>"Auto Destroy"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+active_destroy = true
+local alist = getAddressList()
+if alist.Count &gt;= 1 then
+   local req = alist.getMemoryRecordByDescription("ACTIVATE ONCE")
+   if req ~= nil then
+      req.Active = false
+      sleep(100)
+      req.Active = true
+   end
+end
+{$asm}
+aobscanmodule(aob_destroy_everything,UserAssembly.dll,0F 28 F2 48 89 45 58)
+registersymbol(aob_destroy_everything og_destroy_everything set_destroy_range)
+alloc(newmem_destroy_everything,2000,aob_destroy_everything)
+alloc(og_destroy_everything,8)
+alloc(set_destroy_everything,4)
+alloc(set_destroy_range,4)
+alloc(entity_type,4)
+alloc(entity_pos,20)
+alloc(avatar_pos,20)
+label(return_destroy_everything quit_destroy_everything)
+
+newmem_destroy_everything:
+  mov rax,[rcx+28]
+  mov rax,[rax+14C]
+  mov [entity_type],rax
+  cmp [entity_type],#22
+  je @f
+  cmp [entity_type],#19
+  je @f
+  cmp [entity_type],#2
+  je @f
+  cmp [entity_type],#26
+  je @f
+  cmp [entity_type],#9
+  je @f
+  jmp quit_destroy_everything
+
+reduce:
+  movss xmm10,xmm2
+
+  //get AbsolutePosition
+  mov rdx,[rcx+28]
+  lea rcx,[entity_pos]
+  xor r8,r8
+  reassemble(aob_getabsoluteposition+1F)
+  movups xmm0,[rax]
+  movups [entity_pos],xmm0
+
+  //get AbsolutePosition
+  lea rcx,[avatar_pos]
+  xor r8,r8
+  reassemble(aob_getavatarpos+9)
+  movups xmm0,[rax]
+  movups [avatar_pos],xmm0
+
+  //get Distance
+  lea rdx,[entity_pos]
+  lea rcx,[avatar_pos]
+  xor r8,r8
+  reassemble(aob_distance-5)
+
+  comiss xmm0,[set_destroy_range]
+  ja restore
+
+  movss xmm2,[set_destroy_everything]
+
+  xor eax,eax
+  jmp quit_destroy_everything
+
+restore:
+  movss xmm2,xmm10
+  xor eax,eax
+
+quit_destroy_everything:
+  reassemble(aob_destroy_everything-1E)
+  jmp return_destroy_everything
+
+og_destroy_everything:
+  readmem(aob_destroy_everything-1E,8)
+set_destroy_everything:
+  dd (float)1000
+set_destroy_range:
+  dd (float)10
+entity_pos:
+  dd (float)0
+  dd (float)0
+  dd (float)0
+  dd (float)0
+avatar_pos:
+  dd (float)0
+  dd (float)0
+  dd (float)0
+  dd (float)0
+
+aob_destroy_everything-1E:
+  jmp newmem_destroy_everything
+  nop 3
+return_destroy_everything:
+
+[DISABLE]
+aob_destroy_everything-1E:
+  readmem(og_destroy_everything,8)
+
+unregistersymbol(*)
+dealloc(*)
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352745</ID>
+      <Description>"Easy Ore"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(aob_destroy,UserAssembly.dll,F3 0F 10 43 10 48 83 C4 20 5B C3 E8 ? ? ? ? 48 8B C8 33 D2 E8 ? ? ? ? CC E8 ? ? ? ? CC)
+registersymbol(og_destroy reduced_to)
+alloc(newmem_destroy,1000,aob_destroy)
+label(og_destroy return_destroy quit_destroy reduced_to)
+
+newmem_destroy:
+  movss xmm0,[reduced_to]
+  movss [rbx+10],xmm0
+  jmp return_destroy
+
+quit_destroy:
+  //movss xmm0,[rbx+10]
+  jmp return_destroy
+
+og_destroy:
+  readmem(aob_destroy,5)
+
+reduced_to:
+  dd (float)0.1
+
+aob_destroy:
+  jmp newmem_destroy
+return_destroy:
+
+[DISABLE]
+aob_destroy:
+  readmem(og_destroy,5)
+
+unregistersymbol(*)
+dealloc(*)
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352746</ID>
+      <Description>"Entity Speed"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(aob_entity_speed,UnityPlayer.dll,F3 0F 10 81 ? ? 00 00 C3 CC CC CC CC CC CC CC 80)
+registersymbol(aob_entity_speed og_entity_speed ptr_entity_speed)
+alloc(newmem_entity_speed,1000,aob_entity_speed)
+label(og_entity_speed return_entity_speed quit_entity_speed ptr_entity_speed)
+
+aobscanmodule(aob_entity_speed2,UnityPlayer.dll,8B 87 ? ? 00 00 89 01 80 BF ? ? 00 00 00)
+registersymbol(aob_entity_speed2 og_entity_speed2 set_player_speed set_mob_speed set_other_speed)
+alloc(newmem_entity_speed2,1000,aob_entity_speed2)
+label(og_entity_speed2 return_entity_speed2 quit_entity_speed2 set_player_speed set_mob_speed set_other_speed on_player_speed on_mob_speed on_other_speed)
+
+newmem_entity_speed:
+  mov [ptr_entity_speed],rcx
+  jmp quit_entity_speed
+
+quit_entity_speed:
+  movss xmm0,[rcx+0000031C]
+  jmp return_entity_speed
+
+og_entity_speed:
+  readmem(aob_entity_speed,8)
+
+ptr_entity_speed:
+  dq
+
+aob_entity_speed:
+  jmp newmem_entity_speed
+  nop 3
+return_entity_speed:
+
+newmem_entity_speed2:
+  cmp rdi,[ptr_entity_speed]
+  je on_player_speed
+  cmp byte ptr [rdi+338],#1
+  je on_other_speed
+  mov eax,[set_other_speed]
+  mov [rdi+0000031C],eax
+  jmp quit_entity_speed2
+
+on_player_speed:
+  mov eax,[set_player_speed]
+  mov [rdi+0000031C],eax
+  jmp quit_entity_speed2
+
+on_mob_speed:
+  mov eax,[set_mob_speed]
+  mov [rdi+0000031C],eax
+  jmp quit_entity_speed2
+
+on_other_speed:
+  cmp byte ptr [rdi+368],#0 // normal
+  jne on_mob_speed
+  cmp byte ptr [rdi+370],#0 // boss
+  jne on_mob_speed
+  mov eax,[set_other_speed]
+  mov [rdi+0000031C],eax
+  jmp quit_entity_speed2
+
+quit_entity_speed2:
+  //mov eax,[rdi+00000314]
+  jmp return_entity_speed2
+
+og_entity_speed2:
+  readmem(aob_entity_speed2,6)
+
+set_player_speed:
+  dd (float)1
+
+set_mob_speed:
+  dd (float)0.1
+
+set_other_speed:
+  dd (float)1
+
+aob_entity_speed2:
+  jmp newmem_entity_speed2
+  nop
+return_entity_speed2:
+
+[DISABLE]
+{$lua}
+sleep(50)
+writeFloat("set_player_speed",1)
+sleep(100)
+writeFloat("set_mob_speed",1)
+sleep(100)
+writeFloat("set_other_speed",1)
+sleep(100)
+{$asm}
+
+aob_entity_speed:
+  readmem(og_entity_speed,8)
+
+aob_entity_speed2:
+  readmem(og_entity_speed2,6)
+
+unregistersymbol(*)
+dealloc(*)
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352747</ID>
+      <Description>"Friendly Mob"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+aob = AOBScan("74 ? 48 8B 8B ? ? 00 00 48 85 C9 74 ? 48 8B 01 8B D7 4C 8B ? ? ? ? ? 48 8B","+X-C-W")
+if (aob) then if (aob.getCount() &gt; 1) then registerSymbol("aob_friendly_mob", aob[2], true) end aob.Destroy(); aob = nil; end
+{$asm}
+aob_friendly_mob:
+  db 75
+
+[DISABLE]
+aob_friendly_mob:
+  db 74
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352748</ID>
+      <Description>"Instant Kill Mob"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+active_instant_kill = true
+local alist = getAddressList()
+if alist.Count &gt;= 1 then
+   local req = alist.getMemoryRecordByDescription("ACTIVATE ONCE")
+   if req ~= nil then
+      req.Active = false
+      sleep(100)
+      req.Active = true
+   end
+end
+{$asm}
+aobscanmodule(aob_kill_mob,UserAssembly.dll,F2 0F 10 43 ? 89 45 CF 48 8B 43 ? F2 0F 11 45 C7 48 85 C0 0F ? ? ? ? ? 48)
+registersymbol(aob_kill_mob og_kill_mob set_kill_range)
+alloc(newmem_kill_mob,2000,aob_kill_mob)
+alloc(set_kill_range,4)
+alloc(entity_id,8)
+alloc(entity_pos,20)
+alloc(avatar_pos,20)
+label(quit_kill_mob return_kill_mob og_kill_mob)
+
+newmem_kill_mob:
+  push r13
+  mov r13,[rbx+10]
+  mov r13,[r13+14]
+  mov [entity_id],r13
+  pop r13
+  cmp [entity_id],02000000
+  jl quit_kill_mob
+  cmp [entity_id],03000000
+  jge quit_kill_mob
+
+  //get EntityManager
+  reassemble(aob_entitymanager)
+  reassemble(aob_entitymanager+7)
+  cmp rax,00
+  je quit_kill_mob
+
+  //get Entity
+  mov rcx,rax
+  mov edx,[entity_id]
+  xor r8,r8
+  reassemble(aob_getentitybyid+6)
+  cmp rax,00
+  je quit_kill_mob
+
+  //get AbsolutePosition
+  mov rdx,rax
+  lea rcx,[entity_pos]
+  xor r8,r8
+  reassemble(aob_getabsoluteposition+1F)
+  movups xmm0,[rax]
+  movups [entity_pos],xmm0
+
+  //get AbsolutePosition
+  lea rcx,[avatar_pos]
+  xor r8,r8
+  reassemble(aob_getavatarpos+9)
+  movups xmm0,[rax]
+  movups [avatar_pos],xmm0
+
+  //get Distance
+  lea rdx,[entity_pos]
+  lea rcx,[avatar_pos]
+  xor r8,r8
+  reassemble(aob_distance-5)
+
+  comiss xmm0,[set_kill_range]
+  ja restore
+
+  mov [rbx+58],49742400
+
+restore:
+  reassemble(aob_kill_mob-3)
+
+quit_kill_mob:
+  reassemble(aob_kill_mob)
+  jmp return_kill_mob
+
+og_kill_mob:
+  readmem(aob_kill_mob,5)
+
+set_kill_range:
+  dd (float)10
+entity_pos:
+  dd (float)0
+  dd (float)0
+  dd (float)0
+  dd (float)0
+avatar_pos:
+  dd (float)0
+  dd (float)0
+  dd (float)0
+  dd (float)0
+
+aob_kill_mob:
+  jmp newmem_kill_mob
+return_kill_mob:
+
+[DISABLE]
+aob_kill_mob:
+  readmem(og_kill_mob,5)
+
+unregistersymbol(*)
+dealloc(*)
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352749</ID>
+      <Description>"Loot Range"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(aob_loot_range,UserAssembly.dll,F3 0F 5C 55 ? F2 0F 11 45 ? F3 0F 5C 4D ? F2)
+registersymbol(aob_loot_range og_loot_range set_loot_range)
+alloc(newmem_loot_range,1000,aob_loot_range)
+alloc(og_loot_range,8)
+alloc(set_loot_range,4)
+label(return_loot_range quit_loot_range)
+
+newmem_loot_range:
+  movss xmm5,[set_loot_range]
+  jmp quit_loot_range
+
+quit_loot_range:
+  subss xmm2,[rbp+2B]
+  jmp return_loot_range
+
+og_loot_range:
+  readmem(aob_loot_range,5)
+
+set_loot_range:
+  dd (float)20
+
+aob_loot_range:
+  jmp newmem_loot_range
+return_loot_range:
+
+[DISABLE]
+{$lua}
+writeFloat("set_loot_range",2)
+sleep(100)
+{$asm}
+aob_loot_range:
+  readmem(og_loot_range,5)
+
+unregistersymbol(*)
+dealloc(*)
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352750</ID>
+      <Description>"Auto Pickup"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+local alist = getAddressList()
+if alist.Count &gt;= 1 then
+   local req = alist.getMemoryRecordByDescription("ACTIVATE ONCE")
+   if req ~= nil then
+      req.Active = true
+   end
+end
+
+isAPRunning = false
+function APAutoF(thread)
+    while isAPRunning do
+        if IsGenshinForeground() then
+            if readInteger("check_auto_pickup") ~= 0 then
+                keyDown(autoPickupButton)
+                sleep(125)
+                keyUp(autoPickupButton)
+                sleep(112)
+            end
+        end
+        if process == nil or readInteger(process) == 0 then
+            isAPRunning = false
+        end
+    end
+    thread.terminate()
+end
+function SetAPAutoF(bool)
+    if not bool then
+        isAPRunning = false
+    else
+        if not isAPRunning then
+            isAPRunning = true
+            createThread(APAutoF)
+        end
+    end
+end
+
+SetAPAutoF(true)
+{$asm}
+aobscanmodule(aob_auto_pickup,UserAssembly.dll,8B 40 ? FF C8 89 83 ? ? 00 00 48 83 C4 ? 5B C3)
+registersymbol(aob_auto_pickup og_auto_pickup check_auto_pickup)
+alloc(newmem_auto_pickup,1024,aob_auto_pickup)
+label(og_auto_pickup return_auto_pickup quit_auto_pickup check_auto_pickup)
+
+newmem_auto_pickup:
+  jmp quit_auto_pickup
+
+quit_auto_pickup:
+  mov eax,[rax+18]
+  mov [check_auto_pickup],eax
+  dec eax
+  jmp return_auto_pickup
+
+og_auto_pickup:
+  readmem(aob_auto_pickup,5)
+
+check_auto_pickup:
+  dd #0
+
+aob_auto_pickup:
+  jmp newmem_auto_pickup
+return_auto_pickup:
+
+[DISABLE]
+{$lua}
+SetAPAutoF(false)
+{$asm}
+aob_auto_pickup:
+  readmem(og_auto_pickup,5)
+
+unregistersymbol(*)
+dealloc(*)
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352751</ID>
+      <Description>"Mob Vacuum"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{$lua}
+local alist = getAddressList()
+if alist.Count &gt;= 1 then
+   local req = alist.getMemoryRecordByDescription("Player Coordinates")
+   local req2 = alist.getMemoryRecordByDescription("Mob Vacuum")
+   if req ~= nil and not req.Active and req2 ~= nil and not req2.Active then
+      req.Active = true
+   end
+end
+{$asm}
+[ENABLE]
+aobscanmodule(aob_mob_vacuum,UnityPlayer.dll,89 41 30 8B 42 14 89 41 34 8B 42 18 89 41 38 48 8B 49 08)
+registersymbol(aob_mob_vacuum og_mob_vacuum vacuum_x vacuum_y vacuum_z)
+alloc(newmem_mob_vacuum,1000,aob_mob_vacuum)
+label(og_mob_vacuum return_mob_vacuum quit_mob_vacuum vacuum_x vacuum_y vacuum_z)
+
+newmem_mob_vacuum:
+  cmp rcx,[ptr_player_coordinates]
+  je quit_mob_vacuum
+  cmp rdx,[ptr_player_coordinates]
+  je quit_mob_vacuum
+  cmp eax,[player_x]
+  je quit_mob_vacuum
+  cmp byte ptr [rcx-40],#1
+  je quit_mob_vacuum
+  cmp byte ptr [rcx-40],#7
+  je quit_mob_vacuum
+
+  movss xmm10,[player_x]
+  addss xmm10,[vacuum_x]
+  movss [rcx+30],xmm10
+  movss [rdx+10],xmm10
+
+  movss xmm10,[player_y]
+  addss xmm10,[vacuum_y]
+  movss [rcx+34],xmm10
+  movss [rdx+14],xmm10
+
+  movss xmm10,[player_z]
+  addss xmm10,[vacuum_z]
+  movss [rcx+38],xmm10
+  movss [rdx+18],xmm10
+  jmp aob_mob_vacuum+F
+
+quit_mob_vacuum:
+  mov [rcx+30],eax
+  mov eax,[rdx+14]
+  jmp return_mob_vacuum
+
+og_mob_vacuum:
+  readmem(aob_mob_vacuum,6)
+
+vacuum_x:
+dd (float)1
+
+vacuum_y:
+dd (float)0.5
+
+vacuum_z:
+dd (float)2
+
+aob_mob_vacuum:
+  jmp newmem_mob_vacuum
+  nop
+return_mob_vacuum:
+
+[DISABLE]
+aob_mob_vacuum:
+  readmem(og_mob_vacuum,6)
+
+unregistersymbol(*)
+dealloc(*)
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352752</ID>
+      <Description>"Auto Dialog"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+active_auto_dialog = true
+local alist = getAddressList()
+if alist.Count &gt;= 1 then
+   local req = alist.getMemoryRecordByDescription("ACTIVATE ONCE")
+   if req ~= nil then
+      req.Active = false
+      sleep(100)
+      req.Active = true
+   end
+end
+if IsOS() then
+   aob = AOBScan("E8 ? ? ? ? 48 8D 4C 24 ? F3 0F 11 83 ? ? 00 00 E8 ? ? ? ? 48 8D 4C 24 ? F2 0F 10 00","+X-C-W") -- -F2 call
+   if (aob) then if (aob.getCount() &gt; 1) then registerSymbol("aob_auto_dialog", aob[0], true) end aob.Destroy(); aob = nil; end
+else
+   aob = AOBScan("? ? ? ? ? ? E8 ? ? ? ? 48 8D 4C 24 ? F3 0F 11 83 ? ? 00 00 E8 ? ? ? ? 48 8D 4C 24 ? F2 0F 10 00","+X-C-W") -- -F2 call
+   if (aob) then if (aob.getCount() &gt; 1) then registerSymbol("aob_auto_dialog", aob[0], true) end aob.Destroy(); aob = nil; end
+end
+{$asm}
+registersymbol(og_auto_dialog set_auto_dialog)
+alloc(newmem_auto_dialog,2000,aob_auto_dialog)
+alloc(og_auto_dialog,10)
+alloc(set_auto_dialog,4)
+alloc(talk_dialog,8)
+alloc(has_select,4)
+alloc(value,8)
+alloc(value_box,8)
+alloc(notify,20)
+alloc(save1,40)
+alloc(save2,40)
+alloc(save3,40)
+alloc(save4,40)
+alloc(save5,40)
+label(quit_auto_dialog return_auto_dialog)
+
+newmem_auto_dialog:
+  push r12
+  sub rsp,60
+  call quit_auto_dialog
+  mov r12,[rcx+1C8] //talkDialog
+  test r12,r12
+  je return
+  mov [talk_dialog],r12
+  cmp [talk_dialog],10000000
+  jl return
+  mov r12,[r12+1A8]
+  mov [has_select],r12
+  cmp [has_select],1
+  je return
+  mov r12,[rcx+1C8]
+  mov r12,[r12+1A9]
+  mov [has_select],r12
+  cmp [has_select],1
+  je return
+  mov r12,[rcx+1C8]
+  mov r12,[r12+230]
+  mov [has_select],r12
+  cmp [has_select],1
+  je has_select_l
+
+  //freeClick
+  xor edx,edx
+  call aob_freeclick-121
+  jmp return
+
+has_select_l:
+  cmp [set_auto_dialog],1
+  jne @f
+
+  mov [save1],rdi
+  mov [save2],r8
+  mov [save3],r9
+  mov [save4],r10
+  mov [save5],r11
+
+  //get il2cpp value box
+  mov [value],00
+  reassemble(aob_il2cppvaluebox+16)
+  lea rdx,[value]
+  reassemble(aob_il2cppvaluebox+2A)
+
+  //selectDialog
+  mov [notify],5E
+  mov [notify+8],rax
+  xor r8d,r8d
+  mov rcx,[talk_dialog]
+  lea rdx,[notify]
+  call aob_selectdialog-57
+
+  mov rdi,[save1]
+  mov r8,[save2]
+  mov r9,[save3]
+  mov r10,[save4]
+  mov r11,[save5]
+
+return:
+  add rsp,60
+  pop r12
+  ret
+
+quit_auto_dialog:
+  reassemble(aob_auto_dialog-F2)
+  reassemble(aob_auto_dialog-F0)
+  jmp return_auto_dialog
+
+og_auto_dialog:
+  readmem(aob_auto_dialog-F2,6)
+
+set_auto_dialog:
+  dd 0
+notify:
+  dd 5E
+  dd 0
+  dd 0
+
+aob_auto_dialog-F2:
+  jmp newmem_auto_dialog
+  nop
+return_auto_dialog:
+
+[DISABLE]
+aob_auto_dialog-F2:
+  readmem(og_auto_dialog,6)
+
+unregistersymbol(*)
+dealloc(*)
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352753</ID>
+      <Description>"Auto Select"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+writeInteger("set_auto_dialog",1)
+{$asm}
+[DISABLE]
+{$lua}
+writeInteger("set_auto_dialog",0)
+{$asm}
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352754</ID>
+      <Description>"Fast Dialog"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+active_fast_dialog = true
+local alist = getAddressList()
+if alist.Count &gt;= 1 then
+   local req = alist.getMemoryRecordByDescription("ACTIVATE ONCE")
+   if req ~= nil then
+      req.Active = false
+      sleep(100)
+      req.Active = true
+   end
+end
+{$asm}
+aobscanmodule(aob_fast_dialogue,UserAssembly.dll,3A 8B ? ? 00 00 74 ? 88 8B ? ? 00 00)
+registersymbol(aob_fast_dialogue og_fast_dialogue set_fast_dialogue)
+alloc(newmem_fast_dialogue,1000,aob_fast_dialogue)
+alloc(og_fast_dialogue,10)
+alloc(set_fast_dialogue,4)
+alloc(normal_speed,4)
+label(quit_fast_dialogue return_fast_dialogue inside_dialogue outside_dialogue)
+
+newmem_fast_dialogue:
+  cmp cl,#1
+  je inside_dialogue
+  cmp cl,#0
+  je outside_dialogue
+
+inside_dialogue:
+  //get TimeScale
+  xor ecx,ecx
+  call aob_gettimescale
+  comiss xmm0,[set_fast_dialogue]
+  je quit_fast_dialogue
+
+  //set TimeScale
+  xor edx,edx
+  movss xmm0,[set_fast_dialogue]
+  call aob_settimescale-17
+  jmp quit_fast_dialogue
+
+outside_dialogue:
+  //get TimeScale
+  xor ecx,ecx
+  call aob_gettimescale
+  comiss xmm0,[normal_speed]
+  jna quit_fast_dialogue
+
+  //set TimeScale
+  xor edx,edx
+  movss xmm0,[normal_speed]
+  call aob_settimescale-17
+  jmp quit_fast_dialogue
+
+quit_fast_dialogue:
+  reassemble(aob_fast_dialogue-5)
+  reassemble(aob_fast_dialogue)
+  jmp return_fast_dialogue
+
+og_fast_dialogue:
+  readmem(aob_fast_dialogue,6)
+
+set_fast_dialogue:
+  dd (float)5
+normal_speed:
+  dd (float)1
+
+aob_fast_dialogue:
+  jmp newmem_fast_dialogue
+  nop
+return_fast_dialogue:
+
+[DISABLE]
+aob_fast_dialogue:
+  readmem(og_fast_dialogue,6)
+
+unregistersymbol(*)
+dealloc(*)
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352755</ID>
+      <Description>"Skip Cutscene"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+active_skip_cutscene = true
+local alist = getAddressList()
+if alist.Count &gt;= 1 then
+   local req = alist.getMemoryRecordByDescription("ACTIVATE ONCE")
+   if req ~= nil then
+      req.Active = false
+      sleep(100)
+      req.Active = true
+   end
+end
+if IsOS() then
+   aob = AOBScan("48 8B 4B ? 33 D2 E8 ? ? ? ? 84 C0 0F 85 ? ? ? ? 48 89 7C 24 ? 38 83 ? ? 00 00","+X-C-W") -- -65 call
+   if (aob) then if (aob.getCount() &gt; 0) then registerSymbol("aob_skip_scene", aob[0], true) end aob.Destroy(); aob = nil; end
+else
+   aob = AOBScan("? ? ? 48 8B 4B ? 33 D2 E8 ? ? ? ? 84 C0 0F 85 ? ? ? ? 48 89 7C 24 ? 38 83 ? ? 00 00","+X-C-W") -- -65 call
+   if (aob) then if (aob.getCount() &gt; 0) then registerSymbol("aob_skip_scene", aob[0], true) end aob.Destroy(); aob = nil; end
+end
+{$asm}
+//aobscanmodule(aob_skip_scene,UserAssembly.dll,48 8B 4B ? 33 D2 E8 ? ? ? ? 84 C0 0F 85 ? ? ? ? 48 89 7C 24 ? 38 83 ? ? 00 00)//0F 57 C0 F3 48 0F 2A C0 F3 0F 5E ? ? ? ? ? F3 0F 11 47 30 48 8B CB E8)
+registersymbol(og_skip_scene)
+alloc(newmem_skip_scene,2000,aob_skip_scene)
+alloc(og_skip_scene,10)
+alloc(save1,64)
+alloc(save2,64)
+alloc(save3,64)
+alloc(save4,64)
+alloc(save5,64)
+label(return_skip_scene)
+
+newmem_skip_scene:
+  push rbx
+  sub rsp,40
+
+  mov [save1],rcx
+  mov [save2],rdx
+  mov [save3],r8
+  mov [save4],r9
+
+  xor edx,edx
+  call aob_mediaplayerskip+30
+
+  mov rcx,[save1]
+  mov rdx,[save2]
+  mov r8,[save3]
+  mov r9,[save4]
+  jmp return_skip_scene
+
+og_skip_scene:
+  readmem(aob_skip_scene-65,6)
+
+aob_skip_scene-65:
+  jmp newmem_skip_scene
+  nop
+return_skip_scene:
+
+[DISABLE]
+aob_skip_scene-65:
+  readmem(og_skip_scene,6)
+
+unregistersymbol(*)
+dealloc(*)
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352756</ID>
+      <Description>"Skip Dialog"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+active_skip_dialog = true
+local alist = getAddressList()
+if alist.Count &gt;= 1 then
+   local req = alist.getMemoryRecordByDescription("ACTIVATE ONCE")
+   if req ~= nil then
+      req.Active = false
+      sleep(100)
+      req.Active = true
+   end
+end
+if IsOS() then
+   aob = AOBScan("48 8B 0D ? ? ? ? F3 0F 10 7E ? F3 0F 10 76 ? E8 ? ? ? ? 4C","+X-C-W") -- -81 call
+   if (aob) then if (aob.getCount() &gt; 0) then registerSymbol("aob_skipdialog", aob[0], true) end aob.Destroy(); aob = nil; end
+else
+   aob = AOBScan("? ? ? 48 8B 0D ? ? ? ? F3 0F 10 7E ? F3 0F 10 76 ? E8 ? ? ? ? 4C","+X-C-W") -- -81 call
+   if (aob) then if (aob.getCount() &gt; 0) then registerSymbol("aob_skipdialog", aob[0], true) end aob.Destroy(); aob = nil; end
+end
+{$asm}
+registersymbol(og_skipdialog)
+alloc(newmem_skipdialog,1000,aob_skipdialog)
+alloc(og_skipdialog,10)
+label(return_skipdialog)
+
+aobscanmodule(aob_skipdialog2,UserAssembly.dll,5B E9 ? ? ? ? 80 7B ? 00 74 ? 80 7B ? 00 74 ? 48 8B 4B ? 48 85 C9 74 ? 48 8B)
+registersymbol(aob_skipdialog2 og_skipdialog2)
+alloc(newmem_skipdialog2,1000,aob_skipdialog2)
+alloc(og_skipdialog2,10)
+label(return_skipdialog2)
+
+aobscanmodule(aob_skipdialog3,UserAssembly.dll,E8 ? ? ? ? 84 C0 74 ? 48 8B 8B ? ? 00 00 48 85 C9 0F 84 ? ? ? ? E8 ? ? ? ? 84 C0 75 ? 38 83 ? ? 00 00)
+registersymbol(aob_skipdialog3 og_skipdialog3)
+alloc(newmem_skipdialog3,1000,aob_skipdialog3)
+alloc(og_skipdialog3,10)
+label(return_skipdialog3)
+
+newmem_skipdialog:
+  push rsi
+  sub rsp,40
+
+  xor edx,edx
+  call aob_curtainclickcontinuefinish+33
+
+  add rsp,40
+  pop rsi
+  ret
+
+og_skipdialog:
+  readmem(aob_skipdialog-81,6)
+
+aob_skipdialog-81:
+  jmp newmem_skipdialog
+  nop
+return_skipdialog:
+
+newmem_skipdialog2:
+  jmp aob_skipdialog2+60
+  //cmp [rax+18],0001302D
+
+og_skipdialog2:
+  readmem(aob_skipdialog2+6,6)
+
+aob_skipdialog2+6:
+  jmp newmem_skipdialog2
+  nop
+return_skipdialog2:
+
+newmem_skipdialog3:
+  jmp aob_skipdialog3+9
+  //call UserAssembly.dll+3DCA500
+
+og_skipdialog3:
+  readmem(aob_skipdialog3,5)
+
+aob_skipdialog3:
+  jmp newmem_skipdialog3
+return_skipdialog3:
+
+[DISABLE]
+aob_skipdialog-81:
+  readmem(og_skipdialog,6)
+
+aob_skipdialog2+6:
+  readmem(og_skipdialog2,6)
+
+aob_skipdialog3:
+  readmem(og_skipdialog3,5)
+
+unregistersymbol(*)
+dealloc(*)
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352757</ID>
+      <Description>"Unlock FPS"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(aob_fps,UnityPlayer.dll,8B ? ? ? ? ? 66 0F 6E C8 0F 5B C9 EB ? E8 ? ? ? ? 48 8D 54 24 ? 48)
+alloc(newmem_fps,1024,aob_fps)
+alloc(og_fps,10)
+registersymbol(aob_fps set_fps og_fps)
+label(return_fps quit_fps set_fps)
+
+newmem_fps:
+  mov eax, dword ptr [set_fps]
+  jmp quit_fps
+
+quit_fps:
+  //mov eax,[UnityPlayer.dll+1B90934]
+  jmp return_fps
+
+og_fps:
+  readmem(aob_fps,6)
+
+set_fps:
+  dd #144
+
+aob_fps:
+  jmp newmem_fps
+  nop
+return_fps:
+
+[DISABLE]
+aob_fps:
+  readmem(og_fps,6)
+
+unregistersymbol(*)
+dealloc(*)
+    
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>352758</ID>
+      <Description>"OnGameUpdate"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+active_no_clip = true
+active_no_fog = true
+local alist = getAddressList()
+if alist.Count &gt;= 1 then
+   local req = alist.getMemoryRecordByDescription("ACTIVATE ONCE")
+   if req ~= nil then
+      req.Active = false
+      sleep(100)
+      req.Active = true
+   end
+end
+{$asm}
+aobscanmodule(aob_ongameupdate,UserAssembly.dll,3B 43 2C 7E ? E8 ? ? ? ? 48 8B CB)
+registersymbol(aob_ongameupdate og_ongameupdate)
+alloc(newmem_ongameupdate,3000,aob_ongameupdate)
+alloc(og_ongameupdate,10)
+alloc(save1,40)
+alloc(save2,40)
+alloc(save3,40)
+label(quit_ongameupdate return_ongameupdate)
+
+  // ================= NO CLIP =================
+registersymbol(active_no_clip set_no_clip)
+registersymbol(check_forward check_backward check_right check_left check_up check_down)
+registersymbol(set_avatar_pos)
+alloc(active_no_clip,4)
+alloc(set_no_clip,4)
+alloc(check_forward,4)
+alloc(check_backward,4)
+alloc(check_right,4)
+alloc(check_left,4)
+alloc(check_up,4)
+alloc(check_down,4)
+alloc(set_current_pos,20)
+alloc(set_avatar_pos,20)
+alloc(set_forward,20)
+alloc(set_right,20)
+alloc(set_up,20)
+alloc(set_noclip_delta,4)
+alloc(set_invert,4)
+  // ================= NO CLIP ================= END
+
+  // ================= PROFILE =================
+registersymbol(active_profile)
+registersymbol(string string2 uidfind2 uid2)
+alloc(active_profile,4)
+alloc(string,64)
+alloc(string2,64)
+alloc(uidfind2,64)
+alloc(uid2,64)
+  // ================= PROFILE ================= END
+
+  // ================= NO FOG =================
+registersymbol(active_no_fog)
+alloc(active_no_fog,4)
+alloc(current_fog,4)
+  // ================= NO FOG ================= END
+
+newmem_ongameupdate:
+
+begin_no_clip:
+  // ================= NO CLIP =================
+  cmp [active_no_clip],1
+  jne end_no_clip
+
+  push r12
+  push r13
+  push r14
+  push r15
+
+  mov [save1],rax
+  mov [save2],rbx
+  mov [save3],rcx
+
+  //get EntityManager
+  reassemble(aob_entitymanager)
+  reassemble(aob_entitymanager+7)
+  mov r12,rax
+  cmp r12,00
+  je quit_no_clip
+
+  //get MainCameraEntity
+  mov rcx,r12
+  xor edx,edx
+  reassemble(aob_maincamera-D)
+  mov r13,rax
+  cmp r13,00
+  je quit_no_clip
+
+  //get AvatarEntity
+  mov rcx,r12
+  xor edx,edx
+  reassemble(aob_avatarentity-15)
+  mov r14,rax
+  cmp r14,00
+  je quit_no_clip
+
+  //get RelativePosition
+  mov rdx,r14
+  lea rcx,[set_current_pos]
+  xor r8,r8
+  reassemble(aob_getrelativeposition+8)
+  movups xmm0,[rax]
+  movups [set_current_pos],xmm0
+
+  //get AbsolutePosition
+  lea rcx,[set_avatar_pos]
+  xor r8,r8
+  reassemble(aob_getavatarpos+9)
+  movups xmm0,[rax]
+  movups [set_avatar_pos],xmm0
+
+  //get DeltaTime
+  xor ecx,ecx
+  reassemble(aob_deltatime+A)
+  movss [set_noclip_delta],xmm0
+
+forward:
+  cmp [check_forward],#1
+  jne @f
+  //get Forward
+  mov rdx,r13
+  lea rcx,[set_forward]
+  xor r8,r8
+  reassemble(aob_getforward-5) //  call UserAssembly.dll+360CAE0
+  movups xmm0,[rax]
+  movups [set_forward],xmm0
+  //apply Forward
+  movss xmm0,[set_forward]
+  movss xmm1,[set_forward+4]
+  movss xmm2,[set_forward+8]
+  mulss xmm0,[set_no_clip]
+  mulss xmm1,[set_no_clip]
+  mulss xmm2,[set_no_clip]
+  mulss xmm0,[set_noclip_delta]
+  mulss xmm1,[set_noclip_delta]
+  mulss xmm2,[set_noclip_delta]
+  addss xmm0,[set_current_pos]
+  addss xmm1,[set_current_pos+4]
+  addss xmm2,[set_current_pos+8]
+  movss [set_current_pos],xmm0
+  movss [set_current_pos+4],xmm1
+  movss [set_current_pos+8],xmm2
+  jmp backward
+
+backward:
+  cmp [check_backward],#1
+  jne @f
+  //get Forward
+  mov rdx,r13
+  lea rcx,[set_forward]
+  xor r8,r8
+  reassemble(aob_getforward-5) //call UserAssembly.dll+360CAE0
+  movups xmm0,[rax]
+  movups [set_forward],xmm0
+  //apply Forward
+  movss xmm0,[set_forward]
+  movss xmm1,[set_forward+4]
+  movss xmm2,[set_forward+8]
+  mulss xmm0,[set_no_clip]
+  mulss xmm1,[set_no_clip]
+  mulss xmm2,[set_no_clip]
+  mulss xmm0,[set_noclip_delta]
+  mulss xmm1,[set_noclip_delta]
+  mulss xmm2,[set_noclip_delta]
+  //invert
+  mulss xmm0,[set_invert]
+  mulss xmm1,[set_invert]
+  mulss xmm2,[set_invert]
+  addss xmm0,[set_current_pos]
+  addss xmm1,[set_current_pos+4]
+  addss xmm2,[set_current_pos+8]
+  movss [set_current_pos],xmm0
+  movss [set_current_pos+4],xmm1
+  movss [set_current_pos+8],xmm2
+  jmp right
+
+right:
+  cmp [check_right],#1
+  jne @f
+  //get Right
+  mov rdx,r13
+  lea rcx,[set_right]
+  xor r8,r8
+  reassemble(aob_getright-5) //  call UserAssembly.dll+35F7A70
+  movups xmm0,[rax]
+  movups [set_right],xmm0
+  //apply Right
+  movss xmm0,[set_right]
+  movss xmm1,[set_right+4]
+  movss xmm2,[set_right+8]
+  mulss xmm0,[set_no_clip]
+  mulss xmm1,[set_no_clip]
+  mulss xmm2,[set_no_clip]
+  mulss xmm0,[set_noclip_delta]
+  mulss xmm1,[set_noclip_delta]
+  mulss xmm2,[set_noclip_delta]
+  addss xmm0,[set_current_pos]
+  addss xmm1,[set_current_pos+4]
+  addss xmm2,[set_current_pos+8]
+  movss [set_current_pos],xmm0
+  movss [set_current_pos+4],xmm1
+  movss [set_current_pos+8],xmm2
+  jmp left
+
+left:
+  cmp [check_left],#1
+  jne @f
+  //get Right
+  mov rdx,r13
+  lea rcx,[set_right]
+  xor r8,r8
+  reassemble(aob_getright-5) //call UserAssembly.dll+35F7A70
+  movups xmm0,[rax]
+  movups [set_right],xmm0
+  //apply Right
+  movss xmm0,[set_right]
+  movss xmm1,[set_right+4]
+  movss xmm2,[set_right+8]
+  mulss xmm0,[set_no_clip]
+  mulss xmm1,[set_no_clip]
+  mulss xmm2,[set_no_clip]
+  mulss xmm0,[set_noclip_delta]
+  mulss xmm1,[set_noclip_delta]
+  mulss xmm2,[set_noclip_delta]
+  //invert
+  mulss xmm0,[set_invert]
+  mulss xmm1,[set_invert]
+  mulss xmm2,[set_invert]
+  addss xmm0,[set_current_pos]
+  addss xmm1,[set_current_pos+4]
+  addss xmm2,[set_current_pos+8]
+  movss [set_current_pos],xmm0
+  movss [set_current_pos+4],xmm1
+  movss [set_current_pos+8],xmm2
+  jmp up
+
+up:
+  cmp [check_up],#1
+  jne @f
+  //get Up
+  mov rdx,r14
+  lea rcx,[set_up]
+  xor r8,r8
+  reassemble(aob_getup-5) //  call UserAssembly.dll+36050A0
+  movups xmm0,[rax]
+  movups [set_up],xmm0
+  //apply Up
+  movss xmm0,[set_up]
+  movss xmm1,[set_up+4]
+  movss xmm2,[set_up+8]
+  mulss xmm0,[set_no_clip]
+  mulss xmm1,[set_no_clip]
+  mulss xmm2,[set_no_clip]
+  mulss xmm0,[set_noclip_delta]
+  mulss xmm1,[set_noclip_delta]
+  mulss xmm2,[set_noclip_delta]
+  addss xmm0,[set_current_pos]
+  addss xmm1,[set_current_pos+4]
+  addss xmm2,[set_current_pos+8]
+  movss [set_current_pos],xmm0
+  movss [set_current_pos+4],xmm1
+  movss [set_current_pos+8],xmm2
+  jmp down
+
+down:
+  cmp [check_down],#1
+  jne @f
+  //get Up
+  mov rdx,r14
+  lea rcx,[set_up]
+  xor r8,r8
+  reassemble(aob_getup-5) //  call UserAssembly.dll+36050A0
+  movups xmm0,[rax]
+  movups [set_up],xmm0
+  //apply Up
+  movss xmm0,[set_up]
+  movss xmm1,[set_up+4]
+  movss xmm2,[set_up+8]
+  mulss xmm0,[set_no_clip]
+  mulss xmm1,[set_no_clip]
+  mulss xmm2,[set_no_clip]
+  mulss xmm0,[set_noclip_delta]
+  mulss xmm1,[set_noclip_delta]
+  mulss xmm2,[set_noclip_delta]
+  //invert
+  mulss xmm0,[set_invert]
+  mulss xmm1,[set_invert]
+  mulss xmm2,[set_invert]
+  addss xmm0,[set_current_pos]
+  addss xmm1,[set_current_pos+4]
+  addss xmm2,[set_current_pos+8]
+  movss [set_current_pos],xmm0
+  movss [set_current_pos+4],xmm1
+  movss [set_current_pos+8],xmm2
+  jmp apply
+
+apply:
+  //set relativePosition
+  mov rcx,r14
+  lea rdx,[set_current_pos]
+  mov r8l,01
+  xor r9,r9
+  reassemble(aob_setrelativeposition+16)
+  jmp quit_no_clip
+
+quit_no_clip:
+  mov rax,[save1]
+  mov rbx,[save2]
+  mov rcx,[save3]
+  pop r12
+  pop r13
+  pop r14
+  pop r15
+
+end_no_clip:
+  // ================= NO CLIP ================= END
+
+  // ================= NO FOG =================
+begin_no_fog:
+  mov [save1],rax
+
+  mov ecx,[current_fog]
+  cmp [active_no_fog],ecx
+  je end_no_fog
+
+  xor edx,edx
+  mov cl,[active_no_fog]
+  mov [current_fog],cl
+  call aob_fog-4F
+
+end_no_fog:
+  mov rax,[save1]
+  // ================= NO FOG ================= END
+
+quit_all:
+
+quit_ongameupdate:
+  reassemble(aob_ongameupdate)
+  reassemble(aob_ongameupdate+3)
+  jmp return_ongameupdate
+
+og_ongameupdate:
+  readmem(aob_ongameupdate,5)
+
+  // ================= NO CLIP =================
+active_no_clip:
+  dd 0
+set_no_clip:
+  dd (float)15
+set_invert:
+  dd (float)-1
+  // ================= NO CLIP ================= END
+
+  // ================= NO FOG =================
+active_no_fog:
+  dd 1
+current_fog:
+  dd 1
+  // ================= NO FOG ================= END
+
+aob_ongameupdate:
+  jmp newmem_ongameupdate
+return_ongameupdate:
+
+[DISABLE]
+aob_ongameupdate:
+  readmem(og_ongameupdate,5)
+
+unregistersymbol(*)
+dealloc(*)
+</AssemblerScript>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

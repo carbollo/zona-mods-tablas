@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>802</ID>
+      <Description>"Camera Distance"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{
+  Game : LEGO Star Wars - The Skywalker Saga
+  Game Product Version: 1.0.0.21999217
+  Game File Version: 1.0.0.44657
+  Date : 2023-08-19
+  Author : AScriver
+
+  Description: This script modifies the FOV in "LEGO Star Wars - The Skywalker Saga"
+
+  ** Turn off if flying in a ship as this seems to completely break any steering controls **
+}
+
+[ENABLE]
+
+define(TARGET_ADDRESS_1,"LEGOSTARWARSSKYWALKERSAGA_DX11.exe"+14965E5)
+assert(TARGET_ADDRESS_1,F3 0F 11 83 AC 1B 00 00)
+
+alloc(newmem,$1000,TARGET_ADDRESS_1)
+alloc(pFloatValue, 4)                                              
+
+registersymbol(pFloatValue)  
+
+label(return1)  // Define a label for returning to the original code
+
+newmem:         
+  lea rax, [pFloatValue]  // Load the address of pFloatValue into rax
+  movss xmm0, [rax]       // Move the float value from pFloatValue into xmm0
+  movss [rbx+00001BAC], xmm0  // Store the float value from xmm0 to the desired memory location
+  jmp return1             // Jump back to the original code after injection
+
+pFloatValue:    // Store the float value (1.5 in hexadecimal representation)
+  dd 0x3FC00000 
+
+TARGET_ADDRESS_1:  // Redirect the original code to our injected code
+  jmp newmem
+  nop 3         // Fill the remaining bytes of the original instruction with NOPs
+
+return1:        // Label for returning to the original code
+
+define(TARGET_ADDRESS_2, "LEGOSTARWARSSKYWALKERSAGA_DX11.exe"+369087D)  
+assert(TARGET_ADDRESS_2, F3 0F 11 33)                                   
+
+TARGET_ADDRESS_2:  // Replace the 4-byte instruction at address2 with NOPs
+  nop 4
+
+[DISABLE]
+
+TARGET_ADDRESS_1:  // Restore the original bytes for the first script
+  db F3 0F 11 83 AC 1B 00 00
+
+dealloc(newmem)  // Deallocate the memory used for the injected code
+dealloc(pFloatValue)  // Deallocate the memory used to store the float value
+
+unregistersymbol(pFloatValue)  // Remove the symbol for the float value
+
+TARGET_ADDRESS_2:  // Restore the original bytes for the second script
+  db F3 0F 11 33
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>804</ID>
+          <Description>"Value"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>pFloatValue</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

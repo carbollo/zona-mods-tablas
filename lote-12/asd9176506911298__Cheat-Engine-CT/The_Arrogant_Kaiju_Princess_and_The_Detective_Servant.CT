@@ -1,0 +1,589 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>29</ID>
+      <Description>"The Arrogant Kaiju Princess and The Detective Servant 2024-12-14 Yuki.kaco"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>28</ID>
+      <Description>"Cheat Init"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript Async="1">[ENABLE]
+{$lua}
+if syntaxcheck then return end
+if (LaunchMonoDataCollector() == 0) then end
+
+-- Locate the GData class and its fields
+local gdata = mono_findClass('', 'GData')
+local t = mono_class_enumFields(gdata)
+local playerdataOffset = nil
+for i = 1, #t do
+  if t[i].name == "Playerdata" then
+     playerdataOffset = t[i].offset
+  end
+end
+
+-- Locate the PlayerData class and its fields
+local pdata = mono_findClass('', 'PlayerData')
+local p = mono_class_enumFields(pdata)
+
+-- Allocate memory for storing offsets and register them dynamically
+local offsetMemoryBase = allocateMemory(#p * 4) -- Allocate memory for storing offsets (4 bytes per offset)
+for i = 1, #p do
+  local offsetAddress = offsetMemoryBase + (i - 1) * 4 -- Calculate the memory address for the current offset
+  writeInteger(offsetAddress, p[i].offset) -- Write the offset to the allocated memory
+  registerSymbol(p[i].name, offsetAddress, false) -- Register the symbol using the allocated memory address
+end
+
+-- Get the base static field address for GData and calculate the playerdata address
+local domain = mono_enumDomains()[1] -- Get the first Mono domain
+local baseStaticFieldAddress = mono_class_getStaticFieldAddress(domain, gdata)
+local playerdataAddress = baseStaticFieldAddress + playerdataOffset
+registerSymbol('data', playerdataAddress, false)
+--print(string.format("0x%X", playerdataAddress))
+
+{$asm}
+
+[DISABLE]
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>22</ID>
+          <Description>"isTestMode Setting Cheat Menu"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+{$lua}
+if syntaxcheck then return end
+if (LaunchMonoDataCollector()==0) then error("No Mono") end
+{$asm}
+//code from here to '[DISABLE]' will be used to enable the cheat
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode)
+label(exit)
+
+newmem: //this is allocated memory, you have read,write,execute access
+//place your code here
+mov eax,#1
+ret
+originalcode:
+push ebp
+mov ebp,esp
+sub esp,18
+
+exit:
+jmp returnhere
+
+Main:IsTestMode:
+jmp newmem
+nop
+returnhere:
+
+
+ 
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+dealloc(newmem)
+Main:IsTestMode:
+db 55 8B EC 83 EC 18
+//push ebp
+//mov ebp,esp
+//sub esp,18
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>0</ID>
+          <Description>"PlayerData"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>data</Address>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>1</ID>
+              <Description>"nowDeadLineStage"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>data</Address>
+              <Offsets>
+                <Offset>[nowDeadLineStage]</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>2</ID>
+              <Description>"nowDayRound"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>data</Address>
+              <Offsets>
+                <Offset>[nowDayRound]</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>3</ID>
+              <Description>"nowActionValue"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>data</Address>
+              <Offsets>
+                <Offset>[nowActionValue]</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>4</ID>
+              <Description>"nowMoodValue"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>data</Address>
+              <Offsets>
+                <Offset>[nowMoodValue]</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>5</ID>
+              <Description>"nowTotalMoney"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>data</Address>
+              <Offsets>
+                <Offset>[nowTotalMoney]</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>6</ID>
+              <Description>"nowMonsterHp"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>data</Address>
+              <Offsets>
+                <Offset>[nowMonsterHp]</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>7</ID>
+              <Description>"maxMonsterHp"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>data</Address>
+              <Offsets>
+                <Offset>[maxMonsterHp]</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>8</ID>
+              <Description>"nowBaseAttack"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>data</Address>
+              <Offsets>
+                <Offset>[nowBaseAttack]</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>9</ID>
+              <Description>"nowBaseDef"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>data</Address>
+              <Offsets>
+                <Offset>[nowBaseDef]</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>10</ID>
+              <Description>"nowSelectSoldier"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>data</Address>
+              <Offsets>
+                <Offset>[nowSelectSoldier]</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>11</ID>
+              <Description>"nowEndurance"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>data</Address>
+              <Offsets>
+                <Offset>[nowEndurance]</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>13</ID>
+              <Description>"nowFriendlyValue"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>data</Address>
+              <Offsets>
+                <Offset>[nowFriendlyValue]</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>14</ID>
+              <Description>"nowPleasingValue"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>data</Address>
+              <Offsets>
+                <Offset>[nowPleasingValue]</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>16</ID>
+              <Description>"nowPleasingValue_DailyMax"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>data</Address>
+              <Offsets>
+                <Offset>[nowPleasingValue_DailyMax]</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>17</ID>
+              <Description>"nowExerciseValue"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>data</Address>
+              <Offsets>
+                <Offset>[nowExerciseValue]</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>18</ID>
+              <Description>"hasBadEnd"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>data</Address>
+              <Offsets>
+                <Offset>[hasBadEnd]</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>19</ID>
+              <Description>"isHModeTutorialMode"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>data</Address>
+              <Offsets>
+                <Offset>[isHModeTutorialMode]</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>20</ID>
+              <Description>"isHModeEndure"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>data</Address>
+              <Offsets>
+                <Offset>[isHModeEndure]</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>21</ID>
+              <Description>"isHModeConstraint"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>data</Address>
+              <Offsets>
+                <Offset>[isHModeConstraint]</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>31</ID>
+              <Description>"HModeCumValue"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>data</Address>
+              <Offsets>
+                <Offset>9c</Offset>
+                <Offset>c</Offset>
+                <Offset>8</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>34</ID>
+              <Description>"H Mode Feature"</Description>
+              <Options moHideChildren="1"/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+aobscanregion(Eject_AOB,HModeClickGOP:Execute,HModeClickGOP:Execute+1e1e,89 04 24 8B C0 E8 * * * * 85 C0 0F 85 * * * * C7 85 EC FE FF FF) // should be unique
+alloc(newmem,$1000)
+
+label(code)
+label(return)
+alloc(Orgasm_Flag,8)
+registersymbol(Orgasm_Flag)
+alloc(Stamina_Flag,8)
+registersymbol(Stamina_Flag)
+
+Orgasm_Flag:
+dd 0
+Stamina_Flag:
+dd 0
+
+newmem:
+  push ebx
+  mov ebx,[edi+08]
+  mov ebx,[ebx+0C]
+  cmp [Orgasm_Flag],1
+  jne @f
+  mov [ebx+7C],#0
+@@:
+  cmp [Stamina_Flag],1
+  jne @f
+  mov [ebx+9C],#88888
+
+code:
+  pop ebx
+  mov [esp],eax
+  mov eax,eax
+  jmp return
+
+Eject_AOB:
+  jmp newmem
+return:
+registersymbol(Eject_AOB)
+
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+Eject_AOB:
+  db 89 04 24 8B C0
+
+unregistersymbol(Eject_AOB)
+unregistersymbol(Orgasm_Flag)
+unregistersymbol(Stamina_Flag)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: HModeClickGOP:Execute+e1e
+
+HModeClickGOP:Execute+dfa: 89 04 24                       - mov [esp],eax
+HModeClickGOP:Execute+dfd: 8B C0                          - mov eax,eax
+HModeClickGOP:Execute+dff: E8 5C 90 00 00                 - call DeleteItemsGOP:.ctor
+HModeClickGOP:Execute+e04: 8B 85 CC FE FF FF              - mov eax,[ebp-00000134]
+HModeClickGOP:Execute+e0a: 89 7C 24 04                    - mov [esp+04],edi
+HModeClickGOP:Execute+e0e: 89 04 24                       - mov [esp],eax
+HModeClickGOP:Execute+e11: 8B 00                          - mov eax,[eax]
+HModeClickGOP:Execute+e13: FF 50 40                       - call dword ptr [eax+40]
+HModeClickGOP:Execute+e16: 8D 45 B0                       - lea eax,[ebp-50]
+HModeClickGOP:Execute+e19: BA 58 AE 04 25                 - mov edx,2504AE58
+// ---------- INJECTING HERE ----------
+HModeClickGOP:Execute+e1e: 89 04 24                       - mov [esp],eax
+// ---------- DONE INJECTING  ----------
+HModeClickGOP:Execute+e21: 8B C0                          - mov eax,eax
+HModeClickGOP:Execute+e23: E8 48 08 94 EF                 - call System.Collections.Generic.List`1+Enumerator[T_REF]:MoveNext
+HModeClickGOP:Execute+e28: 85 C0                          - test eax,eax
+HModeClickGOP:Execute+e2a: 0F 85 40 FE FF FF              - jne HModeClickGOP:Execute+c70
+HModeClickGOP:Execute+e30: C7 85 EC FE FF FF 00 00 00 00  - mov [ebp-00000114],00000000
+HModeClickGOP:Execute+e3a: 83 EC 0C                       - sub esp,0C
+HModeClickGOP:Execute+e3d: E8 14 00 00 00                 - call HModeClickGOP:Execute+e56
+HModeClickGOP:Execute+e42: 83 C4 0C                       - add esp,0C
+HModeClickGOP:Execute+e45: 83 BD EC FE FF FF 00           - cmp dword ptr [ebp-00000114],00
+HModeClickGOP:Execute+e4c: 74 06                          - je HModeClickGOP:Execute+e54
+}
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>38</ID>
+                  <Description>"No Ejaculation"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+Orgasm_Flag:
+  db 1
+ 
+ 
+[DISABLE]
+Orgasm_Flag:
+  db 0
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>37</ID>
+                  <Description>"Unlimited Stamina"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+Stamina_Flag:
+  db 1
+ 
+ 
+[DISABLE]
+Stamina_Flag:
+  db 0
+</AssemblerScript>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols>
+    <SymbolEntry>
+      <Name>nowDeadLineStage</Name>
+      <Address>104E0000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>nowDayRound</Name>
+      <Address>104E0004</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>nowActionValue</Name>
+      <Address>104E0008</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>nowMoodValue</Name>
+      <Address>104E000C</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>nowTotalMoney</Name>
+      <Address>104E0010</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>nowMonsterHp</Name>
+      <Address>104E0014</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>maxMonsterHp</Name>
+      <Address>104E0018</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>nowBaseAttack</Name>
+      <Address>104E001C</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>nowBaseDef</Name>
+      <Address>104E0020</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>nowSelectSoldier</Name>
+      <Address>104E0024</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>nowEndurance</Name>
+      <Address>104E0028</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>nowFriendlyValue</Name>
+      <Address>104E002C</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>nowPleasingValue</Name>
+      <Address>104E0030</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>nowPleasingValue_DailyMax</Name>
+      <Address>104E0034</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>nowExerciseValue</Name>
+      <Address>104E0038</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>nowItemBag</Name>
+      <Address>104E003C</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>nowWearClothes</Name>
+      <Address>104E0040</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>snowItemBag</Name>
+      <Address>104E0044</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>nowMapData</Name>
+      <Address>104E0048</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>flagData</Name>
+      <Address>104E004C</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>hasBadEnd</Name>
+      <Address>104E0050</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>AvgPlayAt_Rest</Name>
+      <Address>104E0054</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>AvgPlayAt_Start</Name>
+      <Address>104E0058</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Display_MapFlag_For_AvgID</Name>
+      <Address>104E005C</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>NewTag_Achievement</Name>
+      <Address>104E0060</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>NewTag_Item</Name>
+      <Address>104E0064</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>NewTag_CG</Name>
+      <Address>104E0068</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>NewTag_Memory</Name>
+      <Address>104E006C</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>NewTag_ShopItem</Name>
+      <Address>104E0070</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>NewTag_Dress</Name>
+      <Address>104E0074</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>NewOpen_MapPoint</Name>
+      <Address>104E0078</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>NewTag_Serve</Name>
+      <Address>104E007C</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>NewTag_HModePosture</Name>
+      <Address>104E0080</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>MapPointOpenDone</Name>
+      <Address>104E0084</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>isHModeTutorialMode</Name>
+      <Address>104E0088</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BuffContainer</Name>
+      <Address>104E008C</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>isHModeEndure</Name>
+      <Address>104E0090</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>isHModeConstraint</Name>
+      <Address>104E0094</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>data</Name>
+      <Address>5364EDC</Address>
+    </SymbolEntry>
+  </UserdefinedSymbols>
+  <LuaScript>attachlist=getAutoAttachList()
+stringlist_add(attachlist,"The Detective Servant.exe");
+
+function cycleFullCompact(sender,force) local state = not(compactmenuitem.Caption == 'Compact View Mode'); if force~=nil then state = not force end; compactmenuitem.Caption = state and 'Compact View Mode' or 'Full View Mode'; getMainForm().Splitter1.Visible = state; getMainForm().Panel5.Visible    = state; end; function addCompactMenu() if compactmenualreadyexists then return end; local parent = getMainForm().Menu.Items; compactmenuitem = createMenuItem(parent); parent.add(compactmenuitem); compactmenuitem.Caption = 'Compact View Mode'; compactmenuitem.OnClick = cycleFullCompact; compactmenualreadyexists = 'yes'; end; addCompactMenu(); cycleFullCompact(nil,true)
+</LuaScript>
+</CheatTable>

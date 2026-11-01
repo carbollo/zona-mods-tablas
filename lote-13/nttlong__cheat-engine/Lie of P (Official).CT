@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>0</ID>
+      <Description>"No Items Decrease"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+aobscanmodule(noitemdec,LOP-Win64-Shipping.exe,40 53 48 83 EC 20 33 C0 48 8B D9 85 D2 0F 4E) // should be unique
+alloc(newmem,$1000,noitemdec)
+
+label(code)
+label(return)
+
+newmem:
+mov edx,[rcx+40]
+code:
+  push rbx
+  sub rsp,20
+  jmp return
+
+noitemdec:
+  jmp newmem
+  nop
+return:
+registersymbol(noitemdec)
+
+[DISABLE]
+
+noitemdec:
+  db 40 53 48 83 EC 20
+
+unregistersymbol(noitemdec)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: LOP-Win64-Shipping.exe+1AFFE30
+
+LOP-Win64-Shipping.exe+1AFFE16: 0F B6 57 20        - movzx edx,byte ptr [rdi+20]
+LOP-Win64-Shipping.exe+1AFFE1A: 84 D2              - test dl,dl
+LOP-Win64-Shipping.exe+1AFFE1C: 74 05              - je LOP-Win64-Shipping.exe+1AFFE23
+LOP-Win64-Shipping.exe+1AFFE1E: E8 9D E6 FF FF     - call LOP-Win64-Shipping.exe+1AFE4C0
+LOP-Win64-Shipping.exe+1AFFE23: 48 8B 5C 24 30     - mov rbx,[rsp+30]
+LOP-Win64-Shipping.exe+1AFFE28: 48 83 C4 20        - add rsp,20
+LOP-Win64-Shipping.exe+1AFFE2C: 5F                 - pop rdi
+LOP-Win64-Shipping.exe+1AFFE2D: C3                 - ret 
+LOP-Win64-Shipping.exe+1AFFE2E: CC                 - int 3 
+LOP-Win64-Shipping.exe+1AFFE2F: CC                 - int 3 
+// ---------- INJECTING HERE ----------
+LOP-Win64-Shipping.exe+1AFFE30: 40 53              - push rbx
+// ---------- DONE INJECTING  ----------
+LOP-Win64-Shipping.exe+1AFFE32: 48 83 EC 20        - sub rsp,20
+LOP-Win64-Shipping.exe+1AFFE36: 33 C0              - xor eax,eax
+LOP-Win64-Shipping.exe+1AFFE38: 48 8B D9           - mov rbx,rcx
+LOP-Win64-Shipping.exe+1AFFE3B: 85 D2              - test edx,edx
+LOP-Win64-Shipping.exe+1AFFE3D: 0F 4E D0           - cmovle edx,eax
+LOP-Win64-Shipping.exe+1AFFE40: 48 8B 01           - mov rax,[rcx]
+LOP-Win64-Shipping.exe+1AFFE43: 89 51 40           - mov [rcx+40],edx
+LOP-Win64-Shipping.exe+1AFFE46: FF 90 A0 02 00 00  - call qword ptr [rax+000002A0]
+LOP-Win64-Shipping.exe+1AFFE4C: 48 8B 43 38        - mov rax,[rbx+38]
+LOP-Win64-Shipping.exe+1AFFE50: 48 85 C0           - test rax,rax
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>1</ID>
+      <Description>"Infinite Weapon Sharpness"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+aobscanmodule(weaponshapr,LOP-Win64-Shipping.exe,41 2B C6 0F 49 F8) // should be unique
+alloc(newmem,$1000,weaponshapr)
+
+label(code)
+label(return)
+
+newmem:
+xor r14,r14
+mov eax,#999999
+code:
+//sub eax,r14d
+  cmovns edi,eax
+  jmp return
+
+weaponshapr:
+  jmp newmem
+  nop
+return:
+registersymbol(weaponshapr)
+
+[DISABLE]
+
+weaponshapr:
+  db 41 2B C6 0F 49 F8
+
+unregistersymbol(weaponshapr)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: LOP-Win64-Shipping.exe+1B0390D
+
+LOP-Win64-Shipping.exe+1B038EA: 45 33 C0           - xor r8d,r8d
+LOP-Win64-Shipping.exe+1B038ED: B2 01              - mov dl,01
+LOP-Win64-Shipping.exe+1B038EF: 48 8B CB           - mov rcx,rbx
+LOP-Win64-Shipping.exe+1B038F2: E8 E9 02 00 00     - call LOP-Win64-Shipping.exe+1B03BE0
+LOP-Win64-Shipping.exe+1B038F7: 41 B0 01           - mov r8l,01
+LOP-Win64-Shipping.exe+1B038FA: 33 D2              - xor edx,edx
+LOP-Win64-Shipping.exe+1B038FC: 48 8B CB           - mov rcx,rbx
+LOP-Win64-Shipping.exe+1B038FF: E8 DC 02 00 00     - call LOP-Win64-Shipping.exe+1B03BE0
+LOP-Win64-Shipping.exe+1B03904: 8B 83 DC 00 00 00  - mov eax,[rbx+000000DC]
+LOP-Win64-Shipping.exe+1B0390A: 48 8B CB           - mov rcx,rbx
+// ---------- INJECTING HERE ----------
+LOP-Win64-Shipping.exe+1B0390D: 41 2B C6           - sub eax,r14d
+// ---------- DONE INJECTING  ----------
+LOP-Win64-Shipping.exe+1B03910: 0F 49 F8           - cmovns edi,eax
+LOP-Win64-Shipping.exe+1B03913: 89 BB DC 00 00 00  - mov [rbx+000000DC],edi
+LOP-Win64-Shipping.exe+1B03919: E8 F2 F4 FF FF     - call LOP-Win64-Shipping.exe+1B02E10
+LOP-Win64-Shipping.exe+1B0391E: 0F B6 D0           - movzx edx,al
+LOP-Win64-Shipping.exe+1B03921: 45 33 C0           - xor r8d,r8d
+LOP-Win64-Shipping.exe+1B03924: 48 8B CB           - mov rcx,rbx
+LOP-Win64-Shipping.exe+1B03927: E8 34 F9 FF FF     - call LOP-Win64-Shipping.exe+1B03260
+LOP-Win64-Shipping.exe+1B0392C: 0F 28 74 24 50     - movaps xmm6,[rsp+50]
+LOP-Win64-Shipping.exe+1B03931: 4C 8D 5C 24 60     - lea r11,[rsp+60]
+LOP-Win64-Shipping.exe+1B03936: 49 8B 5B 20        - mov rbx,[r11+20]
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>2</ID>
+      <Description>"Updated table available!"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{$LUA}
+  if syntaxcheck then return end
+  [ENABLE]
+
+--Updated table! (Start)
+    --messageDialog('Enable Dark Mode?', mtInformation,mbYes,mbNo)
+    if messageDialog("Updated table available!\r\n\r\nYou will need Mod Engine to get more cheats and the new updated table\r\n\r\nDownload Mod Engine?", mtConfirmation, mbYes, mbNo) ==mrYes then
+       shellExecute("https://modengine.net")
+    else
+    end
+--Updated table! (End)
+  [DISABLE]
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>3</ID>
+      <Description>"No description"</Description>
+      <VariableType>4 Bytes</VariableType>
+      <Address>85AFD56C</Address>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+  <LuaScript>local max_value=255 ^ 3 - 1000
+address=0x87ADAACC
+hp_adsress = address+0xd20
+sm_adsress = address+0xd50
+writeInteger(adsress, max_value)
+writeInteger(hp_adsress, max_value)
+writeInteger(sm_adsress, max_value)
+
+
+</LuaScript>
+</CheatTable>

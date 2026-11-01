@@ -1,0 +1,1036 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>4</ID>
+      <Description>"Disable world collision"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : Palworld-Win64-Shipping.exe
+  Version:
+  Date   : 2024-06-30
+  Author : CactusPie
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,Palworld-Win64-Shipping.exe, 0F 84 40 01 00 00 48 8B CF E8 45) // should be unique
+
+INJECT:
+  // Patches je to jmp
+  db E9 41 01 00 00 90
+
+[DISABLE]
+
+INJECT:
+  // Reverts jmp back to je
+  db 0F 84 40 01 00 00
+
+unregistersymbol(INJECT)
+
+{
+// ORIGINAL CODE - INJECTION POINT: Palworld-Win64-Shipping.exe+2B4367D
+
+Palworld-Win64-Shipping.exe+2B43635: 44 0F 28 A4 24 D0 01 00 00  - movaps xmm12,[rsp+000001D0]
+Palworld-Win64-Shipping.exe+2B4363E: 44 0F 28 9C 24 E0 01 00 00  - movaps xmm11,[rsp+000001E0]
+Palworld-Win64-Shipping.exe+2B43647: 44 0F 28 94 24 F0 01 00 00  - movaps xmm10,[rsp+000001F0]
+Palworld-Win64-Shipping.exe+2B43650: 48 8D 0C 80                 - lea rcx,[rax+rax*4]
+Palworld-Win64-Shipping.exe+2B43654: 44 0F 28 8C 24 00 02 00 00  - movaps xmm9,[rsp+00000200]
+Palworld-Win64-Shipping.exe+2B4365D: 4C 8D 24 CF                 - lea r12,[rdi+rcx*8]
+Palworld-Win64-Shipping.exe+2B43661: 44 0F 28 84 24 10 02 00 00  - movaps xmm8,[rsp+00000210]
+Palworld-Win64-Shipping.exe+2B4366A: 0F 28 BC 24 20 02 00 00     - movaps xmm7,[rsp+00000220]
+Palworld-Win64-Shipping.exe+2B43672: 0F 28 B4 24 30 02 00 00     - movaps xmm6,[rsp+00000230]
+Palworld-Win64-Shipping.exe+2B4367A: 49 3B FC                    - cmp rdi,r12
+// ---------- INJECTING HERE ----------
+Palworld-Win64-Shipping.exe+2B4367D: 0F 84 40 01 00 00           - je Palworld-Win64-Shipping.exe+2B437C3
+// ---------- DONE INJECTING  ----------
+Palworld-Win64-Shipping.exe+2B43683: 48 8B CF                    - mov rcx,rdi
+Palworld-Win64-Shipping.exe+2B43686: E8 45 68 07 02              - call Palworld-Win64-Shipping.exe+4BB9ED0
+Palworld-Win64-Shipping.exe+2B4368B: 84 C0                       - test al,al
+Palworld-Win64-Shipping.exe+2B4368D: 0F 84 23 01 00 00           - je Palworld-Win64-Shipping.exe+2B437B6
+Palworld-Win64-Shipping.exe+2B43693: 48 8B CF                    - mov rcx,rdi
+Palworld-Win64-Shipping.exe+2B43696: E8 55 CA 06 02              - call Palworld-Win64-Shipping.exe+4BB00F0
+Palworld-Win64-Shipping.exe+2B4369B: 48 8B D8                    - mov rbx,rax
+Palworld-Win64-Shipping.exe+2B4369E: 48 85 C0                    - test rax,rax
+Palworld-Win64-Shipping.exe+2B436A1: 74 79                       - je Palworld-Win64-Shipping.exe+2B4371C
+Palworld-Win64-Shipping.exe+2B436A3: 48 8D 96 38 03 00 00        - lea rdx,[rsi+00000338]
+}
+</AssemblerScript>
+      <Hotkeys>
+        <Hotkey>
+          <Action>Toggle Activation</Action>
+          <Keys>
+            <Key>119</Key>
+          </Keys>
+          <Description>Disable collision checking</Description>
+          <ID>0</ID>
+        </Hotkey>
+      </Hotkeys>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>0</ID>
+      <Description>"Allow building on water"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : Palworld-Win64-Shipping.exe
+  Version: 
+  Date   : 2024-01-26
+  Author : CactusPie
+}
+
+[ENABLE]
+aobscanmodule(INJECT,Palworld-Win64-Shipping.exe,75 0E 0F B6 4E 30) // should be unique
+
+INJECT: // patches je to jmp
+  db EB 0E
+
+[DISABLE]
+INJECT: // patches jmp to je
+  db 75 0E
+
+{
+// ORIGINAL CODE - INJECTION POINT: 7FF7BCB85EFC
+
+7FF7BCB85ED6: 48 8B 44 24 60           - mov rax,[rsp+60]
+7FF7BCB85EDB: 48 89 10                 - mov [rax],rdx
+7FF7BCB85EDE: 48 8D 54 24 60           - lea rdx,[rsp+60]
+7FF7BCB85EE3: E8 A8 20 12 00           - call 7FF7BCCA7F90
+7FF7BCB85EE8: 48 8B 4C 24 60           - mov rcx,[rsp+60]
+7FF7BCB85EED: 0F B6 D8                 - movzx ebx,al
+7FF7BCB85EF0: 48 85 C9                 - test rcx,rcx
+7FF7BCB85EF3: 74 05                    - je 7FF7BCB85EFA
+7FF7BCB85EF5: E8 F6 5A 2B 00           - call 7FF7BCE3B9F0
+7FF7BCB85EFA: 84 DB                    - test bl,bl
+// ---------- INJECTING HERE ----------
+7FF7BCB85EFC: 75 0E                    - jne 7FF7BCB85F0C
+// ---------- DONE INJECTING  ----------
+7FF7BCB85EFE: 0F B6 4E 30              - movzx ecx,byte ptr [rsi+30]
+7FF7BCB85F02: B2 14                    - mov dl,14
+7FF7BCB85F04: E8 17 46 10 00           - call 7FF7BCC8A520
+7FF7BCB85F09: 88 46 30                 - mov [rsi+30],al
+7FF7BCB85F0C: 4C 8D 9C 24 60 02 00 00  - lea r11,[rsp+00000260]
+7FF7BCB85F14: 49 8B 5B 28              - mov rbx,[r11+28]
+7FF7BCB85F18: 49 8B 73 30              - mov rsi,[r11+30]
+7FF7BCB85F1C: 41 0F 28 73 F0           - movaps xmm6,[r11-10]
+7FF7BCB85F21: 41 0F 28 7B E0           - movaps xmm7,[r11-20]
+7FF7BCB85F26: 45 0F 28 43 D0           - movaps xmm8,[r11-30]
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>2</ID>
+      <Description>"Building in mid air"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : Palworld-Win64-Shipping.exe
+  Version: 
+  Date   : 2024-01-27
+  Author : Matt
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+aobscanmodule(INJECT,Palworld-Win64-Shipping.exe,0F 84 8A 00 00 00 48 8D 8D) // should be unique
+
+INJECT: // nop the je instruction
+  db 90 90 90 90 90 90
+
+[DISABLE]
+
+INJECT: // restore je instruction
+  db 0F 84 8A 00 00 00
+
+{
+// ORIGINAL CODE - INJECTION POINT: 7FF7BCB85E6E
+
+7FF7BCB85E43: 48 8B CE              - mov rcx,rsi
+7FF7BCB85E46: C6 44 24 20 01        - mov byte ptr [rsp+20],01
+7FF7BCB85E4B: 44 8B C8              - mov r9d,eax
+7FF7BCB85E4E: 48 8D 54 24 70        - lea rdx,[rsp+70]
+7FF7BCB85E53: E8 18 89 21 02        - call 7FF7BED9E770
+7FF7BCB85E58: 48 8B 4C 24 60        - mov rcx,[rsp+60]
+7FF7BCB85E5D: 48 85 C9              - test rcx,rcx
+7FF7BCB85E60: 74 05                 - je 7FF7BCB85E67
+7FF7BCB85E62: E8 89 5B 2B 00        - call 7FF7BCE3B9F0
+7FF7BCB85E67: F6 85 BD 00 00 00 01  - test byte ptr [rbp+000000BD],01
+// ---------- INJECTING HERE ----------
+7FF7BCB85E6E: 0F 84 8A 00 00 00     - je 7FF7BCB85EFE
+// ---------- DONE INJECTING  ----------
+7FF7BCB85E74: 48 8D 8D E0 00 00 00  - lea rcx,[rbp+000000E0]
+7FF7BCB85E7B: E8 60 56 55 00        - call 7FF7BD0DB4E0
+7FF7BCB85E80: 48 8B D8              - mov rbx,rax
+7FF7BCB85E83: 48 85 C0              - test rax,rax
+7FF7BCB85E86: 0F 84 80 00 00 00     - je 7FF7BCB85F0C
+7FF7BCB85E8C: F7 40 08 00 00 00 60  - test [rax+08],60000000
+7FF7BCB85E93: 75 77                 - jne 7FF7BCB85F0C
+7FF7BCB85E95: 41 B8 01 00 00 00     - mov r8d,00000001
+7FF7BCB85E9B: 48 8D 15 46 B4 2D 04  - lea rdx,[7FF7C0E612E8]
+7FF7BCB85EA2: 48 8D 8D 80 01 00 00  - lea rcx,[rbp+00000180]
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>10</ID>
+      <Description>"Disable Snapping"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : Palworld-Win64-Shipping.exe
+  Version: 
+  Date   : 2024-02-05
+  Author : CactusPie
+}
+
+[ENABLE]
+
+aobscanmodule(CHECK1,Palworld-Win64-Shipping.exe,75 79 0F 5A D1) // should be unique
+aobscanmodule(CHECK2,Palworld-Win64-Shipping.exe,0F 87 48 04 00 00 41) // should be unique
+
+CHECK1:
+  // patches jne to jmp
+  db EB
+
+CHECK2:
+  // patches ja to jmp
+  db E9 49 04 00 00 90
+
+[DISABLE]
+
+CHECK1:
+  // restores jne
+  db 75
+
+CHECK2:
+  // restores ja
+  db 0F 87 48 04 00 00
+
+{
+// ORIGINAL CODE - CHECK1 INJECTION POINT: 7FF7BCB6D548
+
+7FF7BCB6D518: F2 41 0F 5C F4           - subsd xmm6,xmm12
+7FF7BCB6D51D: F2 0F 11 44 24 40        - movsd [rsp+40],xmm0
+7FF7BCB6D523: 41 0F 54 D5              - andps xmm2,xmm13
+7FF7BCB6D527: 66 0F 5A CA              - cvtpd2ps xmm1,xmm2
+7FF7BCB6D52B: F2 0F 58 F7              - addsd xmm6,xmm7
+7FF7BCB6D52F: F3 0F 10 38              - movss xmm7,[rax]
+7FF7BCB6D533: 48 8B 84 24 D0 01 00 00  - mov rax,[rsp+000001D0]
+7FF7BCB6D53B: 44 0F 28 CF              - movaps xmm9,xmm7
+7FF7BCB6D53F: F3 0F 11 4C 24 24        - movss [rsp+24],xmm1
+7FF7BCB6D545: 38 48 01                 - cmp [rax+01],cl
+// ---------- INJECTING HERE ----------
+7FF7BCB6D548: 75 79                    - jne 7FF7BCB6D5C3
+// ---------- DONE INJECTING  ----------
+7FF7BCB6D54A: 0F 5A D1                 - cvtps2pd xmm2,xmm1
+7FF7BCB6D54D: 41 0F 28 CF              - movaps xmm1,xmm15
+7FF7BCB6D551: 0F 28 C2                 - movaps xmm0,xmm2
+7FF7BCB6D554: 41 0F 54 CD              - andps xmm1,xmm13
+7FF7BCB6D558: F2 0F 5C C1              - subsd xmm0,xmm1
+7FF7BCB6D55C: 66 0F 5A C8              - cvtpd2ps xmm1,xmm0
+7FF7BCB6D560: 0F 2F CF                 - comiss xmm1,xmm7
+7FF7BCB6D563: 77 5E                    - ja 7FF7BCB6D5C3
+7FF7BCB6D565: 66 44 0F 2F FB           - comisd xmm15,xmm3
+7FF7BCB6D56A: B1 01                    - mov cl,01
+}
+
+{
+// ORIGINAL CODE - CHECK2 INJECTION POINT: 7FF7BCB6D5FA
+
+7FF7BCB6D5CA: F2 44 0F 10 6C 24 38  - movsd xmm13,[rsp+38]
+7FF7BCB6D5D1: F2 44 0F 10 74 24 30  - movsd xmm14,[rsp+30]
+7FF7BCB6D5D8: F3 0F 10 54 24 20     - movss xmm2,[rsp+20]
+7FF7BCB6D5DE: 41 0F 28 CB           - movaps xmm1,xmm11
+7FF7BCB6D5E2: 0F 54 0D D7 C2 4F 03  - andps xmm1,[7FF7C00698C0]
+7FF7BCB6D5E9: 0F 5A D2              - cvtps2pd xmm2,xmm2
+7FF7BCB6D5EC: 0F 28 C2              - movaps xmm0,xmm2
+7FF7BCB6D5EF: F2 0F 5C C1           - subsd xmm0,xmm1
+7FF7BCB6D5F3: 66 0F 5A C8           - cvtpd2ps xmm1,xmm0
+7FF7BCB6D5F7: 0F 2F CF              - comiss xmm1,xmm7
+// ---------- INJECTING HERE ----------
+7FF7BCB6D5FA: 0F 87 48 04 00 00     - ja 7FF7BCB6DA48
+// ---------- DONE INJECTING  ----------
+7FF7BCB6D600: 41 0F 2F C9           - comiss xmm1,xmm9
+7FF7BCB6D604: 0F 83 3E 04 00 00     - jae 7FF7BCB6DA48
+7FF7BCB6D60A: 66 44 0F 2F DB        - comisd xmm11,xmm3
+7FF7BCB6D60F: 77 0B                 - ja 7FF7BCB6D61C
+7FF7BCB6D611: 73 06                 - jae 7FF7BCB6D619
+7FF7BCB6D613: 41 0F 28 E0           - movaps xmm4,xmm8
+7FF7BCB6D617: EB 03                 - jmp 7FF7BCB6D61C
+7FF7BCB6D619: 0F 57 E4              - xorps xmm4,xmm4
+7FF7BCB6D61C: 44 0F 5A E4           - cvtps2pd xmm12,xmm4
+7FF7BCB6D620: 0F 28 EA              - movaps xmm5,xmm2
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>7</ID>
+      <Description>"Overlapping bases"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : Palworld-Win64-Shipping.exe
+  Version: 
+  Date   : 2024-02-03
+  Author : CactusPie
+}
+
+[ENABLE]
+aobscanmodule(INJECT,Palworld-Win64-Shipping.exe,74 0A E9 ?? ?? ?? ?? 4D 85) // should be unique
+
+INJECT:
+  // replace je with 2x nop
+  db 90 90
+
+[DISABLE]
+INJECT:
+  // restore jne
+  db 74 0A
+
+unregistersymbol(INJECT)
+
+{
+// ORIGINAL CODE - INJECTION POINT: 7FF631D45FF1
+
+7FF631D45FCE: 74 28                    - je 7FF631D45FF8
+7FF631D45FD0: F7 40 08 00 00 00 60     - test [rax+08],60000000
+7FF631D45FD7: 75 1F                    - jne 7FF631D45FF8
+7FF631D45FD9: 48 8B 08                 - mov rcx,[rax]
+7FF631D45FDC: 4C 8B C7                 - mov r8,rdi
+7FF631D45FDF: 48 8B D6                 - mov rdx,rsi
+7FF631D45FE2: 4C 8B 89 38 03 00 00     - mov r9,[rcx+00000338]
+7FF631D45FE9: 48 8B C8                 - mov rcx,rax
+7FF631D45FEC: 41 FF D1                 - call r9
+7FF631D45FEF: 3C 2D                    - cmp al,2D
+// ---------- INJECTING HERE ----------
+7FF631D45FF1: 74 0A                    - je 7FF631D45FFD
+// ---------- DONE INJECTING  ----------
+7FF631D45FF3: E9 EE 00 00 00           - jmp 7FF631D460E6
+7FF631D45FF8: 4D 85 FF                 - test r15,r15
+7FF631D45FFB: 74 4B                    - je 7FF631D46048
+7FF631D45FFD: 41 F7 47 08 00 00 00 60  - test [r15+08],60000000
+7FF631D46005: 75 41                    - jne 7FF631D46048
+7FF631D46007: 49 8B 07                 - mov rax,[r15]
+7FF631D4600A: 4C 8D 47 18              - lea r8,[rdi+18]
+7FF631D4600E: 48 8B D6                 - mov rdx,rsi
+7FF631D46011: 49 8B CF                 - mov rcx,r15
+7FF631D46014: FF 90 40 03 00 00        - call qword ptr [rax+00000340]
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>5</ID>
+      <Description>"Allow building close to palbox"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : Palworld-Win64-Shipping.exe
+  Version: 
+  Date   : 2024-01-30
+  Author : Matt
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+aobscanmodule(INJECT,Palworld-Win64-Shipping.exe,74 15 48 8B 9E A8 02 00 00 B2 02) // should be unique
+
+INJECT:
+  db EB 15 48 8B 9E A8 02 00 00
+
+
+[DISABLE]
+
+INJECT:
+  db 74 15 48 8B 9E A8 02 00 00
+
+
+{
+// ORIGINAL CODE - INJECTION POINT: 7FF6E4E98385
+
+7FF6E4E98356: 48 8D 44 24 50           - lea rax,[rsp+50]
+7FF6E4E9835B: 0F 29 44 24 70           - movaps [rsp+70],xmm0
+7FF6E4E98360: 0F 10 44 24 30           - movups xmm0,[rsp+30]
+7FF6E4E98365: 48 89 44 24 20           - mov [rsp+20],rax
+7FF6E4E9836A: F2 0F 11 4D 80           - movsd [rbp-80],xmm1
+7FF6E4E9836F: F2 0F 10 4C 24 40        - movsd xmm1,[rsp+40]
+7FF6E4E98375: 0F 29 45 90              - movaps [rbp-70],xmm0
+7FF6E4E98379: F2 0F 11 4D A0           - movsd [rbp-60],xmm1
+7FF6E4E9837E: E8 4D 69 1C 00           - call 7FF6E505ECD0
+7FF6E4E98383: 84 C0                    - test al,al
+// ---------- INJECTING HERE ----------
+7FF6E4E98385: 74 15                    - je 7FF6E4E9839C
+// ---------- DONE INJECTING  ----------
+7FF6E4E98387: 48 8B 9E A8 02 00 00     - mov rbx,[rsi+000002A8]
+7FF6E4E9838E: B2 02                    - mov dl,02
+7FF6E4E98390: 0F B6 4B 30              - movzx ecx,byte ptr [rbx+30]
+7FF6E4E98394: E8 47 0C 0F 00           - call 7FF6E4F88FE0
+7FF6E4E98399: 88 43 30                 - mov [rbx+30],al
+7FF6E4E9839C: 4C 8D 9C 24 30 02 00 00  - lea r11,[rsp+00000230]
+7FF6E4E983A4: 49 8B 5B 20              - mov rbx,[r11+20]
+7FF6E4E983A8: 49 8B 73 28              - mov rsi,[r11+28]
+7FF6E4E983AC: 49 8B 7B 30              - mov rdi,[r11+30]
+7FF6E4E983B0: 49 8B E3                 - mov rsp,r11
+}
+</AssemblerScript>
+    </CheatEntry>
+  </CheatEntries>
+  <CheatCodes>
+    <CodeEntry>
+      <Description>Code :jne 7FF7826D49CE</Description>
+      <AddressString>Palworld-Win64-Shipping.exe+2A2499D</AddressString>
+      <Before>
+        <Byte>02</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>3C</Byte>
+        <Byte>2D</Byte>
+      </Before>
+      <Actual>
+        <Byte>75</Byte>
+        <Byte>2F</Byte>
+      </Actual>
+      <After>
+        <Byte>48</Byte>
+        <Byte>83</Byte>
+        <Byte>B9</Byte>
+        <Byte>E8</Byte>
+        <Byte>03</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :jg 7FF7826F64D5</Description>
+      <AddressString>Palworld-Win64-Shipping.exe+2A464C4</AddressString>
+      <Before>
+        <Byte>CC</Byte>
+        <Byte>83</Byte>
+        <Byte>79</Byte>
+        <Byte>48</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>7F</Byte>
+        <Byte>0F</Byte>
+      </Actual>
+      <After>
+        <Byte>83</Byte>
+        <Byte>79</Byte>
+        <Byte>58</Byte>
+        <Byte>00</Byte>
+        <Byte>7F</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :jmp 7FF782702081</Description>
+      <AddressString>Palworld-Win64-Shipping.exe+2A5207C</AddressString>
+      <Before>
+        <Byte>75</Byte>
+        <Byte>05</Byte>
+        <Byte>40</Byte>
+        <Byte>B5</Byte>
+        <Byte>01</Byte>
+      </Before>
+      <Actual>
+        <Byte>EB</Byte>
+        <Byte>03</Byte>
+      </Actual>
+      <After>
+        <Byte>40</Byte>
+        <Byte>32</Byte>
+        <Byte>ED</Byte>
+        <Byte>4D</Byte>
+        <Byte>8B</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :jnl 7FF7827020CF</Description>
+      <AddressString>Palworld-Win64-Shipping.exe+2A5209B</AddressString>
+      <Before>
+        <Byte>FF</Byte>
+        <Byte>C7</Byte>
+        <Byte>49</Byte>
+        <Byte>3B</Byte>
+        <Byte>DE</Byte>
+      </Before>
+      <Actual>
+        <Byte>7D</Byte>
+        <Byte>32</Byte>
+      </Actual>
+      <After>
+        <Byte>49</Byte>
+        <Byte>8B</Byte>
+        <Byte>45</Byte>
+        <Byte>40</Byte>
+        <Byte>48</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :je 7FF7827020F8</Description>
+      <AddressString>Palworld-Win64-Shipping.exe+2A520DB</AddressString>
+      <Before>
+        <Byte>74</Byte>
+        <Byte>23</Byte>
+        <Byte>44</Byte>
+        <Byte>3B</Byte>
+        <Byte>FA</Byte>
+      </Before>
+      <Actual>
+        <Byte>74</Byte>
+        <Byte>1B</Byte>
+      </Actual>
+      <After>
+        <Byte>49</Byte>
+        <Byte>8B</Byte>
+        <Byte>4D</Byte>
+        <Byte>40</Byte>
+        <Byte>49</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :ret </Description>
+      <AddressString>Palworld-Win64-Shipping.exe+4BB3C95</AddressString>
+      <Before>
+        <Byte>48</Byte>
+        <Byte>83</Byte>
+        <Byte>C4</Byte>
+        <Byte>20</Byte>
+        <Byte>5B</Byte>
+      </Before>
+      <Actual>
+        <Byte>C3</Byte>
+      </Actual>
+      <After>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :ret </Description>
+      <AddressString>Palworld-Win64-Shipping.exe+2FE3494</AddressString>
+      <Before>
+        <Byte>75</Byte>
+        <Byte>04</Byte>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>C3</Byte>
+      </Actual>
+      <After>
+        <Byte>33</Byte>
+        <Byte>C0</Byte>
+        <Byte>C3</Byte>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :ret </Description>
+      <AddressString>Palworld-Win64-Shipping.exe+2C9489B</AddressString>
+      <Before>
+        <Byte>48</Byte>
+        <Byte>83</Byte>
+        <Byte>C4</Byte>
+        <Byte>20</Byte>
+        <Byte>5F</Byte>
+      </Before>
+      <Actual>
+        <Byte>C3</Byte>
+      </Actual>
+      <After>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>5C</Byte>
+        <Byte>24</Byte>
+        <Byte>30</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :ret </Description>
+      <AddressString>Palworld-Win64-Shipping.exe+27A972D</AddressString>
+      <Before>
+        <Byte>06</Byte>
+        <Byte>48</Byte>
+        <Byte>83</Byte>
+        <Byte>C4</Byte>
+        <Byte>78</Byte>
+      </Before>
+      <Actual>
+        <Byte>C3</Byte>
+      </Actual>
+      <After>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+        <Byte>48</Byte>
+        <Byte>89</Byte>
+        <Byte>5C</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :ret </Description>
+      <AddressString>Palworld-Win64-Shipping.exe+27A972D</AddressString>
+      <Before>
+        <Byte>06</Byte>
+        <Byte>48</Byte>
+        <Byte>83</Byte>
+        <Byte>C4</Byte>
+        <Byte>78</Byte>
+      </Before>
+      <Actual>
+        <Byte>C3</Byte>
+      </Actual>
+      <After>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+        <Byte>48</Byte>
+        <Byte>89</Byte>
+        <Byte>5C</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :je 7FF7827F0A7C</Description>
+      <AddressString>Palworld-Win64-Shipping.exe+2B40A70</AddressString>
+      <Before>
+        <Byte>52</Byte>
+        <Byte>03</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>74</Byte>
+        <Byte>0A</Byte>
+      </Actual>
+      <After>
+        <Byte>41</Byte>
+        <Byte>80</Byte>
+        <Byte>FF</Byte>
+        <Byte>01</Byte>
+        <Byte>0F</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :ret </Description>
+      <AddressString>Palworld-Win64-Shipping.exe+2FE3494</AddressString>
+      <Before>
+        <Byte>75</Byte>
+        <Byte>04</Byte>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>C3</Byte>
+      </Actual>
+      <After>
+        <Byte>33</Byte>
+        <Byte>C0</Byte>
+        <Byte>C3</Byte>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :ret </Description>
+      <AddressString>Palworld-Win64-Shipping.exe+2E40F8C</AddressString>
+      <Before>
+        <Byte>48</Byte>
+        <Byte>83</Byte>
+        <Byte>C4</Byte>
+        <Byte>30</Byte>
+        <Byte>5F</Byte>
+      </Before>
+      <Actual>
+        <Byte>C3</Byte>
+      </Actual>
+      <After>
+        <Byte>33</Byte>
+        <Byte>C0</Byte>
+        <Byte>38</Byte>
+        <Byte>05</Byte>
+        <Byte>A8</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :ret </Description>
+      <AddressString>Palworld-Win64-Shipping.exe+2E40F8C</AddressString>
+      <Before>
+        <Byte>48</Byte>
+        <Byte>83</Byte>
+        <Byte>C4</Byte>
+        <Byte>30</Byte>
+        <Byte>5F</Byte>
+      </Before>
+      <Actual>
+        <Byte>C3</Byte>
+      </Actual>
+      <After>
+        <Byte>33</Byte>
+        <Byte>C0</Byte>
+        <Byte>38</Byte>
+        <Byte>05</Byte>
+        <Byte>A8</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :jmp 7FF7827F0ACB</Description>
+      <AddressString>Palworld-Win64-Shipping.exe+2B40AC2</AddressString>
+      <Before>
+        <Byte>74</Byte>
+        <Byte>05</Byte>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>10</Byte>
+      </Before>
+      <Actual>
+        <Byte>EB</Byte>
+        <Byte>07</Byte>
+      </Actual>
+      <After>
+        <Byte>48</Byte>
+        <Byte>8D</Byte>
+        <Byte>15</Byte>
+        <Byte>91</Byte>
+        <Byte>E0</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :ret </Description>
+      <AddressString>Palworld-Win64-Shipping.exe+2D148B6</AddressString>
+      <Before>
+        <Byte>C0</Byte>
+        <Byte>48</Byte>
+        <Byte>83</Byte>
+        <Byte>C4</Byte>
+        <Byte>28</Byte>
+      </Before>
+      <Actual>
+        <Byte>C3</Byte>
+      </Actual>
+      <After>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :ret </Description>
+      <AddressString>Palworld-Win64-Shipping.exe+2D44593</AddressString>
+      <Before>
+        <Byte>48</Byte>
+        <Byte>83</Byte>
+        <Byte>C4</Byte>
+        <Byte>20</Byte>
+        <Byte>5B</Byte>
+      </Before>
+      <Actual>
+        <Byte>C3</Byte>
+      </Actual>
+      <After>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :ret </Description>
+      <AddressString>Palworld-Win64-Shipping.exe+2B7088A</AddressString>
+      <Before>
+        <Byte>48</Byte>
+        <Byte>83</Byte>
+        <Byte>C4</Byte>
+        <Byte>20</Byte>
+        <Byte>5F</Byte>
+      </Before>
+      <Actual>
+        <Byte>C3</Byte>
+      </Actual>
+      <After>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>5C</Byte>
+        <Byte>24</Byte>
+        <Byte>40</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :jmp 7FF7827F0B25</Description>
+      <AddressString>Palworld-Win64-Shipping.exe+2B40BC1</AddressString>
+      <Before>
+        <Byte>39</Byte>
+        <Byte>20</Byte>
+        <Byte>00</Byte>
+        <Byte>B3</Byte>
+        <Byte>01</Byte>
+      </Before>
+      <Actual>
+        <Byte>E9</Byte>
+        <Byte>5F</Byte>
+        <Byte>FF</Byte>
+        <Byte>FF</Byte>
+        <Byte>FF</Byte>
+      </Actual>
+      <After>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :je 7FF7827F0BA1</Description>
+      <AddressString>Palworld-Win64-Shipping.exe+2B40B01</AddressString>
+      <Before>
+        <Byte>FC</Byte>
+        <Byte>02</Byte>
+        <Byte>00</Byte>
+        <Byte>84</Byte>
+        <Byte>C0</Byte>
+      </Before>
+      <Actual>
+        <Byte>0F</Byte>
+        <Byte>84</Byte>
+        <Byte>9A</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>4C</Byte>
+        <Byte>24</Byte>
+        <Byte>50</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :ret </Description>
+      <AddressString>Palworld-Win64-Shipping.exe+2FE3494</AddressString>
+      <Before>
+        <Byte>75</Byte>
+        <Byte>04</Byte>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>C3</Byte>
+      </Actual>
+      <After>
+        <Byte>33</Byte>
+        <Byte>C0</Byte>
+        <Byte>C3</Byte>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :ret </Description>
+      <AddressString>Palworld-Win64-Shipping.exe+2D44593</AddressString>
+      <Before>
+        <Byte>48</Byte>
+        <Byte>83</Byte>
+        <Byte>C4</Byte>
+        <Byte>20</Byte>
+        <Byte>5B</Byte>
+      </Before>
+      <Actual>
+        <Byte>C3</Byte>
+      </Actual>
+      <After>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :call 7FF7828207F0</Description>
+      <AddressString>Palworld-Win64-Shipping.exe+2B40AFA</AddressString>
+      <Before>
+        <Byte>24</Byte>
+        <Byte>40</Byte>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>CB</Byte>
+      </Before>
+      <Actual>
+        <Byte>E8</Byte>
+        <Byte>F1</Byte>
+        <Byte>FC</Byte>
+        <Byte>02</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>84</Byte>
+        <Byte>C0</Byte>
+        <Byte>0F</Byte>
+        <Byte>84</Byte>
+        <Byte>9A</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :ret </Description>
+      <AddressString>Palworld-Win64-Shipping.exe+4F8314D</AddressString>
+      <Before>
+        <Byte>48</Byte>
+        <Byte>83</Byte>
+        <Byte>C4</Byte>
+        <Byte>20</Byte>
+        <Byte>5B</Byte>
+      </Before>
+      <Actual>
+        <Byte>C3</Byte>
+      </Actual>
+      <After>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+        <Byte>48</Byte>
+        <Byte>63</Byte>
+        <Byte>C2</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :ret </Description>
+      <AddressString>Palworld-Win64-Shipping.exe+417CDDD</AddressString>
+      <Before>
+        <Byte>04</Byte>
+        <Byte>48</Byte>
+        <Byte>83</Byte>
+        <Byte>C4</Byte>
+        <Byte>78</Byte>
+      </Before>
+      <Actual>
+        <Byte>C3</Byte>
+      </Actual>
+      <After>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+        <Byte>48</Byte>
+        <Byte>83</Byte>
+        <Byte>EC</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :jne 7FF782820855</Description>
+      <AddressString>Palworld-Win64-Shipping.exe+2B70830</AddressString>
+      <Before>
+        <Byte>30</Byte>
+        <Byte>4C</Byte>
+        <Byte>39</Byte>
+        <Byte>04</Byte>
+        <Byte>C8</Byte>
+      </Before>
+      <Actual>
+        <Byte>75</Byte>
+        <Byte>23</Byte>
+      </Actual>
+      <After>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>CB</Byte>
+        <Byte>E8</Byte>
+        <Byte>06</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :call 7FF782944850</Description>
+      <AddressString>Palworld-Win64-Shipping.exe+2B40A0D</AddressString>
+      <Before>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>C8</Byte>
+      </Before>
+      <Actual>
+        <Byte>E8</Byte>
+        <Byte>3E</Byte>
+        <Byte>3E</Byte>
+        <Byte>15</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>84</Byte>
+        <Byte>C0</Byte>
+        <Byte>0F</Byte>
+        <Byte>85</Byte>
+        <Byte>FC</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :je 7FF78294488A</Description>
+      <AddressString>Palworld-Win64-Shipping.exe+2C94870</AddressString>
+      <Before>
+        <Byte>3C</Byte>
+        <Byte>C3</Byte>
+        <Byte>48</Byte>
+        <Byte>3B</Byte>
+        <Byte>DF</Byte>
+      </Before>
+      <Actual>
+        <Byte>74</Byte>
+        <Byte>18</Byte>
+      </Actual>
+      <After>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>13</Byte>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :call 7FF783E2CD30</Description>
+      <AddressString>Palworld-Win64-Shipping.exe+2B7080F</AddressString>
+      <Before>
+        <Byte>48</Byte>
+        <Byte>85</Byte>
+        <Byte>DB</Byte>
+        <Byte>74</Byte>
+        <Byte>46</Byte>
+      </Before>
+      <Actual>
+        <Byte>E8</Byte>
+        <Byte>1C</Byte>
+        <Byte>C5</Byte>
+        <Byte>60</Byte>
+        <Byte>01</Byte>
+      </Actual>
+      <After>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>53</Byte>
+        <Byte>10</Byte>
+        <Byte>4C</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :jne 7FF783E2CDD9</Description>
+      <AddressString>Palworld-Win64-Shipping.exe+417CD41</AddressString>
+      <Before>
+        <Byte>95</Byte>
+        <Byte>04</Byte>
+        <Byte>48</Byte>
+        <Byte>85</Byte>
+        <Byte>C0</Byte>
+      </Before>
+      <Actual>
+        <Byte>0F</Byte>
+        <Byte>85</Byte>
+        <Byte>92</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>48</Byte>
+        <Byte>8D</Byte>
+        <Byte>05</Byte>
+        <Byte>C2</Byte>
+        <Byte>19</Byte>
+      </After>
+    </CodeEntry>
+  </CheatCodes>
+  <UserdefinedSymbols/>
+</CheatTable>

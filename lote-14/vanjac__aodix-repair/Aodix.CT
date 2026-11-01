@@ -1,0 +1,525 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="38">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>8</ID>
+      <Description>"Recommended patches"</Description>
+      <Options moManualExpandCollapse="1" moActivateChildrenAsWell="1" moDeactivateChildrenAsWell="1"/>
+      <LastState Value="" RealAddress="00000000"/>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>2</ID>
+          <Description>"Bug fixes"</Description>
+          <Options moManualExpandCollapse="1" moActivateChildrenAsWell="1" moDeactivateChildrenAsWell="1"/>
+          <LastState Value="" RealAddress="00000000"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>0</ID>
+              <Description>"Fix VST path bug"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{ Game   : Aodix.exe
+  Version: 
+  Date   : 2022-01-17
+  Author : j
+
+  Fixes a bug that causes corrupted VST paths
+}
+
+define(address,"Aodix.exe"+BAFD)
+define(bytes,52 57 52 52 6A 2D 50 FF 50 04 83 C4 18)
+define(cave,"Aodix.exe"+2BC00) // 0x4E bytes used
+
+[ENABLE]
+
+assert(address,bytes)
+
+label(code)
+label(return)
+
+cave:
+
+code:
+  push edi // save actual location of instance name for later
+
+  sub esp,44 // 68 byte output buffer
+  mov edi,esp
+
+  // now the original function call
+  push edx
+  push edi
+  push edx
+  push edx
+  push 2D
+  push eax
+  call dword ptr [eax+04]
+  add esp,18 // 24
+
+  mov edi,[esp+44]
+  mov eax,8 // 8 x 4 bytes
+
+copyname:
+  mov edx,[esp]
+  mov [edi],edx
+  add esp,4
+  add edi,4
+  dec eax
+  jnz copyname
+
+  mov byte [edi-1],0 // null terminator
+  sub edi,20 // restore
+
+  add esp,28 // pop remaining 36 bytes + edi
+  jmp return
+
+address:
+  jmp code
+  nop
+  nop // push eax
+  nop // call dword ptr [eax+04]
+  nop
+  nop
+  nop // add esp,18
+  nop
+  nop
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+  // push edx
+  // push edi
+  // push edx
+  // push edx
+  // push 2D
+  // push eax
+  // call dword ptr [eax+04]
+  // add esp,18
+
+
+{
+// ORIGINAL CODE - INJECTION POINT: Aodix.exe+BAFD
+
+Aodix.exe+BADF: 89 47 04     - mov [edi+04],eax
+Aodix.exe+BAE2: 89 47 08     - mov [edi+08],eax
+Aodix.exe+BAE5: 89 47 0C     - mov [edi+0C],eax
+Aodix.exe+BAE8: 89 47 10     - mov [edi+10],eax
+Aodix.exe+BAEB: 89 47 14     - mov [edi+14],eax
+Aodix.exe+BAEE: 89 47 18     - mov [edi+18],eax
+Aodix.exe+BAF1: 89 47 1C     - mov [edi+1C],eax
+Aodix.exe+BAF4: 8B 44 24 34  - mov eax,[esp+34]
+Aodix.exe+BAF8: 8B 40 04     - mov eax,[eax+04]
+Aodix.exe+BAFB: 33 D2        - xor edx,edx
+// ---------- INJECTING HERE ----------
+Aodix.exe+BAFD: 52           - push edx
+// ---------- DONE INJECTING  ----------
+Aodix.exe+BAFE: 57           - push edi
+Aodix.exe+BAFF: 52           - push edx
+Aodix.exe+BB00: 52           - push edx
+Aodix.exe+BB01: 6A 2D        - push 2D
+Aodix.exe+BB03: 50           - push eax
+Aodix.exe+BB04: FF 50 04     - call dword ptr [eax+04]
+Aodix.exe+BB07: 83 C4 18     - add esp,18
+Aodix.exe+BB0A: 8B 44 24 34  - mov eax,[esp+34]
+Aodix.exe+BB0E: 0F BE 50 1C  - movsx edx,byte ptr [eax+1C]
+Aodix.exe+BB12: 85 D2        - test edx,edx
+}
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>1</ID>
+              <Description>"Fix Bounce panel MIDI crash"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{ Game   : Aodix.exe
+  Version: 
+  Date   : 2022-01-21
+  Author : j
+
+  Fixes a crash triggered by MIDI input while the Bounce panel is open
+}
+
+define(address,"Aodix.exe"+C363)
+define(bytes,E8 98 7A FF FF)
+define(cave,"Aodix.exe"+2BC50) // 0x1A bytes used
+
+[ENABLE]
+
+assert(address,bytes)
+
+label(code)
+label(return)
+
+cave:
+
+code:
+  push eax
+  mov eax,[Aodix.exe+3D6B4] // ASIO handle
+  cmp eax,0
+  je skip
+  // calls ntdll.RtlEnterCriticalSection
+  // crashes if the critical section is not initialized
+  // https://devblogs.microsoft.com/oldnewthing/20170922-00/?p=97065
+  call Aodix.exe+3E00
+skip:
+  pop eax
+  jmp return
+
+address:
+  jmp code
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+  // call Aodix.exe+3E00
+
+{
+// ORIGINAL CODE - INJECTION POINT: Aodix.exe+C363
+
+Aodix.exe+C33E: 89 44 24 18           - mov [esp+18],eax
+Aodix.exe+C342: C1 F9 04              - sar ecx,04
+Aodix.exe+C345: 83 C1 F8              - add ecx,-08
+Aodix.exe+C348: D3 E2                 - shl edx,cl
+Aodix.exe+C34A: 85 96 D8 D8 79 01     - test [esi+0179D8D8],edx
+Aodix.exe+C350: 0F 84 70 01 00 00     - je Aodix.exe+C4C6
+Aodix.exe+C356: 8B 84 37 A4 74 34 00  - mov eax,[edi+esi+003474A4]
+Aodix.exe+C35D: 85 C0                 - test eax,eax
+Aodix.exe+C35F: 74 36                 - je Aodix.exe+C397
+Aodix.exe+C361: 8B CE                 - mov ecx,esi
+// ---------- INJECTING HERE ----------
+Aodix.exe+C363: E8 98 7A FF FF        - call Aodix.exe+3E00
+// ---------- DONE INJECTING  ----------
+Aodix.exe+C368: 33 ED                 - xor ebp,ebp
+Aodix.exe+C36A: 55                    - push ebp
+Aodix.exe+C36B: 55                    - push ebp
+Aodix.exe+C36C: 8B CE                 - mov ecx,esi
+Aodix.exe+C36E: 0F B6 44 24 54        - movzx eax,byte ptr [esp+54]
+Aodix.exe+C373: 50                    - push eax
+Aodix.exe+C374: 0F B6 54 24 54        - movzx edx,byte ptr [esp+54]
+Aodix.exe+C379: 52                    - push edx
+Aodix.exe+C37A: 0F B6 44 24 54        - movzx eax,byte ptr [esp+54]
+Aodix.exe+C37F: 50                    - push eax
+}
+</AssemblerScript>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>7</ID>
+          <Description>"Features"</Description>
+          <Options moManualExpandCollapse="1" moActivateChildrenAsWell="1" moDeactivateChildrenAsWell="1"/>
+          <LastState Value="" RealAddress="00000000"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>5</ID>
+              <Description>"Set length shortcut"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{ Game   : Aodix.exe
+  Version: 
+  Date   : 2022-01-22
+  Author : j
+
+  Adds a shortcut '`' for setting the length of previous events to the cursor.
+}
+
+define(address,"Aodix.exe"+13AF6)
+define(bytes,83 FF 09 0F 84 55 13 00 00)
+define(cave,"Aodix.exe"+2BC70) // 0x138 bytes used
+
+[ENABLE]
+
+assert(address,bytes)
+
+label(code)
+label(return)
+
+cave:
+
+code:
+  // eax: should be set to cursor column?
+  // ebx: safe to use
+  // ecx: safe to use
+  // edx: safe to use
+  // esi: selected pattern offset in table
+  // edi: key code
+  // ebp: project struct ptr
+
+  // https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
+  cmp edi,C0 // `~ key
+  je note_off_shortcut
+
+  // original code to check for TAB
+  cmp edi,09
+  je Aodix.exe+14E54
+  jmp return
+
+
+note_off_shortcut:
+  push edi
+
+  // store undo
+  mov ecx,ebp
+  call Aodix.exe+51F4
+
+  mov ecx,[ebp+esi+81490+2430]    // cursor time
+  imul ebx,[ebp+179D8A8],10 // last event offset
+
+  xor edi,edi // last end time before cursor, or -1 if event cut
+  xor eax,eax // current event offset
+search_events_cut:
+  mov dl,[ebp+eax+B9D8A8+B] // event is resizable
+  cmp dl,0
+  je search_events_cut_next
+  mov dl,[ebp+eax+B9D8A8+8] // event pattern #
+  cmp dl,[ebp+179D8E0] // selected pattern #
+  jne search_events_cut_next
+  mov dl,[ebp+eax+B9D8A8+9] // event track #
+  cmp dl,[ebp+179D8E4] // selected track #
+  jne search_events_cut_next
+  mov edx,[ebp+eax+B9D8A8] // event time
+  cmp edx,ecx
+  jge search_events_cut_next
+
+  add edx,[ebp+eax+B9D8A8+4] // event length
+  cmp edx,ecx
+  jg cut_event
+  // events ending at cursor are excluded from max end time
+  je search_events_cut_next
+
+  // find max end time
+  cmp edx,edi
+  jbe search_events_cut_next
+  mov edi,edx
+  jmp search_events_cut_next
+
+cut_event:
+  sub edx,ecx
+  sub [ebp+eax+B9D8A8+4],edx
+  mov edi,FFFFFFFF
+
+search_events_cut_next:
+  add eax,10 // 16 bytes per event
+  cmp eax,ebx
+  jb search_events_cut
+// end loop search_events_cut
+
+  cmp edi,FFFFFFFF
+  je note_off_shortcut_exit // a note was cut
+
+  // now search for events with end time matching edi
+  // TODO a lot of copy/pasted code here
+  xor eax,eax
+search_events_extend:
+  mov dl,[ebp+eax+B9D8A8+B] // event is resizable
+  test dl,dl
+  jz search_events_extend_next
+  mov dl,[ebp+eax+B9D8A8+8] // event pattern #
+  cmp dl,[ebp+179D8E0] // selected pattern #
+  jne search_events_extend_next
+  mov dl,[ebp+eax+B9D8A8+9] // event track #
+  cmp dl,[ebp+179D8E4] // selected track #
+  jne search_events_extend_next
+  mov edx,[ebp+eax+B9D8A8] // event time
+  add edx,[ebp+eax+B9D8A8+4] // event length
+  cmp edx,edi
+  jne search_events_extend_next
+
+  // extend event
+  sub edx,ecx
+  sub [ebp+eax+B9D8A8+4],edx
+
+search_events_extend_next:
+  add eax,10
+  cmp eax,ebx
+  jb search_events_extend
+// end loop search_events_extend loop
+
+
+note_off_shortcut_exit:
+  pop edi
+  mov [ebp+179DA78],1 // refresh
+  mov eax,[ebp+179D8EC] // get cursor column within track
+  jmp Aodix.exe+13BD4 // shortcut exit
+
+
+address:
+  jmp code
+  nop 4
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+  // cmp edi,09
+  // je Aodix.exe+14E54
+
+{
+// ORIGINAL CODE - INJECTION POINT: Aodix.exe+13AF6
+
+Aodix.exe+13AD0: 6A 10              - push 10
+Aodix.exe+13AD2: FF 15 9C D1 42 00  - call dword ptr [Aodix.exe+2D19C]
+Aodix.exe+13AD8: 0F BF C0           - movsx eax,ax
+Aodix.exe+13ADB: 85 C0              - test eax,eax
+Aodix.exe+13ADD: 0F 8C 52 05 00 00  - jl Aodix.exe+14035
+Aodix.exe+13AE3: 6A 11              - push 11
+Aodix.exe+13AE5: FF 15 9C D1 42 00  - call dword ptr [Aodix.exe+2D19C]
+Aodix.exe+13AEB: 0F BF C0           - movsx eax,ax
+Aodix.exe+13AEE: 85 C0              - test eax,eax
+Aodix.exe+13AF0: 0F 8C 3F 05 00 00  - jl Aodix.exe+14035
+// ---------- INJECTING HERE ----------
+Aodix.exe+13AF6: 83 FF 09           - cmp edi,09
+// ---------- DONE INJECTING  ----------
+Aodix.exe+13AF9: 0F 84 55 13 00 00  - je Aodix.exe+14E54
+Aodix.exe+13AFF: 83 FF 6B           - cmp edi,6B
+Aodix.exe+13B02: 0F 84 18 13 00 00  - je Aodix.exe+14E20
+Aodix.exe+13B08: 83 FF 6D           - cmp edi,6D
+Aodix.exe+13B0B: 0F 84 DB 12 00 00  - je Aodix.exe+14DEC
+Aodix.exe+13B11: 83 FF 25           - cmp edi,25
+Aodix.exe+13B14: 0F 84 8C 12 00 00  - je Aodix.exe+14DA6
+Aodix.exe+13B1A: 83 FF 27           - cmp edi,27
+Aodix.exe+13B1D: 0F 84 3B 12 00 00  - je Aodix.exe+14D5E
+Aodix.exe+13B23: 83 FF 26           - cmp edi,26
+}
+</AssemblerScript>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>11</ID>
+          <Description>"Update version number"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : Aodix.exe
+  Version: 
+  Date   : 2022-01-31
+  Author : j
+
+  Alters the version number and window title.
+}
+
+define(version_addr,"Aodix.exe"+16DA)
+define(old_version,69 10 00 00) // 4201
+define(new_version,6A 10 00 00) // 4202
+
+define(string_addr,"Aodix.exe"+2D386)
+// "(Licensed Version)"
+define(old_string,28 4C 69 63 65 6E 73 65 64 20 56 65 72 73 69 6F 6E 29)
+// "(Patched Version!)"
+define(new_string,28 50 61 74 63 68 65 64 20 56 65 72 73 69 6F 6E 21 29)
+
+[ENABLE]
+
+assert(version_addr,old_version)
+assert(string_addr,old_string)
+
+version_addr:
+  db new_version
+
+string_addr:
+  db new_string
+
+[DISABLE]
+
+version_addr:
+  db old_version
+
+string_addr:
+  db old_string
+
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>10</ID>
+      <Description>"Experimental"</Description>
+      <Options moManualExpandCollapse="1" moActivateChildrenAsWell="1" moDeactivateChildrenAsWell="1"/>
+      <LastState Value="" RealAddress="00000000"/>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>6</ID>
+          <Description>"Allow pre-release=0"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : Aodix.exe
+  Version: 
+  Date   : 2022-01-23
+  Author : j
+
+  Allows setting the pre-release to 0
+}
+
+define(address,"Aodix.exe"+12790)
+define(bytes,6A 01)
+
+[ENABLE]
+assert(address,bytes)
+
+address:
+  push 00
+
+[DISABLE]
+address:
+  db bytes
+  // push 01
+
+{
+// ORIGINAL CODE - INJECTION POINT: Aodix.exe+12790
+
+Aodix.exe+12759: E8 56 AB FF FF                 - call Aodix.exe+D2B4
+Aodix.exe+1275E: 83 C4 0C                       - add esp,0C
+Aodix.exe+12761: C7 83 78 DA 79 01 01 00 00 00  - mov [ebx+0179DA78],00000001
+Aodix.exe+1276B: 89 83 F8 D8 79 01              - mov [ebx+0179D8F8],eax
+Aodix.exe+12771: 8B 83 F0 D8 79 01              - mov eax,[ebx+0179D8F0]
+Aodix.exe+12777: E9 8D F4 FF FF                 - jmp Aodix.exe+11C09
+Aodix.exe+1277C: 8B 44 24 58                    - mov eax,[esp+58]
+Aodix.exe+12780: 8B 94 18 C8 38 08 00           - mov edx,[eax+ebx+000838C8]
+Aodix.exe+12787: 2B 54 24 3C                    - sub edx,[esp+3C]
+Aodix.exe+1278B: 68 FF FF FF 7F                 - push 7FFFFFFF
+// ---------- INJECTING HERE ----------
+Aodix.exe+12790: 6A 01                          - push 01
+// ---------- DONE INJECTING  ----------
+Aodix.exe+12792: 52                             - push edx
+Aodix.exe+12793: E8 1C AB FF FF                 - call Aodix.exe+D2B4
+Aodix.exe+12798: 83 C4 0C                       - add esp,0C
+Aodix.exe+1279B: 8B 54 24 58                    - mov edx,[esp+58]
+Aodix.exe+1279F: 89 84 1A C8 38 08 00           - mov [edx+ebx+000838C8],eax
+Aodix.exe+127A6: 8B 83 F0 D8 79 01              - mov eax,[ebx+0179D8F0]
+Aodix.exe+127AC: C7 83 78 DA 79 01 01 00 00 00  - mov [ebx+0179DA78],00000001
+Aodix.exe+127B6: E9 45 F4 FF FF                 - jmp Aodix.exe+11C00
+Aodix.exe+127BB: 8B 83 D4 D8 79 01              - mov eax,[ebx+0179D8D4]
+Aodix.exe+127C1: 2B 44 24 3C                    - sub eax,[esp+3C]
+}
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>4</ID>
+      <Description>"Debug"</Description>
+      <Options moHideChildren="1"/>
+      <LastState Value="" RealAddress="00000000"/>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>3</ID>
+          <Description>"Project struct pointer"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>Aodix.exe+3C348</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

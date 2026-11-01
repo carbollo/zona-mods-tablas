@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>37</ID>
+      <Description>"Table help"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>44</ID>
+      <Description>"Auto - Flags"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[enable]
+alloc(flags, 512)
+label(inf_hp_enabled)
+label(inf_bullets_enabled)
+label(easy_kills_enabled)
+registersymbol(inf_hp_enabled)
+registersymbol(inf_bullets_enabled)
+registersymbol(easy_kills_enabled)
+
+flags:
+inf_hp_enabled:
+db 00 00 00 00
+easy_kills_enabled:
+db 00 00 00 00
+inf_bullets_enabled:
+db 00 00 00 00
+
+[disable]
+dealloc(flags)
+unregistersymbol(inf_hp_enabled)
+unregistersymbol(inf_bullets_enabled)
+unregistersymbol(easy_kills_enabled)
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>40</ID>
+          <Description>"Auto - 101345DF"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[enable]
+// remind to self: already tried to improve heuristics with rsp return adresses without success
+alloc(inf_bullets, 2048)
+label(player)
+label(inf_hp)
+label(enemies)
+label(common_code0)
+label(common_code0_ret_point)
+label(kill)
+label(mechs)
+
+inf_bullets:
+  cmp [edi+20], 14
+  jne player
+  cmp [edi+24], 14
+  jne player
+  cmp [edi+28], 1
+  jne player
+  cmp [edi+2c], 0
+  jne player
+  cmp [inf_bullets_enabled], 00
+  je common_code0
+  sub eax,edx
+  mov [esi+0C],ecx
+jmp common_code0_ret_point
+
+player:
+  cmp [rsp+58], 68
+  cmp ebx, 00
+  jne enemies
+  cmp [ecx+720], 00 // Filter data that makes JC aways walk
+  jne common_code0
+  cmp [edi+c8], 00  // Filter mechs, so we don't make them invincible
+  jne mechs
+  cmp [inf_hp_enabled], 00
+  jne inf_hp
+jmp common_code0
+
+mechs:
+  cmp [edi], 64
+  jbe common_code0
+jmp kill
+
+inf_hp:
+  sub eax,0
+  mov [esi+0C],ecx
+  mov [edi],64
+jmp common_code0_ret_point
+
+enemies:
+  cmp [easy_kills_enabled], 00
+  je common_code0
+  cmp [rsp+58], 0
+  jne common_code0
+kill:
+  // second check for mechs, which jmp directlly to here
+  cmp [easy_kills_enabled], 00
+  je common_code0
+  sub eax,eax
+  mov [esi+0C],ecx
+  mov [edi],eax
+jmp common_code0_ret_point
+
+common_code0:
+  sub eax,edx
+  mov [esi+0C],ecx
+  mov [edi],eax
+jmp common_code0_ret_point
+
+101345DF:
+jmp inf_bullets
+  nop
+  nop
+common_code0_ret_point:
+
+[disable]
+101345DF:
+  sub eax,edx
+  mov [esi+0C],ecx
+  mov [edi],eax
+dealloc(inf_bullets)
+
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>42</ID>
+          <Description>"Auto - 10165d1c"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[enable]
+registersymbol(player_hp_ptr)
+alloc(player_hp_ptr, 2048)
+label(player_hp_ptr_check)
+label(player_hp_ptr_check_loop)
+label(player_hp_ptr_check_loop_end)
+label(player_hp_ptr_set_loop_continue)
+label(player_hp_ptr_check_loop_end)
+
+alloc(common_code1_cave, 2048)
+label(common_code1)
+label(common_code1_ret_point)
+
+player_hp_ptr:
+db 00 00 00 00
+db 00 00 00 00
+db 00 00 00 00
+db 00 00 00 00
+db 00 00 00 00
+db 00 00 00 00
+
+common_code1_cave:
+  cmp [inf_hp_enabled], 00
+  je common_code1
+  cmp edi, 0
+  jne common_code1
+  cmp [rsp+94], 3
+  jne common_code1
+  mov [eax], 64
+  jmp common_code1
+  /* can be used to store pointers to player HP, but is unecessary and neeeds
+   * a way to detect when the adress changes
+   */
+  je player_hp_ptr_check
+
+common_code1:
+  mov edx,[esp+04]
+  mov ecx,[eax]
+jmp common_code1_ret_point
+
+player_hp_ptr_check:
+  mov edx,[esp+04]
+  mov ecx,[eax]
+  push eax
+  push ebx
+  push ecx
+  mov ecx, eax
+  mov eax, 0
+  mov ebx, 0
+  player_hp_ptr_check_loop:             // Check if the value of edi s stored
+    cmp [player_hp_ptr+ebx],ecx
+    je player_hp_ptr_check_loop_end     // The value is stored jump to the end
+    inc eax
+    add ebx, 4
+    cmp eax, 5
+  jl player_hp_ptr_check_loop
+    mov eax, 0
+    mov ebx, 0
+  player_hp_ptr_set_loop:               // Search the 1st zero value to store edi
+    cmp [player_hp_ptr+ebx], 0
+    jne player_hp_ptr_set_loop_continue // The value is not zero continue serching
+    mov [player_hp_ptr+ebx],ecx
+    jmp player_hp_ptr_check_loop_end
+    player_hp_ptr_set_loop_continue:
+    inc eax
+    add ebx, 4
+    cmp eax, 5
+  jl player_hp_ptr_set_loop
+  player_hp_ptr_check_loop_end:
+  pop ecx
+  pop ebx
+  pop eax
+jmp common_code1_ret_point
+
+10165d1c:
+  jmp common_code1_cave
+  nop
+common_code1_ret_point:
+
+[disable]
+10165d1c:
+  mov edx,[esp+04]
+  mov ecx,[eax]
+dealloc(player_hp_ptr)
+unregistersymbol(player_hp_ptr)
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>45</ID>
+          <Description>"H - inf HP"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[enable]
+inf_hp_enabled:
+db 00 00 00 01
+
+[disable]
+inf_hp_enabled:
+db 00 00 00 00
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>46</ID>
+          <Description>"K - easy KIlls"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[enable]
+easy_kills_enabled:
+db 00 00 00 01
+
+[disable]
+easy_kills_enabled:
+db 00 00 00 00
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>47</ID>
+          <Description>"B - inf Bullets"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[enable]
+inf_bullets_enabled:
+db 00 00 00 01
+
+[disable]
+inf_bullets_enabled:
+db 00 00 00 00
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+  <Comments>Version: 1.112fm, https://community.pcgamingwiki.com/files/file/39-deus-ex-patch-retail/
+</Comments>
+</CheatTable>

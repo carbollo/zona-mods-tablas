@@ -1,0 +1,2634 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>72</ID>
+      <Description>"Credits : TheFate, Hoàng Gia Bảo (Admin)"</Description>
+      <Options moHideChildren="1"/>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>107</ID>
+          <Description>"Dò ID Cây Trong Bách Khoa Toàn Thư"</Description>
+          <Options moHideChildren="1" moManualExpandCollapse="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : PlantsVsZombiesRH.exe
+  Version: 
+  Date   : 2024-11-13
+  Author : TheFate
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+
+aobscanmodule(INJECT,GameAssembly.dll,C7 43 20 FF FF FF FF 48 83 C4 30) // should be unique
+alloc(newmem,$1000,INJECT)
+alloc(idplants,$1000)
+registersymbol(idplants)
+label(code)
+label(return)
+
+newmem:
+  mov [idplants],rbx
+code:
+  mov [rbx+20],FFFFFFFF
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop 2
+return:
+registersymbol(INJECT)
+
+aobscanmodule(INJECT2,GameAssembly.dll,3B 57 20 0F 84 FA 02 00 00) // should be unique
+alloc(newmem2,$1000,INJECT2)
+alloc(idplants,$1000)
+registersymbol(idplants)
+label(code2)
+label(return2)
+
+newmem2:
+  mov [idplants],rdi
+code2:
+  cmp edx,[rdi+20]
+  je GameAssembly.dll+2F7E39
+  jmp return2
+
+INJECT2:
+  jmp newmem2
+  nop 4
+return2:
+registersymbol(INJECT2)
+
+[DISABLE]
+
+INJECT:
+  db C7 43 20 FF FF FF FF
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+2FA6C2
+
+GameAssembly.dll+2FA695: E8 E6 06 04 01        - call GameAssembly.dll+133AD80
+GameAssembly.dll+2FA69A: 48 8B 0D 9F 43 8C 01  - mov rcx,[GameAssembly.dll+1BBEA40]
+GameAssembly.dll+2FA6A1: 48 8B 7B 40           - mov rdi,[rbx+40]
+GameAssembly.dll+2FA6A5: 83 B9 E0 00 00 00 00  - cmp dword ptr [rcx+000000E0],00
+GameAssembly.dll+2FA6AC: 75 05                 - jne GameAssembly.dll+2FA6B3
+GameAssembly.dll+2FA6AE: E8 0D 1C F6 FF        - call GameAssembly.il2cpp_runtime_class_init
+GameAssembly.dll+2FA6B3: 33 D2                 - xor edx,edx
+GameAssembly.dll+2FA6B5: 48 8B CF              - mov rcx,rdi
+GameAssembly.dll+2FA6B8: E8 13 34 04 01        - call GameAssembly.dll+133DAD0
+GameAssembly.dll+2FA6BD: 48 8B 7C 24 40        - mov rdi,[rsp+40]
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+2FA6C2: C7 43 20 FF FF FF FF  - mov [rbx+20],FFFFFFFF
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+2FA6C9: 48 83 C4 30           - add rsp,30
+GameAssembly.dll+2FA6CD: 5B                    - pop rbx
+GameAssembly.dll+2FA6CE: C3                    - ret 
+GameAssembly.dll+2FA6CF: E8 5C 96 02 01        - call GameAssembly.dll+1323D30
+GameAssembly.dll+2FA6D4: 48 85 C0              - test rax,rax
+GameAssembly.dll+2FA6D7: 0F 84 53 01 00 00     - je GameAssembly.dll+2FA830
+GameAssembly.dll+2FA6DD: 33 D2                 - xor edx,edx
+GameAssembly.dll+2FA6DF: 48 8B C8              - mov rcx,rax
+GameAssembly.dll+2FA6E2: E8 A9 2E 05 01        - call GameAssembly.dll+134D590
+GameAssembly.dll+2FA6E7: 48 85 C0              - test rax,rax
+}
+INJECT2:
+  db 3B 57 20 0F 84 FA 02 00 00
+
+unregistersymbol(INJECT2)
+dealloc(newmem2)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+2F7B36
+
+GameAssembly.dll+2F7B07: 8B 54 24 68           - mov edx,[rsp+68]
+GameAssembly.dll+2F7B0B: C6 05 33 B3 9F 01 01  - mov byte ptr [GameAssembly.dll+1CF2E45],01
+GameAssembly.dll+2F7B12: 48 89 5C 24 60        - mov [rsp+60],rbx
+GameAssembly.dll+2F7B17: 8D 42 9C              - lea eax,[rdx-64]
+GameAssembly.dll+2F7B1A: 48 89 6C 24 70        - mov [rsp+70],rbp
+GameAssembly.dll+2F7B1F: 48 89 74 24 40        - mov [rsp+40],rsi
+GameAssembly.dll+2F7B24: 83 F8 01              - cmp eax,01
+GameAssembly.dll+2F7B27: 0F 86 5B 02 00 00     - jbe GameAssembly.dll+2F7D88
+GameAssembly.dll+2F7B2D: 83 FA 66              - cmp edx,66
+GameAssembly.dll+2F7B30: 0F 84 52 02 00 00     - je GameAssembly.dll+2F7D88
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+2F7B36: 3B 57 20              - cmp edx,[rdi+20]
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+2F7B39: 0F 84 FA 02 00 00     - je GameAssembly.dll+2F7E39
+GameAssembly.dll+2F7B3F: 48 8B 5F 30           - mov rbx,[rdi+30]
+GameAssembly.dll+2F7B43: 89 57 20              - mov [rdi+20],edx
+GameAssembly.dll+2F7B46: 48 8B 0D F3 6E 8C 01  - mov rcx,[GameAssembly.dll+1BBEA40]
+GameAssembly.dll+2F7B4D: 83 B9 E0 00 00 00 00  - cmp dword ptr [rcx+000000E0],00
+GameAssembly.dll+2F7B54: 75 05                 - jne GameAssembly.dll+2F7B5B
+GameAssembly.dll+2F7B56: E8 65 47 F6 FF        - call GameAssembly.il2cpp_runtime_class_init
+GameAssembly.dll+2F7B5B: 33 D2                 - xor edx,edx
+GameAssembly.dll+2F7B5D: 48 8B CB              - mov rcx,rbx
+GameAssembly.dll+2F7B60: E8 6B 5F 04 01        - call GameAssembly.dll+133DAD0
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>108</ID>
+              <Description>"ID Cây Trong Bách Khoa Toàn Thư"</Description>
+              <DropDownList DescriptionOnly="1" DisplayValueAsItem="1">/:--- Đậu Hà Lan ---
+0:Đậu Hà Lan
+1030:Đậu Tiểu Liên
+1000:Đậu Hướng Dương
+1001:Đậu Bom Anh Đào
+1004:Đậu Hồ Đào
+1007:Đậu Mìn Khoai Tây
+1011:Đậu Ăn Thịt
+1018:Đậu Phun
+1034:Đậu Băng
+1008:Đậu Nổ Tiểu Liên
+1105:Đậu Băng Tiểu Liên
+1035:Đậu Băng Phun
+1020:Đậu Sắt
+1108:Đậu Tách Nổ
+1090:Đậu Tách
+1107:Đậu Tách Băng
+1019:Đậu Phun Tiểu Liên
+1017:Đậu Nổ Liên Hoàn
+1032:Đậu Liên Hoàn
+1106:Đậu Băng Liên Hoàn
+1065:Đậu Phun Liên Hoàn
+1005:Đậu Nổ Anh Đào
+1109:Đậu Súng Tỉa
+:
+/:--- Hoa Hướng Dương ---
+1000:Đậu Hướng Dương
+1033:Hoa Hướng Dương Đôi
+1002:Bom Hướng Dương
+1006:Hồ Đào Hướng Dương
+1009:Mìn Hướng Dương
+1014:Hướng Dương Ăn Thịt
+1031:Nấm Mặt Trời
+:
+/:--- Bom Anh Đào ---
+2:Bom Anh Đào
+1001:Đậu Bom Anh Đào
+1002:Bom Hướng Dương
+1003:Hồ Anh Đào
+4:Mìn Khoai Tây Nổ Lan
+1016:Bom Ăn Thịt
+:
+/:--- Tường Hồ Đào ---
+3:Tường Hồ Đào
+1004:Đậu Hồ Đào
+1006:Hồ Đào Hướng Dương
+255:Hồ Đào Khổng Lồ
+1010:Mìn Hồ Đào
+1012:Hồ Đào Ăn Thịt
+1021:Hồ Đào Phun
+1027:Hồ Đào Cao
+1029:Hồ Đào Sắt
+1028:Hồ Đào Mũ Bầu Dục Cao
+:
+/:--- Mìn Khoai Tây ---
+4:Mìn Khoai Tây
+1007:Đậu Mìn Khoai Tây
+1009:Mìn Hướng Dương
+4:Mìn Khoai Tây Nổ Lan
+1010:Mìn Hồ Đào
+1015:Mìn Ăn Thịt
+:
+/:--- Thực Vật Ăn Thịt ---
+5:Thực Vật Ăn Thịt
+1011:Đậu Ăn Thịt
+1014:Hướng Dương Ăn Thịt
+1016:Bom Ăn Thịt
+1012:Hồ Đào Ăn Thịt
+1015:Mìn Ăn Thịt
+:
+/:--- Hộp Quà Bí Mật ---
+256:Hộp Quà Bí Mật
+:
+/:--- Ngọn Cỏ Bùng Cháy ---
+254:Ngọn Cỏ Bùng Cháy
+:
+/:--- Nấm Phun ---
+6:Nấm Phun
+1018:Đậu Phun
+1031:Nấm Mặt Trời
+1021:Hồ Đào Phun
+1022:Nấm Phun Thôi Miên
+1036:Nấm Phun Băng
+1044:Nấm Phun Huỷ Diệt
+:
+/:--- Nấm Khói Độc ---
+7:Nấm Khói Độc
+6:Nấm Phun
+1023:Nấm Khói Thôi Miên
+1025:Nấm Khói Sợ Hãi
+1037:Nấm Khói Băng
+1043:Nấm Khói Hủy Diệt
+:
+/:--- Nấm Thôi Miên ---
+8:Nấm Thôi Miên
+1022:Nấm Phun Thôi Miên
+1023:Nấm Khói Thôi Miên
+1024:Nấm Thôi Miên Sợ Hãi
+1041:Nấm Băng Thôi Miên
+1045:Nấm Thôi Miên Hủy Diệt
+:
+/:--- Nấm Sợ Hãi ---
+9:Nấm Sợ Hãi
+6:Nấm Phun
+1025:Nấm Khói Sợ Hãi
+1024:Nấm Thôi Miên Sợ Hãi
+1038:Nấm Băng Sợ Hãi
+1042:Nấm Hủy Diệt Sợ Hãi
+:
+/:--- Nấm Băng ---
+10:Nấm Băng
+1034:Đậu Băng
+1036:Nấm Phun Băng
+1037:Nấm Khói Băng
+1041:Nấm Băng Thôi Miên
+1038:Nấm Băng Sợ Hãi
+1040:Nấm Băng Huỷ Diệt
+1039:Hồ Đào Băng Cao
+1072:Nấm Băng U Sầu
+1074:Cỏ Gai Băng Sắt
+1068:Cỏ Băng Đuôi Mèo
+:
+</DropDownList>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>idplants</Address>
+              <Offsets>
+                <Offset>20</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>109</ID>
+          <Description>"Dò ID Thây Ma Trong Bách Khoa Toàn Thư"</Description>
+          <Options moHideChildren="1" moManualExpandCollapse="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : PlantsVsZombiesRH.exe
+  Version: 
+  Date   : 2024-11-14
+  Author : TheFate
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+
+aobscanmodule(INJECT,GameAssembly.dll,89 77 20 48 8B 0D 5F 7E 8C 01) // should be unique
+alloc(newmem,$1000,INJECT)
+alloc(IDZOMBIES,$1000)
+registersymbol(IDZOMBIES)
+label(code)
+label(return)
+
+newmem:
+  mov [IDZOMBIES],rdi
+code:
+  mov [rdi+20],esi
+  mov rcx,[GameAssembly.dll+1BBEA80]
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop 5
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db 89 77 20 48 8B 0D 5F 7E 8C 01
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+2F6C17
+
+GameAssembly.dll+2F6BDF: 48 8D 0D 32 F3 8C 01  - lea rcx,[GameAssembly.dll+1BC5F18]
+GameAssembly.dll+2F6BE6: E8 C5 5A F8 FF        - call GameAssembly.dll+27C6B0
+GameAssembly.dll+2F6BEB: 48 8D 0D 76 F2 8D 01  - lea rcx,[GameAssembly.dll+1BD5E68]
+GameAssembly.dll+2F6BF2: E8 B9 5A F8 FF        - call GameAssembly.dll+27C6B0
+GameAssembly.dll+2F6BF7: 48 8D 0D 6A 4E 8C 01  - lea rcx,[GameAssembly.dll+1BBBA68]
+GameAssembly.dll+2F6BFE: E8 AD 5A F8 FF        - call GameAssembly.dll+27C6B0
+GameAssembly.dll+2F6C03: C6 05 7E C2 9F 01 01  - mov byte ptr [GameAssembly.dll+1CF2E88],01
+GameAssembly.dll+2F6C0A: 3B 77 20              - cmp esi,[rdi+20]
+GameAssembly.dll+2F6C0D: 0F 84 17 01 00 00     - je GameAssembly.dll+2F6D2A
+GameAssembly.dll+2F6C13: 48 8B 5F 28           - mov rbx,[rdi+28]
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+2F6C17: 89 77 20              - mov [rdi+20],esi
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+2F6C1A: 48 8B 0D 5F 7E 8C 01  - mov rcx,[GameAssembly.dll+1BBEA80]
+GameAssembly.dll+2F6C21: 83 B9 E0 00 00 00 00  - cmp dword ptr [rcx+000000E0],00
+GameAssembly.dll+2F6C28: 75 05                 - jne GameAssembly.dll+2F6C2F
+GameAssembly.dll+2F6C2A: E8 91 56 F6 FF        - call GameAssembly.il2cpp_runtime_class_init
+GameAssembly.dll+2F6C2F: 33 D2                 - xor edx,edx
+GameAssembly.dll+2F6C31: 48 8B CB              - mov rcx,rbx
+GameAssembly.dll+2F6C34: E8 F7 78 04 01        - call GameAssembly.dll+133E530
+GameAssembly.dll+2F6C39: 48 8B 4F 30           - mov rcx,[rdi+30]
+GameAssembly.dll+2F6C3D: 33 D2                 - xor edx,edx
+GameAssembly.dll+2F6C3F: E8 EC 78 04 01        - call GameAssembly.dll+133E530
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>110</ID>
+              <Description>"ID Thây Ma Trong Bách Khoa Toàn Thư"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>IDZOMBIES</Address>
+              <Offsets>
+                <Offset>20</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>99</ID>
+          <Description>"Chỉnh Nền Của Tất Cả Cây Trong Bách Khoa Toàn Thư Thành Buổi Sáng"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : PlantsVsZombiesRH.exe
+  Version: 
+  Date   : 2024-10-24
+  Author : TheFate
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,GameAssembly.dll,81 FB 88 03 00 00 0F) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+  mov ebx,00000001
+code:
+  cmp ebx,00000388
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT)
+
+aobscanmodule(INJECT2,GameAssembly.dll,00 81 FB 8E 03 00 00) // should be unique
+alloc(newmem2,$1000,INJECT2)
+
+label(code2)
+label(return2)
+
+newmem2:
+  mov ebx,00000001
+code2:
+  cmp ebx,0000038E
+  jmp return2
+
+INJECT2+01:
+  jmp newmem2
+  nop
+return2:
+registersymbol(INJECT2)
+
+aobscanmodule(INJECT3,GameAssembly.dll,81 FB 4C 04 00 00 0F) // should be unique
+alloc(newmem3,$1000,INJECT3)
+
+label(code3)
+label(return3)
+
+newmem3:
+  mov ebx,00000001
+code3:
+  cmp ebx,0000044C
+  jmp return3
+
+INJECT3:
+  jmp newmem3
+  nop
+return3:
+registersymbol(INJECT3)
+
+aobscanmodule(INJECT4,GameAssembly.dll,81 FB 4D 04 00 00 75 1A 48 8B 0D) // should be unique
+alloc(newmem4,$1000,INJECT4)
+
+label(code4)
+label(return4)
+
+newmem4:
+  mov ebx,00000001
+code4:
+  cmp ebx,0000044D
+  jmp return4
+
+INJECT4:
+  jmp newmem4
+  nop
+return4:
+registersymbol(INJECT4)
+
+[DISABLE]
+
+INJECT:
+  db 81 FB 88 03 00 00
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+2F7C61
+
+GameAssembly.dll+2F7C28: 75 37                    - jne GameAssembly.dll+2F7C61
+GameAssembly.dll+2F7C2A: 48 8D 0D CF 18 88 01     - lea rcx,[GameAssembly.dll+1B79500]
+GameAssembly.dll+2F7C31: E8 AA 41 F8 FF           - call GameAssembly.dll+27BDE0
+GameAssembly.dll+2F7C36: 48 8D 0D 1B 18 88 01     - lea rcx,[GameAssembly.dll+1B79458]
+GameAssembly.dll+2F7C3D: E8 9E 41 F8 FF           - call GameAssembly.dll+27BDE0
+GameAssembly.dll+2F7C42: 48 8D 0D B7 17 88 01     - lea rcx,[GameAssembly.dll+1B79400]
+GameAssembly.dll+2F7C49: E8 92 41 F8 FF           - call GameAssembly.dll+27BDE0
+GameAssembly.dll+2F7C4E: 48 8D 0D 53 18 88 01     - lea rcx,[GameAssembly.dll+1B794A8]
+GameAssembly.dll+2F7C55: E8 86 41 F8 FF           - call GameAssembly.dll+27BDE0
+GameAssembly.dll+2F7C5A: C6 05 94 74 9A 01 01     - mov byte ptr [GameAssembly.dll+1C9F0F5],01
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+2F7C61: 81 FB 88 03 00 00        - cmp ebx,00000388
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+2F7C67: 0F 8E 1B 02 00 00        - jng GameAssembly.dll+2F7E88
+GameAssembly.dll+2F7C6D: 81 FB 8E 03 00 00        - cmp ebx,0000038E
+GameAssembly.dll+2F7C73: 7E 45                    - jle GameAssembly.dll+2F7CBA
+GameAssembly.dll+2F7C75: 8D 83 06 FC FF FF        - lea eax,[rbx-000003FA]
+GameAssembly.dll+2F7C7B: 83 F8 44                 - cmp eax,44
+GameAssembly.dll+2F7C7E: 77 1D                    - ja GameAssembly.dll+2F7C9D
+GameAssembly.dll+2F7C80: 48 8D 15 79 83 D0 FF     - lea rdx,[GameAssembly.dll]
+GameAssembly.dll+2F7C87: 48 98                    - cdqe 
+GameAssembly.dll+2F7C89: 0F B6 84 02 FC 7E 2F 00  - movzx eax,byte ptr [rdx+rax+002F7EFC]
+GameAssembly.dll+2F7C91: 8B 8C 82 EC 7E 2F 00     - mov ecx,[rdx+rax*4+002F7EEC]
+}
+INJECT2+01:
+  db 81 FB 8E 03 00 00
+
+unregistersymbol(INJECT2)
+dealloc(newmem2)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+2F7C6D
+
+GameAssembly.dll+2F7C31: E8 AA 41 F8 FF           - call GameAssembly.dll+27BDE0
+GameAssembly.dll+2F7C36: 48 8D 0D 1B 18 88 01     - lea rcx,[GameAssembly.dll+1B79458]
+GameAssembly.dll+2F7C3D: E8 9E 41 F8 FF           - call GameAssembly.dll+27BDE0
+GameAssembly.dll+2F7C42: 48 8D 0D B7 17 88 01     - lea rcx,[GameAssembly.dll+1B79400]
+GameAssembly.dll+2F7C49: E8 92 41 F8 FF           - call GameAssembly.dll+27BDE0
+GameAssembly.dll+2F7C4E: 48 8D 0D 53 18 88 01     - lea rcx,[GameAssembly.dll+1B794A8]
+GameAssembly.dll+2F7C55: E8 86 41 F8 FF           - call GameAssembly.dll+27BDE0
+GameAssembly.dll+2F7C5A: C6 05 94 74 9A 01 01     - mov byte ptr [GameAssembly.dll+1C9F0F5],01
+GameAssembly.dll+2F7C61: 81 FB 88 03 00 00        - cmp ebx,00000388
+GameAssembly.dll+2F7C67: 0F 8E 1B 02 00 00        - jng GameAssembly.dll+2F7E88
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+2F7C6D: 81 FB 8E 03 00 00        - cmp ebx,0000038E
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+2F7C73: 7E 45                    - jle GameAssembly.dll+2F7CBA
+GameAssembly.dll+2F7C75: 8D 83 06 FC FF FF        - lea eax,[rbx-000003FA]
+GameAssembly.dll+2F7C7B: 83 F8 44                 - cmp eax,44
+GameAssembly.dll+2F7C7E: 77 1D                    - ja GameAssembly.dll+2F7C9D
+GameAssembly.dll+2F7C80: 48 8D 15 79 83 D0 FF     - lea rdx,[GameAssembly.dll]
+GameAssembly.dll+2F7C87: 48 98                    - cdqe 
+GameAssembly.dll+2F7C89: 0F B6 84 02 FC 7E 2F 00  - movzx eax,byte ptr [rdx+rax+002F7EFC]
+GameAssembly.dll+2F7C91: 8B 8C 82 EC 7E 2F 00     - mov ecx,[rdx+rax*4+002F7EEC]
+GameAssembly.dll+2F7C98: 48 03 CA                 - add rcx,rdx
+GameAssembly.dll+2F7C9B: FF E1                    - jmp rcx
+}
+INJECT3:
+  db 81 FB 4C 04 00 00
+
+unregistersymbol(INJECT3)
+dealloc(newmem3)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+2F7C9D
+
+GameAssembly.dll+2F7C73: 7E 45                    - jle GameAssembly.dll+2F7CBA
+GameAssembly.dll+2F7C75: 8D 83 06 FC FF FF        - lea eax,[rbx-000003FA]
+GameAssembly.dll+2F7C7B: 83 F8 44                 - cmp eax,44
+GameAssembly.dll+2F7C7E: 77 1D                    - ja GameAssembly.dll+2F7C9D
+GameAssembly.dll+2F7C80: 48 8D 15 79 83 D0 FF     - lea rdx,[GameAssembly.dll]
+GameAssembly.dll+2F7C87: 48 98                    - cdqe 
+GameAssembly.dll+2F7C89: 0F B6 84 02 FC 7E 2F 00  - movzx eax,byte ptr [rdx+rax+002F7EFC]
+GameAssembly.dll+2F7C91: 8B 8C 82 EC 7E 2F 00     - mov ecx,[rdx+rax*4+002F7EEC]
+GameAssembly.dll+2F7C98: 48 03 CA                 - add rcx,rdx
+GameAssembly.dll+2F7C9B: FF E1                    - jmp rcx
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+2F7C9D: 81 FB 4C 04 00 00        - cmp ebx,0000044C
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+2F7CA3: 0F 84 2E 02 00 00        - je GameAssembly.dll+2F7ED7
+GameAssembly.dll+2F7CA9: 81 FB 4D 04 00 00        - cmp ebx,0000044D
+GameAssembly.dll+2F7CAF: 75 1A                    - jne GameAssembly.dll+2F7CCB
+GameAssembly.dll+2F7CB1: 48 8B 0D F0 17 88 01     - mov rcx,[GameAssembly.dll+1B794A8]
+GameAssembly.dll+2F7CB8: EB 18                    - jmp GameAssembly.dll+2F7CD2
+GameAssembly.dll+2F7CBA: 8D 83 74 FC FF FF        - lea eax,[rbx-0000038C]
+GameAssembly.dll+2F7CC0: A9 FD FF FF FF           - test eax,FFFFFFFD
+GameAssembly.dll+2F7CC5: 0F 84 0C 02 00 00        - je GameAssembly.dll+2F7ED7
+GameAssembly.dll+2F7CCB: 48 8B 0D 2E 17 88 01     - mov rcx,[GameAssembly.dll+1B79400]
+GameAssembly.dll+2F7CD2: 48 8B 15 E7 73 87 01     - mov rdx,[GameAssembly.dll+1B6F0C0]
+}
+INJECT4:
+  db 81 FB 4D 04 00 00
+
+unregistersymbol(INJECT4)
+dealloc(newmem4)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+2F7CA9
+
+GameAssembly.dll+2F7C7B: 83 F8 44                 - cmp eax,44
+GameAssembly.dll+2F7C7E: 77 1D                    - ja GameAssembly.dll+2F7C9D
+GameAssembly.dll+2F7C80: 48 8D 15 79 83 D0 FF     - lea rdx,[GameAssembly.dll]
+GameAssembly.dll+2F7C87: 48 98                    - cdqe 
+GameAssembly.dll+2F7C89: 0F B6 84 02 FC 7E 2F 00  - movzx eax,byte ptr [rdx+rax+002F7EFC]
+GameAssembly.dll+2F7C91: 8B 8C 82 EC 7E 2F 00     - mov ecx,[rdx+rax*4+002F7EEC]
+GameAssembly.dll+2F7C98: 48 03 CA                 - add rcx,rdx
+GameAssembly.dll+2F7C9B: FF E1                    - jmp rcx
+GameAssembly.dll+2F7C9D: 81 FB 4C 04 00 00        - cmp ebx,0000044C
+GameAssembly.dll+2F7CA3: 0F 84 2E 02 00 00        - je GameAssembly.dll+2F7ED7
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+2F7CA9: 81 FB 4D 04 00 00        - cmp ebx,0000044D
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+2F7CAF: 75 1A                    - jne GameAssembly.dll+2F7CCB
+GameAssembly.dll+2F7CB1: 48 8B 0D F0 17 88 01     - mov rcx,[GameAssembly.dll+1B794A8]
+GameAssembly.dll+2F7CB8: EB 18                    - jmp GameAssembly.dll+2F7CD2
+GameAssembly.dll+2F7CBA: 8D 83 74 FC FF FF        - lea eax,[rbx-0000038C]
+GameAssembly.dll+2F7CC0: A9 FD FF FF FF           - test eax,FFFFFFFD
+GameAssembly.dll+2F7CC5: 0F 84 0C 02 00 00        - je GameAssembly.dll+2F7ED7
+GameAssembly.dll+2F7CCB: 48 8B 0D 2E 17 88 01     - mov rcx,[GameAssembly.dll+1B79400]
+GameAssembly.dll+2F7CD2: 48 8B 15 E7 73 87 01     - mov rdx,[GameAssembly.dll+1B6F0C0]
+GameAssembly.dll+2F7CD9: E8 12 12 1C 00           - call GameAssembly.dll+4B8EF0
+GameAssembly.dll+2F7CDE: 33 D2                    - xor edx,edx
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>100</ID>
+          <Description>"Chỉnh Nền Của Tất Cả Cây Trong Bách Khoa Toàn Thư Thành Buổi Tối"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : PlantsVsZombiesRH.exe
+  Version: 
+  Date   : 2024-10-24
+  Author : TheFate
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,GameAssembly.dll,81 FB 88 03 00 00 0F) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+  mov ebx,00000388
+code:
+  cmp ebx,00000388
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT)
+
+aobscanmodule(INJECT2,GameAssembly.dll,00 81 FB 8E 03 00 00) // should be unique
+alloc(newmem2,$1000,INJECT2)
+
+label(code2)
+label(return2)
+
+newmem2:
+  mov ebx,00000388
+code2:
+  cmp ebx,0000038E
+  jmp return2
+
+INJECT2+01:
+  jmp newmem2
+  nop
+return2:
+registersymbol(INJECT2)
+
+aobscanmodule(INJECT3,GameAssembly.dll,81 FB 4C 04 00 00 0F) // should be unique
+alloc(newmem3,$1000,INJECT3)
+
+label(code3)
+label(return3)
+
+newmem3:
+  mov ebx,00000388
+code3:
+  cmp ebx,0000044C
+  jmp return3
+
+INJECT3:
+  jmp newmem3
+  nop
+return3:
+registersymbol(INJECT3)
+
+aobscanmodule(INJECT4,GameAssembly.dll,81 FB 4D 04 00 00 75 1A 48 8B 0D) // should be unique
+alloc(newmem4,$1000,INJECT4)
+
+label(code4)
+label(return4)
+
+newmem4:
+  mov ebx,00000388
+code4:
+  cmp ebx,0000044D
+  jmp return4
+
+INJECT4:
+  jmp newmem4
+  nop
+return4:
+registersymbol(INJECT4)
+
+[DISABLE]
+
+INJECT:
+  db 81 FB 88 03 00 00
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+2F7C61
+
+GameAssembly.dll+2F7C28: 75 37                    - jne GameAssembly.dll+2F7C61
+GameAssembly.dll+2F7C2A: 48 8D 0D CF 18 88 01     - lea rcx,[GameAssembly.dll+1B79500]
+GameAssembly.dll+2F7C31: E8 AA 41 F8 FF           - call GameAssembly.dll+27BDE0
+GameAssembly.dll+2F7C36: 48 8D 0D 1B 18 88 01     - lea rcx,[GameAssembly.dll+1B79458]
+GameAssembly.dll+2F7C3D: E8 9E 41 F8 FF           - call GameAssembly.dll+27BDE0
+GameAssembly.dll+2F7C42: 48 8D 0D B7 17 88 01     - lea rcx,[GameAssembly.dll+1B79400]
+GameAssembly.dll+2F7C49: E8 92 41 F8 FF           - call GameAssembly.dll+27BDE0
+GameAssembly.dll+2F7C4E: 48 8D 0D 53 18 88 01     - lea rcx,[GameAssembly.dll+1B794A8]
+GameAssembly.dll+2F7C55: E8 86 41 F8 FF           - call GameAssembly.dll+27BDE0
+GameAssembly.dll+2F7C5A: C6 05 94 74 9A 01 01     - mov byte ptr [GameAssembly.dll+1C9F0F5],01
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+2F7C61: 81 FB 88 03 00 00        - cmp ebx,00000388
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+2F7C67: 0F 8E 1B 02 00 00        - jng GameAssembly.dll+2F7E88
+GameAssembly.dll+2F7C6D: 81 FB 8E 03 00 00        - cmp ebx,0000038E
+GameAssembly.dll+2F7C73: 7E 45                    - jle GameAssembly.dll+2F7CBA
+GameAssembly.dll+2F7C75: 8D 83 06 FC FF FF        - lea eax,[rbx-000003FA]
+GameAssembly.dll+2F7C7B: 83 F8 44                 - cmp eax,44
+GameAssembly.dll+2F7C7E: 77 1D                    - ja GameAssembly.dll+2F7C9D
+GameAssembly.dll+2F7C80: 48 8D 15 79 83 D0 FF     - lea rdx,[GameAssembly.dll]
+GameAssembly.dll+2F7C87: 48 98                    - cdqe 
+GameAssembly.dll+2F7C89: 0F B6 84 02 FC 7E 2F 00  - movzx eax,byte ptr [rdx+rax+002F7EFC]
+GameAssembly.dll+2F7C91: 8B 8C 82 EC 7E 2F 00     - mov ecx,[rdx+rax*4+002F7EEC]
+}
+INJECT2+01:
+  db 81 FB 8E 03 00 00
+
+unregistersymbol(INJECT2)
+dealloc(newmem2)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+2F7C6D
+
+GameAssembly.dll+2F7C31: E8 AA 41 F8 FF           - call GameAssembly.dll+27BDE0
+GameAssembly.dll+2F7C36: 48 8D 0D 1B 18 88 01     - lea rcx,[GameAssembly.dll+1B79458]
+GameAssembly.dll+2F7C3D: E8 9E 41 F8 FF           - call GameAssembly.dll+27BDE0
+GameAssembly.dll+2F7C42: 48 8D 0D B7 17 88 01     - lea rcx,[GameAssembly.dll+1B79400]
+GameAssembly.dll+2F7C49: E8 92 41 F8 FF           - call GameAssembly.dll+27BDE0
+GameAssembly.dll+2F7C4E: 48 8D 0D 53 18 88 01     - lea rcx,[GameAssembly.dll+1B794A8]
+GameAssembly.dll+2F7C55: E8 86 41 F8 FF           - call GameAssembly.dll+27BDE0
+GameAssembly.dll+2F7C5A: C6 05 94 74 9A 01 01     - mov byte ptr [GameAssembly.dll+1C9F0F5],01
+GameAssembly.dll+2F7C61: 81 FB 88 03 00 00        - cmp ebx,00000388
+GameAssembly.dll+2F7C67: 0F 8E 1B 02 00 00        - jng GameAssembly.dll+2F7E88
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+2F7C6D: 81 FB 8E 03 00 00        - cmp ebx,0000038E
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+2F7C73: 7E 45                    - jle GameAssembly.dll+2F7CBA
+GameAssembly.dll+2F7C75: 8D 83 06 FC FF FF        - lea eax,[rbx-000003FA]
+GameAssembly.dll+2F7C7B: 83 F8 44                 - cmp eax,44
+GameAssembly.dll+2F7C7E: 77 1D                    - ja GameAssembly.dll+2F7C9D
+GameAssembly.dll+2F7C80: 48 8D 15 79 83 D0 FF     - lea rdx,[GameAssembly.dll]
+GameAssembly.dll+2F7C87: 48 98                    - cdqe 
+GameAssembly.dll+2F7C89: 0F B6 84 02 FC 7E 2F 00  - movzx eax,byte ptr [rdx+rax+002F7EFC]
+GameAssembly.dll+2F7C91: 8B 8C 82 EC 7E 2F 00     - mov ecx,[rdx+rax*4+002F7EEC]
+GameAssembly.dll+2F7C98: 48 03 CA                 - add rcx,rdx
+GameAssembly.dll+2F7C9B: FF E1                    - jmp rcx
+}
+INJECT3:
+  db 81 FB 4C 04 00 00
+
+unregistersymbol(INJECT3)
+dealloc(newmem3)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+2F7C9D
+
+GameAssembly.dll+2F7C73: 7E 45                    - jle GameAssembly.dll+2F7CBA
+GameAssembly.dll+2F7C75: 8D 83 06 FC FF FF        - lea eax,[rbx-000003FA]
+GameAssembly.dll+2F7C7B: 83 F8 44                 - cmp eax,44
+GameAssembly.dll+2F7C7E: 77 1D                    - ja GameAssembly.dll+2F7C9D
+GameAssembly.dll+2F7C80: 48 8D 15 79 83 D0 FF     - lea rdx,[GameAssembly.dll]
+GameAssembly.dll+2F7C87: 48 98                    - cdqe 
+GameAssembly.dll+2F7C89: 0F B6 84 02 FC 7E 2F 00  - movzx eax,byte ptr [rdx+rax+002F7EFC]
+GameAssembly.dll+2F7C91: 8B 8C 82 EC 7E 2F 00     - mov ecx,[rdx+rax*4+002F7EEC]
+GameAssembly.dll+2F7C98: 48 03 CA                 - add rcx,rdx
+GameAssembly.dll+2F7C9B: FF E1                    - jmp rcx
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+2F7C9D: 81 FB 4C 04 00 00        - cmp ebx,0000044C
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+2F7CA3: 0F 84 2E 02 00 00        - je GameAssembly.dll+2F7ED7
+GameAssembly.dll+2F7CA9: 81 FB 4D 04 00 00        - cmp ebx,0000044D
+GameAssembly.dll+2F7CAF: 75 1A                    - jne GameAssembly.dll+2F7CCB
+GameAssembly.dll+2F7CB1: 48 8B 0D F0 17 88 01     - mov rcx,[GameAssembly.dll+1B794A8]
+GameAssembly.dll+2F7CB8: EB 18                    - jmp GameAssembly.dll+2F7CD2
+GameAssembly.dll+2F7CBA: 8D 83 74 FC FF FF        - lea eax,[rbx-0000038C]
+GameAssembly.dll+2F7CC0: A9 FD FF FF FF           - test eax,FFFFFFFD
+GameAssembly.dll+2F7CC5: 0F 84 0C 02 00 00        - je GameAssembly.dll+2F7ED7
+GameAssembly.dll+2F7CCB: 48 8B 0D 2E 17 88 01     - mov rcx,[GameAssembly.dll+1B79400]
+GameAssembly.dll+2F7CD2: 48 8B 15 E7 73 87 01     - mov rdx,[GameAssembly.dll+1B6F0C0]
+}
+INJECT4:
+  db 81 FB 4D 04 00 00
+
+unregistersymbol(INJECT4)
+dealloc(newmem4)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+2F7CA9
+
+GameAssembly.dll+2F7C7B: 83 F8 44                 - cmp eax,44
+GameAssembly.dll+2F7C7E: 77 1D                    - ja GameAssembly.dll+2F7C9D
+GameAssembly.dll+2F7C80: 48 8D 15 79 83 D0 FF     - lea rdx,[GameAssembly.dll]
+GameAssembly.dll+2F7C87: 48 98                    - cdqe 
+GameAssembly.dll+2F7C89: 0F B6 84 02 FC 7E 2F 00  - movzx eax,byte ptr [rdx+rax+002F7EFC]
+GameAssembly.dll+2F7C91: 8B 8C 82 EC 7E 2F 00     - mov ecx,[rdx+rax*4+002F7EEC]
+GameAssembly.dll+2F7C98: 48 03 CA                 - add rcx,rdx
+GameAssembly.dll+2F7C9B: FF E1                    - jmp rcx
+GameAssembly.dll+2F7C9D: 81 FB 4C 04 00 00        - cmp ebx,0000044C
+GameAssembly.dll+2F7CA3: 0F 84 2E 02 00 00        - je GameAssembly.dll+2F7ED7
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+2F7CA9: 81 FB 4D 04 00 00        - cmp ebx,0000044D
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+2F7CAF: 75 1A                    - jne GameAssembly.dll+2F7CCB
+GameAssembly.dll+2F7CB1: 48 8B 0D F0 17 88 01     - mov rcx,[GameAssembly.dll+1B794A8]
+GameAssembly.dll+2F7CB8: EB 18                    - jmp GameAssembly.dll+2F7CD2
+GameAssembly.dll+2F7CBA: 8D 83 74 FC FF FF        - lea eax,[rbx-0000038C]
+GameAssembly.dll+2F7CC0: A9 FD FF FF FF           - test eax,FFFFFFFD
+GameAssembly.dll+2F7CC5: 0F 84 0C 02 00 00        - je GameAssembly.dll+2F7ED7
+GameAssembly.dll+2F7CCB: 48 8B 0D 2E 17 88 01     - mov rcx,[GameAssembly.dll+1B79400]
+GameAssembly.dll+2F7CD2: 48 8B 15 E7 73 87 01     - mov rdx,[GameAssembly.dll+1B6F0C0]
+GameAssembly.dll+2F7CD9: E8 12 12 1C 00           - call GameAssembly.dll+4B8EF0
+GameAssembly.dll+2F7CDE: 33 D2                    - xor edx,edx
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>101</ID>
+          <Description>"Chỉnh Nền Của Tất Cả Cây Trong Bách Khoa Toàn Thư Thành Hồ Bơi"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : PlantsVsZombiesRH.exe
+  Version: 
+  Date   : 2024-10-24
+  Author : TheFate
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,GameAssembly.dll,81 FB 88 03 00 00 0F) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+  mov ebx,000000FC
+code:
+  cmp ebx,00000388
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT)
+
+aobscanmodule(INJECT2,GameAssembly.dll,00 81 FB 8E 03 00 00) // should be unique
+alloc(newmem2,$1000,INJECT2)
+
+label(code2)
+label(return2)
+
+newmem2:
+  mov ebx,000000FC
+code2:
+  cmp ebx,0000038E
+  jmp return2
+
+INJECT2+01:
+  jmp newmem2
+  nop
+return2:
+registersymbol(INJECT2)
+
+aobscanmodule(INJECT3,GameAssembly.dll,81 FB 4C 04 00 00 0F) // should be unique
+alloc(newmem3,$1000,INJECT3)
+
+label(code3)
+label(return3)
+
+newmem3:
+  mov ebx,000000FC
+code3:
+  cmp ebx,0000044C
+  jmp return3
+
+INJECT3:
+  jmp newmem3
+  nop
+return3:
+registersymbol(INJECT3)
+
+aobscanmodule(INJECT4,GameAssembly.dll,81 FB 4D 04 00 00 75 1A 48 8B 0D) // should be unique
+alloc(newmem4,$1000,INJECT4)
+
+label(code4)
+label(return4)
+
+newmem4:
+  mov ebx,000000FC
+code4:
+  cmp ebx,0000044D
+  jmp return4
+
+INJECT4:
+  jmp newmem4
+  nop
+return4:
+registersymbol(INJECT4)
+
+[DISABLE]
+
+INJECT:
+  db 81 FB 88 03 00 00
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+2F7C61
+
+GameAssembly.dll+2F7C28: 75 37                    - jne GameAssembly.dll+2F7C61
+GameAssembly.dll+2F7C2A: 48 8D 0D CF 18 88 01     - lea rcx,[GameAssembly.dll+1B79500]
+GameAssembly.dll+2F7C31: E8 AA 41 F8 FF           - call GameAssembly.dll+27BDE0
+GameAssembly.dll+2F7C36: 48 8D 0D 1B 18 88 01     - lea rcx,[GameAssembly.dll+1B79458]
+GameAssembly.dll+2F7C3D: E8 9E 41 F8 FF           - call GameAssembly.dll+27BDE0
+GameAssembly.dll+2F7C42: 48 8D 0D B7 17 88 01     - lea rcx,[GameAssembly.dll+1B79400]
+GameAssembly.dll+2F7C49: E8 92 41 F8 FF           - call GameAssembly.dll+27BDE0
+GameAssembly.dll+2F7C4E: 48 8D 0D 53 18 88 01     - lea rcx,[GameAssembly.dll+1B794A8]
+GameAssembly.dll+2F7C55: E8 86 41 F8 FF           - call GameAssembly.dll+27BDE0
+GameAssembly.dll+2F7C5A: C6 05 94 74 9A 01 01     - mov byte ptr [GameAssembly.dll+1C9F0F5],01
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+2F7C61: 81 FB 88 03 00 00        - cmp ebx,00000388
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+2F7C67: 0F 8E 1B 02 00 00        - jng GameAssembly.dll+2F7E88
+GameAssembly.dll+2F7C6D: 81 FB 8E 03 00 00        - cmp ebx,0000038E
+GameAssembly.dll+2F7C73: 7E 45                    - jle GameAssembly.dll+2F7CBA
+GameAssembly.dll+2F7C75: 8D 83 06 FC FF FF        - lea eax,[rbx-000003FA]
+GameAssembly.dll+2F7C7B: 83 F8 44                 - cmp eax,44
+GameAssembly.dll+2F7C7E: 77 1D                    - ja GameAssembly.dll+2F7C9D
+GameAssembly.dll+2F7C80: 48 8D 15 79 83 D0 FF     - lea rdx,[GameAssembly.dll]
+GameAssembly.dll+2F7C87: 48 98                    - cdqe 
+GameAssembly.dll+2F7C89: 0F B6 84 02 FC 7E 2F 00  - movzx eax,byte ptr [rdx+rax+002F7EFC]
+GameAssembly.dll+2F7C91: 8B 8C 82 EC 7E 2F 00     - mov ecx,[rdx+rax*4+002F7EEC]
+}
+INJECT2+01:
+  db 81 FB 8E 03 00 00
+
+unregistersymbol(INJECT2)
+dealloc(newmem2)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+2F7C6D
+
+GameAssembly.dll+2F7C31: E8 AA 41 F8 FF           - call GameAssembly.dll+27BDE0
+GameAssembly.dll+2F7C36: 48 8D 0D 1B 18 88 01     - lea rcx,[GameAssembly.dll+1B79458]
+GameAssembly.dll+2F7C3D: E8 9E 41 F8 FF           - call GameAssembly.dll+27BDE0
+GameAssembly.dll+2F7C42: 48 8D 0D B7 17 88 01     - lea rcx,[GameAssembly.dll+1B79400]
+GameAssembly.dll+2F7C49: E8 92 41 F8 FF           - call GameAssembly.dll+27BDE0
+GameAssembly.dll+2F7C4E: 48 8D 0D 53 18 88 01     - lea rcx,[GameAssembly.dll+1B794A8]
+GameAssembly.dll+2F7C55: E8 86 41 F8 FF           - call GameAssembly.dll+27BDE0
+GameAssembly.dll+2F7C5A: C6 05 94 74 9A 01 01     - mov byte ptr [GameAssembly.dll+1C9F0F5],01
+GameAssembly.dll+2F7C61: 81 FB 88 03 00 00        - cmp ebx,00000388
+GameAssembly.dll+2F7C67: 0F 8E 1B 02 00 00        - jng GameAssembly.dll+2F7E88
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+2F7C6D: 81 FB 8E 03 00 00        - cmp ebx,0000038E
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+2F7C73: 7E 45                    - jle GameAssembly.dll+2F7CBA
+GameAssembly.dll+2F7C75: 8D 83 06 FC FF FF        - lea eax,[rbx-000003FA]
+GameAssembly.dll+2F7C7B: 83 F8 44                 - cmp eax,44
+GameAssembly.dll+2F7C7E: 77 1D                    - ja GameAssembly.dll+2F7C9D
+GameAssembly.dll+2F7C80: 48 8D 15 79 83 D0 FF     - lea rdx,[GameAssembly.dll]
+GameAssembly.dll+2F7C87: 48 98                    - cdqe 
+GameAssembly.dll+2F7C89: 0F B6 84 02 FC 7E 2F 00  - movzx eax,byte ptr [rdx+rax+002F7EFC]
+GameAssembly.dll+2F7C91: 8B 8C 82 EC 7E 2F 00     - mov ecx,[rdx+rax*4+002F7EEC]
+GameAssembly.dll+2F7C98: 48 03 CA                 - add rcx,rdx
+GameAssembly.dll+2F7C9B: FF E1                    - jmp rcx
+}
+INJECT3:
+  db 81 FB 4C 04 00 00
+
+unregistersymbol(INJECT3)
+dealloc(newmem3)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+2F7C9D
+
+GameAssembly.dll+2F7C73: 7E 45                    - jle GameAssembly.dll+2F7CBA
+GameAssembly.dll+2F7C75: 8D 83 06 FC FF FF        - lea eax,[rbx-000003FA]
+GameAssembly.dll+2F7C7B: 83 F8 44                 - cmp eax,44
+GameAssembly.dll+2F7C7E: 77 1D                    - ja GameAssembly.dll+2F7C9D
+GameAssembly.dll+2F7C80: 48 8D 15 79 83 D0 FF     - lea rdx,[GameAssembly.dll]
+GameAssembly.dll+2F7C87: 48 98                    - cdqe 
+GameAssembly.dll+2F7C89: 0F B6 84 02 FC 7E 2F 00  - movzx eax,byte ptr [rdx+rax+002F7EFC]
+GameAssembly.dll+2F7C91: 8B 8C 82 EC 7E 2F 00     - mov ecx,[rdx+rax*4+002F7EEC]
+GameAssembly.dll+2F7C98: 48 03 CA                 - add rcx,rdx
+GameAssembly.dll+2F7C9B: FF E1                    - jmp rcx
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+2F7C9D: 81 FB 4C 04 00 00        - cmp ebx,0000044C
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+2F7CA3: 0F 84 2E 02 00 00        - je GameAssembly.dll+2F7ED7
+GameAssembly.dll+2F7CA9: 81 FB 4D 04 00 00        - cmp ebx,0000044D
+GameAssembly.dll+2F7CAF: 75 1A                    - jne GameAssembly.dll+2F7CCB
+GameAssembly.dll+2F7CB1: 48 8B 0D F0 17 88 01     - mov rcx,[GameAssembly.dll+1B794A8]
+GameAssembly.dll+2F7CB8: EB 18                    - jmp GameAssembly.dll+2F7CD2
+GameAssembly.dll+2F7CBA: 8D 83 74 FC FF FF        - lea eax,[rbx-0000038C]
+GameAssembly.dll+2F7CC0: A9 FD FF FF FF           - test eax,FFFFFFFD
+GameAssembly.dll+2F7CC5: 0F 84 0C 02 00 00        - je GameAssembly.dll+2F7ED7
+GameAssembly.dll+2F7CCB: 48 8B 0D 2E 17 88 01     - mov rcx,[GameAssembly.dll+1B79400]
+GameAssembly.dll+2F7CD2: 48 8B 15 E7 73 87 01     - mov rdx,[GameAssembly.dll+1B6F0C0]
+}
+INJECT4:
+  db 81 FB 4D 04 00 00
+
+unregistersymbol(INJECT4)
+dealloc(newmem4)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+2F7CA9
+
+GameAssembly.dll+2F7C7B: 83 F8 44                 - cmp eax,44
+GameAssembly.dll+2F7C7E: 77 1D                    - ja GameAssembly.dll+2F7C9D
+GameAssembly.dll+2F7C80: 48 8D 15 79 83 D0 FF     - lea rdx,[GameAssembly.dll]
+GameAssembly.dll+2F7C87: 48 98                    - cdqe 
+GameAssembly.dll+2F7C89: 0F B6 84 02 FC 7E 2F 00  - movzx eax,byte ptr [rdx+rax+002F7EFC]
+GameAssembly.dll+2F7C91: 8B 8C 82 EC 7E 2F 00     - mov ecx,[rdx+rax*4+002F7EEC]
+GameAssembly.dll+2F7C98: 48 03 CA                 - add rcx,rdx
+GameAssembly.dll+2F7C9B: FF E1                    - jmp rcx
+GameAssembly.dll+2F7C9D: 81 FB 4C 04 00 00        - cmp ebx,0000044C
+GameAssembly.dll+2F7CA3: 0F 84 2E 02 00 00        - je GameAssembly.dll+2F7ED7
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+2F7CA9: 81 FB 4D 04 00 00        - cmp ebx,0000044D
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+2F7CAF: 75 1A                    - jne GameAssembly.dll+2F7CCB
+GameAssembly.dll+2F7CB1: 48 8B 0D F0 17 88 01     - mov rcx,[GameAssembly.dll+1B794A8]
+GameAssembly.dll+2F7CB8: EB 18                    - jmp GameAssembly.dll+2F7CD2
+GameAssembly.dll+2F7CBA: 8D 83 74 FC FF FF        - lea eax,[rbx-0000038C]
+GameAssembly.dll+2F7CC0: A9 FD FF FF FF           - test eax,FFFFFFFD
+GameAssembly.dll+2F7CC5: 0F 84 0C 02 00 00        - je GameAssembly.dll+2F7ED7
+GameAssembly.dll+2F7CCB: 48 8B 0D 2E 17 88 01     - mov rcx,[GameAssembly.dll+1B79400]
+GameAssembly.dll+2F7CD2: 48 8B 15 E7 73 87 01     - mov rdx,[GameAssembly.dll+1B6F0C0]
+GameAssembly.dll+2F7CD9: E8 12 12 1C 00           - call GameAssembly.dll+4B8EF0
+GameAssembly.dll+2F7CDE: 33 D2                    - xor edx,edx
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>83</ID>
+          <Description>"Tự Động Chiến Thắng Tất Cả Màn Chơi"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{$lua}
+[ENABLE]
+local autowinall = decodeFunction("c-n/gL2DC16n=XLNwy*LjDmU?Lntbxy=fe.X^?l3)%K5L9wwVHS-aT^JCml}W*Uo(^R0+CA]{nal1tWH^SyoR5N9JI:*ni=?qLf*y+GSw%boH:xbf}v=Pd+awC%HF[!D/#4gq4o@*/CNOsRkaRmTCQ0a@{[Ez]3;r/J8,xQ0#8fTo9}SfVY=gg.dRHx-vBCqWp{oi5#Z*T8=$kCZ%=(+E]E5b_Je,eq/RA_?gCMVE)CJPp,7Nir2:eSBR?Ca/okefRITXdr9{/}l%T*X$e1-Z%]-H6u(YB@iN[T9fb4CX89_!^B/[CM@b{o[!-JDM7_c(]QCoXKgD?4bOh?E?SX8%]8ncWCUT57D!tz;yRY?Yrr(d(8}sj*lEB*W:3Oh.YH*O7uBIqB09y5qr:@U$E;%DwFmdTBPkN.H5]vkCLON0:f+w^-FW7=JlYR/T%]ApTb^A$l{L)-=Uyo,uoT2tjwd2QE5ULi[yEiIco/@E4]V5=Je1QuR$dgwVp$nm)Qd9.6RXXFH[?75WtIfyyXtZj(w4@iJ]?daFJ4[lRORzeiu$8]?irP!nJ,Fm9psBIGz^^@]IHX%SZvXLK7SukfAy6rqkLWPOGU%g:ZK!JE}rZK]G/f.!%.CbzD=kN?e?0bv=u")
+autowinall()
+
+[DISABLE]
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>84</ID>
+          <Description>"Tự Động Xóa Sạch Dữ Liệu Game"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{$lua}
+[ENABLE]
+local autoresetdata = decodeFunction("c-n/gL2DC16n=XLNwy*LjDmU?Lntbxy=fe.X^?l3)%K5L9wwVHS-aT^JCml}W*Uo(^R0+CA]{nal1tWH^SyoR5N9JI:*ni=?qLf*y+GSw%boH:xbf}v=Pd+awC%HF[!D/#4gq4o@*/CNOsRkaRmTCQ0a@{[Ez]3;r/J8,xQ0#8fTo9}SfVY=gg.dRHx-vBCqWp{oi5#Z*T8=$kCZ%=(+E]E5b_Je,eq/RA_?gCMVE)CJPp,7Nir2:eSBR?Ca/okefRITXdr9{/}l%T*X$e1-Z%]-H6u(YB@iN[T9fb4CX89_!^B/[CM@b{o[!-JDM7_c(]QCoXKgD?4bOh?E?SX8%]8ncWCUT57D!tz;yRY?Yrr(d(8}sj*lEB*W:3Oh.YH*O7uBIqB09y5qr:@U$E;%DwFmdTBPkN.H5]vkCLON0:f+w^-FW7=JlYR/T%]ApTb^A$l{L)-=Uyo,uoT2tjwd2QE5ULi[yEiIco/@E4]V5=Je1QumX,{nD:!LrvDz$H6Yb]jH[?75WtIfyyXtZj(w4@iJ]?daFJ4[lRORzeiu$8]?irP!nJ,Fm9psBIGz^^@]IHX%SZvXLK7SukfAy6rqkLWPOGU%g:ZK!JE}rZK]G/f.!%.CbzD=kN?e=}gv=u")
+autoresetdata()
+
+[DISABLE]
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>115</ID>
+          <Description>"Mặt Trời"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>GameAssembly.dll+1BC1A48</Address>
+          <Offsets>
+            <Offset>AC</Offset>
+            <Offset>8</Offset>
+            <Offset>B8</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>50</ID>
+          <Description>"Hack Mặt Trời"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : PlantsVsZombiesRH.exe
+  Version: 
+  Date   : 2024-11-13
+  Author : TheFate
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+
+aobscanmodule(INJECT,GameAssembly.dll,8B 80 AC 00 00 00 48 8D 4C 24 40 48 8B 7B 30) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+  mov [rax+000000AC],#100000
+code:
+  mov eax,[rax+000000AC]
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db 8B 80 AC 00 00 00
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+304C9C
+
+GameAssembly.dll+304C65: E8 46 7A F7 FF        - call GameAssembly.dll+27C6B0
+GameAssembly.dll+304C6A: 48 8D 0D 87 C6 8A 01  - lea rcx,[GameAssembly.dll+1BB12F8]
+GameAssembly.dll+304C71: E8 3A 7A F7 FF        - call GameAssembly.dll+27C6B0
+GameAssembly.dll+304C76: C6 05 5C E1 9E 01 01  - mov byte ptr [GameAssembly.dll+1CF2DD9],01
+GameAssembly.dll+304C7D: 48 8B 05 0C B3 8D 01  - mov rax,[GameAssembly.dll+1BDFF90]
+GameAssembly.dll+304C84: 48 89 7C 24 30        - mov [rsp+30],rdi
+GameAssembly.dll+304C89: 48 8B 88 B8 00 00 00  - mov rcx,[rax+000000B8]
+GameAssembly.dll+304C90: 48 8B 01              - mov rax,[rcx]
+GameAssembly.dll+304C93: 48 85 C0              - test rax,rax
+GameAssembly.dll+304C96: 0F 84 E3 00 00 00     - je GameAssembly.dll+304D7F
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+304C9C: 8B 80 AC 00 00 00     - mov eax,[rax+000000AC]
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+304CA2: 48 8D 4C 24 40        - lea rcx,[rsp+40]
+GameAssembly.dll+304CA7: 48 8B 7B 30           - mov rdi,[rbx+30]
+GameAssembly.dll+304CAB: 33 D2                 - xor edx,edx
+GameAssembly.dll+304CAD: 89 44 24 40           - mov [rsp+40],eax
+GameAssembly.dll+304CB1: E8 6A CE 9C 00        - call GameAssembly.dll+CD1B20
+GameAssembly.dll+304CB6: 48 85 FF              - test rdi,rdi
+GameAssembly.dll+304CB9: 0F 84 C0 00 00 00     - je GameAssembly.dll+304D7F
+GameAssembly.dll+304CBF: 4C 8B 0F              - mov r9,[rdi]
+GameAssembly.dll+304CC2: 48 8B D0              - mov rdx,rax
+GameAssembly.dll+304CC5: 48 8B CF              - mov rcx,rdi
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>111</ID>
+          <Description>"Không Hồi Chiêu (Cho Cây)"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : PlantsVsZombiesRH.exe
+  Version: 
+  Date   : 2024-09-26
+  Author : TheFate
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,GameAssembly.dll,0F 2F 43 44 0F 29 74 24 20) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+  mov [rbx+44],#108947010000
+code:
+  comiss xmm0,[rbx+44]
+  movaps [rsp+20],xmm6
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop 4
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db 0F 2F 43 44 0F 29 74 24 20
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+319B72
+
+GameAssembly.dll+319B3D: 48 8B D9              - mov rbx,rcx
+GameAssembly.dll+319B40: 75 2B                 - jne GameAssembly.dll+319B6D
+GameAssembly.dll+319B42: 48 8D 0D E7 3F 86 01  - lea rcx,[GameAssembly.dll+1B7DB30]
+GameAssembly.dll+319B49: E8 F2 21 F6 FF        - call GameAssembly.dll+27BD40
+GameAssembly.dll+319B4E: 48 8D 0D 03 28 84 01  - lea rcx,[GameAssembly.dll+1B5C358]
+GameAssembly.dll+319B55: E8 E6 21 F6 FF        - call GameAssembly.dll+27BD40
+GameAssembly.dll+319B5A: 48 8D 0D E7 10 85 01  - lea rcx,[GameAssembly.dll+1B6AC48]
+GameAssembly.dll+319B61: E8 DA 21 F6 FF        - call GameAssembly.dll+27BD40
+GameAssembly.dll+319B66: C6 05 E6 6C 97 01 01  - mov byte ptr [GameAssembly.dll+1C90853],01
+GameAssembly.dll+319B6D: F3 0F 10 43 48        - movss xmm0,[rbx+48]
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+319B72: 0F 2F 43 44           - comiss xmm0,[rbx+44]
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+319B76: 0F 29 74 24 20        - movaps [rsp+20],xmm6
+GameAssembly.dll+319B7B: 77 0B                 - ja GameAssembly.dll+319B88
+GameAssembly.dll+319B7D: 8B 43 48              - mov eax,[rbx+48]
+GameAssembly.dll+319B80: 89 43 44              - mov [rbx+44],eax
+GameAssembly.dll+319B83: E9 D6 00 00 00        - jmp GameAssembly.dll+319C5E
+GameAssembly.dll+319B88: 48 8B 05 B9 10 85 01  - mov rax,[GameAssembly.dll+1B6AC48]
+GameAssembly.dll+319B8F: 48 89 7C 24 40        - mov [rsp+40],rdi
+GameAssembly.dll+319B94: 83 B8 E0 00 00 00 00  - cmp dword ptr [rax+000000E0],00
+GameAssembly.dll+319B9B: 75 0F                 - jne GameAssembly.dll+319BAC
+GameAssembly.dll+319B9D: 48 8B C8              - mov rcx,rax
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>112</ID>
+          <Description>"Không Hồi Chiêu (Găng Tay)"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : PlantsVsZombiesRH.exe
+  Version: 
+  Date   : 2024-09-26
+  Author : TheFate
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,GameAssembly.dll,01 00 00 F3 0F 10 73 34) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+  mov [rbx+34],#108947010000
+code:
+  movss xmm6,[rbx+34]
+  jmp return
+
+INJECT+03:
+  jmp newmem
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db 01 00 00 F3 0F 10 73 34
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+308D5F
+
+GameAssembly.dll+308D35: 48 8B 01              - mov rax,[rcx]
+GameAssembly.dll+308D38: 48 85 C0              - test rax,rax
+GameAssembly.dll+308D3B: 0F 84 69 01 00 00     - je GameAssembly.dll+308EAA
+GameAssembly.dll+308D41: 80 B8 1B 01 00 00 00  - cmp byte ptr [rax+0000011B],00
+GameAssembly.dll+308D48: 74 06                 - je GameAssembly.dll+308D50
+GameAssembly.dll+308D4A: 8B 43 30              - mov eax,[rbx+30]
+GameAssembly.dll+308D4D: 89 43 34              - mov [rbx+34],eax
+GameAssembly.dll+308D50: F3 0F 10 43 30        - movss xmm0,[rbx+30]
+GameAssembly.dll+308D55: 0F 2F 43 34           - comiss xmm0,[rbx+34]
+GameAssembly.dll+308D59: 0F 86 29 01 00 00     - jbe GameAssembly.dll+308E88
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+308D5F: F3 0F 10 73 34        - movss xmm6,[rbx+34]
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+308D64: 33 C9                 - xor ecx,ecx
+GameAssembly.dll+308D66: 48 89 7C 24 40        - mov [rsp+40],rdi
+GameAssembly.dll+308D6B: E8 D0 F6 FE 00        - call GameAssembly.dll+12F8440
+GameAssembly.dll+308D70: F3 0F 58 C6           - addss xmm0,xmm6
+GameAssembly.dll+308D74: F3 0F 11 43 34        - movss [rbx+34],xmm0
+GameAssembly.dll+308D79: 48 8B 05 F8 2E 86 01  - mov rax,[GameAssembly.dll+1B6BC78]
+GameAssembly.dll+308D80: 83 B8 E0 00 00 00 00  - cmp dword ptr [rax+000000E0],00
+GameAssembly.dll+308D87: 75 0F                 - jne GameAssembly.dll+308D98
+GameAssembly.dll+308D89: 48 8B C8              - mov rcx,rax
+GameAssembly.dll+308D8C: E8 BF 2B F5 FF        - call GameAssembly.il2cpp_runtime_class_init
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>113</ID>
+          <Description>"Không Hồi Chiêu (Búa)"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : PlantsVsZombiesRH.exe
+  Version:
+  Date   : 2024-09-26
+  Author : TheFate
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,GameAssembly.dll,00 00 00 F3 0F 10 73 34) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+  mov [rbx+34],#108947010000
+code:
+  movss xmm6,[rbx+34]
+  jmp return
+
+INJECT+03:
+  jmp newmem
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db 00 00 00 F3 0F 10 73 34
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+309820
+
+GameAssembly.dll+3097EF: E8 5C 21 F5 FF        - call GameAssembly.il2cpp_runtime_class_init
+GameAssembly.dll+3097F4: 48 8B 05 FD 59 84 01  - mov rax,[GameAssembly.dll+1B4F1F8]
+GameAssembly.dll+3097FB: 48 8B 80 B8 00 00 00  - mov rax,[rax+000000B8]
+GameAssembly.dll+309802: 80 B8 FD 00 00 00 00  - cmp byte ptr [rax+000000FD],00
+GameAssembly.dll+309809: 74 06                 - je GameAssembly.dll+309811
+GameAssembly.dll+30980B: 8B 43 30              - mov eax,[rbx+30]
+GameAssembly.dll+30980E: 89 43 34              - mov [rbx+34],eax
+GameAssembly.dll+309811: F3 0F 10 43 30        - movss xmm0,[rbx+30]
+GameAssembly.dll+309816: 0F 2F 43 34           - comiss xmm0,[rbx+34]
+GameAssembly.dll+30981A: 0F 86 E7 00 00 00     - jbe GameAssembly.dll+309907
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+309820: F3 0F 10 73 34        - movss xmm6,[rbx+34]
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+309825: 33 C9                 - xor ecx,ecx
+GameAssembly.dll+309827: 48 89 7C 24 40        - mov [rsp+40],rdi
+GameAssembly.dll+30982C: E8 0F EC FE 00        - call GameAssembly.dll+12F8440
+GameAssembly.dll+309831: F3 0F 58 C6           - addss xmm0,xmm6
+GameAssembly.dll+309835: F3 0F 11 43 34        - movss [rbx+34],xmm0
+GameAssembly.dll+30983A: 48 8B 05 37 24 86 01  - mov rax,[GameAssembly.dll+1B6BC78]
+GameAssembly.dll+309841: 83 B8 E0 00 00 00 00  - cmp dword ptr [rax+000000E0],00
+GameAssembly.dll+309848: 75 0F                 - jne GameAssembly.dll+309859
+GameAssembly.dll+30984A: 48 8B C8              - mov rcx,rax
+GameAssembly.dll+30984D: E8 FE 20 F5 FF        - call GameAssembly.il2cpp_runtime_class_init
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>116</ID>
+          <Description>"Tất Cả Cây Đều Bất Tử"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(godMode,GameAssembly.dll,44 29 76 2C 48 8B 9C 24 90 00 00 00) // should be unique
+alloc(newmem,$1000,godMode)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  //sub [rsi+2C],r14d
+  mov rbx,[rsp+00000090]
+  jmp return
+
+godMode:
+  jmp newmem
+  nop 7
+return:
+registersymbol(godMode)
+
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+godMode:
+  db 44 29 76 2C 48 8B 9C 24 90 00 00 00
+
+unregistersymbol(godMode)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+3B838C
+
+GameAssembly.dll+3B835A: E8 C1 E7 F4 FF           - call GameAssembly.dll+306B20
+GameAssembly.dll+3B835F: EB 2B                    - jmp GameAssembly.dll+3B838C
+GameAssembly.dll+3B8361: 48 8B 15 A8 9C 81 01     - mov rdx,[GameAssembly.dll+1BD2010]
+GameAssembly.dll+3B8368: 48 8B 4C 24 38           - mov rcx,[rsp+38]
+GameAssembly.dll+3B836D: E8 AE E7 F4 FF           - call GameAssembly.dll+306B20
+GameAssembly.dll+3B8372: 48 8B 4C 24 30           - mov rcx,[rsp+30]
+GameAssembly.dll+3B8377: 48 85 C9                 - test rcx,rcx
+GameAssembly.dll+3B837A: 75 43                    - jne GameAssembly.dll+3B83BF
+GameAssembly.dll+3B837C: 44 8B B4 24 88 00 00 00  - mov r14d,[rsp+00000088]
+GameAssembly.dll+3B8384: 48 8B B4 24 80 00 00 00  - mov rsi,[rsp+00000080]
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+3B838C: 44 29 76 2C              - sub [rsi+2C],r14d
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+3B8390: 48 8B 9C 24 90 00 00 00  - mov rbx,[rsp+00000090]
+GameAssembly.dll+3B8398: 48 83 C4 60              - add rsp,60
+GameAssembly.dll+3B839C: 41 5E                    - pop r14
+GameAssembly.dll+3B839E: 5F                       - pop rdi
+GameAssembly.dll+3B839F: 5E                       - pop rsi
+GameAssembly.dll+3B83A0: C3                       - ret
+GameAssembly.dll+3B83A1: E8 3A 45 EC FF           - call GameAssembly.dll+27C8E0
+GameAssembly.dll+3B83A6: 90                       - nop
+GameAssembly.dll+3B83A7: E8 34 45 EC FF           - call GameAssembly.dll+27C8E0
+GameAssembly.dll+3B83AC: 90                       - nop
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>117</ID>
+          <Description>"Tất Cả Cây Đều Biến Mất"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : PlantsVsZombiesRH.exe
+  Version:
+  Date   : 2024-09-28
+  Author : TheFate
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,GameAssembly.dll,83 7B 2C 00 7F 15) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+  mov [rbx+2C],#0
+code:
+  cmp dword ptr [rbx+2C],00
+  jg GameAssembly.dll+33C99C
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db 83 7B 2C 00 7F 15
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+33C981
+
+GameAssembly.dll+33C950: 40 53                 - push rbx
+GameAssembly.dll+33C952: 48 83 EC 60           - sub rsp,60
+GameAssembly.dll+33C956: 80 3D CB 4F 95 01 00  - cmp byte ptr [GameAssembly.dll+1C91928],00
+GameAssembly.dll+33C95D: 48 8B D9              - mov rbx,rcx
+GameAssembly.dll+33C960: 75 1F                 - jne GameAssembly.dll+33C981
+GameAssembly.dll+33C962: 48 8D 0D 6F 5E 84 01  - lea rcx,[GameAssembly.dll+1B827D8]
+GameAssembly.dll+33C969: E8 D2 F3 F3 FF        - call GameAssembly.dll+27BD40
+GameAssembly.dll+33C96E: 48 8D 0D FB 07 82 01  - lea rcx,[GameAssembly.dll+1B5D170]
+GameAssembly.dll+33C975: E8 C6 F3 F3 FF        - call GameAssembly.dll+27BD40
+GameAssembly.dll+33C97A: C6 05 A7 4F 95 01 01  - mov byte ptr [GameAssembly.dll+1C91928],01
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+33C981: 83 7B 2C 00           - cmp dword ptr [rbx+2C],00
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+33C985: 7F 15                 - jg GameAssembly.dll+33C99C
+GameAssembly.dll+33C987: 48 8B 03              - mov rax,[rbx]
+GameAssembly.dll+33C98A: 33 D2                 - xor edx,edx
+GameAssembly.dll+33C98C: 48 8B CB              - mov rcx,rbx
+GameAssembly.dll+33C98F: 4C 8B 80 F0 01 00 00  - mov r8,[rax+000001F0]
+GameAssembly.dll+33C996: FF 90 E8 01 00 00     - call qword ptr [rax+000001E8]
+GameAssembly.dll+33C99C: 48 8B 8B C0 00 00 00  - mov rcx,[rbx+000000C0]
+GameAssembly.dll+33C9A3: 0F 29 7C 24 40        - movaps [rsp+40],xmm7
+GameAssembly.dll+33C9A8: 48 85 C9              - test rcx,rcx
+GameAssembly.dll+33C9AB: 0F 84 82 02 00 00     - je GameAssembly.dll+33CC33
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>63</ID>
+          <Description>"Một Cắn Cây Chết"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : PlantsVsZombiesRH.exe
+  Version: 
+  Date   : 2024-10-03
+  Author : TheFate
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+
+aobscanmodule(INJECT,GameAssembly.dll,44 29 76 2C 48 8B 9C 24 90 00 00 00) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  sub [rsi+2C],#666666
+  mov rbx,[rsp+00000090]
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop 7
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db 44 29 76 2C 48 8B 9C 24 90 00 00 00
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+34F05C
+
+GameAssembly.dll+34F02A: E8 E1 11 FC FF           - call GameAssembly.dll+310210
+GameAssembly.dll+34F02F: EB 2B                    - jmp GameAssembly.dll+34F05C
+GameAssembly.dll+34F031: 48 8B 15 48 E2 82 01     - mov rdx,[GameAssembly.dll+1B7D280]
+GameAssembly.dll+34F038: 48 8B 4C 24 38           - mov rcx,[rsp+38]
+GameAssembly.dll+34F03D: E8 CE 11 FC FF           - call GameAssembly.dll+310210
+GameAssembly.dll+34F042: 48 8B 4C 24 30           - mov rcx,[rsp+30]
+GameAssembly.dll+34F047: 48 85 C9                 - test rcx,rcx
+GameAssembly.dll+34F04A: 75 43                    - jne GameAssembly.dll+34F08F
+GameAssembly.dll+34F04C: 44 8B B4 24 88 00 00 00  - mov r14d,[rsp+00000088]
+GameAssembly.dll+34F054: 48 8B B4 24 80 00 00 00  - mov rsi,[rsp+00000080]
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+34F05C: 44 29 76 2C              - sub [rsi+2C],r14d
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+34F060: 48 8B 9C 24 90 00 00 00  - mov rbx,[rsp+00000090]
+GameAssembly.dll+34F068: 48 83 C4 60              - add rsp,60
+GameAssembly.dll+34F06C: 41 5E                    - pop r14
+GameAssembly.dll+34F06E: 5F                       - pop rdi
+GameAssembly.dll+34F06F: 5E                       - pop rsi
+GameAssembly.dll+34F070: C3                       - ret 
+GameAssembly.dll+34F071: E8 9A CF F2 FF           - call GameAssembly.dll+27C010
+GameAssembly.dll+34F076: 90                       - nop 
+GameAssembly.dll+34F077: E8 94 CF F2 FF           - call GameAssembly.dll+27C010
+GameAssembly.dll+34F07C: 90                       - nop 
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>10</ID>
+          <Description>"Trồng Cây Hàng Dọc"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : PlantsVsZombiesRH.exe
+  Version: 
+  Date   : 2024-11-14
+  Author : TheFate
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+
+aobscanmodule(INJECT,GameAssembly.dll,0F 84 81 00 00 00 8B F7) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  jne GameAssembly.dll+34DC4D
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db 0F 84 81 00 00 00
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+34DBC6
+
+GameAssembly.dll+34DB95: 49 8B CF              - mov rcx,r15
+GameAssembly.dll+34DB98: E8 F3 20 FF 00        - call GameAssembly.dll+133FC90
+GameAssembly.dll+34DB9D: 84 C0                 - test al,al
+GameAssembly.dll+34DB9F: 0F 84 A1 FE FF FF     - je GameAssembly.dll+34DA46
+GameAssembly.dll+34DBA5: 48 8B 15 24 24 89 01  - mov rdx,[GameAssembly.dll+1BDFFD0]
+GameAssembly.dll+34DBAC: 48 8B 82 B8 00 00 00  - mov rax,[rdx+000000B8]
+GameAssembly.dll+34DBB3: 48 8B 08              - mov rcx,[rax]
+GameAssembly.dll+34DBB6: 48 85 C9              - test rcx,rcx
+GameAssembly.dll+34DBB9: 0F 84 6C 02 00 00     - je GameAssembly.dll+34DE2B
+GameAssembly.dll+34DBBF: 40 38 B9 55 01 00 00  - cmp [rcx+00000155],dil
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+34DBC6: 0F 84 81 00 00 00     - je GameAssembly.dll+34DC4D
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+34DBCC: 8B F7                 - mov esi,edi
+GameAssembly.dll+34DBCE: 44 8B C7              - mov r8d,edi
+GameAssembly.dll+34DBD1: 44 3B 81 E0 00 00 00  - cmp r8d,[rcx+000000E0]
+GameAssembly.dll+34DBD8: 7D 73                 - jnl GameAssembly.dll+34DC4D
+GameAssembly.dll+34DBDA: 3B 73 28              - cmp esi,[rbx+28]
+GameAssembly.dll+34DBDD: 74 54                 - je GameAssembly.dll+34DC33
+GameAssembly.dll+34DBDF: 48 8B 05 6A 60 89 01  - mov rax,[GameAssembly.dll+1BE3C50]
+GameAssembly.dll+34DBE6: 48 8B 88 B8 00 00 00  - mov rcx,[rax+000000B8]
+GameAssembly.dll+34DBED: 33 C0                 - xor eax,eax
+GameAssembly.dll+34DBEF: 48 89 45 77           - mov [rbp+77],rax
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>118</ID>
+          <Description>"Zombie Tự Chạy Ra Ngoài"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(zombieWave,GameAssembly.dll,F3 0F 10 B7 00 01 00 00) // should be unique
+alloc(newmem,$1000,zombieWave)
+
+label(code)
+label(return)
+
+newmem:
+mov [rdi+00000100],(float)0
+
+code:
+  movss xmm6,[rdi+00000100]
+  jmp return
+
+zombieWave:
+  jmp newmem
+  nop 3
+return:
+registersymbol(zombieWave)
+
+[DISABLE]
+
+zombieWave:
+  db F3 0F 10 B7 00 01 00 00
+
+unregistersymbol(zombieWave)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+311438
+
+GameAssembly.dll+3113FC: E8 AF B2 F6 FF                 - call GameAssembly.dll+27C6B0
+GameAssembly.dll+311401: 48 8D 0D 58 A0 8A 01           - lea rcx,[GameAssembly.dll+1BBB460]
+GameAssembly.dll+311408: E8 A3 B2 F6 FF                 - call GameAssembly.dll+27C6B0
+GameAssembly.dll+31140D: C6 05 5B 1A 9E 01 01           - mov byte ptr [GameAssembly.dll+1CF2E6F],01
+GameAssembly.dll+311414: 8B 87 CC 00 00 00              - mov eax,[rdi+000000CC]
+GameAssembly.dll+31141A: 39 87 C8 00 00 00              - cmp [rdi+000000C8],eax
+GameAssembly.dll+311420: 0F 8D B2 0E 00 00              - jnl GameAssembly.dll+3122D8
+GameAssembly.dll+311426: 4C 89 AC 24 80 00 00 00        - mov [rsp+00000080],r13
+GameAssembly.dll+31142E: 0F 29 74 24 60                 - movaps [rsp+60],xmm6
+GameAssembly.dll+311433: 0F 29 7C 24 50                 - movaps [rsp+50],xmm7
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+311438: F3 0F 10 B7 00 01 00 00        - movss xmm6,[rdi+00000100]
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+311440: 33 C9                          - xor ecx,ecx
+GameAssembly.dll+311442: C7 87 04 01 00 00 00 00 34 43  - mov [rdi+00000104],43340000
+GameAssembly.dll+31144C: E8 CF A7 03 01                 - call GameAssembly.dll+134BC20
+GameAssembly.dll+311451: F3 0F 5C F0                    - subss xmm6,xmm0
+GameAssembly.dll+311455: 33 C9                          - xor ecx,ecx
+GameAssembly.dll+311457: F3 0F 11 B7 00 01 00 00        - movss [rdi+00000100],xmm6
+GameAssembly.dll+31145F: F3 0F 10 B7 F8 00 00 00        - movss xmm6,[rdi+000000F8]
+GameAssembly.dll+311467: E8 B4 A7 03 01                 - call GameAssembly.dll+134BC20
+GameAssembly.dll+31146C: F3 0F 10 0D D0 D5 2A 01        - movss xmm1,[GameAssembly.dll+15BEA44]
+GameAssembly.dll+311474: F3 0F 58 C6                    - addss xmm0,xmm6
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>119</ID>
+          <Description>"Tất Cả Zombie Đều Trốn Đi"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : PlantsVsZombiesRH.exe
+  Version:
+  Date   : 2024-11-13
+  Author : TheFate
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,GameAssembly.dll,8B 81 E0 00 00 00 FF C8) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+  mov [rcx+000000E0],#500000
+code:
+  mov eax,[rcx+000000E0]
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db 8B 81 E0 00 00 00
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+//FF C8 F3 0F ?? ?? 3B ??
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+34E9AF
+
+GameAssembly.dll+34E978: F3 0F 10 0D B0 00 27 01  - movss xmm1,[GameAssembly.dll+15BEA30]
+GameAssembly.dll+34E980: 40 38 B9 5F 01 00 00     - cmp [rcx+0000015F],dil
+GameAssembly.dll+34E987: 75 50                    - jne GameAssembly.dll+34E9D9
+GameAssembly.dll+34E989: 83 B9 E0 00 00 00 06     - cmp dword ptr [rcx+000000E0],06
+GameAssembly.dll+34E990: F3 0F 10 05 B8 02 27 01  - movss xmm0,[GameAssembly.dll+15BEC50]
+GameAssembly.dll+34E998: 74 2F                    - je GameAssembly.dll+34E9C9
+GameAssembly.dll+34E99A: 0F 2F F0                 - comiss xmm6,xmm0
+GameAssembly.dll+34E99D: 0F 87 8A 00 00 00        - ja GameAssembly.dll+34EA2D
+GameAssembly.dll+34E9A3: F3 0F 5C C6              - subss xmm0,xmm6
+GameAssembly.dll+34E9A7: F3 0F 5E 05 8D 02 27 01  - divss xmm0,[GameAssembly.dll+15BEC3C]
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+34E9AF: 8B 81 E0 00 00 00        - mov eax,[rcx+000000E0]
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+34E9B5: FF C8                    - dec eax
+GameAssembly.dll+34E9B7: F3 0F 2C F8              - cvttss2si edi,xmm0
+GameAssembly.dll+34E9BB: 3B F8                    - cmp edi,eax
+GameAssembly.dll+34E9BD: 0F 4D F8                 - cmovge edi,eax
+GameAssembly.dll+34E9C0: 48 8B 82 B8 00 00 00     - mov rax,[rdx+000000B8]
+GameAssembly.dll+34E9C7: EB 64                    - jmp GameAssembly.dll+34EA2D
+GameAssembly.dll+34E9C9: 0F 2F F0                 - comiss xmm6,xmm0
+GameAssembly.dll+34E9CC: 77 5F                    - ja GameAssembly.dll+34EA2D
+GameAssembly.dll+34E9CE: F3 0F 5C C6              - subss xmm0,xmm6
+GameAssembly.dll+34E9D2: F3 41 0F 5E C0           - divss xmm0,xmm8
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>106</ID>
+          <Description>"Tắt Tất Cả Zombie Đều Trốn Đi"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : PlantsVsZombiesRH.exe
+  Version:
+  Date   : 2024-11-13
+  Author : TheFate
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,GameAssembly.dll,8B 81 E0 00 00 00 FF C8) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+  mov [rcx+000000E0],#5
+code:
+  mov eax,[rcx+000000E0]
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db 8B 81 E0 00 00 00
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+//FF C8 F3 0F ?? ?? 3B ??
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+34E9AF
+
+GameAssembly.dll+34E978: F3 0F 10 0D B0 00 27 01  - movss xmm1,[GameAssembly.dll+15BEA30]
+GameAssembly.dll+34E980: 40 38 B9 5F 01 00 00     - cmp [rcx+0000015F],dil
+GameAssembly.dll+34E987: 75 50                    - jne GameAssembly.dll+34E9D9
+GameAssembly.dll+34E989: 83 B9 E0 00 00 00 06     - cmp dword ptr [rcx+000000E0],06
+GameAssembly.dll+34E990: F3 0F 10 05 B8 02 27 01  - movss xmm0,[GameAssembly.dll+15BEC50]
+GameAssembly.dll+34E998: 74 2F                    - je GameAssembly.dll+34E9C9
+GameAssembly.dll+34E99A: 0F 2F F0                 - comiss xmm6,xmm0
+GameAssembly.dll+34E99D: 0F 87 8A 00 00 00        - ja GameAssembly.dll+34EA2D
+GameAssembly.dll+34E9A3: F3 0F 5C C6              - subss xmm0,xmm6
+GameAssembly.dll+34E9A7: F3 0F 5E 05 8D 02 27 01  - divss xmm0,[GameAssembly.dll+15BEC3C]
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+34E9AF: 8B 81 E0 00 00 00        - mov eax,[rcx+000000E0]
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+34E9B5: FF C8                    - dec eax
+GameAssembly.dll+34E9B7: F3 0F 2C F8              - cvttss2si edi,xmm0
+GameAssembly.dll+34E9BB: 3B F8                    - cmp edi,eax
+GameAssembly.dll+34E9BD: 0F 4D F8                 - cmovge edi,eax
+GameAssembly.dll+34E9C0: 48 8B 82 B8 00 00 00     - mov rax,[rdx+000000B8]
+GameAssembly.dll+34E9C7: EB 64                    - jmp GameAssembly.dll+34EA2D
+GameAssembly.dll+34E9C9: 0F 2F F0                 - comiss xmm6,xmm0
+GameAssembly.dll+34E9CC: 77 5F                    - ja GameAssembly.dll+34EA2D
+GameAssembly.dll+34E9CE: F3 0F 5C C6              - subss xmm0,xmm6
+GameAssembly.dll+34E9D2: F3 41 0F 5E C0           - divss xmm0,xmm8
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>124</ID>
+          <Description>"Tự Động Chiến Thắng"</Description>
+          <Options moAlwaysHideChildren="1" moActivateChildrenAsWell="1" moDeactivateChildrenAsWell="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(zombieWave,GameAssembly.dll,F3 0F 10 B7 00 01 00 00) // should be unique
+alloc(newmem,$1000,zombieWave)
+
+label(code)
+label(return)
+
+newmem:
+mov [rdi+00000100],(float)0
+
+code:
+  movss xmm6,[rdi+00000100]
+  jmp return
+
+zombieWave:
+  jmp newmem
+  nop 3
+return:
+registersymbol(zombieWave)
+
+[DISABLE]
+
+zombieWave:
+  db F3 0F 10 B7 00 01 00 00
+
+unregistersymbol(zombieWave)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+311438
+
+GameAssembly.dll+3113FC: E8 AF B2 F6 FF                 - call GameAssembly.dll+27C6B0
+GameAssembly.dll+311401: 48 8D 0D 58 A0 8A 01           - lea rcx,[GameAssembly.dll+1BBB460]
+GameAssembly.dll+311408: E8 A3 B2 F6 FF                 - call GameAssembly.dll+27C6B0
+GameAssembly.dll+31140D: C6 05 5B 1A 9E 01 01           - mov byte ptr [GameAssembly.dll+1CF2E6F],01
+GameAssembly.dll+311414: 8B 87 CC 00 00 00              - mov eax,[rdi+000000CC]
+GameAssembly.dll+31141A: 39 87 C8 00 00 00              - cmp [rdi+000000C8],eax
+GameAssembly.dll+311420: 0F 8D B2 0E 00 00              - jnl GameAssembly.dll+3122D8
+GameAssembly.dll+311426: 4C 89 AC 24 80 00 00 00        - mov [rsp+00000080],r13
+GameAssembly.dll+31142E: 0F 29 74 24 60                 - movaps [rsp+60],xmm6
+GameAssembly.dll+311433: 0F 29 7C 24 50                 - movaps [rsp+50],xmm7
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+311438: F3 0F 10 B7 00 01 00 00        - movss xmm6,[rdi+00000100]
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+311440: 33 C9                          - xor ecx,ecx
+GameAssembly.dll+311442: C7 87 04 01 00 00 00 00 34 43  - mov [rdi+00000104],43340000
+GameAssembly.dll+31144C: E8 CF A7 03 01                 - call GameAssembly.dll+134BC20
+GameAssembly.dll+311451: F3 0F 5C F0                    - subss xmm6,xmm0
+GameAssembly.dll+311455: 33 C9                          - xor ecx,ecx
+GameAssembly.dll+311457: F3 0F 11 B7 00 01 00 00        - movss [rdi+00000100],xmm6
+GameAssembly.dll+31145F: F3 0F 10 B7 F8 00 00 00        - movss xmm6,[rdi+000000F8]
+GameAssembly.dll+311467: E8 B4 A7 03 01                 - call GameAssembly.dll+134BC20
+GameAssembly.dll+31146C: F3 0F 10 0D D0 D5 2A 01        - movss xmm1,[GameAssembly.dll+15BEA44]
+GameAssembly.dll+311474: F3 0F 58 C6                    - addss xmm0,xmm6
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>89</ID>
+              <Description>"Zombie Tự Động Chết"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{ Game   : PlantsVsZombiesRH.exe
+  Version: 
+  Date   : 2024-11-13
+  Author : Admin
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,GameAssembly.dll,0F 2F 7B 58 0F 28 7C 24 20) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  //comiss xmm7,[rbx+58]
+  //movaps xmm7,[rsp+20]
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop 4
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db 0F 2F 7B 58 0F 28 7C 24 20
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+42424D
+
+GameAssembly.dll+42421A: E8 61 84 F2 00                 - call GameAssembly.dll+134C680
+GameAssembly.dll+42421F: F3 0F 5C F0                    - subss xmm6,xmm0
+GameAssembly.dll+424223: 0F 2F FE                       - comiss xmm7,xmm6
+GameAssembly.dll+424226: F3 0F 11 B3 00 01 00 00        - movss [rbx+00000100],xmm6
+GameAssembly.dll+42422E: 72 1D                          - jb GameAssembly.dll+42424D
+GameAssembly.dll+424230: 48 8B 03                       - mov rax,[rbx]
+GameAssembly.dll+424233: 48 8B CB                       - mov rcx,rbx
+GameAssembly.dll+424236: C7 83 00 01 00 00 00 00 00 00  - mov [rbx+00000100],00000000
+GameAssembly.dll+424240: 48 8B 90 E0 01 00 00           - mov rdx,[rax+000001E0]
+GameAssembly.dll+424247: FF 90 D8 01 00 00              - call qword ptr [rax+000001D8]
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+42424D: 0F 2F 7B 58                    - comiss xmm7,[rbx+58]
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+424251: 0F 28 7C 24 20                 - movaps xmm7,[rsp+20]
+GameAssembly.dll+424256: 72 15                          - jb GameAssembly.dll+42426D
+GameAssembly.dll+424258: 48 8B 03                       - mov rax,[rbx]
+GameAssembly.dll+42425B: 33 D2                          - xor edx,edx
+GameAssembly.dll+42425D: 48 8B CB                       - mov rcx,rbx
+GameAssembly.dll+424260: 4C 8B 80 F0 01 00 00           - mov r8,[rax+000001F0]
+GameAssembly.dll+424267: FF 90 E8 01 00 00              - call qword ptr [rax+000001E8]
+GameAssembly.dll+42426D: 80 BB 10 01 00 00 00           - cmp byte ptr [rbx+00000110],00
+GameAssembly.dll+424274: 74 29                          - je GameAssembly.dll+42429F
+GameAssembly.dll+424276: F3 0F 10 73 58                 - movss xmm6,[rbx+58]
+}
+</AssemblerScript>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>66</ID>
+          <Description>"Tất Cả Zombie Bất Tử (Mất Đầu)"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : PlantsVsZombiesRH.exe
+  Version:
+  Date   : 2024-10-04
+  Author : TheFate
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,GameAssembly.dll,0F 2F 43 48 72 15) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+  mov [rbx+48],#10000000
+code:
+  comiss xmm0,[rbx+48]
+  jne GameAssembly.dll+39E985
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db 0F 2F 43 48 72 15
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+39E96A
+
+GameAssembly.dll+39E938: E8 B3 D0 EB FF        - call GameAssembly.il2cpp_runtime_class_init
+GameAssembly.dll+39E93D: 48 8B 05 FC DE 7B 01  - mov rax,[GameAssembly.dll+1B5C840]
+GameAssembly.dll+39E944: 48 8B 80 B8 00 00 00  - mov rax,[rax+000000B8]
+GameAssembly.dll+39E94B: 83 B8 08 01 00 00 00  - cmp dword ptr [rax+00000108],00
+GameAssembly.dll+39E952: 75 6D                 - jne GameAssembly.dll+39E9C1
+GameAssembly.dll+39E954: 48 8B 03              - mov rax,[rbx]
+GameAssembly.dll+39E957: 48 8B CB              - mov rcx,rbx
+GameAssembly.dll+39E95A: 48 8B 90 C0 02 00 00  - mov rdx,[rax+000002C0]
+GameAssembly.dll+39E961: FF 90 B8 02 00 00     - call qword ptr [rax+000002B8]
+GameAssembly.dll+39E967: 0F 57 C0              - xorps xmm0,xmm0
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+39E96A: 0F 2F 43 48           - comiss xmm0,[rbx+48]
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+39E96E: 72 15                 - jb GameAssembly.dll+39E985
+GameAssembly.dll+39E970: 48 8B 03              - mov rax,[rbx]
+GameAssembly.dll+39E973: 33 D2                 - xor edx,edx
+GameAssembly.dll+39E975: 48 8B CB              - mov rcx,rbx
+GameAssembly.dll+39E978: 4C 8B 80 C0 01 00 00  - mov r8,[rax+000001C0]
+GameAssembly.dll+39E97F: FF 90 B8 01 00 00     - call qword ptr [rax+000001B8]
+GameAssembly.dll+39E985: 80 BB D8 00 00 00 00  - cmp byte ptr [rbx+000000D8],00
+GameAssembly.dll+39E98C: 74 33                 - je GameAssembly.dll+39E9C1
+GameAssembly.dll+39E98E: 0F 29 74 24 20        - movaps [rsp+20],xmm6
+GameAssembly.dll+39E993: 33 C9                 - xor ecx,ecx
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>120</ID>
+          <Description>"Tất Cả Zombie Bất Tử"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : PlantsVsZombiesRH.exe
+  Version:
+  Date   : 2024-11-13
+  Author : Admin
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,GameAssembly.dll,0F 2F 7B 58 0F 28 7C 24 20) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+  mov [rbx+58],#1132920832
+code:
+  comiss xmm7,[rbx+58]
+  movaps xmm7,[rsp+20]
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop 4
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db 0F 2F 7B 58 0F 28 7C 24 20
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+42424D
+
+GameAssembly.dll+42421A: E8 61 84 F2 00                 - call GameAssembly.dll+134C680
+GameAssembly.dll+42421F: F3 0F 5C F0                    - subss xmm6,xmm0
+GameAssembly.dll+424223: 0F 2F FE                       - comiss xmm7,xmm6
+GameAssembly.dll+424226: F3 0F 11 B3 00 01 00 00        - movss [rbx+00000100],xmm6
+GameAssembly.dll+42422E: 72 1D                          - jb GameAssembly.dll+42424D
+GameAssembly.dll+424230: 48 8B 03                       - mov rax,[rbx]
+GameAssembly.dll+424233: 48 8B CB                       - mov rcx,rbx
+GameAssembly.dll+424236: C7 83 00 01 00 00 00 00 00 00  - mov [rbx+00000100],00000000
+GameAssembly.dll+424240: 48 8B 90 E0 01 00 00           - mov rdx,[rax+000001E0]
+GameAssembly.dll+424247: FF 90 D8 01 00 00              - call qword ptr [rax+000001D8]
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+42424D: 0F 2F 7B 58                    - comiss xmm7,[rbx+58]
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+424251: 0F 28 7C 24 20                 - movaps xmm7,[rsp+20]
+GameAssembly.dll+424256: 72 15                          - jb GameAssembly.dll+42426D
+GameAssembly.dll+424258: 48 8B 03                       - mov rax,[rbx]
+GameAssembly.dll+42425B: 33 D2                          - xor edx,edx
+GameAssembly.dll+42425D: 48 8B CB                       - mov rcx,rbx
+GameAssembly.dll+424260: 4C 8B 80 F0 01 00 00           - mov r8,[rax+000001F0]
+GameAssembly.dll+424267: FF 90 E8 01 00 00              - call qword ptr [rax+000001E8]
+GameAssembly.dll+42426D: 80 BB 10 01 00 00 00           - cmp byte ptr [rbx+00000110],00
+GameAssembly.dll+424274: 74 29                          - je GameAssembly.dll+42429F
+GameAssembly.dll+424276: F3 0F 10 73 58                 - movss xmm6,[rbx+58]
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>121</ID>
+          <Description>"Tất Cả Zombie Bất Tử (Mất Đầu)"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : PlantsVsZombiesRH.exe
+  Version:
+  Date   : 2024-11-14
+  Author : TheFate
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,GameAssembly.dll,0F 2F 42 58 0F 83 AB 00 00 00) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+  mov [rdx+58],#1000000
+code:
+  comiss xmm0,[rdx+58]
+  jae GameAssembly.dll+31C9E5
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop 5
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db 0F 2F 42 58 0F 83 AB 00 00 00
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+31C930
+
+GameAssembly.dll+31C900: 48 83 EC 28           - sub rsp,28
+GameAssembly.dll+31C904: 4C 8B CA              - mov r9,rdx
+GameAssembly.dll+31C907: 4C 8B D1              - mov r10,rcx
+GameAssembly.dll+31C90A: 48 85 D2              - test rdx,rdx
+GameAssembly.dll+31C90D: 0F 84 12 01 00 00     - je GameAssembly.dll+31CA25
+GameAssembly.dll+31C913: 80 B9 BE 00 00 00 00  - cmp byte ptr [rcx+000000BE],00
+GameAssembly.dll+31C91A: 0F 85 CA 00 00 00     - jne GameAssembly.dll+31C9EA
+GameAssembly.dll+31C920: 80 BA 0A 01 00 00 00  - cmp byte ptr [rdx+0000010A],00
+GameAssembly.dll+31C927: 0F 85 B8 00 00 00     - jne GameAssembly.dll+31C9E5
+GameAssembly.dll+31C92D: 0F 57 C0              - xorps xmm0,xmm0
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+31C930: 0F 2F 42 58           - comiss xmm0,[rdx+58]
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+31C934: 0F 83 AB 00 00 00     - jae GameAssembly.dll+31C9E5
+GameAssembly.dll+31C93A: 8B 52 2C              - mov edx,[rdx+2C]
+GameAssembly.dll+31C93D: 83 FA 09              - cmp edx,09
+GameAssembly.dll+31C940: 7E 16                 - jle GameAssembly.dll+31C958
+GameAssembly.dll+31C942: 8D 42 F4              - lea eax,[rdx-0C]
+GameAssembly.dll+31C945: 83 F8 01              - cmp eax,01
+GameAssembly.dll+31C948: 0F 86 97 00 00 00     - jbe GameAssembly.dll+31C9E5
+GameAssembly.dll+31C94E: 83 FA 10              - cmp edx,10
+GameAssembly.dll+31C951: 75 13                 - jne GameAssembly.dll+31C966
+GameAssembly.dll+31C953: 48 83 C4 28           - add rsp,28
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>92</ID>
+          <Description>"Một Bắn Zombie Chết (Bắn Xuyên)"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : PlantsVsZombiesRH.exe
+  Version: 
+  Date   : 2024-11-13
+  Author : Admin
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,GameAssembly.dll,0F 2F 42 58 0F 83 AB 00 00 00) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+  mov [rdx+58],#3999999999
+code:
+  comiss xmm0,[rdx+58]
+  jae GameAssembly.dll+31C9E5
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop 5
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db 0F 2F 42 58 0F 83 AB 00 00 00
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+31C930
+
+GameAssembly.dll+31C900: 48 83 EC 28           - sub rsp,28
+GameAssembly.dll+31C904: 4C 8B CA              - mov r9,rdx
+GameAssembly.dll+31C907: 4C 8B D1              - mov r10,rcx
+GameAssembly.dll+31C90A: 48 85 D2              - test rdx,rdx
+GameAssembly.dll+31C90D: 0F 84 12 01 00 00     - je GameAssembly.dll+31CA25
+GameAssembly.dll+31C913: 80 B9 BE 00 00 00 00  - cmp byte ptr [rcx+000000BE],00
+GameAssembly.dll+31C91A: 0F 85 CA 00 00 00     - jne GameAssembly.dll+31C9EA
+GameAssembly.dll+31C920: 80 BA 0A 01 00 00 00  - cmp byte ptr [rdx+0000010A],00
+GameAssembly.dll+31C927: 0F 85 B8 00 00 00     - jne GameAssembly.dll+31C9E5
+GameAssembly.dll+31C92D: 0F 57 C0              - xorps xmm0,xmm0
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+31C930: 0F 2F 42 58           - comiss xmm0,[rdx+58]
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+31C934: 0F 83 AB 00 00 00     - jae GameAssembly.dll+31C9E5
+GameAssembly.dll+31C93A: 8B 52 2C              - mov edx,[rdx+2C]
+GameAssembly.dll+31C93D: 83 FA 09              - cmp edx,09
+GameAssembly.dll+31C940: 7E 16                 - jle GameAssembly.dll+31C958
+GameAssembly.dll+31C942: 8D 42 F4              - lea eax,[rdx-0C]
+GameAssembly.dll+31C945: 83 F8 01              - cmp eax,01
+GameAssembly.dll+31C948: 0F 86 97 00 00 00     - jbe GameAssembly.dll+31C9E5
+GameAssembly.dll+31C94E: 83 FA 10              - cmp edx,10
+GameAssembly.dll+31C951: 75 13                 - jne GameAssembly.dll+31C966
+GameAssembly.dll+31C953: 48 83 C4 28           - add rsp,28
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>122</ID>
+          <Description>"Đổi Cây Cần Trồng Ra"</Description>
+          <Options moHideChildren="1" moManualExpandCollapse="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+alloc(newmem,2048,"GameAssembly.dll"+348DC4)
+alloc(newplant1,10)
+registersymbol(newplant1)
+label(returnhere)
+label(originalcode)
+label(exit)
+
+newmem: //this is allocated memory, you have read,write,execute access
+//place your code here
+
+originalcode:
+mov edx,[newplant1]
+mov [rdi+38],edx
+xor r8d,r8d
+
+exit:
+jmp returnhere
+
+"GameAssembly.dll"+348DC4:
+jmp newmem
+nop
+returnhere:
+
+
+
+
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+dealloc(newmem)
+"GameAssembly.dll"+348DC4:
+db 89 57 38 45 33 C0
+//mov [rdi+38],edx
+//xor r8d,r8d
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>123</ID>
+              <Description>"Đổi ID Của Cây Cần Trồng Ra"</Description>
+              <DropDownList DisplayValueAsItem="1">/:--- Đậu Hà Lan ---
+0:Đậu Hà Lan
+1030:Đậu Tiểu Liên
+1000:Đậu Hướng Dương
+1001:Đậu Bom Anh Đào
+1004:Đậu Hạt Óc Chó
+1007:Đậu Mìn Khoai Tây
+1011:Đậu Ăn Thịt
+1018:Đậu Phun
+1034:Đậu Băng
+1008:Đậu Nổ Tiểu Liên
+1105:Đậu Băng Tiểu Liên
+1035:Đậu Băng Phun
+1020:Đậu Sắt
+1108:Đậu Tách Nổ
+1090:Đậu Tách
+1107:Đậu Tách Băng
+1019:Đậu Phun Tiểu Liên
+1017:Đậu Nổ Liên Hoàn
+1032:Đậu Liên Hoàn
+1106:Đậu Băng Liên Hoàn
+1065:Đậu Phun Liên Hoàn
+1005:Đậu Nổ Anh Đào
+1109:Đậu Súng Tỉa
+:
+/:--- Hoa Hướng Dương ---
+1:Hoa Hướng Dương
+1000:Đậu Hướng Dương
+1033:Hoa Hướng Dương Đôi
+1002:Bom Hướng Dương
+1006:Hạt Óc Chó Hướng Dương
+1009:Mìn Hướng Dương
+1014:Hướng Dương Ăn Thịt
+1031:Nấm Mặt Trời
+1077:Nấm Mặt Trời Biển
+1111:Bắp Cải Ánh Dương
+:
+/:--- Bom Anh Đào ---
+2:Bom Anh Đào
+1001:Đậu Bom Anh Đào
+1002:Bom Hướng Dương
+1003:Hồ Anh Đào
+4:Mìn Khoai Tây Nổ Lan
+1016:Bom Ăn Thịt
+:
+/:--- Hạt Óc Chó ---
+3:Hạt Óc Chó
+1004:Đậu Hạt Óc Chó
+1006:Hạt Óc Chó Hướng Dương
+255:Hạt Óc Chó Khổng Lồ
+1010:Mìn Hạt Óc Chó
+1012:Hạt Óc Chó Ăn Thịt
+1021:Hạt Óc Chó Phun
+1027:Hạt Óc Chó Cao
+1029:Hạt Óc Chó Sắt
+1028:Hạt Óc Chó Mũ Bầu Dục Cao
+1147:Hạt Óc Chó Thôi Miên
+:
+/:--- Mìn Khoai Tây ---
+4:Mìn Khoai Tây
+1007:Đậu Mìn Khoai Tây
+1009:Mìn Hướng Dương
+4:Mìn Khoai Tây Nổ Lan
+1010:Mìn Hạt Óc Chó
+1015:Mìn Ăn Thịt
+:
+/:--- Thực Vật Ăn Thịt ---
+5:Thực Vật Ăn Thịt
+1011:Đậu Ăn Thịt
+1014:Hướng Dương Ăn Thịt
+1016:Bom Ăn Thịt
+1012:Hạt Óc Chó Ăn Thịt
+1015:Mìn Ăn Thịt
+:
+/:--- Hộp Quà Bí Mật ---
+256:Hộp Quà Bí Mật
+250:Hộp Quà Kém May Mắn
+:
+/:--- Ngọn Cỏ Bùng Cháy ---
+254:Ngọn Cỏ Bùng Cháy
+:
+/:--- Nấm Phun ---
+6:Nấm Phun
+1018:Đậu Phun
+1031:Nấm Mặt Trời
+1021:Hạt Óc Chó Phun
+1022:Nấm Phun Thôi Miên
+1036:Nấm Phun Băng
+1044:Nấm Phun Huỷ Diệt
+:
+/:--- Nấm Nguyên Tử ---
+11:Nấm Nguyên Tử
+:
+/:--- Nấm Khói Độc ---
+7:Nấm Khói Độc
+6:Nấm Phun
+1023:Nấm Khói Thôi Miên
+1025:Nấm Khói Sợ Hãi
+1037:Nấm Khói Băng
+1043:Nấm Khói Hủy Diệt
+:
+/:--- Nấm Thôi Miên ---
+8:Nấm Thôi Miên
+1022:Nấm Phun Thôi Miên
+1023:Nấm Khói Thôi Miên
+1024:Nấm Thôi Miên Sợ Hãi
+1041:Nấm Băng Thôi Miên
+1045:Nấm Thôi Miên Hủy Diệt
+:
+/:--- Nấm Sợ Hãi ---
+9:Nấm Sợ Hãi
+6:Nấm Phun
+1025:Nấm Khói Sợ Hãi
+1024:Nấm Thôi Miên Sợ Hãi
+1038:Nấm Băng Sợ Hãi
+1042:Nấm Hủy Diệt Sợ Hãi
+:
+/:--- Nấm Băng ---
+10:Nấm Băng
+1034:Đậu Băng
+1036:Nấm Phun Băng
+1037:Nấm Khói Băng
+1041:Nấm Băng Thôi Miên
+1038:Nấm Băng Sợ Hãi
+1040:Nấm Băng Huỷ Diệt
+1039:Hạt Óc Chó Băng Cao
+1072:Nấm Băng U Sầu
+1074:Cỏ Gai Băng Sắt
+1068:Cỏ Băng Đuôi Mèo
+1123:Pháo Ngô Băng
+:
+/:--- Nấm Bạch Tuộc ---
+1070:Nấm Bạch Tuộc
+:
+/:--- Cây Sắt Khác ---
+1096:Sao Sắt
+1097:Bí Ngô Sắt
+1129:Óc Chó Cơ Khí
+1095:Sao Thợ Mỏ
+1099:Bí Ngô Thợ Mỏ
+:
+/:--- Cây Hề ---
+1094:Sao Hề
+1098:Bí Ngô Hề
+:
+/:--- Cây Vàng ---
+1135:Bắp Cải Vàng
+1139:Ngô Vàng
+1142:Dưa Hấu Vàng
+1137:Chậu Vàng
+1146:Tỏi Vàng
+1144:Dù Vàng
+:
+/:--- Cây Lúa ---
+253:Cây Lúa
+:
+/:--- Lá Bèo ---
+12:Lá Bèo
+:
+/:--- Cây Siêu Cấp ---
+1026:Nấm Tình Yêu
+1052:Gốc Cây Lửa Địa Ngục
+1104:Sao Thiên Thạch
+1126:Salad Ngô
+1013:Phi Long Thăng Thiên
+1046:Nấm Xịt Băng Hủy Diệt
+1066:Rong Biển 3 Đầu Đậu
+1110:Siêu Bí Ngô
+1148:Toản Hoa Tán
+:
+/:--- Bí Đao ---
+13:Bí Đè
+1047:Bí Đậu Ba Đầu
+1050:Rong Biển Bí
+1054:Bí Cayy
+1063:Gai Bí
+1059:Gốc Cây Bí Đè
+:
+/:--- Đậu Ba Đầu ---
+14:Đậu 3 Đầu
+1051:Siêu Đậu 3 Đầu Rong Biển
+1058:Đậu 3 Đầu Khô Héo
+1064:Gai 3 Đầu
+1055:3 Gốc Cây Lửa
+:
+:/--- Rong Biển ---
+15:Rong Biển
+1049:Rong Biển Ớt
+1056:Rong Gốc Cây Cháy
+:
+:/--- Ớt ---
+16:Ớt
+1073:Óc Chó Lửa Cao
+1071:Nấm Bạch Tuộc Lửa
+1075:Gai Thép Nóng Chảy
+1069:Mèo Lửa
+1122:Pháo Ngô Lửa
+:
+:/--- Gai ---
+17:Gai
+1062:Gai Nhiệt
+1061:Gai Gốc Lửa
+1060:Gai Thép
+:
+:/--- Gốc Lửa ---
+18:Gốc Cây Lửa
+1053:Siêu Gốc Cây Lửa
+:
+/:--- Nhân Vật Anime ---
+252:Thiếu Nữ Phép Thuật
+:
+/:--- Nấm Biển ---
+19:Nấm Biển
+1078:Đèn Biển
+1076:Xương Rồng Biển
+1086:Nấm Biển Quạt
+1083:Sao Biển
+1101:Nấm Biển Nam Châm
+:
+:/--- Cây Lồng Đèn ---
+20:Cây Lồng Đèn
+1079:Đèn Xương Rồng
+1080:Cỏ 3 Lá Dạ Quang
+1081:Đèn Ông Sao
+1087:Bí Ngô Phát Sáng
+1100:Nấm Nam Châm Phát Sáng
+:
+/:--- Xương Rồng ---
+21:Xương Rồng
+1082:Trực Thăng Xương Rồng
+1085:Sao Xương Rồng
+1088:Bí Ngô Xương Rồng
+1103:Xương Rồng Nam Châm
+:
+/:--- Cỏ Quạt ---
+22:Cỏ Quạt
+1084:Cỏ 5 Cánh
+1091:Bí Ngô Ba Lá
+1102:Cỏ Nam Châm
+:
+/:--- Sao ---
+23:Sao
+1089:Bí Ngô Sao
+1093:Sao Nam Châm
+249:Sao Kiếm Vương
+:
+/:--- Bí Ngô ---
+24:Bí Ngô
+1092:Bí Ngô Nam Châm
+:
+/:--- Nấm Nam Châm ---
+25:Nấm Nam Châm
+:
+/:--- Mèo ---
+1067:Mèo
+:
+/:--- Bắp Cải ---
+26:Bắp Cải
+1112:Chậu Bắp Cải
+1113:Ngô Bọc Cải
+1118:Bắp Cải Tỏi
+1128:Dù Bắp Cải
+1134:Bắp Cải Bạc
+1124:Dưa Cải
+:
+/:--- Chậu Cây ---
+27:Chậu Cây
+1114:Chậu Ngô
+1130:Chậu Tỏi
+1133:Chậu Dù
+1136:Chậu Bạc
+1125:Chậu Dưa
+:
+/:--- Ngô ---
+28:Ngô
+1117:Ngô Độc
+1115:Dù Bơ
+1138:Ngô Bạc
+1121:Dưa Hấu Bơ
+:
+/:--- Củ Tỏi ---
+29:Tỏi
+1127:Dù Tỏi
+1145:Tỏi Bạc
+1119:Dưa Hấu Độc
+:
+/:--- Dù ---
+30:Dù
+1143:Dù Bạc
+1131:Dù Dưa Hấu
+:
+/:--- Hoa Đồng Tiền ---
+31:Hoa Đồng Tiền
+1140:2 Hoa Cúc
+:
+/:--- Dưa Hấu ---
+32:Dưa Hấu
+1116:Dưa Hấu Băng
+1141:Dưa Bạc
+1132:Pháo Dưa Hấu
+:
+/:--- Pháo Ngô ---
+1120:Pháo Ngô
+:
+/:--- Cây Tối Thượng ---
+914:Tỏi Bắp Công Nghệ
+901:Liên Pháo Anh Đào
+902:Hỏa Bộc Bí Đao
+903:Anh Long Đế Vương
+904:Hàn Diệt Linh
+909:Sao Tân Tiến Toàn Diện
+910:Đại Pháo Tuyệt Diệt
+913:Hắc Tảng
+915:Băng Phá Luân
+905:Nhật Quang Hồ
+900:Nữ Vương Thôi Miên
+906:Hắc Thích
+911:Bí Tân Tiến
+908:Băng Hồ Tân Tiến
+907:Lan Tử Đinh
+916:Tổng Tài Bá Đạo
+</DropDownList>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>newplant1</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>105</ID>
+          <Description>"ID Gamemode"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>GameAssembly.dll+1BAF690</Address>
+          <Offsets>
+            <Offset>104</Offset>
+            <Offset>B8</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols>
+    <SymbolEntry>
+      <Name>sayhisymbol</Name>
+      <Address>215AB790000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>plantchanger</Name>
+      <Address>215AB791000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>plantchanger1</Name>
+      <Address>215AB792000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>newplant</Name>
+      <Address>215AB793000</Address>
+    </SymbolEntry>
+  </UserdefinedSymbols>
+  <LuaScript>openProcess("PlantsVsZombiesRH.exe")
+</LuaScript>
+</CheatTable>

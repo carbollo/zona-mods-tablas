@@ -1,0 +1,1735 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>30173</ID>
+      <Description>"&lt;----Activate scripts by clicking on the box     (Made by Tavreth)"</Description>
+      <Options moHideChildren="1"/>
+      <Color>008000</Color>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>30130</ID>
+          <Description>"Enable for First Person (Enable At Main Menu)"</Description>
+          <Options moHideChildren="1" moActivateChildrenAsWell="1" moDeactivateChildrenAsWell="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+define(newmem,GRW.exe+98B600)
+define(stop,GRW.exe+15C45200)//2bytes
+define(respawnTime,GRW.exe+15C45203)//4bytes
+define(HeadPointerVar,GRW.exe+15C45207)//8bytes
+define(FOV1Result,GRW.exe+15C4520F)//4bytes
+define(HeadRenderPTR,GRW.exe+15C45213)//8bytes
+define(HeadRenderReset,GRW.exe+15C4521B)//1bytes
+define(3rdPersonToggle,GRW.exe+15C4521C)//1bytes
+define(GlobalCoords,GRW.exe+15C45220)//16bytes
+label(loop)
+label(preloop)
+label(returnhere)
+label(exit)
+label(adsstop)
+label(returnhere2)
+label(dronebyte)
+label(SetSpawnTime)
+label(returnSetSpawnTime)
+label(FOV1)
+label(FOV1return)
+label(FOV1Skip)
+label(FOV2)
+label(FOV2return)
+label(FOV1multiplier)
+label(FOVbase)
+label(FOV3skip)
+label(FOV3)
+label(FOV3return)
+label(exit2)
+label(returnhere3)
+label(HeadRender)
+label(HeadRenderExit)
+label(skipHead)
+label(toggleSkip)
+label(turnoff)
+label(HeadPointer)
+label(HeadPointerReturn)
+label(HeadPointerExit)
+label(HeadPointerDiff)
+label(HeadPointer1JB)
+label(HeadPointer2JB)
+label(HeadPointerNext)
+label(HeadPointerNext2)
+label(done)
+label(HeadPointerNull)
+label(HeadPointerNullReturn)
+
+
+//xmm 0 1 2 are valid
+newmem:
+movaps xmm1,[rdx+30]
+push r15
+push r14
+push r13
+push rdi
+push rax
+push r9
+push rcx
+push rdx
+push r8
+sub rsp 28
+mov rcx,[GRW.exe+491D500]
+mov rdx,45
+call GRW.exe+6EA690
+mov r15l,al
+add rsp 28
+pop r8
+pop rdx
+pop rcx
+pop r9
+pop rax
+pop rdi
+test r15l,r15l
+je toggleSkip
+mov r15l,[3rdPersonToggle]
+test r15l,r15l
+je turnoff
+mov byte ptr [3rdPersonToggle],00
+jmp toggleSkip
+turnoff:
+mov byte ptr [3rdPersonToggle],01
+toggleSkip:
+cmp rcx,[GRW.exe+493D138]
+jne exit2 //check if writing to camera coords
+mov r15,[GRW.exe+4914628]
+mov r15l,[r15+349]
+test r15l,r15l
+je exit //not first person when 0
+mov r15l,[stop]
+test r15l,r15l
+jne exit2 //not first person when 1
+mov r15l,[stop+1]
+test r15l,r15l
+jne exit //not first person when 1
+mov r15l,[3rdPersonToggle]
+test r15l,r15l
+jne exit
+mov r15,[GRW.exe+49223E8]
+mov r15,[r15+50]
+xor r13,r13
+jmp loop
+
+preloop:
+inc r13
+loop:
+mov r14,[r15+r13*8]
+mov r14,[r14+18]
+mov r14l,[r14+3FC]
+test r14l,r14l
+je preloop
+
+mov r14,[r15+r13*8]
+mov r14,[r14+10]
+mov r13,[r14+E0]
+mov r13,[r13+10C0]
+movaps xmm1,[r13+50]
+movaps [GlobalCoords],xmm1
+mov r15,[HeadPointerVar]
+test r15,r15
+je done
+movaps xmm1,[r15+80]
+
+done:
+mov r15d,(float)1
+movaps [rcx+30],xmm1
+mov [rcx+3C],r15d
+pop r13
+pop r14
+pop r15
+push r11
+push r10
+push r9
+push r8
+push rax
+push rcx
+push rdx
+mov rcx,[HeadRenderPTR]
+test rcx,rcx
+je skipHead
+xor rdx,rdx
+mov dl,01
+mov [HeadRenderReset],dl
+call GRW.exe+25B1C60
+skipHead:
+pop rdx
+pop rcx
+pop rax
+pop r8
+pop r9
+pop r10
+pop r11
+jmp returnhere
+exit:
+mov r15l,[HeadRenderReset]
+test r15l,r15l
+je exit2
+push r11
+push r10
+push r9
+push r8
+push rax
+push rcx
+push rdx
+mov rcx,[HeadRenderPTR]
+xor rdx,rdx
+mov [HeadRenderReset],dl
+call GRW.exe+25B1C60
+pop rdx
+pop rcx
+pop rax
+pop r8
+pop r9
+pop r10
+pop r11
+exit2:
+pop r13
+pop r14
+pop r15
+movaps [rcx+30],xmm1
+jmp returnhere
+
+adsstop:
+mov [stop],dl
+ret
+
+dronebyte:
+mov [rdi+0000180A],bl
+mov [stop+1],bl
+jmp returnhere2
+
+SetSpawnTime:
+mov [respawnTime],41200000
+movss xmm1,[respawnTime]
+jmp returnSetSpawnTime
+
+FOV1:
+movss xmm14,[rax+10]
+movss xmm15,[FOV1multiplier+4]
+comiss xmm14,xmm15
+jb FOV1Skip
+subss xmm14,xmm15
+mulss xmm14,[FOV1multiplier]
+addss xmm14,xmm15
+FOV1Skip:
+movss [rcx+38],xmm14
+movss [FOV1Result],xmm14
+xorps xmm14,xmm14
+xorps xmm15,xmm15
+jmp FOV1return
+
+FOV2:
+movss xmm0,[FOV1Result]
+movss [rax+38],xmm0
+jmp FOV2return
+
+FOV3:
+mov eax,[rcx+0000034C]
+cmp eax,#1051261138
+je FOV3skip
+cmp eax,#1057360530
+je FOV3skip
+cmp eax,#1048447523
+je FOV3skip
+cmp eax,#1060121943
+je FOV3skip
+movss xmm0,[FOVbase]
+movss xmm1,[FOVbase+4]
+movss [rcx+0000034C],xmm0
+movss [rcx+00000344],xmm1
+jmp FOV3return
+FOV3skip:
+movss xmm0,[rcx+0000034C]
+movss xmm1,[rcx+00000344]
+jmp FOV3return
+
+HeadRender:
+push r15
+push r14
+mov r14,14257AC30
+mov r15,[rbx+08]
+mov r15,[r15+1F0]
+cmp r15,r14
+jne HeadRenderExit
+mov r14l,[HeadRenderReset]
+test r14l,r14l
+jne HeadRenderExit
+mov [HeadRenderPTR],rbx
+mov sil,01
+HeadRenderExit:
+pop r14
+pop r15
+cmp byte ptr [rbx+30],00
+je GRW.exe+11B01D09
+jmp returnhere3
+
+HeadPointer:
+movaps [rsi+00000080],xmm0
+sub rsp 18
+Push r15
+mov r15,[GRW.exe+491D340]
+mov r15,[r15+10]
+mov r15,[r15+608]
+mov r15l,[r15+182]
+test r15l,r15l
+jne HeadPointerExit
+mov r15,[HeadPointerVar]
+test r15,r15
+jne HeadPointerExit
+
+
+movaps [rsp],xmm0
+movss xmm13,[rsp]
+movss xmm14,[HeadPointerDiff]
+movss xmm15,[GlobalCoords]
+comiss xmm15,xmm13
+jb HeadPointer1JB
+subss xmm15,xmm14
+comiss xmm15,xmm13
+ja HeadPointerExit
+jmp HeadPointerNext
+
+HeadPointer1JB:
+addss xmm15,xmm14
+comiss xmm15,xmm13
+jb HeadPointerExit
+
+HeadPointerNext:
+movss xmm13,[rsp+4]
+movss xmm15,[GlobalCoords+4]
+comiss xmm15,xmm13
+jb HeadPointer2JB
+
+subss xmm15,xmm14
+comiss xmm15,xmm13
+ja HeadPointerExit
+jmp HeadPointerNext2
+
+HeadPointer2JB:
+addss xmm15,xmm14
+comiss xmm15,xmm13
+jb HeadPointerExit
+
+HeadPointerNext2:
+mov [HeadPointerVar],rsi
+
+HeadPointerExit:
+add rsp 18
+pop r15
+xorps xmm13,xmm13
+xorps xmm14,xmm14
+xorps xmm15,xmm15
+jmp HeadPointerReturn
+
+HeadPointerNull:
+mov byte ptr [rdi+00000182],01
+push r15
+xor r15,r15
+mov [HeadPointerVar],r15
+pop r15
+jmp HeadPointerNullReturn
+
+
+FOV1multiplier:
+db 85 EB 71 40 74 A3 50 3F
+FOVbase:
+db 72 A3 50 3F 0E 6A 90 3F
+HeadPointerDiff:
+db 9A 99 99 3E
+
+"GRW.exe"+B3703B6:
+jmp newmem
+nop 3
+returnhere:
+
+"GRW.exe"+E7D197A:
+jmp dronebyte
+nop
+returnhere2:
+
+"GRW.exe"+FF4B56A:
+jmp SetSpawnTime
+nop 3
+returnSetSpawnTime:
+
+"GRW.exe"+11A9A9C8:
+jmp FOV1
+nop
+FOV1return:
+
+"GRW.exe"+11AA90D1:
+jmp FOV2
+FOV2return:
+
+"GRW.exe"+11A87E2B:
+jmp FOV3
+nop B
+FOV3return:
+
+"GRW.exe"+11A7BCD6:
+call adsstop
+
+"GRW.exe"+11A7BCEC:
+call adsstop
+
+"GRW.exe"+11B01CDF:
+jmp HeadRender
+nop
+returnhere3:
+
+"GRW.exe"+83A2706:
+jmp HeadPointer
+nop 2
+HeadPointerReturn:
+
+"GRW.exe"+F457C67:
+jmp HeadPointerNull
+nop 2
+HeadPointerNullReturn:
+
+"GRW.exe"+11A7A3B9:
+call adsstop
+
+"GRW.exe"+11A7BD02:
+call adsstop
+ 
+[DISABLE]
+unregisterSymbol(respawnTime)
+"GRW.exe"+B3703B6:
+movaps xmm1,[rdx+30]
+movaps [rcx+30],xmm1
+
+"GRW.exe"+E7D197A:
+mov [rdi+0000180A],bl
+
+"GRW.exe"+FF4B56A:
+movss xmm1,[rbx+00000440]
+
+"GRW.exe"+11AA90D1:
+movss [rax+38],xmm0
+
+"GRW.exe"+11A9A9C8:
+mov edx,[rax+10]
+mov [rcx+38],edx
+
+"GRW.exe"+11A87E2B:
+movss xmm0,[rcx+0000034C]
+movss xmm1,[rcx+00000344]
+
+"GRW.exe"+11A7BCD6:
+call GRW.exe+25B1C60
+
+"GRW.exe"+11A7BCEC:
+call GRW.exe+25B1C60
+
+"GRW.exe"+11B01CDF:
+cmp byte ptr [rbx+30],00
+je GRW.exe+11B01D09
+
+"GRW.exe"+83A2706:
+movaps [rsi+00000080],xmm0
+
+"GRW.exe"+F457C67:
+mov byte ptr [rdi+00000182],01
+
+"GRW.exe"+11A7A3B9:
+call GRW.exe+25B1C60
+
+"GRW.exe"+11A7BD02:
+call GRW.exe+25B1C60
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>30131</ID>
+              <Description>"Enable Lean First Person"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+"GRW.exe"+10D9B3AB:
+nop 6
+[DISABLE]
+"GRW.exe"+10D9B3AB:
+jne GRW.exe+10D9B438
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>30132</ID>
+              <Description>"Remove Out Of Bounds"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+"GRW.exe"+2508CD0:
+ret
+nop 4
+[DISABLE]
+"GRW.exe"+2508CD0:
+jmp GRW.exe+118FD3A0
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>30133</ID>
+              <Description>"Super Accuracy"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+"GRW.exe"+23A7276:
+nop 5
+[DISABLE]
+"GRW.exe"+23A7276:
+movss [rbx+74],xmm6
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>30135</ID>
+              <Description>"No Camera Blur"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+"GRW.exe"+11AAAA40:
+db 00
+[DISABLE]
+"GRW.exe"+11AAAA40:
+db 01
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>30136</ID>
+              <Description>"Fix Preview on Coop"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+"GRW.exe"+606C44A:
+nop 2
+[DISABLE]
+"GRW.exe"+606C44A:
+ja GRW.exe+606C461
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>30137</ID>
+              <Description>"Rent-A-Gun (use locked guns)"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+"GRW.exe"+F972261:
+jmp GRW.exe+F972285
+[DISABLE]
+"GRW.exe"+F972261:
+jne GRW.exe+F972285
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>30140</ID>
+              <Description>"Prevent body/Gun dissappear"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+"GRW.exe"+11A7BD0F:
+nop 5
+"GRW.exe"+11A7BBD5:
+nop 5
+
+
+ 
+ 
+[DISABLE]
+"GRW.exe"+11A7BD0F:
+db E8 BC 5F B3 F0
+"GRW.exe"+11A7BBD5:
+db E8 26 A9 B2 F0
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>30134</ID>
+              <Description>"MiniMap Fix"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+"GRW.exe"+FF1893A:
+nop 2
+
+[DISABLE]
+"GRW.exe"+FF1893A:
+je GRW.exe+FF189B5
+</AssemblerScript>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>30190</ID>
+          <Description>"Other Game Modifiers"</Description>
+          <Options moHideChildren="1"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>25288</ID>
+              <Description>"Time Multiplier (Set At Main Menu) (SinglePlayer Only)"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Double</VariableType>
+              <Address>GRW.exe+375D208</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>30185</ID>
+              <Description>"ADS Ping Range (1000 max range)"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>GRW.exe+48773B0</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>29893</ID>
+              <Description>"Toggle AI Teammates"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+"GRW.exe"+60FDFAA:
+cmp byte ptr [rcx+00000269],00
+[DISABLE]
+"GRW.exe"+60FDFAA:
+cmp byte ptr [rcx+00000269],01
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>24000</ID>
+              <Description>"No Recoil"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+"GRW.exe"+11AB40F3:
+nop 5
+[DISABLE]
+"GRW.exe"+11AB40F3:
+movss [rax+10],xmm1
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>24022</ID>
+              <Description>"No CoolDown for Rebel Support"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+"GRW.exe"+6AA325:
+nop 6
+
+
+ 
+ 
+[DISABLE]
+"GRW.exe"+6AA325:
+je GRW.exe+6AA505
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>30019</ID>
+              <Description>"Disable Sync Shot/Ping in Single Player"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+"GRW.exe"+5FFABD6:
+nop 2
+"GRW.exe"+608DBAA:
+nop 6
+"GRW.exe"+608DB9C:
+nop 6
+"GRW.exe"+608DB92:
+nop 6
+[DISABLE]
+"GRW.exe"+5FFABD6:
+db 74 62
+"GRW.exe"+608DBAA:
+db 0F 84 96 01 00 00
+"GRW.exe"+608DB9C:
+db 0F 85 6A 01 00 00
+"GRW.exe"+608DB92:
+db 0F 84 AE 01 00 00
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>30189</ID>
+              <Description>"Power User Stuff"</Description>
+              <Options moHideChildren="1"/>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>30188</ID>
+                  <Description>"Decrypt Primary Encryption Function (4 Byte values)"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+"GRW.exe"+1AA060:
+mov [rcx+20],edx
+jmp GRW.exe+57C8190
+[DISABLE]
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>26249</ID>
+                  <Description>"Coord Pointer List"</Description>
+                  <Options moHideChildren="1"/>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+alloc(CoordOffset,8)
+registerSymbol(CoordOffset)
+newmem:
+ 
+[DISABLE]
+unregisterSymbol(CoordOffset)
+dealloc(CoordOffset)
+</AssemblerScript>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>26250</ID>
+                      <Description>"Pointer List Offset"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Byte</VariableType>
+                      <Address>CoordOffset</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>26251</ID>
+                      <Description>"Coord Base"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>GRW.exe+49223E8</Address>
+                      <Offsets>
+                        <Offset>0</Offset>
+                        <Offset>10C0</Offset>
+                        <Offset>E0</Offset>
+                        <Offset>10</Offset>
+                        <Offset>[CoordOffset]</Offset>
+                        <Offset>50</Offset>
+                      </Offsets>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>26252</ID>
+                          <Description>"Player X coord (offset 50)"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>50</Offset>
+                            <Offset>10C0</Offset>
+                            <Offset>E0</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>26253</ID>
+                              <Description>"Player Y coord"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>Float</VariableType>
+                              <Address>GRW.exe+49223E8</Address>
+                              <Offsets>
+                                <Offset>54</Offset>
+                                <Offset>10C0</Offset>
+                                <Offset>E0</Offset>
+                                <Offset>10</Offset>
+                                <Offset>[CoordOffset]</Offset>
+                                <Offset>50</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>26254</ID>
+                              <Description>"Player Z coord"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>Float</VariableType>
+                              <Address>GRW.exe+49223E8</Address>
+                              <Offsets>
+                                <Offset>58</Offset>
+                                <Offset>10C0</Offset>
+                                <Offset>E0</Offset>
+                                <Offset>10</Offset>
+                                <Offset>[CoordOffset]</Offset>
+                                <Offset>50</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>26262</ID>
+                      <Description>"Bone Pointers"</Description>
+                      <Options moManualExpandCollapse="1"/>
+                      <ShowAsHex>1</ShowAsHex>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>GRW.exe+49223E8</Address>
+                      <Offsets>
+                        <Offset>378</Offset>
+                        <Offset>D8</Offset>
+                        <Offset>10</Offset>
+                        <Offset>[CoordOffset]</Offset>
+                        <Offset>50</Offset>
+                      </Offsets>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>26297</ID>
+                          <Description>"Right Hand"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>C8</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26289</ID>
+                          <Description>"Left Hand"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>98</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26265</ID>
+                          <Description>"Bone Torso Z"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>8</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26301</ID>
+                          <Description>"Right Hand"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>D8</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26308</ID>
+                          <Description>"Left Toe"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>224</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26293</ID>
+                          <Description>"Left Hand"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>A8</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26268</ID>
+                          <Description>"Bone Torso Rotation Y"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>14</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26309</ID>
+                          <Description>"Left Toe"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>228</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26269</ID>
+                          <Description>"Bone Torso Rotation Z"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>18</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26316</ID>
+                          <Description>"Right Toe"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>254</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26317</ID>
+                          <Description>"Right Toe"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>258</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26292</ID>
+                          <Description>"Left Hand"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>A4</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26288</ID>
+                          <Description>"Left Hand"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>94</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26300</ID>
+                          <Description>"Right Hand"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>D4</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26311</ID>
+                          <Description>"Right Toe"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>240</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26294</ID>
+                          <Description>"Left Hand"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>AC</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26279</ID>
+                          <Description>"Right Foot"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>60</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26296</ID>
+                          <Description>"Right Hand"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>C4</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26304</ID>
+                          <Description>"Left Toe"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>214</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26315</ID>
+                          <Description>"Right Toe"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>250</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26318</ID>
+                          <Description>"Right Toe"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>25C</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26295</ID>
+                          <Description>"Right Hand"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>C0</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26281</ID>
+                          <Description>"Right Foot"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>68</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26273</ID>
+                          <Description>"Left Foot"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>38</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26270</ID>
+                          <Description>"Bone Torso Rotation W"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>1C</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26312</ID>
+                          <Description>"Right Toe"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>244</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26267</ID>
+                          <Description>"Bone Torso Rotation X"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>10</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26272</ID>
+                          <Description>"Left Foot"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>34</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26275</ID>
+                          <Description>"Left Foot"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>40</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26278</ID>
+                          <Description>"Left Foot"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>4C</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26313</ID>
+                          <Description>"Right Toe"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>248</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26305</ID>
+                          <Description>"Left Toe"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>218</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26266</ID>
+                          <Description>"Bone Torso W"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>C</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26274</ID>
+                          <Description>"Left Foot"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>3C</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26282</ID>
+                          <Description>"Right Foot"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>6C</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26290</ID>
+                          <Description>"Left Hand"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>9C</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26298</ID>
+                          <Description>"Right Hand"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>CC</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26306</ID>
+                          <Description>"Left Toe"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>21C</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26314</ID>
+                          <Description>"Right Toe"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>24C</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26263</ID>
+                          <Description>"Bone Torso X"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>0</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26264</ID>
+                          <Description>"Bone Torso Y"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>4</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26310</ID>
+                          <Description>"Left Toe"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>22C</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26307</ID>
+                          <Description>"Left Toe"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>220</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26280</ID>
+                          <Description>"Right Foot"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>64</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26287</ID>
+                          <Description>"Left Hand"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>90</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26299</ID>
+                          <Description>"Right Hand"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>D0</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26286</ID>
+                          <Description>"Right Foot"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>7C</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26283</ID>
+                          <Description>"Right Foot"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>70</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26271</ID>
+                          <Description>"Left Foot"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>30</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26303</ID>
+                          <Description>"Left Toe"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>210</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26302</ID>
+                          <Description>"Right Hand"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>DC</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26291</ID>
+                          <Description>"Left Hand"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>A0</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26285</ID>
+                          <Description>"Right Foot"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>78</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26284</ID>
+                          <Description>"Right Foot"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>74</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26277</ID>
+                          <Description>"Left Foot"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>48</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26276</ID>
+                          <Description>"Left Foot"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Float</VariableType>
+                          <Address>GRW.exe+49223E8</Address>
+                          <Offsets>
+                            <Offset>44</Offset>
+                            <Offset>378</Offset>
+                            <Offset>D8</Offset>
+                            <Offset>10</Offset>
+                            <Offset>[CoordOffset]</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>26246</ID>
+                      <Description>"User Byte (2 is You)"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Byte</VariableType>
+                      <Address>GRW.exe+49223E8</Address>
+                      <Offsets>
+                        <Offset>3FC</Offset>
+                        <Offset>18</Offset>
+                        <Offset>[CoordOffset]</Offset>
+                        <Offset>50</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>30044</ID>
+                      <Description>"offset count"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>GRW.exe+49223E8</Address>
+                      <Offsets>
+                        <Offset>48</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>24</ID>
+              <Description>"Tactical Drone/Binoculars"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+Define(newmem,GRW.exe+E7B22E)
+label(returnhere)
+
+newmem:
+mov [rbx+000000B9],al
+push r15
+mov r15,["GRW.exe"+04914708]
+mov [r15+311],al
+pop r15
+jmp returnhere
+
+"GRW.exe"+5FFAC9C:
+jmp newmem
+nop
+returnhere:
+
+
+[DISABLE]
+"GRW.exe"+5FFAC9C:
+mov [rbx+000000B9],al
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>8</ID>
+              <Description>"Drone Cooldown"</Description>
+              <Options moHideChildren="1"/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+Define(newmem,GRW.exe+E7B219)
+label(returnhere)
+label(Time)
+registerSymbol(Time)
+
+newmem:
+cvtsi2ss xmm0,[Time]
+jmp returnhere
+
+Time:
+db 60 EA 00 00
+
+"GRW.exe"+11A40E07:
+jmp newmem
+nop 4
+returnhere:
+
+"GRW.exe"+251CFC3:
+mov rax,[Time]
+nop 8
+[DISABLE]
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>10</ID>
+                  <Description>"Drone CoolDown Time in Miliseconds"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>Time</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>30041</ID>
+          <Description>"If you enjoyed the mod, and want to say thanks"</Description>
+          <Options moHideChildren="1"/>
+          <Color>008000</Color>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>30042</ID>
+              <Description>"You could donate to show your appreciation at"</Description>
+              <Options moHideChildren="1"/>
+              <Color>008000</Color>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>30043</ID>
+                  <Description>"https://www.buymeacoffee.com/Tavreth"</Description>
+                  <Color>0000FF</Color>
+                  <GroupHeader>1</GroupHeader>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+  <Comments>First Person Mod Made By Tavreth.
+Hosted at https://www.nexusmods.com/ghostreconwildlands/mods/20
+Buy me a drink at https://www.buymeacoffee.com/Tavreth
+Special Thanks to:
+Mask
+i_pk_pjers_i
+Bean_Burrito
+They made making this mod a little bit easier.
+</Comments>
+</CheatTable>

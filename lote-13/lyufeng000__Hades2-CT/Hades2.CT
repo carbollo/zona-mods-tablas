@@ -1,0 +1,835 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="46">
+  <Forms>
+    <UDF1 Class="TCEForm" Encoding="Ascii85">rIJBU!Y}xaO9yO#.*TSEhaHRu4g^lLK#B^-DMUcMnX*{#v9wFqY4^Fa^D6J_?7)RWIpe^Tx4wVc[kREX;nlcRHu3uQj9hv]ZmRR4cUtvfsjL+(M-Z+n%KAjsOvKhlrS:eoYHgk1^fj[FFF+uWQZU:^#mXi$R+}TK!x0T3as8CK)=CYCa)$r^xkp$8T$MdrdHvn8JrwDJ!602OK_/KD$DA.cfZfiJo-#O7cP3QoXTNVdO]rJpAd=KhKI?)L]n@8NOx=gnWO(9CE-k$oOBff9T-,K6sUfFo%fPNLl3T%^Mg$YG,U/5x*6-UadA-}1P(22/RL8jk8jd.JHk:t/jI%ZvIa6R$MWw;1p@rZBm0IhtOQ[lvk5iRnp#lp)nxNlNfpz;ZtP-Z8v%H4wJhl%@mS)aM^-kVZ%0a4;.5EX4%KS?_]QeU/ubOk;qjLFHz;:TA+eo#$o^Pbzl?auaF8</UDF1>
+  </Forms>
+  <CheatEntries>
+    <CheatEntry>
+      <ID>87499</ID>
+      <Description>"启动修改器"</Description>
+      <Options moHideChildren="1"/>
+      <LastState Activated="1"/>
+      <Color>0000FF</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{$lua}
+if syntaxcheck then return end
+
+function Exec(s)
+  pause()
+  local luaState = getAddress("Hades2.sgg::ScriptManager::LuaInterface")
+  luaState = readPointer(luaState)
+  if luaState == 0 then print("No Lua State - Please Wait Until Everything is Loaded") unpause() error("") return end
+  executeCodeEx( 0, nil, getAddress( "Hades2.Lua::DoString" ),luaState , s ,"cheat")
+  unpause()
+end
+
+[ENABLE]
+
+init_script = [[
+
+function _CreateLoot( args )
+
+	RandomSynchronize()
+	local lootPointId = args.SpawnPoint or SelectLootSpawnPoint( CurrentRun.CurrentRoom, args )
+	if lootPointId == nil then
+		DebugAssert({ Text = "GiveLoot: trying to give loot but there are no eligible LootPoint objects in room.", Owner = "Eduardo" })
+	end
+	local lootData = args.LootData or LootData[args.Name]
+	local loot = DeepCopyTable( lootData )
+	local lootId = SpawnObstacle({ Name = lootData.Name, DestinationId = lootPointId, Group = "Standing", OffsetX = args.OffsetX, OffsetY = args.OffsetY })
+	loot.ObjectId = lootId
+	loot.BlockExitText = "ExitBlockedByBoon"
+	loot.BoughtFromShop = args.BoughtFromShop
+	loot.StackNum = args.StackNum or loot.StackNum
+	loot.ExchangeOnlyFromLootName = args.ExchangeOnlyFromLootName
+
+	if not GameData.MissingPackages[loot.Name] then
+		--LoadPackages({ Name = loot.Name })
+	end
+	if loot.SpeakerName then
+		LoadVoiceBanks(loot.SpeakerName)
+	end
+
+	SetTraitsOnLoot( loot, args )
+
+	if args.AddBoostedAnimation or loot.AddBoostedAnimation then
+		CreateAnimation({ DestinationId = loot.ObjectId, Name = "RoomRewardAvailableRareSparkles" })
+	end
+	if args.SuppressFlares then
+		StopAnimation({ DestinationId = loot.ObjectId, Names = { "BoonOrbSpawn", "BoonOrbSpawn2", "PickupFlare", "PickupFlareA", "PickupFlareA2", "PickupFlareB01", "PickupFlareB02" }, })
+	end
+
+	AddToGroup({ Id = lootId, Name = "Loot" })
+	loot.MenuNotify = UIData.BoonMenuId
+	if not args.DoesNotBlockExit then
+		MapState.RoomRequiredObjects[lootId] = loot
+	end
+	LootObjects[lootId] = loot
+
+	local lootId = loot.ObjectId
+	AttachLua({ Id = lootId, Table = loot })
+	SetColor({ Id = lootId, Color = loot.LootColor, Duration = 0 })
+	LootSpawnPresentation( loot, args )
+
+	if args.ResourceCosts ~= nil then
+		loot.ResourceCosts = ShallowCopyTable( args.ResourceCosts )
+		local costMultiplier = 1 + ( MetaUpgradeData.ShopPricesShrineUpgrade.ChangeValue - 1 )
+		costMultiplier = costMultiplier * GetTotalHeroTraitValue("StoreCostMultiplier", {IsMultiplier = true, Multiplicative = true})
+		if costMultiplier ~= 1 then
+			for name, cost in pairs( loot.ResourceCosts ) do
+				loot.ResourceCosts[name] = round( cost * costMultiplier )
+			end
+		end
+		UpdateCostText( loot )
+	end
+
+	if loot.SetupEvents ~= nil then
+		RunEventsGeneric( loot.SetupEvents, loot, args )
+	end
+
+	return loot
+end
+
+function ToggleGod()
+	SessionState.SafeMode = not SessionState.SafeMode
+	SessionState.BlockHeroDeath = not SessionState.BlockHeroDeath
+	SessionState.BlockHeroDamage = not SessionState.BlockHeroDamage
+	SessionState.UnlimitedMana = not SessionState.UnlimitedMana
+	local Msg = "God Enabled"
+	if not SessionState.SafeMode then Msg = "God Disabled" end
+	thread( InCombatText, CurrentRun.Hero.ObjectId, Msg, 0.9, { ShadowScaleX = 1.5 } )
+end
+
+function CheatMsg(s)
+ thread( InCombatText, CurrentRun.Hero.ObjectId, s, 0.9, { ShadowScaleX = 1.5 } )
+end
+
+
+]]
+
+ResourceID = allocateMemory(8)
+registerSymbol("iResourceID",ResourceID)
+writeInteger(ResourceID,1) -- Bones
+writeInteger(ResourceID+4,10) -- Amount
+
+--Exec(init_script)
+[DISABLE]
+deAlloc(ResourceID)
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>87531</ID>
+          <Description>"[Console]"</Description>
+          <LastState Value="" RealAddress="00000000"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>87500</ID>
+              <Description>"Toggle Console UDF"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+
+{$lua}
+
+if syntaxcheck then return end
+
+function command ( s )
+  local luaState = getAddress("Hades2.sgg::ScriptManager::LuaInterface")
+  luaState = readPointer(luaState)
+  if luaState == 0 then print("No Lua State") unpause() error("") return end
+  executeCodeEx( 0, nil, getAddress( "Hades2.Lua::DoString" ),luaState , s ,"cheat")
+end
+
+function trim( s )
+  return s:find'^%s*$' and '' or s:match'^%s*(.*%S)'
+end
+
+function UDF1_InputKeyUp( sender, key )
+  if isKeyPressed( VK_SHIFT ) then
+    if key == VK_RETURN then
+      local text = sender.Lines.Text
+      if text and #text &gt; 0 then
+        text = trim( text )
+        UDF1.Log.Append( text .. '\r\n' )
+        --text = text:gsub( "\r\n", "\n" )
+        pause()
+        command( text )
+        unpause()
+        sender.Lines.Text = nil
+      end
+    end
+  end
+  return key
+end
+
+function UDF1_ClearClick( sender )
+  strings_clear( memo_getLines( UDF1_Log ) )
+end
+
+function ClearDebugLog()
+  strings_clear( memo_getLines( UDF1_Log ) )
+end
+
+function CloseLog()
+  ClearDebugLog()
+  form_hide( UDF1 )
+end
+
+function ShowLog()
+  form_show( UDF1 )
+end
+
+function UDF1_FormClose( sender )
+  ScriptEntry = addresslist_getMemoryRecordByDescription( getAddressList(), "Toggle Console UDF" )
+  memoryrecord_unfreeze( ScriptEntry )
+  return caHide
+end
+
+[ENABLE]
+
+ShowLog()
+
+[DISABLE]
+
+CloseLog()
+</AssemblerScript>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>87533</ID>
+          <Description>"[Pointers]"</Description>
+          <LastState Value="" RealAddress="00000000"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>87510</ID>
+              <Description>"伤害倍数："</Description>
+              <LastState Value="1" RealAddress="7FF7DD264F8C"/>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>Hades2.sgg::ConfigOptions::DamageMultiplier </Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87511</ID>
+              <Description>"受到伤害倍数："</Description>
+              <LastState Value="1" RealAddress="7FF7DD264C74"/>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>Hades2.sgg::ConfigOptions::DamageTakenMultiplier</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87538</ID>
+              <Description>"注意：更改这些数值会影响下一个房间！"</Description>
+              <LastState Value="" RealAddress="00000000"/>
+              <Color>C0C0C0</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>87532</ID>
+          <Description>"【脚本】"</Description>
+          <LastState Value="" RealAddress="00000000"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>87536</ID>
+              <Description>"切换上帝模式？(Toggle God)"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+{$lua}
+if syntaxcheck then return end
+[ENABLE]
+Exec(init_script)
+Exec("ToggleGod()")
+[DISABLE]
+Exec(init_script)
+Exec("ToggleGod()")
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87504</ID>
+              <Description>"治疗"</Description>
+              <LastState/>
+              <Color>0000FF</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+{$lua}
+if syntaxcheck then return end
+[ENABLE]
+local s = [[
+Heal( CurrentRun.Hero, { HealAmount = 9999 } )
+ManaDelta( 9999 )
+CheatMsg("Heal Enabled")
+]]
+Exec(init_script)
+Exec(s)
+[DISABLE]
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87506</ID>
+              <Description>"生成100金币"</Description>
+              <LastState/>
+              <Color>00FFFF</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+{$lua}
+if syntaxcheck then return end
+[ENABLE]
+local s = [[
+thread( GushMoney, { Amount = 100, LocationId = CurrentRun.Hero.ObjectId, Radius = 100, Source = "DebugSpawnMoney" } )
+CheatMsg("获得100金币")
+]]
+Exec(init_script)
+Exec(s)
+[DISABLE]
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87544</ID>
+              <Description>"生成1000金币"</Description>
+              <LastState/>
+              <Color>00FFFF</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+{$lua}
+if syntaxcheck then return end
+[ENABLE]
+local s = [[
+thread( GushMoney, { Amount = 1000, LocationId = CurrentRun.Hero.ObjectId, Radius = 100, Source = "DebugSpawnMoney" } )
+CheatMsg("获得1000金币")
+]]
+Exec(init_script)
+Exec(s)
+[DISABLE]
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87512</ID>
+              <Description>"增加10个骰子"</Description>
+              <LastState/>
+              <Color>FF8000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+{$lua}
+if syntaxcheck then return end
+[ENABLE]
+local s = [[
+		AddRerolls( nil, { Amount = 10 } )
+        CheatMsg("+10 ReRolls")
+]]
+Exec(init_script)
+Exec(s)
+[DISABLE]
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87523</ID>
+              <Description>"升级武器"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+{$lua}
+if syntaxcheck then return end
+[ENABLE]
+local s = [[
+		CreateWeaponLoot()
+        CheatMsg("Weapon Loot Spawned!")
+]]
+Exec(init_script)
+Exec(s)
+[DISABLE]
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87513</ID>
+              <Description>"解锁法典(Unlock Codex)"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+{$lua}
+if syntaxcheck then return end
+[ENABLE]
+local ID = messageDialog("You Really Want To Unlock All?",mtWarning,mbYes ,mbNo)
+if ID == mrNo then error("no") return end
+
+local s = [[
+		UnlockEntireCodex()
+		thread( ShowCodexUpdate )
+]]
+Exec(init_script)
+Exec(s)
+[DISABLE]
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87516</ID>
+              <Description>"给予所有资源99"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+{$lua}
+if syntaxcheck then return end
+[ENABLE]
+
+local s = [[
+		for k, resourceName in ipairs( ResourceDisplayOrderData ) do
+			AddResource( resourceName, 99, "Debug" )
+		end
+]]
+Exec(init_script)
+Exec(s)
+[DISABLE]
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87517</ID>
+              <Description>"通过ID获取资源"</Description>
+              <LastState/>
+              <Color>00FF00</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+{$lua}
+if syntaxcheck then return end
+[ENABLE]
+
+local s = [[
+		for k, resourceName in ipairs( ResourceDisplayOrderData ) do
+			if k == %d then AddResource( resourceName, %d, "Debug" ) end
+		end
+]]
+
+local ResourceInfo = getAddress("iResourceID")
+local ID = readInteger(ResourceInfo)
+if ID &gt; 96 then print("Invalid ID") error("invalid ID") return end
+
+s = string.format(s,ID,readInteger(ResourceInfo+4))
+Exec(init_script)
+Exec(s)
+[DISABLE]
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>87518</ID>
+                  <Description>"ID:"</Description>
+                  <LastState Value="15" RealAddress="259CF270000"/>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>00FF00</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>iResourceID</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>87519</ID>
+                  <Description>"Amount:"</Description>
+                  <LastState Value="50" RealAddress="259CF270004"/>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>00FF00</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>iResourceID+4</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87537</ID>
+              <Description>"宙斯祝福"</Description>
+              <LastState/>
+              <Color>FF8000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+{$lua}
+if syntaxcheck then return end
+[ENABLE]
+
+local s = [[
+_CreateLoot({ Name = "ZeusUpgrade", OffsetX =  100 })
+CheatMsg("生成宙斯祝福")
+]]
+Exec(init_script)
+Exec(s)
+[DISABLE]
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87549</ID>
+              <Description>"波塞冬祝福"</Description>
+              <LastState/>
+              <Color>FF8000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+{$lua}
+if syntaxcheck then return end
+[ENABLE]
+
+local s = [[
+_CreateLoot({ Name = "PoseidonUpgrade", OffsetX =  100 })
+CheatMsg("生成波塞冬祝福")
+]]
+Exec(init_script)
+Exec(s)
+[DISABLE]
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87545</ID>
+              <Description>"赫拉祝福"</Description>
+              <LastState/>
+              <Color>FF8000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+{$lua}
+if syntaxcheck then return end
+[ENABLE]
+
+local s = [[
+_CreateLoot({ Name = "HeraUpgrade", OffsetX =  100 })
+CheatMsg("生成赫拉祝福")
+]]
+Exec(init_script)
+Exec(s)
+[DISABLE]
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87546</ID>
+              <Description>"战神祝福"</Description>
+              <LastState/>
+              <Color>FF8000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+{$lua}
+if syntaxcheck then return end
+[ENABLE]
+
+local s = [[
+_CreateLoot({ Name = "AresUpgrade", OffsetX =  100 })
+CheatMsg("生成阿瑞斯祝福")
+]]
+Exec(init_script)
+Exec(s)
+[DISABLE]
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87539</ID>
+              <Description>"阿波罗祝福"</Description>
+              <LastState/>
+              <Color>FF8000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+{$lua}
+if syntaxcheck then return end
+[ENABLE]
+
+local s = [[
+_CreateLoot({ Name = "ApolloUpgrade", OffsetX =  100 })
+CheatMsg("生成阿波罗祝福")
+]]
+Exec(init_script)
+Exec(s)
+[DISABLE]
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87540</ID>
+              <Description>"爱神祝福"</Description>
+              <LastState/>
+              <Color>FF8000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+{$lua}
+if syntaxcheck then return end
+[ENABLE]
+
+local s = [[
+_CreateLoot({ Name = "AphroditeUpgrade", OffsetX =  100 })
+CheatMsg("生成阿佛洛狄忒祝福")
+]]
+Exec(init_script)
+Exec(s)
+[DISABLE]
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87541</ID>
+              <Description>"冰神祝福"</Description>
+              <LastState/>
+              <Color>FF8000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+{$lua}
+if syntaxcheck then return end
+[ENABLE]
+
+local s = [[
+_CreateLoot({ Name = "DemeterUpgrade", OffsetX =  100 })
+CheatMsg("生成德墨忒尔祝福")
+]]
+Exec(init_script)
+Exec(s)
+[DISABLE]
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87542</ID>
+              <Description>"火神祝福"</Description>
+              <LastState/>
+              <Color>FF8000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+{$lua}
+if syntaxcheck then return end
+[ENABLE]
+
+local s = [[
+_CreateLoot({ Name = "HestiaUpgrade", OffsetX =  100 })
+CheatMsg("生成赫菲斯托斯祝福")
+]]
+Exec(init_script)
+Exec(s)
+[DISABLE]
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87543</ID>
+              <Description>"匠神祝福"</Description>
+              <LastState/>
+              <Color>FF8000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+{$lua}
+if syntaxcheck then return end
+[ENABLE]
+
+local s = [[
+_CreateLoot({ Name = "HephaestusUpgrade", OffsetX =  100 })
+CheatMsg("生成赫斯提亚祝福")
+]]
+Exec(init_script)
+Exec(s)
+[DISABLE]
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87548</ID>
+              <Description>"赫尔墨斯祝福"</Description>
+              <LastState/>
+              <Color>FF8000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+{$lua}
+if syntaxcheck then return end
+[ENABLE]
+
+local s = [[
+_CreateLoot({ Name = "HermesUpgrade", OffsetX =  100 })
+CheatMsg("生成赫尔墨斯祝福")
+]]
+Exec(init_script)
+Exec(s)
+[DISABLE]
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87525</ID>
+              <Description>"给予力量石榴"</Description>
+              <LastState/>
+              <Color>0000FF</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+{$lua}
+if syntaxcheck then return end
+[ENABLE]
+local s = [[
+		CreateStackLoot()
+        CheatMsg("力量石榴!")
+]]
+Exec(init_script)
+Exec(s)
+[DISABLE]
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87550</ID>
+              <Description>"给予三重力量石榴"</Description>
+              <LastState/>
+              <Color>0000FF</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+{$lua}
+if syntaxcheck then return end
+[ENABLE]
+
+local s = [[
+_CreateLoot({ Name = "StackUpgradeTriple", OffsetX = 100 })
+CheatMsg("生成三倍力量石榴")
+]]
+Exec(init_script)
+Exec(s)
+
+[DISABLE]
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87551</ID>
+              <Description>"提升血量上限"</Description>
+              <LastState/>
+              <Color>0000FF</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+{$lua}
+if syntaxcheck then return end
+[ENABLE]
+
+local s = [[
+    local heroId = CurrentRun.Hero.ObjectId
+
+    -- 在玩家脚边生成一个可拾取的“加血上限”道具
+    local dropName = "MaxHealthDropBig"  -- 如果崩，可以再试 MaxHealthDropSmall / MaxHealthDrop
+    local consumableId = SpawnObstacle({
+        Name = dropName,
+        DestinationId = heroId,
+        Group = "Standing",
+        OffsetX = 100,
+        OffsetY = 0,
+        ForceToValidLocation = true
+    })
+
+    local consumable = CreateConsumableItem(consumableId, dropName, 0)
+
+    CheatMsg("生成血量上限")
+]]
+
+Exec(init_script)
+Exec(s)
+
+[DISABLE]
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87552</ID>
+              <Description>"提升蓝量上限"</Description>
+              <LastState/>
+              <Color>0000FF</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+{$lua}
+if syntaxcheck then return end
+[ENABLE]
+
+local s = [[
+    local heroId = CurrentRun.Hero.ObjectId
+
+    local dropName = "MaxManaDropBig"  -- 如果不行试 MaxManaDropSmall / MaxManaDrop
+    local consumableId = SpawnObstacle({
+        Name = dropName,
+        DestinationId = heroId,
+        Group = "Standing",
+        OffsetX = -100,
+        OffsetY = 0,
+        ForceToValidLocation = true
+    })
+
+    local consumable = CreateConsumableItem(consumableId, dropName, 0)
+
+    CheatMsg("生成加蓝上限道具（Soul Tonic 型的）")
+]]
+
+Exec(init_script)
+Exec(s)
+
+[DISABLE]
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87553</ID>
+              <Description>"给予锤子"</Description>
+              <LastState/>
+              <Color>0000FF</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+{$lua}
+if syntaxcheck then return end
+[ENABLE]
+
+local s = [[
+    _CreateLoot({ Name = "WeaponUpgrade", OffsetX = 100 })
+    CheatMsg("武器锤子！")
+]]
+
+Exec(init_script)
+Exec(s)
+
+[DISABLE]
+
+</AssemblerScript>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols>
+    <SymbolEntry>
+      <Name>iResourceID</Name>
+      <Address>259CF270000</Address>
+    </SymbolEntry>
+  </UserdefinedSymbols>
+  <Comments>AddMoney( 9000, "GrantUpgrade" )
+CreateWeaponLoot()
+CreateStackLoot()
+LiveFillInShopOptions()
+StartUpStore()
+SpawnDummyEnemy()
+GenerateMarketItems()
+BuildSuperMeter( CurrentRun, 100 )
+AddResource( "MetaPoints", 100, "Debug" )
+AddRerolls( 99, "Debug", { IgnoreMetaUpgrades = true } )
+local debugBoons = { "DionysusUpgrade" } for k, debugBoon in pairs( debugBoons ) do CreateLoot({ Name = debugBoon, OffsetX = k * 100 }) end
+local consumableName = "ChaosWeaponUpgrade" local playerId = GetIdsByType({ Name = "_PlayerUnit" }) local consumableId = SpawnObstacle({ Name = consumableName, DestinationId = playerId, Group = "Standing" }) local consumable = CreateConsumableItem( consumableId, consumableName, 0 )
+local playerId = GetIdsByType({ Name = "_PlayerUnit" }) DropHealth( "HealDropMinor", playerId )
+</Comments>
+  <DisassemblerComments>
+    <DisassemblerComment>
+      <Address>"Cyberpunk2077.exe"+28834D</Address>
+      <Header>CRASH ON (TRUE)
+</Header>
+    </DisassemblerComment>
+    <DisassemblerComment>
+      <Address>"Cyberpunk2077.exe"+AA6E8D</Address>
+      <Header>COMMAND CHECKER
+</Header>
+    </DisassemblerComment>
+    <DisassemblerComment>
+      <Address>"Cyberpunk2077.exe"+AA72A3</Address>
+      <Header>WRONG COMMAND CHECK
+</Header>
+    </DisassemblerComment>
+    <DisassemblerComment>
+      <Address>"Cyberpunk2077.exe"+AA7E0C</Address>
+      <Header>SEARCH COMMAND?
+</Header>
+    </DisassemblerComment>
+    <DisassemblerComment>
+      <Address>"Cyberpunk2077.exe"+AAC6AD</Address>
+      <Header>PRE CRASH ON (TRUE)
+</Header>
+    </DisassemblerComment>
+    <DisassemblerComment>
+      <Address>"Cyberpunk2077.exe"+ABD247</Address>
+      <Header>CRASH ON CHECKING
+</Header>
+    </DisassemblerComment>
+    <DisassemblerComment>
+      <Address>"Cyberpunk2077.exe"+ABD291</Address>
+      <Header>CRASH NEAR?
+</Header>
+    </DisassemblerComment>
+  </DisassemblerComments>
+</CheatTable>

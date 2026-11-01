@@ -1,0 +1,2491 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>0</ID>
+      <Description>"启用Mono Script（首先激活这个！！！）"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+if syntaxcheck then return end
+if process and readInteger(process) ~= 0 then
+    mono_initialize()
+    LaunchMonoDataCollector()
+else
+    local msg = 'No process detected.'
+    print(msg)
+    error(msg)
+end
+{$asm}
+[DISABLE]
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>3</ID>
+      <Description>"卡牌时间查找（含饥饿值）"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : WaysOfAlchemy.exe
+  Version: 
+  Date   : 2025-08-22
+  Author : 86152
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(CardTimer,GameAssembly.dll,0F 11 44 30 20 0F 11 4C 30 30 0F 11 54 30 40 0F 11 5C 30 50 E8 E8) // should be unique
+alloc(newmem,$100,CardTimer)
+
+label(code)
+label(return)
+
+label(CardTimeA)
+registersymbol(CardTimeA)
+label(CardTimeB)
+registersymbol(CardTimeB)
+
+newmem:
+
+  mov [CardTimeA],rax
+  mov [CardTimeB],rsi
+code:
+  movups [rax+rsi+20],xmm0
+  jmp return
+
+CardTimeA:
+  dd
+CardTimeB:
+  dd
+
+CardTimer:
+  jmp newmem
+return:
+registersymbol(CardTimer)
+
+[DISABLE]
+
+CardTimer:
+  db 0F 11 44 30 20
+
+unregistersymbol(*)
+dealloc(*)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+830EF
+
+GameAssembly.dll+830CF: 8D 47 01                 - lea eax,[rdi+01]
+GameAssembly.dll+830D2: 48 8D 4D 01              - lea rcx,[rbp+01]
+GameAssembly.dll+830D6: 3B 46 18                 - cmp eax,[rsi+18]
+GameAssembly.dll+830D9: 73 7F                    - jae GameAssembly.dll+8315A
+GameAssembly.dll+830DB: 48 8B C1                 - mov rax,rcx
+GameAssembly.dll+830DE: 33 D2                    - xor edx,edx
+GameAssembly.dll+830E0: 48 C1 E0 06              - shl rax,06
+GameAssembly.dll+830E4: 48 C1 E1 06              - shl rcx,06
+GameAssembly.dll+830E8: 48 83 C1 20              - add rcx,20
+GameAssembly.dll+830EC: 48 03 CE                 - add rcx,rsi
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+830EF: 0F 11 44 30 20           - movups [rax+rsi+20],xmm0
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+830F4: 0F 11 4C 30 30           - movups [rax+rsi+30],xmm1
+GameAssembly.dll+830F9: 0F 11 54 30 40           - movups [rax+rsi+40],xmm2
+GameAssembly.dll+830FE: 0F 11 5C 30 50           - movups [rax+rsi+50],xmm3
+GameAssembly.dll+83103: E8 18 4E 31 00           - call GameAssembly.il2cpp_value_box+20
+GameAssembly.dll+83108: 48 FF C3                 - inc rbx
+GameAssembly.dll+8310B: 41 FF C7                 - inc r15d
+GameAssembly.dll+8310E: 49 83 C6 40              - add r14,40
+GameAssembly.dll+83112: 48 89 5C 24 20           - mov [rsp+20],rbx
+GameAssembly.dll+83117: 44 3B BC 24 70 01 00 00  - cmp r15d,[rsp+00000170]
+GameAssembly.dll+8311F: 0F 8C 0B FE FF FF        - jl GameAssembly.dll+82F30
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>160</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>40</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>29</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>50</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>4</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>54</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>161</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>80</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>30</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>90</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>14</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>94</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>162</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>C0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>31</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>D0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>15</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>D4</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>163</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>100</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>32</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>110</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>16</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>114</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>164</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>140</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>33</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>150</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>17</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>154</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>165</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>180</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>34</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>190</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>18</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>194</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>166</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>1C0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>35</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>1D0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>19</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>1D4</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>167</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>200</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>36</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>210</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>20</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>214</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>168</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>240</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>37</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>250</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>21</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>254</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>169</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>280</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>38</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>290</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>22</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>294</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>170</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>2C0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>39</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>2D0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>23</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>2D4</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>171</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>300</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>40</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>310</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>24</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>314</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>172</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>340</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>41</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>350</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>25</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>354</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>173</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>380</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>42</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>390</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>26</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>394</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>174</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>3C0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>43</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>3D0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>27</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>3D4</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>175</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>400</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>44</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>410</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>28</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>414</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>176</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>440</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>81</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>450</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>82</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>454</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>177</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>480</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>84</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>490</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>85</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>494</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>178</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>4C0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>87</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>4D0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>88</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>4D4</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>179</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>500</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>90</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>510</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>91</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>514</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>180</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>540</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>93</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>550</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>94</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>554</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>181</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>580</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>96</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>590</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>97</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>594</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>182</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>5C0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>99</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>5D0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>100</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>5D4</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>183</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>600</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>102</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>610</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>103</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>614</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>184</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>640</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>105</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>650</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>106</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>654</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>185</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>680</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>108</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>690</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>109</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>694</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>186</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>6C0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>111</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>6D0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>112</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>6D4</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>187</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>700</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>114</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>710</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>115</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>714</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>188</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>740</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>117</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>750</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>118</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>754</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>189</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>780</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>121</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>790</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>122</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>794</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>190</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>7C0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>124</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>7D0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>125</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>7D4</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>191</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>800</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>127</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>810</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>128</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>814</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>192</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>840</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>130</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>850</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>131</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>854</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>193</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>880</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>133</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>890</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>134</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>894</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>194</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>8C0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>136</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>8D0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>137</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>8D4</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>195</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>900</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>139</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>910</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>140</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>914</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>196</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>940</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>142</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>950</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>143</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>954</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>197</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>980</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>145</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>990</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>146</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>994</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>198</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>9C0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>148</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>9D0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>149</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>9D4</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>199</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>A00</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>151</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>A10</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>152</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>A14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>200</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>A40</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>154</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>A50</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>155</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>CardTimeB</Address>
+          <Offsets>
+            <Offset>A54</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>45</ID>
+      <Description>"标签-时间停止"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : WaysOfAlchemy.exe
+  Version: 
+  Date   : 2025-08-24
+  Author : 86152
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(PlantTimer,GameAssembly.dll,F3 0F 5C C2 F3 0F 11 41 34) // should be unique
+alloc(newmem,$1000,PlantTimer)
+
+label(code)
+label(return)
+
+label(decayPointer)
+registersymbol(decayPointer)
+label(decay)
+
+label(hungerPointer)
+registersymbol(hungerPointer)
+label(hunger)
+
+label(crimePointer)
+registersymbol(crimePointer)
+label(crime)
+
+label(hirePointer)
+registersymbol(hirePointer)
+label(hire)
+
+
+newmem:
+
+decay:
+  cmp byte ptr [decayPointer],00
+  je hunger
+  cmp [rcx+20],00000057
+  je return
+hunger:
+  cmp byte ptr [hungerPointer],00
+  je crime
+  cmp [rcx+20],0000004C
+  je return
+crime:
+  cmp byte ptr [crimePointer],00
+  je hire
+  cmp [rcx+20],000000C8
+  je return
+hire:
+  cmp byte ptr [hirePointer],00
+  je code
+  cmp [rcx+20],0000004D
+  je return
+code:
+  subss xmm0,xmm2
+  movss [rcx+34],xmm0
+  jmp return
+
+decayPointer:
+  db 00
+hungerPointer:
+  db 00
+crimePointer:
+  db 00
+hirePointer:
+  db 00
+
+PlantTimer:
+  jmp newmem
+  nop 4
+return:
+registersymbol(PlantTimer)
+
+[DISABLE]
+
+PlantTimer:
+  db F3 0F 5C C2 F3 0F 11 41 34
+
+unregistersymbol(*)
+dealloc(*)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+68E1D1
+
+GameAssembly.dll+68E1A6: F3 41 0F 11 00           - movss [r8],xmm0
+GameAssembly.dll+68E1AB: 7A 02                    - jp GameAssembly.dll+68E1AF
+GameAssembly.dll+68E1AD: 74 19                    - je GameAssembly.dll+68E1C8
+GameAssembly.dll+68E1AF: F3 0F 58 41 30           - addss xmm0,[rcx+30]
+GameAssembly.dll+68E1B4: F3 0F 11 41 30           - movss [rcx+30],xmm0
+GameAssembly.dll+68E1B9: F3 41 0F 10 00           - movss xmm0,[r8]
+GameAssembly.dll+68E1BE: F3 0F 58 41 34           - addss xmm0,[rcx+34]
+GameAssembly.dll+68E1C3: F3 0F 11 41 34           - movss [rcx+34],xmm0
+GameAssembly.dll+68E1C8: F3 0F 10 41 34           - movss xmm0,[rcx+34]
+GameAssembly.dll+68E1CD: 48 8B 41 28              - mov rax,[rcx+28]
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+68E1D1: F3 0F 5C C2              - subss xmm0,xmm2
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+68E1D5: F3 0F 11 41 34           - movss [rcx+34],xmm0
+GameAssembly.dll+68E1DA: 48 85 C0                 - test rax,rax
+GameAssembly.dll+68E1DD: 74 31                    - je GameAssembly.dll+68E210
+GameAssembly.dll+68E1DF: F3 0F 11 80 80 00 00 00  - movss [rax+00000080],xmm0
+GameAssembly.dll+68E1E7: 0F 2F 49 34              - comiss xmm1,[rcx+34]
+GameAssembly.dll+68E1EB: 73 07                    - jae GameAssembly.dll+68E1F4
+GameAssembly.dll+68E1ED: B0 01                    - mov al,01
+GameAssembly.dll+68E1EF: 48 83 C4 28              - add rsp,28
+GameAssembly.dll+68E1F3: C3                       - ret 
+GameAssembly.dll+68E1F4: C7 41 34 00 00 00 00     - mov [rcx+34],00000000
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>78</ID>
+          <Description>"枯萎中"</Description>
+          <DropDownList DisplayValueAsItem="1">0:不启用
+1:启用
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>decayPointer</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>79</ID>
+          <Description>"饥饿"</Description>
+          <DropDownList DisplayValueAsItem="1">0:不启用
+1:启用
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>hungerPointer</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>119</ID>
+          <Description>"宗教审判官"</Description>
+          <DropDownList DisplayValueAsItem="1">0:不启用
+1:启用
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>crimePointer</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>156</ID>
+          <Description>"雇工时长"</Description>
+          <DropDownList DisplayValueAsItem="1">0:不启用
+1:启用
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>hirePointer</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>224</ID>
+      <Description>"查找全局时间"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : WaysOfAlchemy.exe
+  Version: 
+  Date   : 2025-08-26
+  Author : 86152
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(GetOverallTime,GameAssembly.dll,8B 40 18 41 89 06) // should be unique
+alloc(newmem,$100,GetOverallTime)
+
+label(code)
+label(return)
+
+label(OverallTime)
+registersymbol(OverallTime)
+
+newmem:
+  mov [OverallTime],rax
+code:
+  mov eax,[rax+18]
+  mov [r14],eax
+  jmp return
+
+OverallTime:
+  dd
+
+GetOverallTime:
+  jmp newmem
+  nop
+return:
+registersymbol(GetOverallTime)
+
+[DISABLE]
+
+GetOverallTime:
+  db 8B 40 18 41 89 06
+
+unregistersymbol(*)
+dealloc(*)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+6A13E2
+
+Game.GameSession.GameSessionManager.UpdateSessionTime: 40 53                 - push rbx
+GameAssembly.dll+6A1392: 56                    - push rsi
+GameAssembly.dll+6A1393: 41 56                 - push r14
+GameAssembly.dll+6A1395: 48 83 EC 30           - sub rsp,30
+GameAssembly.dll+6A1399: 80 3D B8 CE 94 03 00  - cmp byte ptr [GameAssembly.dll+3FEE258],00
+GameAssembly.dll+6A13A0: 49 8B F0              - mov rsi,r8
+GameAssembly.dll+6A13A3: 4C 8B F2              - mov r14,rdx
+GameAssembly.dll+6A13A6: 48 8B D9              - mov rbx,rcx
+GameAssembly.dll+6A13A9: 75 13                 - jne GameAssembly.dll+6A13BE
+GameAssembly.dll+6A13AB: 48 8D 0D 76 95 69 03  - lea rcx,[GameAssembly.dll+3D3A928]
+GameAssembly.dll+6A13B2: E8 C9 79 CF FF        - call GameAssembly.il2cpp_get_exception_argument_null+2C0
+GameAssembly.dll+6A13B7: C6 05 9A CE 94 03 01  - mov byte ptr [GameAssembly.dll+3FEE258],01
+GameAssembly.dll+6A13BE: 48 8B 83 40 02 00 00  - mov rax,[rbx+00000240]
+GameAssembly.dll+6A13C5: 48 89 6C 24 50        - mov [rsp+50],rbp
+GameAssembly.dll+6A13CA: 48 89 7C 24 58        - mov [rsp+58],rdi
+GameAssembly.dll+6A13CF: 4C 89 7C 24 60        - mov [rsp+60],r15
+GameAssembly.dll+6A13D4: 0F 29 74 24 20        - movaps [rsp+20],xmm6
+GameAssembly.dll+6A13D9: 48 85 C0                 - test rax,rax
+GameAssembly.dll+6A13DC: 0F 84 01 02 00 00        - je GameAssembly.dll+6A15E3
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+6A13E2: 8B 40 18                 - mov eax,[rax+18]
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+6A13E5: 41 89 06                 - mov [r14],eax
+GameAssembly.dll+6A13E8: 80 BB 35 02 00 00 00     - cmp byte ptr [rbx+00000235],00
+GameAssembly.dll+6A13EF: 75 14                    - jne GameAssembly.dll+6A1405
+GameAssembly.dll+6A13F1: 48 83 BB 38 02 00 00 00  - cmp qword ptr [rbx+00000238],00
+GameAssembly.dll+6A13F9: 75 0A                    - jne GameAssembly.dll+6A1405
+GameAssembly.dll+6A13FB: F3 0F 10 B3 20 02 00 00  - movss xmm6,[rbx+00000220]
+GameAssembly.dll+6A1403: EB 03                    - jmp GameAssembly.dll+6A1408
+GameAssembly.dll+6A1405: 0F 57 F6                 - xorps xmm6,xmm6
+GameAssembly.dll+6A1408: 33 C9                    - xor ecx,ecx
+GameAssembly.dll+6A140A: E8 71 E6 70 02           - call UnityEngine.Time.get_deltaTime
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>223</ID>
+          <Description>"全局时间"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>OverallTime</Address>
+          <Offsets>
+            <Offset>18</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>248</ID>
+      <Description>"遍历所有卡牌任务开始时间"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : WaysOfAlchemy.exe
+  Version:
+  Date   : 2025-08-26
+  Author : 86152
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(FindTaskTime,GameAssembly.dll,E8 99 9D 4C 00) // should be unique
+alloc(Task01,$1000,FindTaskTime)
+label(Task02)
+label(Task03)
+label(Task04)
+label(Task05)
+label(Task06)
+label(Task07)
+label(Task08)
+label(Task09)
+label(Task10)
+
+label(code)
+label(return)
+
+
+label(TaskTime)
+registersymbol(TaskTime)
+
+Task01:
+  cmp r15,00000000
+  jne Task02
+  mov [TaskTime],rcx
+  jmp code
+Task02:
+  cmp r15,00000001
+  jne Task03
+  mov [TaskTime+10],rcx
+  jmp code
+Task03:
+  cmp r15,00000002
+  jne Task04
+  mov [TaskTime+20],rcx
+  jmp code
+Task04:
+  cmp r15,00000003
+  jne Task05
+  mov [TaskTime+30],rcx
+  jmp code
+Task05:
+  cmp r15,00000004
+  jne Task06
+  mov [TaskTime+40],rcx
+  jmp code
+Task06:
+  cmp r15,00000005
+  jne Task07
+  mov [TaskTime+50],rcx
+  jmp code
+Task07:
+  cmp r15,00000006
+  jne Task08
+  mov [TaskTime+60],rcx
+  jmp code
+Task08:
+  cmp r15,00000007
+  jne Task09
+  mov [TaskTime+70],rcx
+  jmp code
+Task09:
+  cmp r15,00000008
+  jne Task10
+  mov [TaskTime+80],rcx
+  jmp code
+Task10:
+  cmp r15,00000009
+  jne code
+  mov [TaskTime+90],rcx
+code:
+  call GameAssembly.dll+C5F910
+  jmp return
+
+TaskTime:
+  dd
+
+FindTaskTime:
+  jmp Task01
+return:
+registersymbol(FindTaskTime)
+
+[DISABLE]
+
+FindTaskTime:
+  db E8 99 9D 4C 00
+
+unregistersymbol(*)
+dealloc(*)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+795B72
+
+GameAssembly.dll+795B42: 75 23                 - jne GameAssembly.dll+795B67
+GameAssembly.dll+795B44: 4C 8B 05 CD D2 5D 03  - mov r8,[GameAssembly.dll+3D72E18]
+GameAssembly.dll+795B4B: 48 8D 4C 24 70        - lea rcx,[rsp+70]
+GameAssembly.dll+795B50: 41 0F 28 C9           - movaps xmm1,xmm9
+GameAssembly.dll+795B54: 48 89 54 24 70        - mov [rsp+70],rdx
+GameAssembly.dll+795B59: E8 82 98 4C 00        - call GameAssembly.dll+C5F3E0
+GameAssembly.dll+795B5E: 48 8B 44 24 70        - mov rax,[rsp+70]
+GameAssembly.dll+795B63: 48 89 43 34           - mov [rbx+34],rax
+GameAssembly.dll+795B67: 48 8B 15 1A D5 5D 03  - mov rdx,[GameAssembly.dll+3D73088]
+GameAssembly.dll+795B6E: 48 8D 4B 34           - lea rcx,[rbx+34]
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+795B72: E8 99 9D 4C 00        - call GameAssembly.dll+C5F910
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+795B77: 48 85 FF              - test rdi,rdi
+GameAssembly.dll+795B7A: 0F 84 B5 00 00 00     - je GameAssembly.dll+795C35
+GameAssembly.dll+795B80: 48 8B 15 51 CE 5A 03  - mov rdx,[GameAssembly.dll+3D429D8]
+GameAssembly.dll+795B87: B9 02 00 00 00        - mov ecx,00000002
+GameAssembly.dll+795B8C: 0F 29 74 24 50        - movaps [rsp+50],xmm6
+GameAssembly.dll+795B91: 4C 8B C7              - mov r8,rdi
+GameAssembly.dll+795B94: 41 0F 28 F1           - movaps xmm6,xmm9
+GameAssembly.dll+795B98: F3 0F 5C F0           - subss xmm6,xmm0
+GameAssembly.dll+795B9C: E8 2F 36 8A FF        - call GameAssembly.dll+391D0
+GameAssembly.dll+795BA1: F3 0F 5E F0           - divss xmm6,xmm0
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>249</ID>
+          <Description>"Task1"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>TaskTime</Address>
+          <Offsets>
+            <Offset>4</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>250</ID>
+          <Description>"Task2"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>TaskTime+10</Address>
+          <Offsets>
+            <Offset>4</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>251</ID>
+          <Description>"Task3"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>TaskTime+20</Address>
+          <Offsets>
+            <Offset>4</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>252</ID>
+          <Description>"Task4"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>TaskTime+30</Address>
+          <Offsets>
+            <Offset>4</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>253</ID>
+          <Description>"Task5"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>TaskTime+40</Address>
+          <Offsets>
+            <Offset>4</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>254</ID>
+          <Description>"Task6"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>TaskTime+50</Address>
+          <Offsets>
+            <Offset>4</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>255</ID>
+          <Description>"Task7"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>TaskTime+60</Address>
+          <Offsets>
+            <Offset>4</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>256</ID>
+          <Description>"Task8"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>TaskTime+70</Address>
+          <Offsets>
+            <Offset>4</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>257</ID>
+          <Description>"Task9"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>TaskTime+80</Address>
+          <Offsets>
+            <Offset>4</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>258</ID>
+          <Description>"Task10"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>TaskTime+90</Address>
+          <Offsets>
+            <Offset>4</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>203</ID>
+      <Description>"卡牌静态属性值查找（开关刷新）"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : WaysOfAlchemy.exe
+  Version: 
+  Date   : 2025-08-25
+  Author : 86152
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(StatInject,GameAssembly.dll,41 8B 96 90 00 00 00) // should be unique
+alloc(newmem,$1000,StatInject)
+
+label(code)
+label(return)
+
+label(Count)
+registersymbol(Count)
+label(CountFix)
+
+label(StatHead)
+registersymbol(StatHead)
+
+newmem:
+  push r13
+  push edx
+  mov r13,StatHead
+  mov edx,[Count]
+  add edx,8
+  cmp edx,120
+  jbe CountFix
+  mov edx,8
+CountFix:
+  add r13,edx
+  mov [r13],r14
+  mov [Count],edx
+  pop edx
+  pop r13
+code:
+  mov edx,[r14+00000090]
+  jmp return
+Count:
+  db 0
+StatHead:
+  dd
+
+StatInject:
+  jmp newmem
+  nop 2
+return:
+registersymbol(StatInject)
+
+[DISABLE]
+
+StatInject:
+  db 41 8B 96 90 00 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+762795
+
+GameAssembly.dll+762769: E9 E8 00 00 00           - jmp GameAssembly.dll+762856
+GameAssembly.dll+76276E: 4C 89 BC 24 D0 00 00 00  - mov [rsp+000000D0],r15
+GameAssembly.dll+762776: 4D 85 F6                 - test r14,r14
+GameAssembly.dll+762779: 0F 84 2C 01 00 00        - je GameAssembly.dll+7628AB
+GameAssembly.dll+76277F: 33 D2                    - xor edx,edx
+GameAssembly.dll+762781: 49 8B CE                 - mov rcx,r14
+GameAssembly.dll+762784: E8 27 9F F2 FF           - call Game.Entities.Properties.GameEntityProperty.Clone
+GameAssembly.dll+762789: 4C 8B F8                 - mov r15,rax
+GameAssembly.dll+76278C: 48 85 C0                 - test rax,rax
+GameAssembly.dll+76278F: 0F 84 16 01 00 00        - je GameAssembly.dll+7628AB
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+762795: 41 8B 96 90 00 00 00     - mov edx,[r14+00000090]
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+76279C: 45 33 C9                 - xor r9d,r9d
+GameAssembly.dll+76279F: 45 33 C0                 - xor r8d,r8d
+GameAssembly.dll+7627A2: 48 8B C8                 - mov rcx,rax
+GameAssembly.dll+7627A5: E8 16 A3 F2 FF           - call Game.Entities.Properties.GameEntityProperty.SetCount
+GameAssembly.dll+7627AA: F2 0F 10 4E 10           - movsd xmm1,[rsi+10]
+GameAssembly.dll+7627AF: 48 8D 55 EF              - lea rdx,[rbp-11]
+GameAssembly.dll+7627B3: 48 8B 5F 10              - mov rbx,[rdi+10]
+GameAssembly.dll+7627B7: 48 8D 4D BF              - lea rcx,[rbp-41]
+GameAssembly.dll+7627BB: 0F 57 C0                 - xorps xmm0,xmm0
+GameAssembly.dll+7627BE: F2 0F 11 4D FF           - movsd [rbp-01],xmm1
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>278</ID>
+          <Description>"Count"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>Count</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>262</ID>
+          <Description>"属性1"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>StatHead+8</Address>
+          <Offsets>
+            <Offset>90</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>263</ID>
+          <Description>"属性2"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>StatHead+10</Address>
+          <Offsets>
+            <Offset>90</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>264</ID>
+          <Description>"属性3"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>StatHead+18</Address>
+          <Offsets>
+            <Offset>90</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>265</ID>
+          <Description>"属性4"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>StatHead+20</Address>
+          <Offsets>
+            <Offset>90</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>266</ID>
+          <Description>"属性5"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>StatHead+28</Address>
+          <Offsets>
+            <Offset>90</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>267</ID>
+          <Description>"属性6"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>StatHead+30</Address>
+          <Offsets>
+            <Offset>90</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>268</ID>
+          <Description>"属性7"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>StatHead+38</Address>
+          <Offsets>
+            <Offset>90</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>269</ID>
+          <Description>"属性8"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>StatHead+40</Address>
+          <Offsets>
+            <Offset>90</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>270</ID>
+          <Description>"属性9"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>StatHead+48</Address>
+          <Offsets>
+            <Offset>90</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>271</ID>
+          <Description>"属性10"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>StatHead+50</Address>
+          <Offsets>
+            <Offset>90</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>272</ID>
+          <Description>"属性11"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>StatHead+58</Address>
+          <Offsets>
+            <Offset>90</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>273</ID>
+          <Description>"属性12"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>StatHead+60</Address>
+          <Offsets>
+            <Offset>90</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>274</ID>
+          <Description>"属性13"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>StatHead+68</Address>
+          <Offsets>
+            <Offset>90</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>275</ID>
+          <Description>"属性14"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>StatHead+70</Address>
+          <Offsets>
+            <Offset>90</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>276</ID>
+          <Description>"属性15"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>StatHead+78</Address>
+          <Offsets>
+            <Offset>90</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>277</ID>
+          <Description>"属性16"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>StatHead+80</Address>
+          <Offsets>
+            <Offset>90</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>279</ID>
+          <Description>"属性17"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>StatHead+88</Address>
+          <Offsets>
+            <Offset>90</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>280</ID>
+          <Description>"属性18"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>StatHead+90</Address>
+          <Offsets>
+            <Offset>90</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>282</ID>
+          <Description>"属性19"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>StatHead+98</Address>
+          <Offsets>
+            <Offset>90</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>281</ID>
+          <Description>"属性20"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>StatHead+A0</Address>
+          <Offsets>
+            <Offset>90</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>8</ID>
+      <Description>"----------------------------------分割线以下为废弃/汇编参考，不会汇编就别点了-----------------------------------------"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>10</ID>
+      <Description>"主角精力"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : WaysOfAlchemy.exe
+  Version: 
+  Date   : 2025-08-23
+  Author : 86152
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(Energy,GameAssembly.dll,41 8B 96 90 00 00 00) // should be unique
+alloc(newmem,$1000,Energy)
+
+label(code)
+label(return)
+
+label(EnergyAddr)
+registersymbol(EnergyAddr)
+
+newmem:
+  mov [EnergyAddr],r14
+code:
+  mov edx,[r14+00000090]
+  jmp return
+
+EnergyAddr:
+  dd
+
+Energy:
+  jmp newmem
+  nop 2
+return:
+registersymbol(Energy)
+
+[DISABLE]
+
+Energy:
+  db 41 8B 96 90 00 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+758237
+
+GameAssembly.dll+75820B: E9 E3 00 00 00           - jmp GameAssembly.dll+7582F3
+GameAssembly.dll+758210: 4C 89 BC 24 D0 00 00 00  - mov [rsp+000000D0],r15
+GameAssembly.dll+758218: 4D 85 F6                 - test r14,r14
+GameAssembly.dll+75821B: 0F 84 1B 01 00 00        - je GameAssembly.dll+75833C
+GameAssembly.dll+758221: 33 D2                    - xor edx,edx
+GameAssembly.dll+758223: 49 8B CE                 - mov rcx,r14
+GameAssembly.dll+758226: E8 85 B6 F2 FF           - call Game.Entities.Properties.GameEntityProperty.Clone
+GameAssembly.dll+75822B: 4C 8B F8                 - mov r15,rax
+GameAssembly.dll+75822E: 48 85 C0                 - test rax,rax
+GameAssembly.dll+758231: 0F 84 05 01 00 00        - je GameAssembly.dll+75833C
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+758237: 41 8B 96 90 00 00 00     - mov edx,[r14+00000090]
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+75823E: 45 33 C9                 - xor r9d,r9d
+GameAssembly.dll+758241: 45 33 C0                 - xor r8d,r8d
+GameAssembly.dll+758244: 48 8B C8                 - mov rcx,rax
+GameAssembly.dll+758247: E8 74 BA F2 FF           - call Game.Entities.Properties.GameEntityProperty.SetCount
+GameAssembly.dll+75824C: F2 0F 10 4F 10           - movsd xmm1,[rdi+10]
+GameAssembly.dll+758251: 48 8D 55 EF              - lea rdx,[rbp-11]
+GameAssembly.dll+758255: 48 8B 5E 10              - mov rbx,[rsi+10]
+GameAssembly.dll+758259: 48 8D 4D BF              - lea rcx,[rbp-41]
+GameAssembly.dll+75825D: 0F 57 C0                 - xorps xmm0,xmm0
+GameAssembly.dll+758260: F2 0F 11 4D FF           - movsd [rbp-01],xmm1
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>11</ID>
+          <Description>"精力"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>EnergyAddr</Address>
+          <Offsets>
+            <Offset>90</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>259</ID>
+      <Description>"卡牌静态属性值查找（汇编参考）"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : WaysOfAlchemy.exe
+  Version: 
+  Date   : 2025-08-25
+  Author : 86152
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(StatInject,GameAssembly.dll,41 8B 96 90 00 00 00) // should be unique
+alloc(newmem,$100,StatInject)
+
+label(code)
+label(return)
+
+label(StatHead)
+registersymbol(StatHead)
+
+newmem:
+  mov [StatHead],r14
+code:
+  mov edx,[r14+00000090]
+  jmp return
+
+StatHead:
+  dd
+
+StatInject:
+  jmp newmem
+  nop 2
+return:
+registersymbol(StatInject)
+
+[DISABLE]
+
+StatInject:
+  db 41 8B 96 90 00 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+762795
+
+GameAssembly.dll+762769: E9 E8 00 00 00           - jmp GameAssembly.dll+762856
+GameAssembly.dll+76276E: 4C 89 BC 24 D0 00 00 00  - mov [rsp+000000D0],r15
+GameAssembly.dll+762776: 4D 85 F6                 - test r14,r14
+GameAssembly.dll+762779: 0F 84 2C 01 00 00        - je GameAssembly.dll+7628AB
+GameAssembly.dll+76277F: 33 D2                    - xor edx,edx
+GameAssembly.dll+762781: 49 8B CE                 - mov rcx,r14
+GameAssembly.dll+762784: E8 27 9F F2 FF           - call Game.Entities.Properties.GameEntityProperty.Clone
+GameAssembly.dll+762789: 4C 8B F8                 - mov r15,rax
+GameAssembly.dll+76278C: 48 85 C0                 - test rax,rax
+GameAssembly.dll+76278F: 0F 84 16 01 00 00        - je GameAssembly.dll+7628AB
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+762795: 41 8B 96 90 00 00 00     - mov edx,[r14+00000090]
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+76279C: 45 33 C9                 - xor r9d,r9d
+GameAssembly.dll+76279F: 45 33 C0                 - xor r8d,r8d
+GameAssembly.dll+7627A2: 48 8B C8                 - mov rcx,rax
+GameAssembly.dll+7627A5: E8 16 A3 F2 FF           - call Game.Entities.Properties.GameEntityProperty.SetCount
+GameAssembly.dll+7627AA: F2 0F 10 4E 10           - movsd xmm1,[rsi+10]
+GameAssembly.dll+7627AF: 48 8D 55 EF              - lea rdx,[rbp-11]
+GameAssembly.dll+7627B3: 48 8B 5F 10              - mov rbx,[rdi+10]
+GameAssembly.dll+7627B7: 48 8D 4D BF              - lea rcx,[rbp-41]
+GameAssembly.dll+7627BB: 0F 57 C0                 - xorps xmm0,xmm0
+GameAssembly.dll+7627BE: F2 0F 11 4D FF           - movsd [rbp-01],xmm1
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>260</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>StatHead</Address>
+          <Offsets>
+            <Offset>90</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>234</ID>
+      <Description>"开始任务时记录当前时刻"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : WaysOfAlchemy.exe
+  Version: 
+  Date   : 2025-08-26
+  Author : 86152
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,GameAssembly.dll,F3 0F 10 48 18 48 8D) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  movss xmm1,[rax+18]
+  jmp return
+
+INJECT:
+  jmp newmem
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db F3 0F 10 48 18
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+69C839
+
+GameAssembly.dll+69C809: 48 85 DB                 - test rbx,rbx
+GameAssembly.dll+69C80C: 0F 84 D4 02 00 00        - je GameAssembly.dll+69CAE6
+GameAssembly.dll+69C812: 48 8B 15 1F 3B 6A 03     - mov rdx,[GameAssembly.dll+3D40338]
+GameAssembly.dll+69C819: B9 14 00 00 00           - mov ecx,00000014
+GameAssembly.dll+69C81E: 4C 8B C3                 - mov r8,rbx
+GameAssembly.dll+69C821: E8 8A 61 96 FF           - call GameAssembly.dll+29B0
+GameAssembly.dll+69C826: 48 8B F0                 - mov rsi,rax
+GameAssembly.dll+69C829: 49 8B 86 40 02 00 00     - mov rax,[r14+00000240]
+GameAssembly.dll+69C830: 48 85 C0                 - test rax,rax
+GameAssembly.dll+69C833: 0F 84 AD 02 00 00        - je GameAssembly.dll+69CAE6
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+69C839: F3 0F 10 48 18           - movss xmm1,[rax+18]
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+69C83E: 48 8D 4D B0              - lea rcx,[rbp-50]
+GameAssembly.dll+69C842: 4C 89 BC 24 A8 00 00 00  - mov [rsp+000000A8],r15
+GameAssembly.dll+69C84A: 0F 28 DE                 - movaps xmm3,xmm6
+GameAssembly.dll+69C84D: 45 33 FF                 - xor r15d,r15d
+GameAssembly.dll+69C850: 44 8B C7                 - mov r8d,edi
+GameAssembly.dll+69C853: 4C 89 7C 24 20           - mov [rsp+20],r15
+GameAssembly.dll+69C858: E8 13 91 FD FF           - call Game.Cards.Logic.GameCardProcessStartArgs..ctor
+GameAssembly.dll+69C85D: 48 85 F6                 - test rsi,rsi
+GameAssembly.dll+69C860: 0F 84 7C 02 00 00        - je GameAssembly.dll+69CAE2
+GameAssembly.dll+69C866: 4C 8B 16                 - mov r10,[rsi]
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>247</ID>
+      <Description>"遍历所有卡牌任务开始时间（汇编）"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : WaysOfAlchemy.exe
+  Version: 
+  Date   : 2025-08-26
+  Author : 86152
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,GameAssembly.dll,F3 0F 10 41 04 48 83 C4 20) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  movss xmm0,[rcx+04]
+  jmp return
+
+INJECT:
+  jmp newmem
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db F3 0F 10 41 04
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+C5DBD0
+
+GameAssembly.dll+C5DBB2: 48 83 EC 20     - sub rsp,20
+GameAssembly.dll+C5DBB6: 80 39 00        - cmp byte ptr [rcx],00
+GameAssembly.dll+C5DBB9: 48 8B D9        - mov rbx,rcx
+GameAssembly.dll+C5DBBC: 75 12           - jne GameAssembly.dll+C5DBD0
+GameAssembly.dll+C5DBBE: 33 C9           - xor ecx,ecx
+GameAssembly.dll+C5DBC0: E8 7B 13 1B 01  - call System.ThrowHelper.ThrowInvalidOperationException_InvalidOperation_NoValue
+GameAssembly.dll+C5DBC5: F3 0F 10 43 04  - movss xmm0,[rbx+04]
+GameAssembly.dll+C5DBCA: 48 83 C4 20     - add rsp,20
+GameAssembly.dll+C5DBCE: 5B              - pop rbx
+GameAssembly.dll+C5DBCF: C3              - ret 
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+C5DBD0: F3 0F 10 41 04  - movss xmm0,[rcx+04]
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+C5DBD5: 48 83 C4 20     - add rsp,20
+GameAssembly.dll+C5DBD9: 5B              - pop rbx
+GameAssembly.dll+C5DBDA: C3              - ret 
+GameAssembly.dll+C5DBDB: CC              - int 3 
+GameAssembly.dll+C5DBDC: CC              - int 3 
+GameAssembly.dll+C5DBDD: CC              - int 3 
+GameAssembly.dll+C5DBDE: CC              - int 3 
+GameAssembly.dll+C5DBDF: CC              - int 3 
+GameAssembly.dll+C5DBE0: 48 89 5C 24 08  - mov [rsp+08],rbx
+GameAssembly.dll+C5DBE5: 48 89 6C 24 10  - mov [rsp+10],rbp
+}
+</AssemblerScript>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

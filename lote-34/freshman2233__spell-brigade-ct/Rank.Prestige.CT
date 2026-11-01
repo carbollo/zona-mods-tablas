@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>5</ID>
+      <Description>"[Script] Rank &amp; XP Tracker"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game    : TheSpellBrigade }
+{ Version : V1.1.3.19565}
+{ Author  : enchanter}
+{ Date    : 2026-9-17}
+{ Update  : re-targeted for V1.1.3.19565 }
+
+[ENABLE]
+// ---------------------------------------------------------------------------
+// Hook point: inside CharacterRankDisplay.Display, which runs when you open the
+// "Wizards" menu and highlight a wizard.
+//
+// The surrounding x64 code is:
+//     call CharacterRankProgression.GetOrCreateProgressForCharacter   -> rax = progression
+//     ...
+//     mov r8d,[rax+18]      &lt;-- INJECT starts here (10 bytes, all displacement-free)
+//     xor r9d,r9d
+//     mov edx,[rax+10]
+//     call CharacterBadgeDisplay.Show        &lt;-- deliberately NOT overwritten
+//
+// Why the AOB looks the way it does:
+//   * The old signature was "8B 50 10 E8 94 C8 FF FF". The trailing 4 bytes are the
+//     rel32 displacement of `call Show`, which changes on every recompile - that is
+//     what broke the table on the game update.
+//   * Here that displacement is wildcarded, and the 6 trailing bytes
+//     (45 33 C9 4C 8B C3) make the match unique. There is a second, structurally
+//     identical call site inside ClaimPrestigeModal.Refresh which this signature
+//     correctly does NOT match.
+//   * We start the scan 10 bytes early (at `mov r8d,[rax+18]`) so that the whole
+//     patch region is displacement-free. `call Show` is left intact, so the disable
+//     branch can restore exact bytes without hardcoding any address.
+// ---------------------------------------------------------------------------
+aobscanmodule(INJECT, GameAssembly.dll, 44 8B 40 18 45 33 C9 8B 50 10 E8 ?? ?? ?? ?? 45 33 C9 4C 8B C3)
+alloc(newmem, $1000, INJECT)
+
+label(code)
+label(return)
+globalalloc(pCharacter, 8)
+
+newmem:
+  // rax holds the CharacterRankProgression object for the highlighted wizard.
+  mov [pCharacter], rax
+
+code:
+  // re-execute the instructions we overwrote, then fall through into `call Show`
+  mov r8d, [rax+18]
+  xor r9d, r9d
+  mov edx, [rax+10]
+  jmp return
+
+INJECT:
+  jmp newmem
+  // pad the remaining 5 bytes so the 10-byte patch region is fully consumed
+  db 90 90 90 90 90
+
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+// Restore the original 10 bytes. These contain no rel32/absolute displacement,
+// so this stays correct across game updates.
+INJECT:
+  db 44 8B 40 18 45 33 C9 8B 50 10
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// Address layout of the captured object (unchanged from V1.0.2.16657):
+//   +0x10  int32  rank
+//   +0x14  float  progress  (feed straight into the rank progress slider)
+//   +0x18  int32  prestige
+//
+// Reference - the original call site this hook is built around:
+//   mov r8d,[rax+18]
+//   xor r9d,r9d
+//   mov edx,[rax+10]
+//   call CharacterBadgeDisplay.Show
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>3</ID>
+      <Description>"Current character_rank"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>4 Bytes</VariableType>
+      <Address>pCharacter</Address>
+      <Offsets>
+        <Offset>10</Offset>
+      </Offsets>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>4</ID>
+      <Description>"Current character_progress"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>Float</VariableType>
+      <Address>pCharacter</Address>
+      <Offsets>
+        <Offset>14</Offset>
+      </Offsets>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>6</ID>
+      <Description>"Current character_prestige"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>4 Bytes</VariableType>
+      <Address>pCharacter</Address>
+      <Offsets>
+        <Offset>18</Offset>
+      </Offsets>
+    </CheatEntry>
+  </CheatEntries>
+</CheatTable>

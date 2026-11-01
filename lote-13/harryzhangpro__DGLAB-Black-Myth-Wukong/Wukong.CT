@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>356957</ID>
+      <Description>"&lt;== Enable for attach to game process "</Description>
+      <Color>0000FF</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript Async="1">[ENABLE]
+{$lua}
+if syntaxcheck then return end
+  if(getCEVersion() &lt; 7.3) then
+    ShowMessage('Warning! CE version should be 7.3 or above')
+    error()
+  end
+  ---------------
+ local pcss = 'b1-Win64-Shipping.exe'
+ local msg = 'The process b1-Win64-Shipping.exe is NOT found!'
+ OpenProcess(pcss)
+  if (readInteger(process) == readInteger(pcss)) and (readInteger(process) ~= nil) then
+       ShowMessage(msg)
+    error()
+  else
+   getMainForm().caption = "Table Created By Tuuuup! DGLAB by @Siling00(Same as X)"
+    end
+
+{$asm}
+//LuaCall(function cycleFullCompact(sender,force) local state = not(compactmenuitem.Caption == 'Compact View Mode'); if force~=nil then state = not force end; compactmenuitem.Caption = state and 'Compact View Mode' or 'Full View Mode'; getMainForm().Splitter1.Visible = state; getMainForm().Panel4.Visible    = state; getMainForm().Panel5.Visible    = state; end; function addCompactMenu() if compactmenualreadyexists then return end; local parent = getMainForm().Menu.Items; compactmenuitem = createMenuItem(parent); parent.add(compactmenuitem); compactmenuitem.Caption = 'Compact View Mode'; compactmenuitem.OnClick = cycleFullCompact; compactmenualreadyexists = 'yes'; end; addCompactMenu(); cycleFullCompact(nil,true))
+[DISABLE]
+{$lua}
+if monopipe~=nil then monopipe.Destroy() ; monopipe=nil end  -- mono disable
+{$asm}
+//LuaCall(cycleFullCompact(nil,false))
+
+
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>0</ID>
+          <Description>"&lt;== Compact Mode"</Description>
+          <Color>0000FF</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+LuaCall(function cycleFullCompact(sender,force) local state = not(compactmenuitem.Caption == 'Compact View Mode'); if force~=nil then state = not force end; compactmenuitem.Caption = state and 'Compact View Mode' or 'Full View Mode'; getMainForm().Splitter1.Visible = state; getMainForm().Panel4.Visible    = state; getMainForm().Panel5.Visible    = state; end; function addCompactMenu() if compactmenualreadyexists then return end; local parent = getMainForm().Menu.Items; compactmenuitem = createMenuItem(parent); parent.add(compactmenuitem); compactmenuitem.Caption = 'Compact View Mode'; compactmenuitem.OnClick = cycleFullCompact; compactmenualreadyexists = 'yes'; end; addCompactMenu(); cycleFullCompact(nil,true))
+
+[DISABLE]
+LuaCall(cycleFullCompact(nil,false))
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>358379</ID>
+          <Description>"Inject!"</Description>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript Async="1">{ Game   : b1-Win64-Shipping.exe
+  Version: 
+  Date   : 2024-08-28
+  Author : Tuuup!
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(playerbase4,$process,488B90xxxxxxxx488B4598833800F30F104070F30F114590F30F104590833800F30F104874F30F114D90F30F104D90488BCE) // should be unique
+alloc(newmem,$1000,playerbase4)
+registersymbol(playerbase4 pbase2)
+label(code pbase2)
+label(return)
+
+newmem:
+mov rdx,[rax+000000D0]
+mov rax,[rdx+28]
+test rax,rax
+je code
+mov rax,[rax+18]
+test rax,rax
+je code
+mov rax,[rax+38]
+test rax,rax
+je code
+cmp [rax+b8],(float)9999
+jne code
+mov [pbase2],rdx
+code:
+
+jmp return
+pbase2:
+dq 0
+playerbase4:
+jmp newmem
+nop 2
+return:
+
+[DISABLE]
+
+playerbase4:
+  db 48 8B 90 D0 00 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+{
+// ORIGINAL CODE - INJECTION POINT: b1-Win64-Shipping.exe+252358F
+
+b1-Win64-Shipping.exe+2523566: 48 8B 4D 98           - mov rcx,[rbp-68]
+b1-Win64-Shipping.exe+252356A: 83 39 00              - cmp dword ptr [rcx],00
+b1-Win64-Shipping.exe+252356D: 0F B6 51 6C           - movzx edx,byte ptr [rcx+6C]
+b1-Win64-Shipping.exe+2523571: 48 8B C8              - mov rcx,rax
+b1-Win64-Shipping.exe+2523574: 83 38 00              - cmp dword ptr [rax],00
+b1-Win64-Shipping.exe+2523577: E8 52 DB 4A 02        - call b1-Win64-Shipping.exe+49D10CE
+b1-Win64-Shipping.exe+252357C: 48 8B F0              - mov rsi,rax
+b1-Win64-Shipping.exe+252357F: 48 85 C0              - test rax,rax
+b1-Win64-Shipping.exe+2523582: 0F 84 E5 00 00 00     - je b1-Win64-Shipping.exe+252366D
+b1-Win64-Shipping.exe+2523588: 48 8B 85 68 FF FF FF  - mov rax,[rbp-00000098]
+// ---------- INJECTING HERE ----------
+b1-Win64-Shipping.exe+252358F: 48 8B 90 D0 00 00 00  - mov rdx,[rax+000000D0]
+// ---------- DONE INJECTING  ----------
+b1-Win64-Shipping.exe+2523596: 48 8B 45 98           - mov rax,[rbp-68]
+b1-Win64-Shipping.exe+252359A: 83 38 00              - cmp dword ptr [rax],00
+b1-Win64-Shipping.exe+252359D: F3 0F 10 40 70        - movss xmm0,[rax+70]
+b1-Win64-Shipping.exe+25235A2: F3 0F 11 45 90        - movss [rbp-70],xmm0
+b1-Win64-Shipping.exe+25235A7: F3 0F 10 45 90        - movss xmm0,[rbp-70]
+b1-Win64-Shipping.exe+25235AC: 83 38 00              - cmp dword ptr [rax],00
+b1-Win64-Shipping.exe+25235AF: F3 0F 10 48 74        - movss xmm1,[rax+74]
+b1-Win64-Shipping.exe+25235B4: F3 0F 11 4D 90        - movss [rbp-70],xmm1
+b1-Win64-Shipping.exe+25235B9: F3 0F 10 4D 90        - movss xmm1,[rbp-70]
+b1-Win64-Shipping.exe+25235BE: 48 8B CE              - mov rcx,rsi
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>358643</ID>
+              <Description>"Enable DGLAB"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{  Game Executable   :
+   Author            : Harryzhangpro
+   Executable Version:
+   Script Date       :30 Aug,2024
+}
+
+{$lua}
+if syntaxcheck then return end
+if hpTimer ~= nil then
+    hpTimer.destroy()
+end
+if connectionCheckTimer ~= nil then
+    connectionCheckTimer.destroy()
+end
+
+prev_hp = 0  -- 初始化prev_hp
+prev_max_hp = 0
+
+[ENABLE]
+
+local socket = require("socket")
+local client = socket.tcp()
+client:settimeout(0)  -- 设置非阻塞模式
+
+local function connectClient()
+    local success, err = client:connect("127.0.0.1", 10086)
+    if not success then
+        print("[Error] Connection failed: " .. tostring(err))
+    else
+        print("[Info] Connected to the server.")
+    end
+end
+
+connectClient()
+
+hpTimer = createTimer()
+hpTimer.setInterval(10)
+hpTimer.onTimer = function()
+
+    local pg = getAddressSafe('[pbase2]')
+    if pg ~= nil then
+        local pg3 = getAddressSafe('[[pbase2]+28]')
+        if pg3 ~= nil then
+            local pg4 = getAddressSafe('[[[pbase2]+28]+18]')
+            if pg4 ~= nil then
+                local pg5 = getAddressSafe('[[[[pbase2]+28]+18]+38]')
+                if pg5 ~= nil then
+
+                    local max_hp = readFloat('[[[[pbase2]+28]+18]+38]+24')
+                    local now_hp = readFloat('[[[[pbase2]+28]+18]+38]+27C')
+                    local delta = now_hp - prev_hp
+                    prev_hp = now_hp
+
+                    if delta &lt; 0 and prev_max_hp == max_hp then
+                        local success, err = client:send("hit:" .. tostring(delta) .. "hp:" .. tostring(now_hp))  -- 尝试发送当前HP
+                        if not success then
+                            print("[Error] Send failed: " .. tostring(err))
+                            client:close()  -- 关闭当前连接
+                            client = socket.tcp()  -- 创建新客户端
+                            connectClient()  -- 尝试重新连接
+                        else
+                            print(string.format("[Event] Strike! delta %.2f now_hp %.2f", delta, now_hp))
+                        end
+                    end
+
+                    prev_max_hp = max_hp
+
+                end
+            end
+        end
+    end
+end
+
+-- 定时器每1秒检查一次连接状态
+connectionCheckTimer = createTimer()
+connectionCheckTimer.setInterval(1000)
+connectionCheckTimer.onTimer = function()
+    local success, err = client:send("ping")  -- 发送ping以检查连接状态
+    if not success then
+        print("[Error] Connection lost. Attempting to reconnect...")
+        client:close()  -- 关闭当前连接
+        client = socket.tcp()  -- 创建新客户端
+        connectClient()  -- 尝试重新连接
+    end
+end
+
+[DISABLE]
+if hpTimer ~= nil then
+    hpTimer.destroy()
+end
+if connectionCheckTimer ~= nil then
+    connectionCheckTimer.destroy()
+end
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>358637</ID>
+              <Description>"base address"</Description>
+              <Options moHideChildren="1" moManualExpandCollapse="1"/>
+              <ShowAsSigned>1</ShowAsSigned>
+              <GroupHeader>1</GroupHeader>
+              <Address>pbase2</Address>
+              <Offsets>
+                <Offset>0</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

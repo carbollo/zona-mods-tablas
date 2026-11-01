@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="52">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>56</ID>
+      <Description>"GitHub BOOM [aob] v9.3 with Zero Init Health"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//PuzzleTroop.Init
+ 
+aobscanmodule(INJEhealth,GameAssembly.dll,89 47 10 8B 97 8C 00 00 00) // should be unique
+alloc(newmem,$1000)
+alloc(execCount,4)
+
+label(skipZeroing)
+label(return)
+
+newmem:
+  inc dword ptr [execCount]         // crește contorul
+  cmp dword ptr [execCount], 5      // dacă execuția e &gt;=5, setează eax = 0
+  jl skipZeroing
+  xor eax, eax                      // setează eax = 0
+
+
+skipZeroing:
+  mov [edi+10],eax
+  mov edx,[edi+0000008C]
+  jmp return
+
+INJEhealth:
+  jmp newmem
+  nop 4
+return:
+registersymbol(INJEhealth)
+
+[DISABLE]
+INJEhealth:
+  db 89 47 10 8B 97 8C 00 00 00
+
+unregistersymbol(INJEhealth)
+dealloc(newmem)
+dealloc(execCount)
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+B9A402
+
+GameAssembly.dll+B9A3E6: 8B C8              - mov ecx,eax
+GameAssembly.dll+B9A3E8: 83 C4 08           - add esp,08
+GameAssembly.dll+B9A3EB: C1 E9 1F           - shr ecx,1F
+GameAssembly.dll+B9A3EE: 84 C9              - test cl,cl
+GameAssembly.dll+B9A3F0: 75 0E              - jne GameAssembly.dll+B9A400
+GameAssembly.dll+B9A3F2: 3D E8 03 00 00     - cmp eax,000003E8
+GameAssembly.dll+B9A3F7: 7E 09              - jle GameAssembly.dll+B9A402
+GameAssembly.dll+B9A3F9: B8 E8 03 00 00     - mov eax,000003E8
+GameAssembly.dll+B9A3FE: EB 02              - jmp GameAssembly.dll+B9A402
+GameAssembly.dll+B9A400: 33 C0              - xor eax,eax
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+B9A402: 89 47 10           - mov [edi+10],eax
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+B9A405: 8B 97 8C 00 00 00  - mov edx,[edi+0000008C]
+GameAssembly.dll+B9A40B: 85 D2              - test edx,edx
+GameAssembly.dll+B9A40D: 0F 84 30 09 00 00  - je GameAssembly.dll+B9AD43
+GameAssembly.dll+B9A413: 8B 02              - mov eax,[edx]
+GameAssembly.dll+B9A415: FF B0 34 02 00 00  - push [eax+00000234]
+GameAssembly.dll+B9A41B: 8B 88 30 02 00 00  - mov ecx,[eax+00000230]
+GameAssembly.dll+B9A421: 52                 - push edx
+GameAssembly.dll+B9A422: FF D1              - call ecx
+GameAssembly.dll+B9A424: 8B C8              - mov ecx,eax
+GameAssembly.dll+B9A426: 83 C4 08           - add esp,08
+}
+</AssemblerScript>
+      <Hotkeys>
+        <Hotkey>
+          <Action>Toggle Activation</Action>
+          <Keys>
+            <Key>5</Key>
+          </Keys>
+          <ID>0</ID>
+        </Hotkey>
+      </Hotkeys>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>55</ID>
+      <Description>"NOP mov [esi+10],00000001"</Description>
+      <Color>008000</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+GameAssembly.dll+3A6AAC:
+db 7F 07 90 90 90 90 90 90 90
+//PuzzleTroop.AdjustHealth 
+ 
+[DISABLE]
+GameAssembly.dll+3A6AAC:
+db 7F 07 C7 46 10 01 00 00 00
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>106</ID>
+      <Description>"All Rewards v9.3"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>// Date   : 31 July 2026
+ // Author : Balenaucigasa
+
+
+[ENABLE]
+aobscanmodule(INJ_reward,GameAssembly.dll,03 45 0C 89 41 0C 5D) // should be unique
+alloc(newmem,$1000,INJ_reward)
+
+label(code)
+label(return)
+
+newmem:
+mov eax,(int)5
+add [ecx+0C],00000064 //add more gold
+add [ecx+14],(int)40   //40  //add more souls
+add [ecx+20],(int)1   //add XP , Max is 10 but as a precaution, do not change the default value
+add [ecx+18],(int)5   //add 5 keys, Max is 5
+mov [ecx+1C],(int)1   //add 1 Treasure Maps, Maxim is 10
+
+
+code:
+  add [ecx+10],eax
+  pop ebp
+  ret 
+  jmp return
+
+INJ_reward+03:
+  jmp newmem
+return:
+registersymbol(INJ_reward)
+
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+INJ_reward+03:
+  db 89 41 0C 5D C3
+
+unregistersymbol(INJ_reward)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+BE7AEC
+
+GameAssembly.dll+BE7ADB: CC        - int 3 
+GameAssembly.dll+BE7ADC: CC        - int 3 
+GameAssembly.dll+BE7ADD: CC        - int 3 
+GameAssembly.dll+BE7ADE: CC        - int 3 
+GameAssembly.dll+BE7ADF: CC        - int 3 
+Reward.AddGold: 55        - push ebp
+System.Runtime.Serialization.Formatters.Binary.ObjectProgress.ArrayCountIncrement+1: 8B EC     - mov ebp,esp
+GameAssembly.dll+BE7AE3: 8B 4D 08  - mov ecx,[ebp+08]
+GameAssembly.dll+BE7AE6: 8B 41 0C  - mov eax,[ecx+0C]
+GameAssembly.dll+BE7AE9: 03 45 0C  - add eax,[ebp+0C]
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+BE7AEC: 89 41 0C  - mov [ecx+0C],eax
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+BE7AEF: 5D        - pop ebp
+GameAssembly.dll+BE7AF0: C3        - ret 
+GameAssembly.dll+BE7AF1: CC        - int 3 
+GameAssembly.dll+BE7AF2: CC        - int 3 
+GameAssembly.dll+BE7AF3: CC        - int 3 
+GameAssembly.dll+BE7AF4: CC        - int 3 
+GameAssembly.dll+BE7AF5: CC        - int 3 
+GameAssembly.dll+BE7AF6: CC        - int 3 
+GameAssembly.dll+BE7AF7: CC        - int 3 
+GameAssembly.dll+BE7AF8: CC        - int 3 
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>63</ID>
+      <Description>"Boom for Explore [With Cedric] v9.3"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+aobscanmodule(all_health,GameAssembly.dll,89 47 10 8B 97 8C 00 00 00) // should be unique
+alloc(newmem,$1000)
+
+label(code)
+label(is_friendly)
+label(return)
+
+newmem:
+
+code:
+  // Pasul 1: Verificăm dacă ID-ul trupei de la [edi+50] este 6498 (zecimal)
+  cmp dword ptr [edi+50], #6498
+  // #6498 Cedric 1962
+  // #7813 Moonveil
+  // #1481 underspire
+
+  // Pasul 2: Dacă este egal (adică e trupa ta), sărim direct la codul original (nu modificăm nimic)
+  je is_friendly
+
+  // Pasul 3: Dacă NU este egal (e inamicul), suprascriem registrul EAX cu 0 înainte de a-l muta în viață
+  mov eax, 0
+
+is_friendly:
+  mov [edi+10],eax                // Executăm instrucțiunea originală (cu EAX intact sau modificat în 0)
+  mov edx,[edi+0000008C]          // Cealaltă instrucțiune originală din AOB
+  jmp return
+
+all_health:
+  jmp newmem
+  nop 4
+return:
+registersymbol(all_health)
+
+[DISABLE]
+all_health:
+  db 89 47 10 8B 97 8C 00 00 00
+
+unregistersymbol(all_health)
+dealloc(newmem)
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>57</ID>
+      <Description>"Boom Arena v9.3"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+ 
+aobscanmodule(INJarena,GameAssembly.dll,89 47 10 8B 97 8C 00 00 00) // should be unique
+alloc(newmem,$1000)
+alloc(execCount,4)
+
+label(return)
+label(ExecuteOriginalCode)
+
+newmem: //PuzzleTroop.Init
+  inc dword ptr [execCount]
+  cmp dword ptr [execCount], 4
+  jle ExecuteOriginalCode
+  xor eax, eax
+  cmp dword ptr [execCount], 8
+  jne ExecuteOriginalCode
+  mov dword ptr [execCount], 0
+
+ExecuteOriginalCode:
+  mov [edi+10],eax
+  mov edx,[edi+0000008C]
+  jmp return
+
+INJarena:
+  jmp newmem
+  nop 4
+return:
+registersymbol(INJarena)
+
+[DISABLE]
+INJarena:
+  db 89 47 10 8B 97 8C 00 00 00
+
+unregistersymbol(INJarena)
+dealloc(newmem)
+dealloc(execCount)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+B9A402
+
+GameAssembly.dll+B9A3E6: 8B C8              - mov ecx,eax
+GameAssembly.dll+B9A3E8: 83 C4 08           - add esp,08
+GameAssembly.dll+B9A3EB: C1 E9 1F           - shr ecx,1F
+GameAssembly.dll+B9A3EE: 84 C9              - test cl,cl
+GameAssembly.dll+B9A3F0: 75 0E              - jne GameAssembly.dll+B9A400
+GameAssembly.dll+B9A3F2: 3D E8 03 00 00     - cmp eax,000003E8
+GameAssembly.dll+B9A3F7: 7E 09              - jle GameAssembly.dll+B9A402
+GameAssembly.dll+B9A3F9: B8 E8 03 00 00     - mov eax,000003E8
+GameAssembly.dll+B9A3FE: EB 02              - jmp GameAssembly.dll+B9A402
+GameAssembly.dll+B9A400: 33 C0              - xor eax,eax
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+B9A402: 89 47 10           - mov [edi+10],eax
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+B9A405: 8B 97 8C 00 00 00  - mov edx,[edi+0000008C]
+GameAssembly.dll+B9A40B: 85 D2              - test edx,edx
+GameAssembly.dll+B9A40D: 0F 84 30 09 00 00  - je GameAssembly.dll+B9AD43
+GameAssembly.dll+B9A413: 8B 02              - mov eax,[edx]
+GameAssembly.dll+B9A415: FF B0 34 02 00 00  - push [eax+00000234]
+GameAssembly.dll+B9A41B: 8B 88 30 02 00 00  - mov ecx,[eax+00000230]
+GameAssembly.dll+B9A421: 52                 - push edx
+GameAssembly.dll+B9A422: FF D1              - call ecx
+GameAssembly.dll+B9A424: 8B C8              - mov ecx,eax
+GameAssembly.dll+B9A426: 83 C4 08           - add esp,08
+}
+</AssemblerScript>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

@@ -1,0 +1,586 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="46">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>1</ID>
+      <Description>"启用"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$LUA}
+local pid = getProcessIDFromProcessName(PROCESS_NAME)
+if not pid then
+    showMessage("先启动游戏，然后重新开启此选项")
+    return
+end
+if getOpenedProcessID() ~= pid then
+    openProcess(pid)
+end
+
+if LaunchMonoDataCollector() == 0 then
+    showMessage("激活 Mono 功能失败！")
+    return
+end
+
+local classID = mono_findClass("", "UIController")
+local instance = mono_getClassInstance(classID)
+if not instance then return end
+
+local offsets = mono_getClassFieldOffsets(classID)
+if not offsets then return end
+
+PlayerControllerOffs = mono_getClassFieldOffsets(mono_findClass("", "PlayerController"))
+WeaponOffs = mono_getClassFieldOffsets(mono_findClass("", "Weapon"))
+
+registerSymbol("pPlayerController", instance + offsets.playerController)
+registerSymbol("pWeapon", instance + offsets.weapon)
+
+{$ASM}
+
+
+
+[DISABLE]
+{$LUA}
+PlayerControllerOffs = nil
+WeaponOffs = nil
+
+unregisterSymbol("pPlayerController")
+unregisterSymbol("pWeapon")
+
+{$ASM}
+
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>36</ID>
+          <Description>"Player Attribute"</Description>
+          <Options moHideChildren="1"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>5</ID>
+              <Description>"Crouch Speed Multiplier"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>pPlayerController</Address>
+              <Offsets>
+                <Offset>PlayerControllerOffs.crouchSpeed</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>6</ID>
+              <Description>"Walk Speed"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>pPlayerController</Address>
+              <Offsets>
+                <Offset>PlayerControllerOffs.walkSpeed</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>9</ID>
+              <Description>"Invincible"</Description>
+              <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">0:False
+1:True
+</DropDownList>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>pPlayerController</Address>
+              <Offsets>
+                <Offset>PlayerControllerOffs.invincible</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>10</ID>
+              <Description>"HP"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pPlayerController</Address>
+              <Offsets>
+                <Offset>PlayerControllerOffs.Hp</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>11</ID>
+              <Description>"Max HP"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pPlayerController</Address>
+              <Offsets>
+                <Offset>PlayerControllerOffs.max_Hp</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>12</ID>
+              <Description>"H"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>pPlayerController</Address>
+              <Offsets>
+                <Offset>PlayerControllerOffs.H</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>13</ID>
+              <Description>"Max H"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>pPlayerController</Address>
+              <Offsets>
+                <Offset>PlayerControllerOffs.max_H</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>14</ID>
+              <Description>"Stamina"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>pPlayerController</Address>
+              <Offsets>
+                <Offset>PlayerControllerOffs.stamina</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>15</ID>
+              <Description>"Max Stamina"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>pPlayerController</Address>
+              <Offsets>
+                <Offset>PlayerControllerOffs.max_Stamina</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>16</ID>
+              <Description>"Fall Down Combo"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>pPlayerController</Address>
+              <Offsets>
+                <Offset>PlayerControllerOffs.fallDownCombo</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>35</ID>
+              <Description>"Drop Timer"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>pPlayerController</Address>
+              <Offsets>
+                <Offset>PlayerControllerOffs.d_Timer</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>28</ID>
+          <Description>"Weapon"</Description>
+          <Options moHideChildren="1"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>7</ID>
+              <Description>"Get Gun And Kye"</Description>
+              <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">0:False
+1:True
+</DropDownList>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>pPlayerController</Address>
+              <Offsets>
+                <Offset>PlayerControllerOffs.getGunAndKye</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>8</ID>
+              <Description>"Get Rifle"</Description>
+              <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">0:False
+1:True
+</DropDownList>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>pPlayerController</Address>
+              <Offsets>
+                <Offset>PlayerControllerOffs.getRifle</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>29</ID>
+              <Description>"ammunition"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pWeapon</Address>
+              <Offsets>
+                <Offset>WeaponOffs.ammunition</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>30</ID>
+              <Description>"magazine"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pWeapon</Address>
+              <Offsets>
+                <Offset>WeaponOffs.magazine</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>31</ID>
+              <Description>"magazineCapacity"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pWeapon</Address>
+              <Offsets>
+                <Offset>WeaponOffs.magazineCapacity</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>32</ID>
+              <Description>"R_ammunition"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pWeapon</Address>
+              <Offsets>
+                <Offset>WeaponOffs.R_ammunition</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>33</ID>
+              <Description>"R_magazine"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pWeapon</Address>
+              <Offsets>
+                <Offset>WeaponOffs.R_magazine</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>34</ID>
+              <Description>"R_magazineCapacity"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pWeapon</Address>
+              <Offsets>
+                <Offset>WeaponOffs.R_magazineCapacity</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>17</ID>
+          <Description>"Sex Status"</Description>
+          <Options moHideChildren="1"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>18</ID>
+              <Description>"U_Sex_Timer"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pPlayerController</Address>
+              <Offsets>
+                <Offset>PlayerControllerOffs.U_Sex_Timer</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>19</ID>
+              <Description>"U_ML"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>pPlayerController</Address>
+              <Offsets>
+                <Offset>PlayerControllerOffs.U_ML</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>20</ID>
+              <Description>"U_Fly_Eggs"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pPlayerController</Address>
+              <Offsets>
+                <Offset>PlayerControllerOffs.U_Fly_Eggs</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>21</ID>
+              <Description>"U_Tentacle_Eggs"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pPlayerController</Address>
+              <Offsets>
+                <Offset>PlayerControllerOffs.U_Tentacle_Eggs</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>22</ID>
+              <Description>"U_Spider_Eggs"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pPlayerController</Address>
+              <Offsets>
+                <Offset>PlayerControllerOffs.U_Spider_Eggs</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>23</ID>
+              <Description>"R_Sex_Timer"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pPlayerController</Address>
+              <Offsets>
+                <Offset>PlayerControllerOffs.R_Sex_Timer</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>24</ID>
+              <Description>"R_ML"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>pPlayerController</Address>
+              <Offsets>
+                <Offset>PlayerControllerOffs.R_ML</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>25</ID>
+              <Description>"R_Fly_Eggs"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pPlayerController</Address>
+              <Offsets>
+                <Offset>PlayerControllerOffs.R_Fly_Eggs</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>26</ID>
+              <Description>"R_Tentacle_Eggs"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pPlayerController</Address>
+              <Offsets>
+                <Offset>PlayerControllerOffs.R_Tentacle_Eggs</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>27</ID>
+              <Description>"R_Spider_Eggs"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pPlayerController</Address>
+              <Offsets>
+                <Offset>PlayerControllerOffs.R_Spider_Eggs</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>37</ID>
+          <Description>"Tank"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+{$LUA}
+local classID = mono_findClass("", "TankController")
+local instance = mono_getClassInstance(classID)
+if not instance then return end
+
+local offsets = mono_getClassFieldOffsets(classID)
+if not offsets then return end
+
+TankController = {}
+for name, offset in pairs(offsets) do
+    TankController[name] = instance + offset
+end
+
+registerSymbol("pTankController", instance)
+
+{$ASM}
+
+
+
+[DISABLE]
+{$LUA}
+TankController = nil
+unregisterSymbol("pTankController")
+{$ASM}
+
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>41</ID>
+              <Description>"M_fireDelatTime"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>TankController.M_fireDelatTime</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>42</ID>
+              <Description>"T_fireDelatTime"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>TankController.T_fireDelatTime</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>43</ID>
+              <Description>"alphaIncreaseAmount"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>TankController.alphaIncreaseAmount</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>44</ID>
+              <Description>"alphaDecreaseRate"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>TankController.alphaDecreaseRate</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>40</ID>
+          <Description>"Unlimited Ammo"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+"&lt;Shoot&gt;d__24.MoveNext"+63:
+db 90 90 90 90 90 90
+
+"&lt;R_Shoot&gt;d__25.MoveNext"+81:
+db 90 90 90 90 90 90
+
+"Weapon.ReloadingFinish"+A:
+db 90 90 90 90 90 90
+
+"Weapon.R_ReloadingFinish"+A:
+db 90 90 90 90 90 90
+
+
+
+[DISABLE]
+
+"&lt;Shoot&gt;d__24.MoveNext"+63:
+db FF 8B 8C 00 00 00
+//dec [rbx+0000008C]
+
+"&lt;R_Shoot&gt;d__25.MoveNext"+81:
+db FF 8B 98 00 00 00
+//dec [rbx+00000098]
+
+"Weapon.ReloadingFinish"+A:
+db FF 8B 90 00 00 00
+//dec [rbx+00000090]
+
+"Weapon.R_ReloadingFinish"+A:
+db FF 8B 9C 00 00 00
+//dec [rbx+0000009C]
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>38</ID>
+          <Description>"Stand up immediately"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+alloc(newmem,2048,"HState.OnUpdate"+9B8) 
+label(returnhere)
+label(originalcode)
+label(exit)
+
+label(float_20)
+
+newmem: //this is allocated memory, you have read,write,execute access
+//place your code here
+
+originalcode:
+movss xmm0,[float_20]
+
+exit:
+jmp returnhere
+
+float_20:
+dd (float)20
+
+"HState.OnUpdate"+9B8:
+jmp newmem
+returnhere:
+
+
+ 
+ 
+[DISABLE]
+dealloc(newmem)
+"HState.OnUpdate"+9B8:
+db F3 41 0F 58 C1
+//addss xmm0,xmm9
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>39</ID>
+          <Description>"Continuously dripping"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+alloc(newmem,2048,"PlayerController.Update"+4D0) 
+label(returnhere)
+label(originalcode)
+label(exit)
+
+label(float_10)
+
+newmem: //this is allocated memory, you have read,write,execute access
+//place your code here
+
+originalcode:
+movss xmm0,[float_10]
+movss [rbx+000000A0],xmm0
+movss xmm0,[rbx+000000A0]
+
+exit:
+jmp returnhere
+
+float_10:
+dd (float)10
+
+"PlayerController.Update"+4D0:
+jmp newmem
+nop 3
+returnhere:
+
+
+ 
+ 
+[DISABLE]
+dealloc(newmem)
+"PlayerController.Update"+4D0:
+db F3 0F 10 83 A0 00 00 00
+//movss xmm0,[rbx+000000A0]
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+  <LuaScript>PROCESS_NAME = "Syahata's bad day.exe"
+
+function mono_getClassInstance(classID)
+    local instance = mono_class_findInstancesOfClassListOnly(mono_class_getNamespace(classID), classID)
+    if not instance or #instance == 0 then
+        return nil
+    end
+    return instance[1]
+end
+
+function mono_getClassFieldOffsets(classID)
+    local fields = mono_class_enumFields(classID)
+    if not fields or #fields == 0 then
+        return nil
+    end
+
+    local t = {}
+    for i = 1, #fields do
+        t[fields[i].name] = fields[i].offset
+    end
+    return t
+end
+
+</LuaScript>
+</CheatTable>

@@ -1,0 +1,805 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="46">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>109</ID>
+      <Description>"Evoland 1"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$LUA}
+local pid = getProcessIDFromProcessName("Evoland.exe")
+if not pid then
+    showMessage("先启动游戏，然后重新开启此选项")
+    return
+end
+
+if getOpenedProcessID() ~= pid then
+    openProcess(pid)
+end
+
+{$ASM}
+
+
+
+[DISABLE]
+
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>17</ID>
+          <Description>"人物坐标"</Description>
+          <Options moHideChildren="1"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>15</ID>
+              <Description>"X"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Double</VariableType>
+              <Address>"libhl.dll"+0004914C</Address>
+              <Offsets>
+                <Offset>8</Offset>
+                <Offset>30</Offset>
+                <Offset>3C</Offset>
+                <Offset>4</Offset>
+                <Offset>7CC</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>16</ID>
+              <Description>"Y"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Double</VariableType>
+              <Address>"libhl.dll"+0004914C</Address>
+              <Offsets>
+                <Offset>10</Offset>
+                <Offset>30</Offset>
+                <Offset>3C</Offset>
+                <Offset>4</Offset>
+                <Offset>7CC</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>108</ID>
+              <Description>"自由移动 [小键盘85前后 46左右]"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+{$LUA}
+local function movePlayer(x, y)
+    if x then
+        local recordPosX = AddressList.getMemoryRecordByID(15)
+        local addrX = recordPosX.CurrentAddress
+        if not addrX or addrX == 0 then
+            return
+        end
+
+        local posX = readDouble(addrX) + x
+        writeDouble(addrX, posX)
+        return
+    end
+
+    if y then
+        local recordPosY = AddressList.getMemoryRecordByID(16)
+        local addrY = recordPosY.CurrentAddress
+        if not addrY or addrY == 0 then
+            return
+        end
+
+        local posY = readDouble(addrY) + y
+        writeDouble(addrY, posY)
+        return
+    end
+end
+
+local timer = createTimer(getMainForm())
+timer.Interval = 100
+timer.OnTimer = function()
+    local distanceX = 1.0
+    local distanceY = 1.0
+
+    if isKeyPressed(VK_NUMPAD4) then
+        movePlayer(-distanceX, nil)
+    elseif isKeyPressed(VK_NUMPAD6) then
+        movePlayer(distanceX, nil)
+    elseif isKeyPressed(VK_NUMPAD8) then
+        movePlayer(nil, -distanceY)
+    elseif isKeyPressed(VK_NUMPAD5) then
+        movePlayer(nil, distanceY)
+    end
+end
+
+FreeMoveTimer = timer
+
+{$ASM}
+
+
+
+[DISABLE]
+{$LUA}
+FreeMoveTimer.Enabled = false
+FreeMoveTimer.destroy()
+FreeMoveTimer = nil
+{$ASM}
+
+</AssemblerScript>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>123</ID>
+          <Description>"人物属性"</Description>
+          <Options moHideChildren="1"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>20</ID>
+              <Description>"金钱"</Description>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"libhl.dll"+0004914C</Address>
+              <Offsets>
+                <Offset>0</Offset>
+                <Offset>84</Offset>
+                <Offset>70</Offset>
+                <Offset>34</Offset>
+                <Offset>0</Offset>
+                <Offset>638</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>31</ID>
+              <Description>"当前生命"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"libhl.dll"+0004914C</Address>
+              <Offsets>
+                <Offset>0</Offset>
+                <Offset>3C</Offset>
+                <Offset>70</Offset>
+                <Offset>34</Offset>
+                <Offset>0</Offset>
+                <Offset>638</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>33</ID>
+              <Description>"红心生命（3D）"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>"libhl.dll"+0004914C</Address>
+              <Offsets>
+                <Offset>80</Offset>
+                <Offset>3C</Offset>
+                <Offset>70</Offset>
+                <Offset>34</Offset>
+                <Offset>0</Offset>
+                <Offset>638</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>114</ID>
+          <Description>"回合制战斗"</Description>
+          <Options moHideChildren="1"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>28</ID>
+              <Description>"男角色"</Description>
+              <Options moHideChildren="1"/>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>110</ID>
+                  <Description>"最大生命"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>"libhl.dll"+0004914C</Address>
+                  <Offsets>
+                    <Offset>F0</Offset>
+                    <Offset>10</Offset>
+                    <Offset>8</Offset>
+                    <Offset>34</Offset>
+                    <Offset>88</Offset>
+                    <Offset>3C</Offset>
+                    <Offset>4</Offset>
+                    <Offset>7CC</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>111</ID>
+                  <Description>"当前生命"</Description>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>"libhl.dll"+0004914C</Address>
+                  <Offsets>
+                    <Offset>F4</Offset>
+                    <Offset>10</Offset>
+                    <Offset>8</Offset>
+                    <Offset>34</Offset>
+                    <Offset>88</Offset>
+                    <Offset>3C</Offset>
+                    <Offset>4</Offset>
+                    <Offset>7CC</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>112</ID>
+                  <Description>"攻击"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>"libhl.dll"+0004914C</Address>
+                  <Offsets>
+                    <Offset>F8</Offset>
+                    <Offset>10</Offset>
+                    <Offset>8</Offset>
+                    <Offset>34</Offset>
+                    <Offset>88</Offset>
+                    <Offset>3C</Offset>
+                    <Offset>4</Offset>
+                    <Offset>7CC</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>113</ID>
+                  <Description>"防御"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>"libhl.dll"+0004914C</Address>
+                  <Offsets>
+                    <Offset>FC</Offset>
+                    <Offset>10</Offset>
+                    <Offset>8</Offset>
+                    <Offset>34</Offset>
+                    <Offset>88</Offset>
+                    <Offset>3C</Offset>
+                    <Offset>4</Offset>
+                    <Offset>7CC</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>118</ID>
+              <Description>"女角色"</Description>
+              <Options moHideChildren="1"/>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>119</ID>
+                  <Description>"最大生命"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>"libhl.dll"+0004914C</Address>
+                  <Offsets>
+                    <Offset>F0</Offset>
+                    <Offset>14</Offset>
+                    <Offset>8</Offset>
+                    <Offset>34</Offset>
+                    <Offset>88</Offset>
+                    <Offset>3C</Offset>
+                    <Offset>4</Offset>
+                    <Offset>7CC</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>120</ID>
+                  <Description>"当前生命"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>"libhl.dll"+0004914C</Address>
+                  <Offsets>
+                    <Offset>F4</Offset>
+                    <Offset>14</Offset>
+                    <Offset>8</Offset>
+                    <Offset>34</Offset>
+                    <Offset>88</Offset>
+                    <Offset>3C</Offset>
+                    <Offset>4</Offset>
+                    <Offset>7CC</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>121</ID>
+                  <Description>"攻击"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>"libhl.dll"+0004914C</Address>
+                  <Offsets>
+                    <Offset>F8</Offset>
+                    <Offset>14</Offset>
+                    <Offset>8</Offset>
+                    <Offset>34</Offset>
+                    <Offset>88</Offset>
+                    <Offset>3C</Offset>
+                    <Offset>4</Offset>
+                    <Offset>7CC</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>122</ID>
+                  <Description>"防御"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>"libhl.dll"+0004914C</Address>
+                  <Offsets>
+                    <Offset>FC</Offset>
+                    <Offset>14</Offset>
+                    <Offset>8</Offset>
+                    <Offset>34</Offset>
+                    <Offset>88</Offset>
+                    <Offset>3C</Offset>
+                    <Offset>4</Offset>
+                    <Offset>7CC</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>115</ID>
+          <Description>"3D战斗"</Description>
+          <Options moHideChildren="1"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>35</ID>
+              <Description>"最终BOSS战"</Description>
+              <Options moHideChildren="1"/>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>34</ID>
+                  <Description>"我的生命值"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>"libhl.dll"+0004914C</Address>
+                  <Offsets>
+                    <Offset>48</Offset>
+                    <Offset>20</Offset>
+                    <Offset>88</Offset>
+                    <Offset>C</Offset>
+                    <Offset>1C</Offset>
+                    <Offset>0</Offset>
+                    <Offset>650</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>125</ID>
+                  <Description>"BOSS生命值（断掉手臂后）"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>"libhl.dll"+0004914C</Address>
+                  <Offsets>
+                    <Offset>18</Offset>
+                    <Offset>10</Offset>
+                    <Offset>8</Offset>
+                    <Offset>48</Offset>
+                    <Offset>24</Offset>
+                    <Offset>88</Offset>
+                    <Offset>C</Offset>
+                    <Offset>1C</Offset>
+                    <Offset>0</Offset>
+                    <Offset>650</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>69</ID>
+      <Description>"Evoland 2"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$LUA}
+local pid = getProcessIDFromProcessName("Evoland.exe")
+if not pid then
+    showMessage("先启动游戏，然后重新开启此选项")
+    return
+end
+
+if getOpenedProcessID() ~= pid then
+    openProcess(pid)
+end
+
+
+local pPlayerData = getAddressSafe("[[[[libhl.dll+4914C]+54C]+0]+40]")
+
+registerSymbol("pPlayerData", pPlayerData)
+{$ASM}
+
+
+
+[DISABLE]
+{$LUA}
+unregisterSymbol("pPlayerData")
+{$ASM}
+
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>85</ID>
+          <Description>"角色坐标"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+
+
+
+[DISABLE]
+
+
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>72</ID>
+              <Description>"X"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Double</VariableType>
+              <Address>[pPlayerData+30]+2C</Address>
+              <Offsets>
+                <Offset>38</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>74</ID>
+              <Description>"Y"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Double</VariableType>
+              <Address>[pPlayerData+30]+2C</Address>
+              <Offsets>
+                <Offset>40</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>99</ID>
+              <Description>"Z (3D)"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Double</VariableType>
+              <Address>[pPlayerData+30]+2C</Address>
+              <Offsets>
+                <Offset>28</Offset>
+                <Offset>88</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>95</ID>
+              <Description>"自由移动 [小键盘85前后 46左右 79上下]"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+{$LUA}
+local function updatePlayerImage(x, y)
+    if x then
+        local addrX = getAddressSafe("[[[pPlayerData+30]+2C]+0C]+10")
+        if addrX then
+            writeDouble(addrX, x * 16)
+        end
+        return
+    end
+
+    if y then
+        local addrY = getAddressSafe("[[[pPlayerData+30]+2C]+0C]+18")
+        if addrY then
+            writeDouble(addrY, y * 16)
+        end
+        return
+    end
+end
+
+local function movePlayer(x, y, z)
+    if x then
+        local addrX = getAddressSafe("[[pPlayerData+30]+2C]+38")
+        if addrX then
+            local posX = readDouble(addrX) + x
+            writeDouble(addrX, posX)
+            updatePlayerImage(posX, nil)
+        end
+        return
+    end
+
+    if y then
+        local addrY = getAddressSafe("[[pPlayerData+30]+2C]+40")
+        if addrY then
+            local posY = readDouble(addrY) + y
+            writeDouble(addrY, posY)
+            updatePlayerImage(nil, posY)
+        end
+        return
+    end
+
+    if z then
+        local addrZ = getAddressSafe("[[[pPlayerData+30]+2C]+88]+28")
+        if addrZ then
+            local posZ = readDouble(addrZ) + z
+            writeDouble(addrZ, posZ)
+        end
+        return
+    end
+end
+
+local timer = createTimer(getMainForm())
+timer.Interval = 100
+timer.OnTimer = function()
+    local distanceX = 1.5
+    local distanceY = 1.5
+    local distanceZ = 2.0
+
+    if isKeyPressed(VK_NUMPAD4) then
+        movePlayer(-distanceX, nil, nil)
+    elseif isKeyPressed(VK_NUMPAD6) then
+        movePlayer(distanceX, nil, nil)
+    elseif isKeyPressed(VK_NUMPAD8) then
+        movePlayer(nil, -distanceY, nil)
+    elseif isKeyPressed(VK_NUMPAD5) then
+        movePlayer(nil, distanceY, nil)
+    elseif isKeyPressed(VK_NUMPAD7) then
+        movePlayer(nil, nil, distanceZ)
+    elseif isKeyPressed(VK_NUMPAD9) then
+        movePlayer(nil, nil, -distanceZ)
+    end
+end
+
+FreeMoveTimer = timer
+
+{$ASM}
+ 
+ 
+[DISABLE]
+{$LUA}
+FreeMoveTimer.Enabled = false
+FreeMoveTimer.destroy()
+FreeMoveTimer = nil
+{$ASM}
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>104</ID>
+              <Description>"角色图标坐标"</Description>
+              <Options moHideChildren="1"/>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>106</ID>
+                  <Description>"角色图像X"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Double</VariableType>
+                  <Address>[pPlayerData+30]+2C</Address>
+                  <Offsets>
+                    <Offset>10</Offset>
+                    <Offset>0C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>107</ID>
+                  <Description>"角色图像Y"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Double</VariableType>
+                  <Address>[pPlayerData+30]+2C</Address>
+                  <Offsets>
+                    <Offset>18</Offset>
+                    <Offset>0C</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>78</ID>
+          <Description>"角色属性"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+{$LUA}
+local pPlayerAttribute = getAddressSafe("[[pPlayerData+24]+5C]+C")
+
+registerSymbol("pPlayerAttribute", pPlayerAttribute)
+{$ASM}
+
+
+[DISABLE]
+{$LUA}
+unregisterSymbol("pPlayerAttribute")
+{$ASM}
+
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>79</ID>
+              <Description>"基础攻击"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pPlayerAttribute</Address>
+              <Offsets>
+                <Offset>0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>80</ID>
+              <Description>"基础防御"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pPlayerAttribute</Address>
+              <Offsets>
+                <Offset>4</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>81</ID>
+              <Description>"当前等级"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pPlayerAttribute</Address>
+              <Offsets>
+                <Offset>8</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82</ID>
+              <Description>"最大生命"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pPlayerAttribute</Address>
+              <Offsets>
+                <Offset>C</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>83</ID>
+              <Description>"当前经验"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pPlayerAttribute</Address>
+              <Offsets>
+                <Offset>10</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>89</ID>
+          <Description>"技能"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+
+
+
+[DISABLE]
+
+
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>90</ID>
+              <Description>"技能CD"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Double</VariableType>
+              <Address>pPlayerData+28</Address>
+              <Offsets>
+                <Offset>98</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>93</ID>
+              <Description>"技能强度"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pPlayerData+28</Address>
+              <Offsets>
+                <Offset>3C</Offset>
+                <Offset>54</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>97</ID>
+              <Description>"释放技能 [E键1级 R键2级]"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+{$LUA}
+local timer = createTimer(getMainForm())
+timer.Interval = 100
+timer.OnTimer = function()
+    local addrCD = getAddressSafe("[pPlayerData+28]+98")
+    local addrSkill = getAddressSafe("[[pPlayerData+28]+54]+3C")
+    if not addrCD or not addrSkill then
+        return
+    end
+
+    if isKeyPressed(VK_E) then
+        writeDouble(addrCD, 0)
+        writeInteger(addrSkill, 1078853959)
+    elseif isKeyPressed(VK_R) then
+        writeDouble(addrCD, 0)
+        writeInteger(addrSkill, 1080459345)
+    end
+end
+
+UseSkillTimer = timer
+
+{$ASM}
+ 
+ 
+[DISABLE]
+{$LUA}
+UseSkillTimer.Enabled = false
+UseSkillTimer.destroy()
+UseSkillTimer = nil
+{$ASM}
+
+</AssemblerScript>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>98</ID>
+          <Description>"金币"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>pPlayerData+24</Address>
+          <Offsets>
+            <Offset>58</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>84</ID>
+          <Description>"当前生命"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>pPlayerData+30</Address>
+          <Offsets>
+            <Offset>64</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>94</ID>
+          <Description>"无视敌人"</Description>
+          <DropDownList ReadOnly="1" DisplayValueAsItem="1">0:关闭
+1:开启
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>pPlayerData+30</Address>
+          <Offsets>
+            <Offset>74</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>87</ID>
+          <Description>"时间"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>pPlayerData+30</Address>
+          <Offsets>
+            <Offset>8C</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>100</ID>
+          <Description>"DEBUG"</Description>
+          <Options moHideChildren="1"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>68</ID>
+              <Description>"pPlayerData"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pPlayerData</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

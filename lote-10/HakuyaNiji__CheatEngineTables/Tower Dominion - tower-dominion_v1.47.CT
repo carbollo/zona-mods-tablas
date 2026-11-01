@@ -1,0 +1,1064 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>105407</ID>
+      <Description>"资源变动增量"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : tower-dominion.exe
+  Version: 
+  Date   : 2025-09-06
+  Author : 86152
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(resourceAddr,GameAssembly.dll,F3 0F 11 70 10 44) // should be unique
+alloc(newmem,$100,resourceAddr)
+
+label(code)
+label(return)
+
+label(resourceP)
+registersymbol(resourceP)
+
+newmem:
+  addss xmm6,[resourceP]
+code:
+  movss [rax+10],xmm6
+  jmp return
+resourceP:
+  dd (float)10000
+resourceAddr:
+  jmp newmem
+return:
+registersymbol(resourceAddr)
+
+[DISABLE]
+
+resourceAddr:
+  db F3 0F 11 70 10
+
+unregistersymbol(*)
+dealloc(*)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+5C7579
+
+GameAssembly.dll+5C7553: F3 0F 5C 40 10        - subss xmm0,[rax+10]
+GameAssembly.dll+5C7558: F3 0F 11 46 14        - movss [rsi+14],xmm0
+GameAssembly.dll+5C755D: 48 8B 4B 18           - mov rcx,[rbx+18]
+GameAssembly.dll+5C7561: 48 85 C9              - test rcx,rcx
+GameAssembly.dll+5C7564: 74 4E                 - je GameAssembly.dll+5C75B4
+GameAssembly.dll+5C7566: 4C 8B 05 C3 4F 41 03  - mov r8,[GameAssembly.dll+39DC530]
+GameAssembly.dll+5C756D: 8B D7                 - mov edx,edi
+GameAssembly.dll+5C756F: E8 FC 23 B5 00        - call GameAssembly.dll+1119970
+GameAssembly.dll+5C7574: 48 85 C0              - test rax,rax
+GameAssembly.dll+5C7577: 74 3B                 - je GameAssembly.dll+5C75B4
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+5C7579: F3 0F 11 70 10        - movss [rax+10],xmm6
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+5C757E: 44 8B C7              - mov r8d,edi
+GameAssembly.dll+5C7581: 4C 8B 0D 10 88 45 03  - mov r9,[GameAssembly.dll+3A1FD98]
+GameAssembly.dll+5C7588: 48 8B D3              - mov rdx,rbx
+GameAssembly.dll+5C758B: 48 8B 4B 10           - mov rcx,[rbx+10]
+GameAssembly.dll+5C758F: E8 EC EA 30 00        - call GameAssembly.dll+8D6080
+GameAssembly.dll+5C7594: 33 C9                 - xor ecx,ecx
+GameAssembly.dll+5C7596: 48 8B 74 24 48        - mov rsi,[rsp+48]
+GameAssembly.dll+5C759B: 48 8B 6C 24 40        - mov rbp,[rsp+40]
+GameAssembly.dll+5C75A0: 48 8B 5C 24 50        - mov rbx,[rsp+50]
+GameAssembly.dll+5C75A5: 0F 28 74 24 20        - movaps xmm6,[rsp+20]
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>105409</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>resourceP</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>105411</ID>
+      <Description>"建筑不减"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : tower-dominion.exe
+  Version: 
+  Date   : 2025-09-06
+  Author : 86152
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(BuildPlace,GameAssembly.dll,5F 8A 02 FF 8B D4 00 00 00) // should be unique
+registersymbol(BuildPlace)
+BuildPlace+03:
+  nop 6
+return:
+
+[DISABLE]
+
+BuildPlace+03:
+  db FF 8B D4 00 00 00
+
+unregistersymbol(*)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+50B751
+
+GameAssembly.dll+50B725: 48 8B 5F 48           - mov rbx,[rdi+48]
+GameAssembly.dll+50B729: 48 89 74 24 30        - mov [rsp+30],rsi
+GameAssembly.dll+50B72E: 48 85 DB              - test rbx,rbx
+GameAssembly.dll+50B731: 0F 84 28 01 00 00     - je GameAssembly.dll+50B85F
+GameAssembly.dll+50B737: 48 8B 8B B0 00 00 00  - mov rcx,[rbx+000000B0]
+GameAssembly.dll+50B73E: 48 85 C9              - test rcx,rcx
+GameAssembly.dll+50B741: 0F 84 18 01 00 00     - je GameAssembly.dll+50B85F
+GameAssembly.dll+50B747: 45 33 C0              - xor r8d,r8d
+GameAssembly.dll+50B74A: 33 D2                 - xor edx,edx
+GameAssembly.dll+50B74C: E8 3F 5F 8A 02        - call UnityEngine.UI.Toggle.set_isOn
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+50B751: FF 8B D4 00 00 00     - dec [rbx+000000D4]
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+50B757: 48 8D 8B D4 00 00 00  - lea rcx,[rbx+000000D4]
+GameAssembly.dll+50B75E: 48 8B B3 80 00 00 00  - mov rsi,[rbx+00000080]
+GameAssembly.dll+50B765: 33 D2                 - xor edx,edx
+GameAssembly.dll+50B767: E8 14 85 38 01        - call System.Int32.ToString
+GameAssembly.dll+50B76C: 48 85 F6              - test rsi,rsi
+GameAssembly.dll+50B76F: 0F 84 EA 00 00 00     - je GameAssembly.dll+50B85F
+GameAssembly.dll+50B775: 4C 8B 0E              - mov r9,[rsi]
+GameAssembly.dll+50B778: 48 8B D0              - mov rdx,rax
+GameAssembly.dll+50B77B: 48 8B CE              - mov rcx,rsi
+GameAssembly.dll+50B77E: 4D 8B 81 60 05 00 00  - mov r8,[r9+00000560]
+}
+</AssemblerScript>
+      <Hotkeys>
+        <Hotkey>
+          <Action>Toggle Activation</Action>
+          <Keys>
+            <Key>50</Key>
+          </Keys>
+          <ID>0</ID>
+          <ActivateSound TTS="EN">Activated</ActivateSound>
+          <DeactivateSound TTS="EN">Deactivated</DeactivateSound>
+        </Hotkey>
+      </Hotkeys>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>105412</ID>
+      <Description>"----------------------------未修复----------------------------"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>105328</ID>
+      <Description>"Building Data Collect"</Description>
+      <Color>FF0000</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : tower-dominion.exe
+  Version: DEMO
+  Date   : 2025-02-07
+  Author : BabyGroot
+
+  This script does blah blah blah
+}
+
+//Nvizzio.Game.GamePlay.GameEntities.BuildingEntity.SetSelected  &lt;-- USED
+//Nvizzio.Game.GamePlay.GameEntities.BuildingEntity.SetHovered
+
+[ENABLE]
+
+aobscanmodule(pData_Building,GameAssembly.dll,48 8B BF D0 01 00 00 84) // should be unique
+alloc(newmem,$1000,pData_Building)
+
+alloc(pBase_Building,8)
+registersymbol(pBase_Building)
+
+label(code)
+label(return)
+
+pBase_Building:
+dd
+
+newmem:
+
+code:
+mov [pBase_Building],rdi
+  mov rdi,[rdi+000001D0]
+  jmp return
+
+pData_Building:
+  jmp newmem
+  nop 2
+return:
+registersymbol(pData_Building pBase_Building)
+
+[DISABLE]
+
+pData_Building:
+  db 48 8B BF D0 01 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+41CFA8
+
+GameAssembly.dll+41CF74: 48 8B F9              - mov rdi,rcx
+GameAssembly.dll+41CF77: 75 13                 - jne GameAssembly.dll+41CF8C
+GameAssembly.dll+41CF79: 48 8D 0D 48 5B 13 03  - lea rcx,[GameAssembly.dll+3552AC8]
+GameAssembly.dll+41CF80: E8 CB C3 F1 FF        - call GameAssembly.il2cpp_get_exception_argument_null+2B0
+GameAssembly.dll+41CF85: C6 05 70 BA 34 03 01  - mov byte ptr [GameAssembly.dll+37689FC],01
+GameAssembly.dll+41CF8C: 48 8B 8F 58 01 00 00  - mov rcx,[rdi+00000158]
+GameAssembly.dll+41CF93: 0F B6 D3              - movzx edx,bl
+GameAssembly.dll+41CF96: 88 9F F8 01 00 00     - mov [rdi+000001F8],bl
+GameAssembly.dll+41CF9C: 4C 8B 05 25 5B 13 03  - mov r8,[GameAssembly.dll+3552AC8]
+GameAssembly.dll+41CFA3: E8 E8 50 29 00        - call GameAssembly.dll+6B2090
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+41CFA8: 48 8B BF D0 01 00 00  - mov rdi,[rdi+000001D0]
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+41CFAF: 84 DB                 - test bl,bl
+GameAssembly.dll+41CFB1: 75 37                 - jne GameAssembly.dll+41CFEA
+GameAssembly.dll+41CFB3: 33 DB                 - xor ebx,ebx
+GameAssembly.dll+41CFB5: 8B C3                 - mov eax,ebx
+GameAssembly.dll+41CFB7: 48 85 FF              - test rdi,rdi
+GameAssembly.dll+41CFBA: 74 72                 - je GameAssembly.dll+41D02E
+GameAssembly.dll+41CFBC: 0F 1F 40 00           - nop dword ptr [rax+00]
+GameAssembly.dll+41CFC0: 3B 47 18              - cmp eax,[rdi+18]
+GameAssembly.dll+41CFC3: 7D 58                 - jnl GameAssembly.dll+41D01D
+GameAssembly.dll+41CFC5: 3B 5F 18              - cmp ebx,[rdi+18]
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>105330</ID>
+          <Description>"Building Data"</Description>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+          <Color>FF8000</Color>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>105332</ID>
+              <Description>"pBase - [ Color Silver Don't Chance ]"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C0C0C0</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>[pBase_Building]</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>105334</ID>
+              <Description>""</Description>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>105336</ID>
+              <Description>"→ Active, Selected Building / Tower ←"</Description>
+              <Color>408080</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>105404</ID>
+              <Description>"→ Wait A Few Moments For The Value To Change ←"</Description>
+              <Color>408080</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>105335</ID>
+              <Description>""</Description>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>105352</ID>
+              <Description>"Building Name"</Description>
+              <Color>4080FF</Color>
+              <VariableType>String</VariableType>
+              <Length>128</Length>
+              <Unicode>1</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>[pBase_Building]+198</Address>
+              <Offsets>
+                <Offset>14</Offset>
+                <Offset>88</Offset>
+                <Offset>30</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>105345</ID>
+              <Description>"Is Targetable?"</Description>
+              <Color>808000</Color>
+              <VariableType>Byte</VariableType>
+              <Address>[pBase_Building]+B9</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>105348</ID>
+              <Description>""</Description>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>105347</ID>
+              <Description>"Max Hp"</Description>
+              <Color>0000FF</Color>
+              <VariableType>Float</VariableType>
+              <Address>[pBase_Building]+1D8</Address>
+              <Offsets>
+                <Offset>10</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>105337</ID>
+              <Description>"Current Hp"</Description>
+              <Color>0000FF</Color>
+              <VariableType>Float</VariableType>
+              <Address>[pBase_Building]+40</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>105338</ID>
+              <Description>"Shield"</Description>
+              <Color>0000FF</Color>
+              <VariableType>Float</VariableType>
+              <Address>[pBase_Building]+44</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>105339</ID>
+              <Description>"Shield Modifier"</Description>
+              <Color>0000FF</Color>
+              <VariableType>Float</VariableType>
+              <Address>[pBase_Building]+48</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>105340</ID>
+              <Description>"Aircraft Modifier"</Description>
+              <Color>0000FF</Color>
+              <VariableType>Float</VariableType>
+              <Address>[pBase_Building]+54</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>105341</ID>
+              <Description>"Anti Aircraft Modifier"</Description>
+              <Color>0000FF</Color>
+              <VariableType>Float</VariableType>
+              <Address>[pBase_Building]+58</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>105342</ID>
+              <Description>"Armor Modifier"</Description>
+              <Color>0000FF</Color>
+              <VariableType>Float</VariableType>
+              <Address>[pBase_Building]+5C</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>105343</ID>
+              <Description>"Armor Break Modifier"</Description>
+              <Color>0000FF</Color>
+              <VariableType>Float</VariableType>
+              <Address>[pBase_Building]+60</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>105344</ID>
+              <Description>"Anti Shield Modifier"</Description>
+              <Color>0000FF</Color>
+              <VariableType>Float</VariableType>
+              <Address>[pBase_Building]+64</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>105370</ID>
+              <Description>"Intensity"</Description>
+              <Color>0000FF</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>[pBase_Building]+A0</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>105368</ID>
+              <Description>"energyStoringCapacity"</Description>
+              <Color>0000FF</Color>
+              <VariableType>8 Bytes</VariableType>
+              <Address>[pBase_Building]+1A8</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>105346</ID>
+              <Description>"Current Upgrade Level"</Description>
+              <Color>0000FF</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>[pBase_Building]+1B8</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>105369</ID>
+              <Description>"armor"</Description>
+              <Color>0000FF</Color>
+              <VariableType>Float</VariableType>
+              <Address>[pBase_Building]+200</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>105351</ID>
+              <Description>""</Description>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>105350</ID>
+              <Description>"Sell Currency Type"</Description>
+              <DropDownList DisplayValueAsItem="1">0:Recon
+1:Supply
+2:Energy
+3:Grenadier
+4:Nothing - [ CompanyStandard ]
+5:Nothing - [ CompanyBugler ]
+6:Nothing - [ Chaplain ]
+7:Nothing - [ FieldMedic ]
+8:Nothing - [ CompanyLieutenant ]
+9:Nothing - [ QuarterMaster ]
+11:Tech
+</DropDownList>
+              <Color>0000FF</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>[pBase_Building]+1FC</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>105349</ID>
+              <Description>"Sell Price"</Description>
+              <Color>0000FF</Color>
+              <VariableType>Float</VariableType>
+              <Address>[pBase_Building]+1E0</Address>
+              <Offsets>
+                <Offset>10</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>105353</ID>
+              <Description>"← Weapons Slots"</Description>
+              <Options moHideChildren="1" moManualExpandCollapse="1"/>
+              <Color>800040</Color>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>105356</ID>
+                  <Description>"← Weapons Slots"</Description>
+                  <Color>C0C0C0</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[pBase_Building]+E0</Address>
+                  <Offsets>
+                    <Offset>18</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>105355</ID>
+                  <Description>"← Weapon [1]"</Description>
+                  <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                  <Color>FF0080</Color>
+                  <GroupHeader>1</GroupHeader>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>105357</ID>
+                      <Description>"Weapon Name"</Description>
+                      <Color>4080FF</Color>
+                      <VariableType>String</VariableType>
+                      <Length>128</Length>
+                      <Unicode>1</Unicode>
+                      <CodePage>0</CodePage>
+                      <ZeroTerminate>1</ZeroTerminate>
+                      <Address>[pBase_Building]+E0</Address>
+                      <Offsets>
+                        <Offset>14</Offset>
+                        <Offset>88</Offset>
+                        <Offset>38</Offset>
+                        <Offset>128</Offset>
+                        <Offset>20</Offset>
+                        <Offset>20</Offset>
+                        <Offset>10</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>105359</ID>
+                      <Description>"Is Detection?"</Description>
+                      <DropDownList DescriptionOnly="1" DisplayValueAsItem="1">0:No/Off/Disabled
+1:Yes/On/Enabled
+</DropDownList>
+                      <Color>808000</Color>
+                      <VariableType>Byte</VariableType>
+                      <Address>[pBase_Building]+E0</Address>
+                      <Offsets>
+                        <Offset>170</Offset>
+                        <Offset>20</Offset>
+                        <Offset>20</Offset>
+                        <Offset>10</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>105366</ID>
+                      <Description>"Is Armor Break?"</Description>
+                      <DropDownList DescriptionOnly="1" DisplayValueAsItem="1">0:No/Off/Disabled
+1:Yes/On/Enabled
+</DropDownList>
+                      <Color>808000</Color>
+                      <VariableType>Byte</VariableType>
+                      <Address>[pBase_Building]+E0</Address>
+                      <Offsets>
+                        <Offset>13D</Offset>
+                        <Offset>118</Offset>
+                        <Offset>20</Offset>
+                        <Offset>20</Offset>
+                        <Offset>10</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>105363</ID>
+                      <Description>"Rate Of Fire"</Description>
+                      <Color>0000FF</Color>
+                      <VariableType>Float</VariableType>
+                      <Address>[pBase_Building]+E0</Address>
+                      <Offsets>
+                        <Offset>10</Offset>
+                        <Offset>140</Offset>
+                        <Offset>20</Offset>
+                        <Offset>20</Offset>
+                        <Offset>10</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>105364</ID>
+                      <Description>"Reload Time"</Description>
+                      <Color>0000FF</Color>
+                      <VariableType>Float</VariableType>
+                      <Address>[pBase_Building]+E0</Address>
+                      <Offsets>
+                        <Offset>10</Offset>
+                        <Offset>148</Offset>
+                        <Offset>20</Offset>
+                        <Offset>20</Offset>
+                        <Offset>10</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>105358</ID>
+                      <Description>"Magazine Size"</Description>
+                      <Color>0000FF</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>[pBase_Building]+E0</Address>
+                      <Offsets>
+                        <Offset>150</Offset>
+                        <Offset>20</Offset>
+                        <Offset>20</Offset>
+                        <Offset>10</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>105365</ID>
+                      <Description>"speed"</Description>
+                      <Color>0000FF</Color>
+                      <VariableType>Float</VariableType>
+                      <Address>[pBase_Building]+E0</Address>
+                      <Offsets>
+                        <Offset>11C</Offset>
+                        <Offset>118</Offset>
+                        <Offset>20</Offset>
+                        <Offset>20</Offset>
+                        <Offset>10</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>105361</ID>
+                      <Description>"Distance Range Min"</Description>
+                      <Color>0000FF</Color>
+                      <VariableType>Float</VariableType>
+                      <Address>[pBase_Building]+E0</Address>
+                      <Offsets>
+                        <Offset>10</Offset>
+                        <Offset>138</Offset>
+                        <Offset>20</Offset>
+                        <Offset>20</Offset>
+                        <Offset>10</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>105362</ID>
+                      <Description>"Distance Range Max"</Description>
+                      <Color>0000FF</Color>
+                      <VariableType>Float</VariableType>
+                      <Address>[pBase_Building]+E0</Address>
+                      <Offsets>
+                        <Offset>14</Offset>
+                        <Offset>138</Offset>
+                        <Offset>20</Offset>
+                        <Offset>20</Offset>
+                        <Offset>10</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>105371</ID>
+                  <Description>"← Weapon [2]"</Description>
+                  <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                  <Color>FF0080</Color>
+                  <GroupHeader>1</GroupHeader>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>105372</ID>
+                      <Description>"Weapon Name"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>4080FF</Color>
+                      <VariableType>String</VariableType>
+                      <Length>128</Length>
+                      <Unicode>1</Unicode>
+                      <CodePage>0</CodePage>
+                      <ZeroTerminate>1</ZeroTerminate>
+                      <Address>[pBase_Building]+E0</Address>
+                      <Offsets>
+                        <Offset>14</Offset>
+                        <Offset>88</Offset>
+                        <Offset>38</Offset>
+                        <Offset>128</Offset>
+                        <Offset>20</Offset>
+                        <Offset>28</Offset>
+                        <Offset>10</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>105373</ID>
+                      <Description>"Is Detection?"</Description>
+                      <DropDownList DescriptionOnly="1" DisplayValueAsItem="1">0:No/Off/Disabled
+1:Yes/On/Enabled
+</DropDownList>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>808000</Color>
+                      <VariableType>Byte</VariableType>
+                      <Address>[pBase_Building]+E0</Address>
+                      <Offsets>
+                        <Offset>170</Offset>
+                        <Offset>20</Offset>
+                        <Offset>28</Offset>
+                        <Offset>10</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>105374</ID>
+                      <Description>"Is Armor Break?"</Description>
+                      <DropDownList DescriptionOnly="1" DisplayValueAsItem="1">0:No/Off/Disabled
+1:Yes/On/Enabled
+</DropDownList>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>808000</Color>
+                      <VariableType>Byte</VariableType>
+                      <Address>[pBase_Building]+E0</Address>
+                      <Offsets>
+                        <Offset>13D</Offset>
+                        <Offset>118</Offset>
+                        <Offset>20</Offset>
+                        <Offset>28</Offset>
+                        <Offset>10</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>105375</ID>
+                      <Description>"Rate Of Fire"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>0000FF</Color>
+                      <VariableType>Float</VariableType>
+                      <Address>[pBase_Building]+E0</Address>
+                      <Offsets>
+                        <Offset>10</Offset>
+                        <Offset>140</Offset>
+                        <Offset>20</Offset>
+                        <Offset>28</Offset>
+                        <Offset>10</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>105376</ID>
+                      <Description>"Reload Time"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>0000FF</Color>
+                      <VariableType>Float</VariableType>
+                      <Address>[pBase_Building]+E0</Address>
+                      <Offsets>
+                        <Offset>10</Offset>
+                        <Offset>148</Offset>
+                        <Offset>20</Offset>
+                        <Offset>28</Offset>
+                        <Offset>10</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>105377</ID>
+                      <Description>"Magazine Size"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>0000FF</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>[pBase_Building]+E0</Address>
+                      <Offsets>
+                        <Offset>150</Offset>
+                        <Offset>20</Offset>
+                        <Offset>28</Offset>
+                        <Offset>10</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>105378</ID>
+                      <Description>"speed"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>0000FF</Color>
+                      <VariableType>Float</VariableType>
+                      <Address>[pBase_Building]+E0</Address>
+                      <Offsets>
+                        <Offset>11C</Offset>
+                        <Offset>118</Offset>
+                        <Offset>20</Offset>
+                        <Offset>28</Offset>
+                        <Offset>10</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>105379</ID>
+                      <Description>"Distance Range Min"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>0000FF</Color>
+                      <VariableType>Float</VariableType>
+                      <Address>[pBase_Building]+E0</Address>
+                      <Offsets>
+                        <Offset>10</Offset>
+                        <Offset>138</Offset>
+                        <Offset>20</Offset>
+                        <Offset>28</Offset>
+                        <Offset>10</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>105380</ID>
+                      <Description>"Distance Range Max"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>0000FF</Color>
+                      <VariableType>Float</VariableType>
+                      <Address>[pBase_Building]+E0</Address>
+                      <Offsets>
+                        <Offset>14</Offset>
+                        <Offset>138</Offset>
+                        <Offset>20</Offset>
+                        <Offset>28</Offset>
+                        <Offset>10</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>105381</ID>
+                  <Description>"← Weapon [3]"</Description>
+                  <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                  <Color>FF0080</Color>
+                  <GroupHeader>1</GroupHeader>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>105382</ID>
+                      <Description>"Weapon Name"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>4080FF</Color>
+                      <VariableType>String</VariableType>
+                      <Length>128</Length>
+                      <Unicode>1</Unicode>
+                      <CodePage>0</CodePage>
+                      <ZeroTerminate>1</ZeroTerminate>
+                      <Address>[pBase_Building]+E0</Address>
+                      <Offsets>
+                        <Offset>14</Offset>
+                        <Offset>88</Offset>
+                        <Offset>38</Offset>
+                        <Offset>128</Offset>
+                        <Offset>20</Offset>
+                        <Offset>30</Offset>
+                        <Offset>10</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>105383</ID>
+                      <Description>"Is Detection?"</Description>
+                      <DropDownList DescriptionOnly="1" DisplayValueAsItem="1">0:No/Off/Disabled
+1:Yes/On/Enabled
+</DropDownList>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>808000</Color>
+                      <VariableType>Byte</VariableType>
+                      <Address>[pBase_Building]+E0</Address>
+                      <Offsets>
+                        <Offset>170</Offset>
+                        <Offset>20</Offset>
+                        <Offset>30</Offset>
+                        <Offset>10</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>105384</ID>
+                      <Description>"Is Armor Break?"</Description>
+                      <DropDownList DescriptionOnly="1" DisplayValueAsItem="1">0:No/Off/Disabled
+1:Yes/On/Enabled
+</DropDownList>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>808000</Color>
+                      <VariableType>Byte</VariableType>
+                      <Address>[pBase_Building]+E0</Address>
+                      <Offsets>
+                        <Offset>13D</Offset>
+                        <Offset>118</Offset>
+                        <Offset>20</Offset>
+                        <Offset>30</Offset>
+                        <Offset>10</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>105385</ID>
+                      <Description>"Rate Of Fire"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>0000FF</Color>
+                      <VariableType>Float</VariableType>
+                      <Address>[pBase_Building]+E0</Address>
+                      <Offsets>
+                        <Offset>10</Offset>
+                        <Offset>140</Offset>
+                        <Offset>20</Offset>
+                        <Offset>30</Offset>
+                        <Offset>10</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>105386</ID>
+                      <Description>"Reload Time"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>0000FF</Color>
+                      <VariableType>Float</VariableType>
+                      <Address>[pBase_Building]+E0</Address>
+                      <Offsets>
+                        <Offset>10</Offset>
+                        <Offset>148</Offset>
+                        <Offset>20</Offset>
+                        <Offset>30</Offset>
+                        <Offset>10</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>105387</ID>
+                      <Description>"Magazine Size"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>0000FF</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>[pBase_Building]+E0</Address>
+                      <Offsets>
+                        <Offset>150</Offset>
+                        <Offset>20</Offset>
+                        <Offset>30</Offset>
+                        <Offset>10</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>105388</ID>
+                      <Description>"speed"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>0000FF</Color>
+                      <VariableType>Float</VariableType>
+                      <Address>[pBase_Building]+E0</Address>
+                      <Offsets>
+                        <Offset>11C</Offset>
+                        <Offset>118</Offset>
+                        <Offset>20</Offset>
+                        <Offset>30</Offset>
+                        <Offset>10</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>105389</ID>
+                      <Description>"Distance Range Min"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>0000FF</Color>
+                      <VariableType>Float</VariableType>
+                      <Address>[pBase_Building]+E0</Address>
+                      <Offsets>
+                        <Offset>10</Offset>
+                        <Offset>138</Offset>
+                        <Offset>20</Offset>
+                        <Offset>30</Offset>
+                        <Offset>10</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>105390</ID>
+                      <Description>"Distance Range Max"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>0000FF</Color>
+                      <VariableType>Float</VariableType>
+                      <Address>[pBase_Building]+E0</Address>
+                      <Offsets>
+                        <Offset>14</Offset>
+                        <Offset>138</Offset>
+                        <Offset>20</Offset>
+                        <Offset>30</Offset>
+                        <Offset>10</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>105393</ID>
+                  <Description>"← Weapon [4]"</Description>
+                  <Options moHideChildren="1" moManualExpandCollapse="1"/>
+                  <Color>FF0080</Color>
+                  <GroupHeader>1</GroupHeader>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>105394</ID>
+                      <Description>"Weapon Name"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>4080FF</Color>
+                      <VariableType>String</VariableType>
+                      <Length>128</Length>
+                      <Unicode>1</Unicode>
+                      <CodePage>0</CodePage>
+                      <ZeroTerminate>1</ZeroTerminate>
+                      <Address>[pBase_Building]+E0</Address>
+                      <Offsets>
+                        <Offset>14</Offset>
+                        <Offset>88</Offset>
+                        <Offset>38</Offset>
+                        <Offset>128</Offset>
+                        <Offset>20</Offset>
+                        <Offset>38</Offset>
+                        <Offset>10</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>105395</ID>
+                      <Description>"Is Detection?"</Description>
+                      <DropDownList DescriptionOnly="1" DisplayValueAsItem="1">0:No/Off/Disabled
+1:Yes/On/Enabled
+</DropDownList>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>808000</Color>
+                      <VariableType>Byte</VariableType>
+                      <Address>[pBase_Building]+E0</Address>
+                      <Offsets>
+                        <Offset>170</Offset>
+                        <Offset>20</Offset>
+                        <Offset>38</Offset>
+                        <Offset>10</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>105396</ID>
+                      <Description>"Is Armor Break?"</Description>
+                      <DropDownList DescriptionOnly="1" DisplayValueAsItem="1">0:No/Off/Disabled
+1:Yes/On/Enabled
+</DropDownList>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>808000</Color>
+                      <VariableType>Byte</VariableType>
+                      <Address>[pBase_Building]+E0</Address>
+                      <Offsets>
+                        <Offset>13D</Offset>
+                        <Offset>118</Offset>
+                        <Offset>20</Offset>
+                        <Offset>38</Offset>
+                        <Offset>10</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>105397</ID>
+                      <Description>"Rate Of Fire"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>0000FF</Color>
+                      <VariableType>Float</VariableType>
+                      <Address>[pBase_Building]+E0</Address>
+                      <Offsets>
+                        <Offset>10</Offset>
+                        <Offset>140</Offset>
+                        <Offset>20</Offset>
+                        <Offset>38</Offset>
+                        <Offset>10</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>105398</ID>
+                      <Description>"Reload Time"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>0000FF</Color>
+                      <VariableType>Float</VariableType>
+                      <Address>[pBase_Building]+E0</Address>
+                      <Offsets>
+                        <Offset>10</Offset>
+                        <Offset>148</Offset>
+                        <Offset>20</Offset>
+                        <Offset>38</Offset>
+                        <Offset>10</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>105399</ID>
+                      <Description>"Magazine Size"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>0000FF</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>[pBase_Building]+E0</Address>
+                      <Offsets>
+                        <Offset>150</Offset>
+                        <Offset>20</Offset>
+                        <Offset>38</Offset>
+                        <Offset>10</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>105400</ID>
+                      <Description>"speed"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>0000FF</Color>
+                      <VariableType>Float</VariableType>
+                      <Address>[pBase_Building]+E0</Address>
+                      <Offsets>
+                        <Offset>11C</Offset>
+                        <Offset>118</Offset>
+                        <Offset>20</Offset>
+                        <Offset>38</Offset>
+                        <Offset>10</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>105401</ID>
+                      <Description>"Distance Range Min"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>0000FF</Color>
+                      <VariableType>Float</VariableType>
+                      <Address>[pBase_Building]+E0</Address>
+                      <Offsets>
+                        <Offset>10</Offset>
+                        <Offset>138</Offset>
+                        <Offset>20</Offset>
+                        <Offset>38</Offset>
+                        <Offset>10</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>105402</ID>
+                      <Description>"Distance Range Max"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>0000FF</Color>
+                      <VariableType>Float</VariableType>
+                      <Address>[pBase_Building]+E0</Address>
+                      <Offsets>
+                        <Offset>14</Offset>
+                        <Offset>138</Offset>
+                        <Offset>20</Offset>
+                        <Offset>38</Offset>
+                        <Offset>10</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

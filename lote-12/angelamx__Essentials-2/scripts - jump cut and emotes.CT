@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="38">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>875</ID>
+      <Description>"jump cut and emotes"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+alloc(newmem,128)
+label(originalcode)
+label(returnhere)
+// hooks CUser::PacketPC
+newmem:
+mov cl,[ebp+02]
+cmp cl,02
+je short jump
+cmp cl,74
+jge short emotes
+originalcode:
+mov edx,[edi+000000DC]
+jmp returnhere
+
+jump:
+// CUser-&gt;recoveryType
+cmp [edi+00001270],02
+je 00479155
+jmp originalcode
+
+emotes:
+pushad
+// GetTickCount
+call dword ptr [005540D0]
+cmp [edi+00001534],eax
+popad
+jg 00479155
+pushad
+// GetTickCount
+call dword ptr [005540D0]
+add eax,#10000
+mov [edi+00001534],eax
+popad
+jmp originalcode
+
+"ps_game.exe"+7893D:
+jmp newmem
+nop
+returnhere:
+
+[DISABLE]
+dealloc(newmem)
+"ps_game.exe"+7893D:
+mov edx,[edi+000000DC]
+</AssemblerScript>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>2</ID>
+      <Description>"Unlimited Ammo"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : IGI2 - Covert Strike
+  Version: 
+  Date   : 2025-10-22
+  Author : gg
+
+  This script does blah blah blah
+}
+
+define(address,"igi2.exe"+12E27A)
+define(bytes,89 44 BB 08 8B 44 24 1C)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000)
+
+label(code)
+label(return)
+
+newmem:
+  mov eax,(int)99
+code:
+  mov [ebx+edi*4+08],eax
+  mov eax,[esp+1C]
+  jmp return
+
+address:
+  jmp newmem
+  nop 3
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+  // mov [ebx+edi*4+08],eax
+  // mov eax,[esp+1C]
+
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: igi2.exe+12E27A
+
+igi2.exe+12E266: 50                    - push eax
+igi2.exe+12E267: EB 1F                 - jmp igi2.exe+12E288
+igi2.exe+12E269: 8B 44 BB 08           - mov eax,[ebx+edi*4+08]
+igi2.exe+12E26D: 2B C5                 - sub eax,ebp
+igi2.exe+12E26F: 33 C9                 - xor ecx,ecx
+igi2.exe+12E271: 85 C0                 - test eax,eax
+igi2.exe+12E273: 0F 9E C1              - setle cl
+igi2.exe+12E276: 55                    - push ebp
+igi2.exe+12E277: 49                    - dec ecx
+igi2.exe+12E278: 23 C1                 - and eax,ecx
+// ---------- INJECTING HERE ----------
+igi2.exe+12E27A: 89 44 BB 08           - mov [ebx+edi*4+08],eax
+// ---------- DONE INJECTING  ----------
+igi2.exe+12E27E: 8B 44 24 1C           - mov eax,[esp+1C]
+igi2.exe+12E282: 01 A8 80 00 00 00     - add [eax+00000080],ebp
+igi2.exe+12E288: E8 03 2A 00 00        - call igi2.exe+130C90
+igi2.exe+12E28D: 83 C4 04              - add esp,04
+igi2.exe+12E290: 8B 94 24 A0 00 00 00  - mov edx,[esp+000000A0]
+igi2.exe+12E297: 8B 84 24 9C 00 00 00  - mov eax,[esp+0000009C]
+igi2.exe+12E29E: 8B 8C 24 A8 00 00 00  - mov ecx,[esp+000000A8]
+igi2.exe+12E2A5: 52                    - push edx
+igi2.exe+12E2A6: 8B 94 24 A8 00 00 00  - mov edx,[esp+000000A8]
+igi2.exe+12E2AD: 50                    - push eax
+}
+</AssemblerScript>
+    </CheatEntry>
+  </CheatEntries>
+  <CheatCodes>
+    <CodeEntry>
+      <Description>Ammo writer :mov [ebx+edi*4+08],eax</Description>
+      <AddressString>igi2.exe+12E27A</AddressString>
+      <Before>
+        <Byte>C1</Byte>
+        <Byte>55</Byte>
+        <Byte>49</Byte>
+        <Byte>23</Byte>
+        <Byte>C1</Byte>
+      </Before>
+      <Actual>
+        <Byte>89</Byte>
+        <Byte>44</Byte>
+        <Byte>BB</Byte>
+        <Byte>08</Byte>
+      </Actual>
+      <After>
+        <Byte>8B</Byte>
+        <Byte>44</Byte>
+        <Byte>24</Byte>
+        <Byte>1C</Byte>
+        <Byte>01</Byte>
+      </After>
+    </CodeEntry>
+  </CheatCodes>
+  <UserdefinedSymbols/>
+</CheatTable>

@@ -1,0 +1,439 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="26">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>91733</ID>
+      <Description>"Enable"</Description>
+      <LastState Value="" RealAddress="00000000"/>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>91414</ID>
+          <Description>"allow all effectids"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+"DARKSOULS.exe"+A3EC84:
+nop
+nop
+nop
+
+"DARKSOULS.exe"+A3EC8D:
+nop
+nop
+nop
+ 
+[DISABLE]
+"DARKSOULS.exe"+A3EC84:
+shl edx,0F
+
+"DARKSOULS.exe"+A3EC8D:
+sar edx,0F
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>91729</ID>
+          <Description>"Rally System"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+//*********on weapon toggle drop rally*********
+alloc(toggle_drop_rally,2048)
+label(toggle_drop_rally_returnhere)
+
+toggle_drop_rally:
+mov [beforehit_time], 0 //we got hit infin ago, drop it
+mov [ebx-08],eax
+mov eax,[ebx]
+jmp toggle_drop_rally_returnhere
+
+"DARKSOULS.exe"+B37F31:
+jmp toggle_drop_rally
+toggle_drop_rally_returnhere:
+
+//*********track player previous hp and time of on player hit*********
+alloc(track_onhit_data,2048)
+globalalloc(beforehit_time,4)
+globalalloc(beforehit_hp,4)
+globalalloc(gothit,4)
+label(start_check_if_player_attacking)
+label(track_onhit_data_returnhere)
+label(track_onhit_data_exit)
+label(check_if_player_attacking)
+label(track_onhit_data_exit_cleanup)
+label(set_new_rally_hp)
+label(gothit_bounds_check)
+label(right_hand_wep_atk)
+label(left_hand_wep_atk)
+label(check_is_weapon_occult)
+label(weapon_is_occult)
+
+track_onhit_data:
+//if prehit hp is zero
+cmp [beforehit_hp], 0
+jne start_check_if_player_attacking
+mov [beforehit_hp], ffff
+
+//if (target entity is host)
+// {
+start_check_if_player_attacking:
+push ebx
+mov  ebx, [137DC70]
+mov  ebx, [ebx+4] //ebx is entityPointer to local player
+cmp  [ebx], eax //if entityPointer for local player == target (eax)
+pop  ebx
+jne check_if_player_attacking
+//save current time and player hp
+push ebx
+mov ebx, [eax+2D4] //player hp
+mov [beforehit_hp], ebx
+mov ebx, [100C42AC] //current time ms
+mov [beforehit_time], ebx
+inc [gothit] //marker for getting hit (used for ui)
+cmp [gothit], 2
+jle gothit_bounds_check
+mov [gothit], 2
+gothit_bounds_check:
+pop ebx
+jmp track_onhit_data_exit
+// }
+
+//if (attacking entity is host)
+// {
+check_if_player_attacking:
+push ebx
+mov  ebx, [137DC70]
+mov  ebx, [ebx+4]
+cmp  [ebx], esi //attacker (esi)
+pop ebx
+jne track_onhit_data_exit
+//rally code
+push eax
+push ebx
+push edx
+push ecx
+        //if (currenttime-storedtime &lt; MAX RECOVERY TIME
+        mov eax, [beforehit_time]
+        add eax, 1388
+        cmp eax, [100C42AC]
+        jl track_onhit_data_exit_cleanup
+        //&amp;&amp; weapon_is_occult)
+        //need to load weapon used data
+        mov  eax, [0137D644]
+        mov  eax, [eax+3C]
+        mov  eax, [eax+30]
+        mov  eax, [eax+C]
+        mov  eax, [eax+654]
+        mov  ebx, [ebp+C] //grab attack_data ptr
+        cmp  [ebx+44], -1 //indicates which hand used in attack
+        je   right_hand_wep_atk
+        cmp  [ebx+44], -2
+        je   left_hand_wep_atk
+        jmp  track_onhit_data_exit_cleanup
+        right_hand_wep_atk:
+        mov  eax, [eax+1F8] //grabs the weapon's id
+        jmp  check_is_weapon_occult
+        left_hand_wep_atk:
+        mov  eax, [eax+1B4]
+        check_is_weapon_occult:
+        mov  ecx, eax //save weaponid since we'll trash it but need it again
+        cmp  eax, DCB40 //Dark Hand
+        je   weapon_is_occult
+        //Priscilla's Dagger +1,+2,etc
+        cmp  eax, 19640
+        je   weapon_is_occult
+        cmp  eax, 19641
+        je   weapon_is_occult
+        cmp  eax, 19642
+        je   weapon_is_occult
+        cmp  eax, 19643
+        je   weapon_is_occult
+        cmp  eax, 19644
+        je   weapon_is_occult
+        cmp  eax, 19645
+        je   weapon_is_occult
+        //Velka's Rapier +1,+2,etc
+        cmp  eax, 93378
+        je   weapon_is_occult
+        cmp  eax, 93379
+        je   weapon_is_occult
+        cmp  eax, 9337A
+        je   weapon_is_occult
+        cmp  eax, 9337B
+        je   weapon_is_occult
+        cmp  eax, 9337C
+        je   weapon_is_occult
+        cmp  eax, 9337D
+        je   weapon_is_occult
+        mov  edx, 0 //clear dividend
+        mov  ebx, 64 //Occult upgrade (check if hundreds place == 7 via weaponid/100 % 10)
+        div  ebx //eax is set to div 100
+        mov  edx, 0
+        mov  ebx, A
+        div  ebx //edx is set to modulo 10 (weapon path)
+        cmp  edx, 7
+        je   weapon_is_occult
+        jmp  track_onhit_data_exit_cleanup
+
+        weapon_is_occult:
+        //get weapon scaling
+        mov  eax, ecx
+        //save sse's
+        sub     esp, 10
+        movdqu  dqword [esp], xmm0
+        sub     esp, 10
+        movdqu  dqword [esp], xmm1
+        mov  edx, 0
+        mov  ebx, A
+        div  ebx //edx is set to modulo 10 (weapon upgrade)
+        //calculate (0.05+upgrade/10)
+        movd xmm0, edx
+        mov  edx, A
+        movd  xmm1, edx
+        divss xmm0, xmm1
+        mov  edx, 3d4ccccd //0.05
+        movd xmm1, edx
+        addss xmm0, xmm1 //xmm0 is our scaler
+        //calculate scaled recovery
+        mov  ebx, [ebp+C] //re-grab attack_data ptr
+        mov  eax, [ebx+16C] //damage is attack_data+16C
+        movd xmm1, eax
+        mulss xmm0, xmm1
+        movd eax, xmm0 //scaled recovery hp (eax is scaled dmg)
+        //restore sse's
+        movdqu  xmm1, dqword [esp]
+        add     esp, 10
+        movdqu  xmm0, dqword [esp]
+        add     esp, 10
+
+        add  eax, [esi+2D4] //new possible hp after rally
+        //Playerhp = min(prehithp, playerhp+Recoveryhp)
+        cmp  eax, [beforehit_hp]
+        jle  set_new_rally_hp
+        mov  eax, [beforehit_hp]
+        set_new_rally_hp:
+        mov  [esi+2D4], eax
+
+        //apply the rally sfx
+        push  16760 //effect id
+        push  2710 //character id
+        call  D611C0 //call lua_SetEventSpecialEffect_2
+// }
+
+track_onhit_data_exit_cleanup:
+pop ecx
+pop edx
+pop ebx
+pop eax
+//exit normally
+track_onhit_data_exit:
+xorps xmm0,xmm0
+sub esp,14
+jmp track_onhit_data_returnhere
+
+"DARKSOULS.exe"+A6BFE6:
+jmp track_onhit_data
+nop
+track_onhit_data_returnhere:
+
+//*********track which ui bar is being smoothed*********
+alloc(track_what_bar,2048)
+globalalloc(current_selected_bar,4)
+label(track_what_bar_returnhere)
+
+track_what_bar:
+mov [current_selected_bar], eax
+inc eax
+cmp eax,[esi+10]
+mov [esp+28],eax
+jmp track_what_bar_returnhere
+
+"DARKSOULS.exe"+386D04:
+jmp track_what_bar
+nop
+nop
+nop
+track_what_bar_returnhere:
+
+//*********control the timer for the current ui bar*********
+alloc(controltimer,2048)
+label(execute_orange_drop)
+label(execute_partial_orange_drop)
+label(controltimer_returnhere)
+label(start_controlling_timer)
+label(dont_control_timer)
+label(timer_check_continue)
+label(cap_display_max_hp)
+label(dont_cap_max_hp)
+
+controltimer:
+//if this is the timer of interest
+cmp [current_selected_bar], 23
+je start_controlling_timer
+cmp [current_selected_bar], 24
+je start_controlling_timer
+cmp [current_selected_bar], 25
+je start_controlling_timer
+cmp [current_selected_bar], 26
+je start_controlling_timer
+jmp dont_control_timer
+
+start_controlling_timer:
+//fix for coming into section with too many hits
+//can happen if pc gets hit but doesn't take hp _bar_ damage (since hp can extend past visual)
+//causing this code not to get run immediatly after hit
+cmp [gothit], 2
+jle timer_check_continue
+mov [gothit], 1
+
+timer_check_continue:
+//check timer
+push eax
+mov eax, [beforehit_time]
+add eax, 1388 //MAX RECOVERY TIME
+cmp [100C42AC], eax //compare current time to hittime+MAX RECOVERY TIME
+pop eax
+jge execute_orange_drop
+
+//if we got hit before the timer went down
+cmp [gothit], 2
+je execute_partial_orange_drop
+jmp controltimer_returnhere
+
+//if timer is at desired point, drop orange
+execute_orange_drop:
+mov [gothit],0
+mov [eax+3C],0
+jmp controltimer_returnhere
+
+//if we got interrupted before previous drop, drop orange to the _previous_ hp value
+execute_partial_orange_drop:
+mov [gothit],1
+//save sse's
+sub     esp, 10
+movdqu  dqword [esp], xmm0
+sub     esp, 10
+movdqu  dqword [esp], xmm1
+//calculate previous_hp/max_hp. This should be location of orange
+//NOTE: max hp must be capped at _displayable_ max hp (1900 in gui bar), otherwise get problems
+push    eax
+mov     eax, [00CE0FEB+5]
+mov     eax, [eax]
+mov     eax, [eax+0]
+mov     eax, [eax+2D8]//max hp
+cmp     eax, 76C //_displayable_ max hp (1900)
+jg      cap_display_max_hp
+jmp     dont_cap_max_hp
+cap_display_max_hp:
+mov     eax, 76C
+dont_cap_max_hp:
+movd    xmm0, eax
+pop     eax
+movss   xmm1, [beforehit_hp]
+divss   xmm1, xmm0
+movss   [eax+3C],xmm1
+//restore sse's
+movdqu  xmm1, dqword [esp]
+add     esp, 10
+movdqu  xmm0, dqword [esp]
+add     esp, 10
+jmp controltimer_returnhere
+
+//if timer not interested, normal instruction
+dont_control_timer:
+movss [eax+3C],xmm1
+jmp controltimer_returnhere
+
+"DARKSOULS.exe"+888CED:
+jmp controltimer
+controltimer_returnhere:
+ 
+[DISABLE]
+dealloc(controltimer)
+"DARKSOULS.exe"+888CED:
+movss [eax+3C],xmm1
+//Alt: db F3 0F 11 48 3C
+
+dealloc(track_what_bar)
+"DARKSOULS.exe"+386D04:
+inc eax
+cmp eax,[esi+10]
+mov [esp+28],eax
+//Alt: db 40 3B 46 10 89 44 24 28
+
+dealloc(track_onhit_data)
+"DARKSOULS.exe"+A6BFE6:
+xorps xmm0,xmm0
+sub esp,14
+//Alt: db 0F 57 C0 83 EC 14
+
+dealloc(toggle_drop_rally)
+"DARKSOULS.exe"+B37F31:
+mov [ebx-08],eax
+mov eax,[ebx]
+//Alt: db 89 43 F8 8B 03
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>91734</ID>
+      <Description>"Vars"</Description>
+      <LastState Value="" RealAddress="00000000"/>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>91422</ID>
+          <Description>"ms since start"</Description>
+          <VariableType>4 Bytes</VariableType>
+          <Address>fmodex.dll+C42AC</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>91730</ID>
+          <Description>"beforehit_time"</Description>
+          <VariableType>4 Bytes</VariableType>
+          <Address>beforehit_time</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>91731</ID>
+          <Description>"beforehit_hp"</Description>
+          <VariableType>4 Bytes</VariableType>
+          <Address>beforehit_hp</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>91732</ID>
+          <Description>"gothit"</Description>
+          <VariableType>4 Bytes</VariableType>
+          <Address>gothit</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols>
+    <SymbolEntry>
+      <Name>timercounter</Name>
+      <Address>24D60030</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>current_selected_bar</Name>
+      <Address>26FC0030</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>previoushit_time</Name>
+      <Address>24D60000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>beforehit_hp</Name>
+      <Address>26FC0010</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>beforehit_time</Name>
+      <Address>26FC0000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>gothit</Name>
+      <Address>26FC0020</Address>
+    </SymbolEntry>
+  </UserdefinedSymbols>
+</CheatTable>

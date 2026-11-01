@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>0</ID>
+      <Description>"Super Multiplier"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : Megabonk
+  Version: 
+  Date   : 2025-10-12
+  Author : gg
+  PlayerInventory.AddXP
+  This script does blah blah blah
+}
+
+define(address,"GameAssembly.dll"+4DFD52)
+define(bytes,01 BB 84 00 00 00)
+define(xpm,01 00 00 00)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,"GameAssembly.dll"+4DFD52)
+
+label(code)
+label(return)
+label(xpMultiplier)
+
+registersymbol(xpMultiplier)
+
+newmem:
+  imul edi,[xpMultiplier]
+code:
+  add [rbx+00000084],edi
+  jmp return
+xpMultiplier:
+  db xpm
+
+address:
+  jmp newmem
+  nop
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+  // add [rbx+00000084],edi
+
+dealloc(newmem)
+unregistersymbol(xpMultiplier)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+4DFD52
+
+GameAssembly.dll+4DFD35: E8 66 ED F1 FF     - call Assets.Scripts.Saves___Serialization.Progression.Challenges.ChallengesTracker.HasChallengeModifier
+GameAssembly.dll+4DFD3A: 84 C0              - test al,al
+GameAssembly.dll+4DFD3C: 75 1A              - jne GameAssembly.dll+4DFD58
+GameAssembly.dll+4DFD3E: 48 8B 4B 40        - mov rcx,[rbx+40]
+GameAssembly.dll+4DFD42: 48 85 C9           - test rcx,rcx
+GameAssembly.dll+4DFD45: 74 1C              - je GameAssembly.dll+4DFD63
+GameAssembly.dll+4DFD47: 33 D2              - xor edx,edx
+GameAssembly.dll+4DFD49: E8 A2 8E F4 FF     - call Assets.Scripts.Inventory__Items__Pickups.PlayerHealth.IsDead
+GameAssembly.dll+4DFD4E: 84 C0              - test al,al
+GameAssembly.dll+4DFD50: 75 06              - jne GameAssembly.dll+4DFD58
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+4DFD52: 01 BB 84 00 00 00  - add [rbx+00000084],edi
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+4DFD58: 48 8B 5C 24 30     - mov rbx,[rsp+30]
+GameAssembly.dll+4DFD5D: 48 83 C4 20        - add rsp,20
+GameAssembly.dll+4DFD61: 5F                 - pop rdi
+GameAssembly.dll+4DFD62: C3                 - ret
+GameAssembly.dll+4DFD63: E8 A8 9B D8 FF     - call GameAssembly.mono_method_get_class+B0
+GameAssembly.dll+4DFD68: CC                 - int 3
+GameAssembly.dll+4DFD69: CC                 - int 3
+GameAssembly.dll+4DFD6A: CC                 - int 3
+GameAssembly.dll+4DFD6B: CC                 - int 3
+GameAssembly.dll+4DFD6C: CC                 - int 3
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>1</ID>
+          <Description>"Multiplier - plz no higher than 30"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>xpMultiplier</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <CheatCodes>
+    <CodeEntry>
+      <Description>XP Adder :add [rbx+00000084],edi</Description>
+      <AddressString>GameAssembly.dll+4A3843</AddressString>
+      <Before>
+        <Byte>FF</Byte>
+        <Byte>84</Byte>
+        <Byte>C0</Byte>
+        <Byte>75</Byte>
+        <Byte>06</Byte>
+      </Before>
+      <Actual>
+        <Byte>01</Byte>
+        <Byte>BB</Byte>
+        <Byte>84</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>5C</Byte>
+        <Byte>24</Byte>
+        <Byte>30</Byte>
+      </After>
+    </CodeEntry>
+  </CheatCodes>
+  <UserdefinedSymbols/>
+</CheatTable>

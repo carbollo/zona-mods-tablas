@@ -1,0 +1,486 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="26">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>0</ID>
+      <Description>"Mono"</Description>
+      <Options moHideChildren="1"/>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+{$lua}
+if (LaunchMonoDataCollector()==0) then
+  error("no mono")
+end
+{$asm}
+
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>10</ID>
+          <Description>"PlayerController"</Description>
+          <Options moHideChildren="1" moManualExpandCollapse="1"/>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+alloc(newmem,2048)
+label(returnhere)
+label(Invincible_status)
+label(originalcode)
+label(exit)
+globalalloc(pPlayer,4)
+registersymbol(Invincible_status)
+
+newmem: //this is allocated memory, you have read,write,execute access
+//place your code here
+mov [pPlayer],eax
+cmp [Invincible_status],0
+je originalcode
+mov byte ptr [eax+6C],1
+jmp originalcode
+
+Invincible_status:
+ dd 0
+
+originalcode:
+mov eax,[eax+60]
+test eax,eax
+
+exit:
+jmp returnhere
+
+AbstractPlayerController:get_IsDead+27:
+jmp newmem
+returnhere:
+
+
+ 
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+dealloc(newmem)
+unregistersymbol(Invincible_status)
+AbstractPlayerController:get_IsDead+27:
+mov eax,[eax+60]
+test eax,eax
+//Alt: db 8B 40 60 85 C0
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>19</ID>
+              <Description>"Inf. Health"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode)
+label(exit)
+
+newmem: //this is allocated memory, you have read,write,execute access
+//place your code here
+mov eax,[edi+5C]
+originalcode:
+mov [edi+60],eax
+sub esp,0C
+
+exit:
+jmp returnhere
+
+PlayerStatsManager:TakeDamage+8e:
+jmp newmem
+nop
+returnhere:
+
+
+ 
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+dealloc(newmem)
+PlayerStatsManager:TakeDamage+8e:
+mov [edi+60],eax
+sub esp,0C
+//Alt: db 89 47 60 83 EC 0C
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>16</ID>
+              <Description>"Super Invincible"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+Invincible_status:
+ dd 1
+ 
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+Invincible_status:
+ dd 0
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>17</ID>
+              <Description>"Pointers"</Description>
+              <Options moHideChildren="1" moManualExpandCollapse="1"/>
+              <LastState Value="" RealAddress="00000000"/>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>2</ID>
+                  <Description>"HealthMax"</Description>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>pPlayer</Address>
+                  <Offsets>
+                    <Offset>5c</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>3</ID>
+                  <Description>"Health"</Description>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>pPlayer</Address>
+                  <Offsets>
+                    <Offset>60</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>6</ID>
+                  <Description>"SuperMeter (Max 5 cards = 50)-(CTRL = Add 1crad)"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>pPlayer</Address>
+                  <Offsets>
+                    <Offset>68</Offset>
+                  </Offsets>
+                  <Hotkeys>
+                    <Hotkey>
+                      <Action>Increase Value</Action>
+                      <Keys>
+                        <Key>17</Key>
+                      </Keys>
+                      <Value>10</Value>
+                      <ID>0</ID>
+                    </Hotkey>
+                  </Hotkeys>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>7</ID>
+                  <Description>"SuperInvincible"</Description>
+                  <DropDownList DescriptionOnly="1" DisplayValueAsItem="1">0:Off
+1:On
+</DropDownList>
+                  <VariableType>Byte</VariableType>
+                  <Address>pPlayer</Address>
+                  <Offsets>
+                    <Offset>6C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>4</ID>
+                  <Description>"hardInvincibility"</Description>
+                  <VariableType>Byte</VariableType>
+                  <Address>pPlayer</Address>
+                  <Offsets>
+                    <Offset>84</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>11</ID>
+                  <Description>"&lt;ExCost&gt;k__BackingField"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>pPlayer</Address>
+                  <Offsets>
+                    <Offset>70</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>12</ID>
+                  <Description>"&lt;Deaths&gt;k__BackingField"</Description>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>pPlayer</Address>
+                  <Offsets>
+                    <Offset>74</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>13</ID>
+                  <Description>"&lt;ParriesThisJump&gt;k__BackingField"</Description>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>pPlayer</Address>
+                  <Offsets>
+                    <Offset>78</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>14</ID>
+                  <Description>"&lt;StoneTime&gt;k__BackingField"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>pPlayer</Address>
+                  <Offsets>
+                    <Offset>7C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>15</ID>
+                  <Description>"timeSinceStoned"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>pPlayer</Address>
+                  <Offsets>
+                    <Offset>80</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>21</ID>
+          <Description>"PlayerInventory"</Description>
+          <Options moHideChildren="1" moManualExpandCollapse="1"/>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode)
+label(exit)
+globalalloc(pCoin,4)
+
+newmem: //this is allocated memory, you have read,write,execute access
+//place your code here
+mov [pCoin],eax
+originalcode:
+mov eax,[eax+14]
+leave 
+ret 
+
+exit:
+jmp returnhere
+
+PlayerData:GetCurrency+1d:
+jmp newmem
+returnhere:
+
+
+ 
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+dealloc(newmem)
+PlayerData:GetCurrency+1d:
+mov eax,[eax+14]
+leave 
+ret 
+//Alt: db 8B 40 14 C9 C3
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>22</ID>
+              <Description>"money"</Description>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pCoin</Address>
+              <Offsets>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>23</ID>
+          <Description>"Grade (A+) or (P)"</Description>
+          <Options moHideChildren="1" moManualExpandCollapse="1"/>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+alloc(newmem,2048)
+label(returnhere)
+label(Pacific_status)
+label(pCoins)
+label(Coins_status)
+label(originalcode)
+label(exit)
+globalalloc(pGrade,4)
+registersymbol(Pacific_status)
+registersymbol(Coins_status)
+
+newmem: //this is allocated memory, you have read,write,execute access
+//place your code here
+mov [pGrade],eax
+mov [eax+8],(float)100
+mov [eax+10],0
+mov [eax+14],#3
+mov [eax+18],#6
+cmp [Pacific_status],0
+je pCoins
+mov byte ptr [eax+24],1
+jmp pCoins
+
+Pacific_status:
+ dd 0
+
+pCoins:
+cmp [Coins_status],0
+je originalcode
+mov [eax+1C],#5
+jmp originalcode
+
+Coins_status:
+ dd 0
+
+originalcode:
+movzx eax,byte ptr [eax+24]
+test eax,eax
+
+exit:
+jmp returnhere
+
+LevelScoringData:CalculateGrade+25:
+jmp newmem
+nop
+returnhere:
+
+
+ 
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+dealloc(newmem)
+unregistersymbol(Pacific_status)
+unregistersymbol(Coins_status)
+LevelScoringData:CalculateGrade+25:
+movzx eax,byte ptr [eax+24]
+test eax,eax
+//Alt: db 0F B6 40 24 85 C0
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>33</ID>
+              <Description>"All Coins Collected (Not activate in boss level. Only activated in run &amp; gun level)"</Description>
+              <LastState/>
+              <Color>0000FF</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+Coins_status:
+ dd 1
+
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+Coins_status:
+ dd 0
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>32</ID>
+              <Description>"Pacific Run Perfect (Not activate in boss level. Only activated in run &amp; gun level)"</Description>
+              <LastState/>
+              <Color>0000FF</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+Pacific_status:
+ dd 1
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+Pacific_status:
+ dd 0
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>34</ID>
+              <Description>"Pointers"</Description>
+              <Options moHideChildren="1" moManualExpandCollapse="1"/>
+              <LastState Value="" RealAddress="00000000"/>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>24</ID>
+                  <Description>"time"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>pGrade</Address>
+                  <Offsets>
+                    <Offset>8</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>29</ID>
+                  <Description>"goalTime"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>pGrade</Address>
+                  <Offsets>
+                    <Offset>C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>25</ID>
+                  <Description>"numTimesHit"</Description>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>pGrade</Address>
+                  <Offsets>
+                    <Offset>10</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>26</ID>
+                  <Description>"numParries"</Description>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>pGrade</Address>
+                  <Offsets>
+                    <Offset>14</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>28</ID>
+                  <Description>"superMeterUsed"</Description>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>pGrade</Address>
+                  <Offsets>
+                    <Offset>18</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>27</ID>
+                  <Description>"coinCollected"</Description>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>pGrade</Address>
+                  <Offsets>
+                    <Offset>1C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>30</ID>
+                  <Description>"pacificRun"</Description>
+                  <VariableType>Byte</VariableType>
+                  <Address>pGrade</Address>
+                  <Offsets>
+                    <Offset>24</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>31</ID>
+                  <Description>"useCoinInsteadOfSuperMeter"</Description>
+                  <VariableType>Byte</VariableType>
+                  <Address>pGrade</Address>
+                  <Offsets>
+                    <Offset>25</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

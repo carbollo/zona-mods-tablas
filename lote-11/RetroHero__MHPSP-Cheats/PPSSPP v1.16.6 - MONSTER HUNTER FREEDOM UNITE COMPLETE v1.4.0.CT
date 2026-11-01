@@ -1,0 +1,496 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>134459</ID>
+      <Description>"Attach to PPSSPP"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{$lua}
+function checkProcessList()
+    slStringList=createStringlist()
+    processList=createStringlist()
+    slHexList=createStringlist()
+    getProcesslist(processList)
+    slStringID=strings_getCount(processList)
+    for y=0,slStringID-1 do
+       slHexID=nil
+       slStringID=strings_getString(processList, y)
+       slHexID=string.find(slStringID, "PPSSPPWindows")
+       if slHexID~=nil then strings_add(slStringList, slStringID); end
+    end
+    slStringID=strings_getCount(slStringList)
+    if slStringID&lt;1 then
+       print("Failed to detect PPSSPPWindows process.")
+    else
+       if slStringID&gt;1 then
+        print("Warning: you had more than one PPSSPPWindows process opened, attaching to the first one.")
+       end
+       for y=0,slStringID-1 do
+           slHexID=nil
+           slStringID=strings_getString(slStringList, y)
+           slHexID=string.sub(slStringID, string.find(slStringID, "%x%x%x%x%x%x%x%x"))
+           if slHexID~=nil then  strings_add(slHexList, slHexID); end
+           slHexID=strings_getCount(slHexList)
+       end
+       Mooo=strings_getString(slHexList, 0)
+       Moo=tonumber(Mooo,16)
+    end
+end
+function attach()
+ checkProcessList()
+ openProcess(Moo)
+end
+{$asm}
+luaCall(attach())
+[ENABLE]
+[DISABLE]
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>134467</ID>
+      <Description>"PPSSPP scripts aob x64 (does not require exact version, but might fail) updated for ~v1.16.6-346+"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+
+function GetProcessNameFromId(processId)
+  local processName = nil
+  local list = createStringlist()
+  getProcesslist(list)
+  for i = 0, list.Count-1 do
+    local id, name = list.String[i]:match("(.*)-(.*)")
+    if processId == tonumber(id, 16) then
+      processName = name
+      break
+    end
+  end
+  return processName
+end
+
+function lua_aobscan(module,bytes,index)
+  index = index - 1
+  if(getModuleSize(module)) then
+      local memScanner = createMemScan()
+      local memFoundList = createFoundList(memScanner)
+      memScanner.firstScan(
+        soExactValue,vtByteArray,rtRounded,bytes,nil,
+        getAddress(module),(getAddress(module)+getModuleSize(module)),"",
+        fsmNotAligned,"",true,false,false,false)
+      memScanner.waitTillDone()
+      memFoundList.initialize()
+        if(memFoundList.Count == 0) then
+          AoB=nil
+          print("Failed, probably PPSSPP changed too much, try versions around 1.16.6.346+")
+        else
+          AoB=memFoundList.Address[index]
+        end
+      memScanner.destroy()
+      memFoundList.destroy()
+  end
+end
+
+
+function disableme(memoryrecord,before,currentstate)
+ if (AoB == nil or userMemory=="0000000008800000") then
+  memoryrecord_unfreeze(memoryrecord)
+ end
+ return true
+end
+
+
+function justdoit()
+  controlMainForm = getMainForm()
+  moduleName = GetProcessNameFromId(getOpenedProcessID())
+  AoB=nil
+  --AoB = AOBScan("48 89 44 24 28 8D 4A FA")
+  memoryrecordMain=getAddressList().getMemoryRecordByDescription("PPSSPP scripts aob x64 (does not require exact version, but might fail) updated for ~v1.16.6-346+")
+  if (moduleName) then
+     lua_aobscan(moduleName,"8D 4A FA 48 89 44 24 28",1)
+--   lua_aobscan(moduleName,"48 89 44 24 28 8D 4A FA",1)
+  else
+   print("Use first icon from the left at the top or script to attach CE to PPSSPP process or use Attach to PPSSPP script.")
+  end
+  if (AoB) then
+   --st = tonumber(AoB[0],16)
+   st = tonumber(AoB,16)
+   offset=readInteger(st-0x4)
+   pointer=st+offset
+   --print(string.format("%08X pointer",pointer),string.format("%08X offset",offset))
+   userMemory=string.format("%016X",readQword(pointer)+0x8800000)
+   --print(string.format("%08X user memory",pointer),userMemory)
+   if (userMemory=="0000000008800000") then
+    print("Run the game first.")
+   else
+    getAddressList().getMemoryRecordByDescription("PSP memory in CE(aob x64_v16.6)").setAddress(userMemory)
+   end
+   --AoB.Destroy()
+  end
+  memoryrecord_onActivate(memoryrecordMain,disableme)
+end
+{$asm}
+
+luaCall(justdoit())
+[DISABLE]
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>134468</ID>
+          <Description>"PSP memory in CE(aob x64_v16.6)"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>0000021235CF0000</Address>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>134502</ID>
+              <Description>"mAFUMOFU HOOD"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+00138D15</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>134501</ID>
+              <Description>"Equipment Box"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>+01195EE8</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>134486</ID>
+              <Description>"Item Box"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+1198DC8</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>134489</ID>
+              <Description>"Item Table Start"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+19A252</Address>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>134491</ID>
+                  <Description>"Rarity:"</Description>
+                  <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">00:Rare 1
+01:Rare 2
+02:Rare 3
+03:Rare 4
+04:Rare 5
+05:Rare 6
+06:Rare 7
+07:Rare 8
+08:Rare 9
+09:Rare 10
+</DropDownList>
+                  <ShowAsHex>1</ShowAsHex>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Byte</VariableType>
+                  <Address>+0</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>134492</ID>
+                  <Description>"Max Stack:"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Byte</VariableType>
+                  <Address>+1</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>134493</ID>
+                  <Description>"Icon Fang Flag:"</Description>
+                  <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">00:Off
+01:On
+</DropDownList>
+                  <ShowAsHex>1</ShowAsHex>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Byte</VariableType>
+                  <Address>+2</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>134494</ID>
+                  <Description>"Icon ID:"</Description>
+                  <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">00:Smoke Bomb White
+01:Ball/Gem	Red
+02:Bomb	Green
+03:Meat
+04:Bait
+05:Fish
+06:Trap Tool
+07:Whetstone
+08:Dung
+09:Monster Part
+0A:Bone
+0B:Binoculars
+0C:Mushroom
+0D:Bug Net
+0E:Hide
+0F:Herb
+10:Pickaxe
+11:Barrel
+12:Seed
+13:BBQ Spit
+14:Bug
+15:Trap
+16:Net
+17:Scale
+18:Drink
+19:Egg
+1A:Bullet
+1B:Ore
+1C:Husk
+1D:Map
+1E:Horn
+1F:Claw/Fang
+20:Honey
+21:Question Mark
+22:Coin
+23:Sac
+24:Book
+25:Ticket
+26:Knife
+27:Rustshard
+28:Great Sword
+29:Sword and Shield
+2A:Lance
+2B:Hammer
+2C:Heavy Bowgun
+2D:Dual Blades
+2E:Light Bowgun
+2F:Helmet
+30:Chest
+31:Waist
+32:Arms
+33:Legs
+34:Music Note
+35:Haircut
+36:Decoration Jewel
+37:Vegetal
+38:Boomerang
+39:Bow Coating
+3A:Empty Phial
+3B:Crab Carapace
+3C:Hunting Horn
+3D:Long Sword
+3E:Bow
+3F:Gunlance
+40:Armor Sphere
+41:Plate
+</DropDownList>
+                  <ShowAsHex>1</ShowAsHex>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Byte</VariableType>
+                  <Address>+3</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>134495</ID>
+                  <Description>"Icon Color:"</Description>
+                  <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">00:White
+01:Red
+02:Green
+03:Blue
+04:Yellow
+05:Purple
+06:Light Blue
+07:Orange
+08:Pink
+09:Lime
+0A:Gray
+0B:Brown
+0C:Teal
+0D:Dark Green
+0E:Dark Red
+0F:Dark Blue
+10:Dark Purple
+</DropDownList>
+                  <ShowAsHex>1</ShowAsHex>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Byte</VariableType>
+                  <Address>+4</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>134496</ID>
+                  <Description>"Unk:"</Description>
+                  <ShowAsHex>1</ShowAsHex>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>+5</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>134497</ID>
+                  <Description>"Buy Price:"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>+A</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>134498</ID>
+                  <Description>"Selling price:"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>+E</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>134499</ID>
+                  <Description>"Unk2:"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>+F</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>134469</ID>
+          <Description>"Limit Scan Range"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{$lua}
+function setStartStop()
+  local controlMainForm = getMainForm()
+  local addr = getAddressList().getMemoryRecordByDescription("PSP memory in CE(aob x64_v16.6)").getCurrentAddress()
+  local check = cheatEngineIs64Bit()
+  local check2 = targetIs64Bit()
+  if (check and check2) then
+   start = string.format("%016X",addr)
+   st = string.format("%016X",addr + 25165824)
+  else
+   start = string.format("%08X",addr)
+   st = string.format("%08X",addr + 25165824)
+  end
+  controlMainForm.FromAddress.setCaption(start)
+  controlMainForm.ToAddress.setCaption(st)
+end
+{$asm}
+[ENABLE]
+luaCall(setStartStop())
+[DISABLE]
+luaCall(setStartStop())
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>134470</ID>
+          <Description>"Limit Scan Range(for HD remasters &amp; some homebrew)"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{$lua}
+function setStartStop()
+  local controlMainForm = getMainForm()
+  local addr = getAddressList().getMemoryRecordByDescription("PSP memory in CE(aob x64_v16.6)").getCurrentAddress()
+  local check = cheatEngineIs64Bit()
+  local check2 = targetIs64Bit()
+  if (check and check2) then
+   start = string.format("%016X",addr)
+   st = string.format("%016X",addr + 58720256)
+  else
+   start = string.format("%08X",addr)
+   st = string.format("%08X",addr + 58720256)
+  end
+  controlMainForm.FromAddress.setCaption(start)
+  controlMainForm.ToAddress.setCaption(st)
+end
+{$asm}
+[ENABLE]
+luaCall(setStartStop())
+[DISABLE]
+luaCall(setStartStop())
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>134471</ID>
+          <Description>"Select cheat entry and click on the square left from this text to convert address"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{$lua}
+function PrintCW()
+  selected = getAddressList().SelCount
+  if (selected &gt; 0) then
+   setable = getAddressList().getSelectedRecords().CurrentAddress
+   all = getAddressList().Count
+   j = 1
+   local addrtable = {}
+   for i = 0, all-1 do
+    local sel = getAddressList().MemoryRecord[i].Selected
+    local address = getAddressList().MemoryRecord[i].getCurrentAddress()
+    if (sel and address &gt; 0) then
+     print("")
+     addrtable[j] = adr1
+     local desc = getAddressList().MemoryRecord[i].getDescription()
+     local val = getAddressList().MemoryRecord[i].Value
+     local typ = getAddressList().MemoryRecord[i].Type
+     local addr = getAddressList().getMemoryRecordByDescription("PSP memory in CE(aob x64_v16.6)").getCurrentAddress()
+     local cwcheat = address - addr
+     local disassembly = cwcheat + 0x8800000
+     local check = cheatEngineIs64Bit()
+     local check2 = targetIs64Bit()
+     if (check and check2) then
+       print("CE:",string.format("%016X",address)..", CWC:",string.format("%08X",cwcheat)..", Dissassembly:",string.format("%08X",disassembly)..", simple CWCheat:")
+     else
+       print("CE:",string.format("%08X",address)..", CWC:",string.format("%08X",cwcheat)..", Dissassembly:",string.format("%08X",disassembly)..", simple CWCheat:")
+     end
+     print("_C0 "..desc)
+     local hex = getAddressList().MemoryRecord[i].ShowAsHex
+     if (hex==false) then
+      if (typ == 0) then
+       val = string.format("%08X",val)
+       cwcheat = string.format("%08X",cwcheat)
+      end
+      if (typ == 1) then
+       val = string.format("%08X",val)
+       cwcheat = string.format("%08X",cwcheat+0x10000000)
+      end
+      if (typ == 2) then
+       val = string.format("%08X",val)
+       cwcheat = string.format("%08X",cwcheat+0x20000000)
+      end
+      if (typ == 4) then
+       local s=string.pack("f",val)
+       local f=string.unpack("i4",s)
+       val = string.format("%08X",f)
+       cwcheat = string.format("%08X",cwcheat+0x20000000)
+      end
+     else
+      if (typ == 0) then
+       val = string.format("%08X",tonumber(val,16))
+       cwcheat = string.format("%08X",cwcheat)
+      end
+      if (typ == 1) then
+       val = string.format("%08X",tonumber(val,16))
+       cwcheat = string.format("%08X",cwcheat+0x10000000)
+      end
+      if (typ == 2) then
+       cwcheat = string.format("%08X",cwcheat+0x20000000)
+      end
+      if (typ == 4) then
+       cwcheat = string.format("%08X",cwcheat+0x20000000)
+      end
+     end
+     if (typ == 3 or typ &gt; 4) then
+       print("Type unsupported")
+     else
+       print("_L 0x"..cwcheat,"0x"..val)
+     end
+     j=j+1
+    end
+   end
+  else
+   print("Select cheat entry first!")
+  end
+end
+{$asm}
+[ENABLE]
+luaCall(PrintCW())
+
+[DISABLE]
+luaCall(PrintCW())
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols>
+    <SymbolEntry>
+      <Name>AoB</Name>
+      <Address>000001C0</Address>
+    </SymbolEntry>
+  </UserdefinedSymbols>
+</CheatTable>

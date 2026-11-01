@@ -1,0 +1,2204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="46">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>17</ID>
+      <Description>"enable"</Description>
+      <Options moHideChildren="1" moAllowManualCollapseAndExpand="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript Async="1">[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+aobscanmodule(controlingPlayerBaseReadAOB,$process,E8 * * * * 4* * * * 4* * * 0F 85 * * * * 4* * * * * * * 4* * * * * 4* * * 8* * * * 00 75 09 4* * * * FF * * EB 05 E8 * * * * 8* * 74)
+registersymbol(controlingPlayerBaseReadAOB)
+
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode_controlingPlayerBaseReadAOB)
+label(exit)
+
+label(pPlayerBase)
+registersymbol(pPlayerBase originalcode_controlingPlayerBaseReadAOB)
+
+newmem: //this is allocated memory, you have read,write,execute access
+//place your code here
+readmem(controlingPlayerBaseReadAOB+21,5)
+//cmp byte ptr [rsp+48],00
+reassemble(controlingPlayerBaseReadAOB+26)
+//jne CrimsonDesert.exe+20A3A54
+mov rax,pPlayerBase
+mov [rax],r12
+readmem(controlingPlayerBaseReadAOB+28,4)
+//mov rax,[r12]
+reassemble(controlingPlayerBaseReadAOB+2c)
+//call qword ptr [rax+10]
+jmp exit
+
+originalcode_controlingPlayerBaseReadAOB:
+readmem(controlingPlayerBaseReadAOB+21,14)
+//cmp byte ptr [rsp+48],00
+//jne CrimsonDesert.exe+20A3A54
+//mov rax,[r12]
+//call qword ptr [rax+10]
+
+exit:
+jmp returnhere
+
+///
+pPlayerBase:
+///
+
+controlingPlayerBaseReadAOB+21: //"CrimsonDesert.exe"+20A3A44:
+jmp far newmem
+returnhere:
+
+///***************************************************///
+aobscanmodule(someValueChangeAOB,$process,4* * * * 4* * * * 4* * * * 4* * * * * 4* * * * 6* * * * 4* * * * 5* 5* 5* C3)
+registersymbol(someValueChangeAOB)
+
+alloc(newmem2,2048)
+label(returnhere2)
+label(originalcode2_someValueChangeAOB)
+label(exit2)
+
+label(pStamina pHealth bMaxStamina bInfHealth dMinHealth)
+registersymbol(originalcode2_someValueChangeAOB pStamina pHealth bMaxStamina bInfHealth dMinHealth)
+
+newmem2: //this is allocated memory, you have read,write,execute access
+//place your code here
+push rax
+push rcx
+push rdx
+push rsi
+mov rcx,1000000000
+mov rax,pPlayerBase
+mov rax,[rax]
+test rax,rax
+jz end2
+mov rax,[rax+68]
+test rax,rax
+jz end2
+mov rax,[rax+20]
+
+chk12:
+mov rsi,pStamina
+mov rdx,bMaxStamina
+cmp byte ptr [rdx],1
+jne chk22
+cmp r15,rcx
+jl @f
+cmp [r15],rax
+je isstamina
+@@:
+cmp [rsi],rdi
+je domax2
+
+chk22:
+mov rsi,pHealth
+lea rdx,[rdx+4]
+cmp byte ptr [rdx],1
+jne chkend2
+cmp r13,rcx
+jl @f
+cmp [r13],rax
+je ishealth
+@@:
+cmp [rsi],rdi
+je domin2
+
+chkend2:
+jmp end2
+
+isstamina:
+mov [rsi],rdi
+jmp domax2
+
+ishealth:
+mov [rsi],rdi
+jmp domin2
+
+domax2:
+//cmp [rdi+18],rbx
+//jle @f
+mov rbx,[rdi+18]
+@@:
+jmp end2
+
+domin2:
+lea rcx,[rdx+4]
+fild dword ptr [rdi+18]
+fmul dword ptr [rcx]
+fistp dword ptr [rcx+4]
+mov rcx,[rcx+4]
+cmp rbx,rcx
+cmovl rbx,rcx
+jmp end2
+
+end2:
+pop rsi
+pop rdx
+pop rcx
+pop rax
+
+originalcode2_someValueChangeAOB:
+readmem(someValueChangeAOB+8,17)
+//mov [rdi+08],rbx
+//mov rbx,[rsp+48]
+//mov [rdi+38],rsi
+//mov [rdi+50],bp
+
+exit2:
+jmp returnhere2
+
+///
+pStamina:
+dq 0
+pHealth:
+dq 0
+bMaxStamina:
+dd 0
+bInfHealth:
+dd 0
+dMinHealth:
+dd (float)0.5
+///
+
+someValueChangeAOB+8: //"CrimsonDesert.exe"+C791503:
+jmp far newmem2
+nop 3
+returnhere2:
+
+///***************************************************///
+
+
+
+
+
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+dealloc(newmem)
+controlingPlayerBaseReadAOB+21: //"CrimsonDesert.exe"+20A3A44:
+readmem(originalcode_controlingPlayerBaseReadAOB,14)
+//db 80 7C 24 48 00 75 09 49 8B 04 24 FF 50 10
+//cmp byte ptr [rsp+48],00
+//jne CrimsonDesert.exe+20A3A54
+//mov rax,[r12]
+//call qword ptr [rax+10]
+
+unregistersymbol(pPlayerBase originalcode_controlingPlayerBaseReadAOB)
+
+///***************************************************///
+dealloc(newmem2)
+someValueChangeAOB+8: //"CrimsonDesert.exe"+C791503:
+readmem(originalcode2_someValueChangeAOB,17)
+//db 48 89 5F 08 48 8B 5C 24 48 48 89 77 38 66 89 6F 50
+//mov [rdi+08],rbx
+//mov rbx,[rsp+48]
+//mov [rdi+38],rsi
+//mov [rdi+50],bp
+
+unregistersymbol(originalcode2_someValueChangeAOB bMaxStamina bInfHealth dMinHealth)
+
+///***************************************************///
+
+/*
+CrimsonDesert.exe+20A3972 - E8 39E5F6FE           - call CrimsonDesert.exe+1011EB0
+CrimsonDesert.exe+20A3977 - 48 89 05 E2FEDF03     - mov [CrimsonDesert.exe+5EA3860],rax { (0) }
+CrimsonDesert.exe+20A397E - 48 8D 0D D3FEDF03     - lea rcx,[CrimsonDesert.exe+5EA3858] { (0) }
+CrimsonDesert.exe+20A3985 - E8 6260C101           - call CrimsonDesert.exe+3CB99EC
+CrimsonDesert.exe+20A398A - 48 8B 1D CFFEDF03     - mov rbx,[CrimsonDesert.exe+5EA3860] { (0) }
+CrimsonDesert.exe+20A3991 - 48 8B 85 C03C0000     - mov rax,[rbp+00003CC0]
+CrimsonDesert.exe+20A3998 - 48 8B 78 08           - mov rdi,[rax+08]
+CrimsonDesert.exe+20A399C - 48 8D 4C 24 44        - lea rcx,[rsp+44]
+CrimsonDesert.exe+20A39A1 - E8 6A6125FE           - call CrimsonDesert.exe+2F9B10
+CrimsonDesert.exe+20A39A6 - 0FB7 88 A4010000      - movzx ecx,word ptr [rax+000001A4]
+CrimsonDesert.exe+20A39AD - 4C 69 C1 E8030000     - imul r8,rcx,000003E8 { 1000 }
+CrimsonDesert.exe+20A39B4 - 48 B8 15AE47E17A14AE47 - mov rax,47AE147AE147AE15 { -515396075 }
+CrimsonDesert.exe+20A39BE - 49 F7 E0              - mul r8
+CrimsonDesert.exe+20A39C1 - 4C 2B C2              - sub r8,rdx
+CrimsonDesert.exe+20A39C4 - 49 D1 E8              - shr r8,1
+CrimsonDesert.exe+20A39C7 - 4C 03 C2              - add r8,rdx
+CrimsonDesert.exe+20A39CA - 49 C1 E8 06           - shr r8,06 { 6 }
+CrimsonDesert.exe+20A39CE - B8 07000000           - mov eax,00000007 { 7 }
+CrimsonDesert.exe+20A39D3 - 66 89 44 24 38        - mov [rsp+38],ax
+CrimsonDesert.exe+20A39D8 - 48 8D 44 24 60        - lea rax,[rsp+60]
+CrimsonDesert.exe+20A39DD - 48 89 44 24 30        - mov [rsp+30],rax
+CrimsonDesert.exe+20A39E2 - 48 89 5C 24 28        - mov [rsp+28],rbx
+CrimsonDesert.exe+20A39E7 - 4C 8B CF              - mov r9,rdi
+CrimsonDesert.exe+20A39EA - 48 8D 55 90           - lea rdx,[rbp-70]
+CrimsonDesert.exe+20A39EE - 48 8B 0D 3B8FBE03     - mov rcx,[CrimsonDesert.exe+5C8C930] { (25FE3E7AA00) }
+CrimsonDesert.exe+20A39F5 - E8 1680F0FF           - call CrimsonDesert.exe+1FABA10
+CrimsonDesert.exe+20A39FA - 0FB6 BD D03C0000      - movzx edi,byte ptr [rbp+00003CD0]
+CrimsonDesert.exe+20A3A01 - 48 8D 05 40DF9402     - lea rax,[CrimsonDesert.exe+49F1948] { (1414CF030) }
+CrimsonDesert.exe+20A3A08 - 48 89 45 00           - mov [rbp+00],rax
+CrimsonDesert.exe+20A3A0C - 48 8D 05 65766902     - lea rax,[CrimsonDesert.exe+473B078] { (16) }
+CrimsonDesert.exe+20A3A13 - 48 89 45 00           - mov [rbp+00],rax
+CrimsonDesert.exe+20A3A17 - 48 8D 45 10           - lea rax,[rbp+10]
+CrimsonDesert.exe+20A3A1B - 48 89 45 F8           - mov [rbp-08],rax
+CrimsonDesert.exe+20A3A1F - 48 8D 4D 10           - lea rcx,[rbp+10]
+controlingPlayerBaseReadAOB- E8 68B324FE           - call CrimsonDesert.exe+2EED90
+CrimsonDesert.exe+20A3A28 - 48 83 C6 20           - add rsi,20 { 32 }
+CrimsonDesert.exe+20A3A2C - 49 3B F5              - cmp rsi,r13
+CrimsonDesert.exe+20A3A2F - 0F85 EBFCFFFF         - jne CrimsonDesert.exe+20A3720
+CrimsonDesert.exe+20A3A35 - 48 8D 05 84058202     - lea rax,[CrimsonDesert.exe+48C3FC0] { (14100B690) }
+CrimsonDesert.exe+20A3A3C - 48 89 44 24 70        - mov [rsp+70],rax
+CrimsonDesert.exe+20A3A41 - 49 8B CC              - mov rcx,r12
+CrimsonDesert.exe+20A3A44 - FF25 00000000 0000850100000000 - jmp 01850000
+CrimsonDesert.exe+20A3A52 - EB 05                 - jmp CrimsonDesert.exe+20A3A59
+CrimsonDesert.exe+20A3A54 - E8 A77BF6FE           - call CrimsonDesert.exe+100B600
+CrimsonDesert.exe+20A3A59 - 84 C0                 - test al,al
+CrimsonDesert.exe+20A3A5B - 74 0A                 - je CrimsonDesert.exe+20A3A67
+CrimsonDesert.exe+20A3A5D - 49 8B 04 24           - mov rax,[r12]
+CrimsonDesert.exe+20A3A61 - 49 8B CC              - mov rcx,r12
+CrimsonDesert.exe+20A3A64 - FF 50 18              - call qword ptr [rax+18]
+CrimsonDesert.exe+20A3A67 - C6 45 80 00           - mov byte ptr [rbp-80],00 { 0 }
+CrimsonDesert.exe+20A3A6B - 49 83 C7 68           - add r15,68 { 104 }
+CrimsonDesert.exe+20A3A6F - 4C 3B 7D 98           - cmp r15,[rbp-68]
+CrimsonDesert.exe+20A3A73 - 48 8B 74 24 68        - mov rsi,[rsp+68]
+CrimsonDesert.exe+20A3A78 - 41 BD 00000000        - mov r13d,00000000 { 0 }
+CrimsonDesert.exe+20A3A7E - 41 BC FFFF0000        - mov r12d,0000FFFF { 65535 }
+CrimsonDesert.exe+20A3A84 - 0F85 A6FAFFFF         - jne CrimsonDesert.exe+20A3530
+CrimsonDesert.exe+20A3A8A - 40 84 FF              - test dil,dil
+CrimsonDesert.exe+20A3A8D - 74 3E                 - je CrimsonDesert.exe+20A3ACD
+CrimsonDesert.exe+20A3A8F - 8B 85 58080000        - mov eax,[rbp+00000858]
+CrimsonDesert.exe+20A3A95 - 3B 85 5C080000        - cmp eax,[rbp+0000085C]
+CrimsonDesert.exe+20A3A9B - 72 14                 - jb CrimsonDesert.exe+20A3AB1
+CrimsonDesert.exe+20A3A9D - 33 D2                 - xor edx,edx
+CrimsonDesert.exe+20A3A9F - 48 8D 8D 50080000     - lea rcx,[rbp+00000850]
+CrimsonDesert.exe+20A3AA6 - E8 F5818EFE           - call CrimsonDesert.exe+98BCA0
+CrimsonDesert.exe+20A3AAB - 8B 85 58080000        - mov eax,[rbp+00000858]
+CrimsonDesert.exe+20A3AB1 - 48 69 C8 D0000000     - imul rcx,rax,000000D0 { 208 }
+CrimsonDesert.exe+20A3AB8 - 48 03 8D 50080000     - add rcx,[rbp+00000850]
+CrimsonDesert.exe+20A3ABF - 49 8B D6              - mov rdx,r14
+CrimsonDesert.exe+20A3AC2 - E8 69958EFE           - call CrimsonDesert.exe+98D030
+CrimsonDesert.exe+20A3AC7 - FF 85 58080000        - inc [rbp+00000858]
+CrimsonDesert.exe+20A3ACD - 48 8B 9D C83C0000     - mov rbx,[rbp+00003CC8]
+CrimsonDesert.exe+20A3AD4 - 49 81 C6 D0000000     - add r14,000000D0 { 208 }
+CrimsonDesert.exe+20A3ADB - 4C 3B 75 A0           - cmp r14,[rbp-60]
+CrimsonDesert.exe+20A3ADF - 0F85 DBF9FFFF         - jne CrimsonDesert.exe+20A34C0
+CrimsonDesert.exe+20A3AE5 - 48 8B 8D C03C0000     - mov rcx,[rbp+00003CC0]
+CrimsonDesert.exe+20A3AEC - 4C 8B 7D A8           - mov r15,[rbp-58]
+CrimsonDesert.exe+20A3AF0 - 44 0FB6 A5 D83C0000   - movzx r12d,byte ptr [rbp+00003CD8]
+CrimsonDesert.exe+20A3AF8 - 40 32 F6              - xor sil,sil
+CrimsonDesert.exe+20A3AFB - 48 8B 9D 50080000     - mov rbx,[rbp+00000850]
+CrimsonDesert.exe+20A3B02 - 8B 85 58080000        - mov eax,[rbp+00000858]
+CrimsonDesert.exe+20A3B08 - 48 69 F8 D0000000     - imul rdi,rax,000000D0 { 208 }
+CrimsonDesert.exe+20A3B0F - 48 03 FB              - add rdi,rbx
+CrimsonDesert.exe+20A3B12 - 48 3B DF              - cmp rbx,rdi
+CrimsonDesert.exe+20A3B15 - 0F84 B0000000         - je CrimsonDesert.exe+20A3BCB
+CrimsonDesert.exe+20A3B1B - 44 0FB6 74 24 40      - movzx r14d,byte ptr [rsp+40]
+CrimsonDesert.exe+20A3B21 - 80 BB CD000000 00     - cmp byte ptr [rbx+000000CD],00 { 0 }
+CrimsonDesert.exe+20A3B28 - 75 28                 - jne CrimsonDesert.exe+20A3B52
+CrimsonDesert.exe+20A3B2A - 45 0FB6 CE            - movzx r9d,r14b
+CrimsonDesert.exe+20A3B2E - 4C 8B C3              - mov r8,rbx
+CrimsonDesert.exe+20A3B31 - 48 8D 95 C83C0000     - lea rdx,[rbp+00003CC8]
+CrimsonDesert.exe+20A3B38 - E8 93EBFFFF           - call CrimsonDesert.exe+20A26D0
+*/
+
+/*
+CrimsonDesert.exe+C791450 - 48 89 5C 24 10        - mov [rsp+10],rbx
+CrimsonDesert.exe+C791455 - 55                    - push rbp
+CrimsonDesert.exe+C791456 - 56                    - push rsi
+CrimsonDesert.exe+C791457 - 57                    - push rdi
+CrimsonDesert.exe+C791458 - 48 83 EC 20           - sub rsp,20 { 32 }
+CrimsonDesert.exe+C79145C - 48 8B 59 18           - mov rbx,[rcx+18]
+CrimsonDesert.exe+C791460 - 41 0FB7 E9            - movzx ebp,r9w
+CrimsonDesert.exe+C791464 - 48 03 59 20           - add rbx,[rcx+20]
+CrimsonDesert.exe+C791468 - 48 89 D6              - mov rsi,rdx
+CrimsonDesert.exe+C79146B - 48 89 CF              - mov rdi,rcx
+CrimsonDesert.exe+C79146E - 4C 39 C3              - cmp rbx,r8
+CrimsonDesert.exe+C791471 - 7C 0C                 - jl CrimsonDesert.exe+C79147F
+CrimsonDesert.exe+C791473 - 4C 3B 41 28           - cmp r8,[rcx+28]
+CrimsonDesert.exe+C791477 - 4C 89 C3              - mov rbx,r8
+CrimsonDesert.exe+C79147A - 48 0F4C 59 28         - cmovl rbx,[rcx+28]
+CrimsonDesert.exe+C79147F - 48 83 79 30 00        - cmp qword ptr [rcx+30],00 { 0 }
+CrimsonDesert.exe+C791484 - 74 64                 - je CrimsonDesert.exe+C7914EA
+CrimsonDesert.exe+C791486 - 80 79 52 00           - cmp byte ptr [rcx+52],00 { 0 }
+CrimsonDesert.exe+C79148A - 75 30                 - jne CrimsonDesert.exe+C7914BC
+CrimsonDesert.exe+C79148C - 48 85 DB              - test rbx,rbx
+CrimsonDesert.exe+C79148F - 7E 25                 - jle CrimsonDesert.exe+C7914B6
+CrimsonDesert.exe+C791491 - 4C 8D 4C 24 58        - lea r9,[rsp+58]
+CrimsonDesert.exe+C791496 - 49 89 F0              - mov r8,rsi
+CrimsonDesert.exe+C791499 - 48 8D 54 24 40        - lea rdx,[rsp+40]
+CrimsonDesert.exe+C79149E - E8 8DC5B2F4           - call CrimsonDesert.exe+12BDA30
+CrimsonDesert.exe+C7914A3 - 48 8B 15 C8FB230B     - mov rdx,[CrimsonDesert.exe+179D1072] { (0) }
+CrimsonDesert.exe+C7914AA - 28 15 99FC230B        - sub [CrimsonDesert.exe+179D1149],dl { (44) }
+CrimsonDesert.exe+C7914B0 - 48 83 38 00           - cmp qword ptr [rax],00 { 0 }
+CrimsonDesert.exe+C7914B4 - 7F 06                 - jg CrimsonDesert.exe+C7914BC
+CrimsonDesert.exe+C7914B6 - C6 47 52 01           - mov byte ptr [rdi+52],01 { 1 }
+CrimsonDesert.exe+C7914BA - EB 2E                 - jmp CrimsonDesert.exe+C7914EA
+CrimsonDesert.exe+C7914BC - 80 7F 52 00           - cmp byte ptr [rdi+52],00 { 0 }
+CrimsonDesert.exe+C7914C0 - 74 28                 - je CrimsonDesert.exe+C7914EA
+CrimsonDesert.exe+C7914C2 - 48 3B 5F 30           - cmp rbx,[rdi+30]
+CrimsonDesert.exe+C7914C6 - 7D 1E                 - jnl CrimsonDesert.exe+C7914E6
+CrimsonDesert.exe+C7914C8 - 4C 8D 4C 24 58        - lea r9,[rsp+58]
+CrimsonDesert.exe+C7914CD - 49 89 F0              - mov r8,rsi
+CrimsonDesert.exe+C7914D0 - 48 8D 54 24 40        - lea rdx,[rsp+40]
+CrimsonDesert.exe+C7914D5 - 48 89 F9              - mov rcx,rdi
+CrimsonDesert.exe+C7914D8 - E8 53C5B2F4           - call CrimsonDesert.exe+12BDA30
+CrimsonDesert.exe+C7914DD - 48 8B 4F 30           - mov rcx,[rdi+30]
+CrimsonDesert.exe+C7914E1 - 48 39 08              - cmp [rax],rcx
+CrimsonDesert.exe+C7914E4 - 7C 04                 - jl CrimsonDesert.exe+C7914EA
+CrimsonDesert.exe+C7914E6 - C6 47 52 00           - mov byte ptr [rdi+52],00 { 0 }
+CrimsonDesert.exe+C7914EA - 31 D2                 - xor edx,edx
+CrimsonDesert.exe+C7914EC - 48 89 D8              - mov rax,rbx
+CrimsonDesert.exe+C7914EF - 48 2B 47 18           - sub rax,[rdi+18]
+CrimsonDesert.exe+C7914F3 - 48 39 5F 18           - cmp [rdi+18],rbx
+CrimsonDesert.exe+C7914F7 - 48 0F4F C2            - cmovg rax,rdx
+someValueChangeAOB        - 48 89 47 20           - mov [rdi+20],rax
+CrimsonDesert.exe+C7914FF - 48 FF 47 48           - inc qword ptr [rdi+48]
+CrimsonDesert.exe+C791503 - 48 89 5F 08           - mov [rdi+08],rbx
+CrimsonDesert.exe+C791507 - 48 8B 5C 24 48        - mov rbx,[rsp+48]
+CrimsonDesert.exe+C79150C - 48 89 77 38           - mov [rdi+38],rsi
+CrimsonDesert.exe+C791510 - 66 89 6F 50           - mov [rdi+50],bp
+CrimsonDesert.exe+C791514 - 48 83 C4 20           - add rsp,20 { 32 }
+CrimsonDesert.exe+C791518 - 5F                    - pop rdi
+CrimsonDesert.exe+C791519 - 5E                    - pop rsi
+CrimsonDesert.exe+C79151A - 5D                    - pop rbp
+CrimsonDesert.exe+C79151B - C3                    - ret
+*/
+
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>19</ID>
+          <Description>"inf. health"</Description>
+          <Options moHideChildren="1" moAllowManualCollapseAndExpand="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript Async="1">[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+bInfHealth:
+db 1
+
+ 
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+bInfHealth:
+db 0
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>13</ID>
+              <Description>"min health (% in decminal)"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>dMinHealth</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>18</ID>
+          <Description>"ignore stamina"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript Async="1">[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+aobscanmodule(someValueAlterationReadAOB,$process,4* * * 10 4* * * * 4* * * * 4* * * 40 0F * * * 66 * * 48 4* * * * 4*)
+registersymbol(someValueAlterationReadAOB)
+
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode_someValueAlterationReadAOB)
+label(exit)
+
+registersymbol(originalcode_someValueAlterationReadAOB)
+
+newmem: //this is allocated memory, you have read,write,execute access
+//place your code here
+mov rax,pStamina
+cmp [rax],rbx
+jne nend
+readmem(someValueAlterationReadAOB,4)
+//mov rax,[rbx+10]
+test rax,rax
+jge @f
+xor rax,rax
+@@:
+readmem(someValueAlterationReadAOB+4,12)
+//mov [rdi+38],rax
+//mov rax,[rbx+48]
+//mov [rdi+40],rax
+jmp exit
+nend:
+
+originalcode_someValueAlterationReadAOB:
+readmem(someValueAlterationReadAOB,16)
+//mov rax,[rbx+10]
+//mov [rdi+38],rax
+//mov rax,[rbx+48]
+//mov [rdi+40],rax
+
+exit:
+jmp returnhere
+
+///
+
+someValueAlterationReadAOB: //"CrimsonDesert.exe"+C777210:
+jmp far newmem
+nop 2
+returnhere:
+
+///***************************************************///
+bMaxStamina:
+db 1
+
+///***************************************************///
+
+
+
+
+
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+dealloc(newmem)
+someValueAlterationReadAOB: //"CrimsonDesert.exe"+C777210:
+readmem(originalcode_someValueAlterationReadAOB,16)
+//db 48 8B 43 10 48 89 47 38 48 8B 43 48 48 89 47 40
+//mov rax,[rbx+10]
+//mov [rdi+38],rax
+//mov rax,[rbx+48]
+//mov [rdi+40],rax
+
+unregistersymbol(originalcode_someValueAlterationReadAOB)
+
+///***************************************************///
+bMaxStamina:
+db 0
+
+///***************************************************///
+
+/*
+CrimsonDesert.exe+C7771B3 - 66 66 66 66 2E 0F1F 84 00 00000000  - nop word ptr cs:[rax+rax+00000000]
+CrimsonDesert.exe+C7771C0 - 48 89 5C 24 08        - mov [rsp+08],rbx
+CrimsonDesert.exe+C7771C5 - 66 89 54 24 10        - mov [rsp+10],dx
+CrimsonDesert.exe+C7771CA - 57                    - push rdi
+CrimsonDesert.exe+C7771CB - 48 83 EC 20           - sub rsp,20 { 32 }
+CrimsonDesert.exe+C7771CF - 4C 89 C7              - mov rdi,r8
+CrimsonDesert.exe+C7771D2 - E8 1912B4F4           - call CrimsonDesert.exe+12B83F0
+CrimsonDesert.exe+C7771D7 - 48 8D 4C 24 38        - lea rcx,[rsp+38]
+CrimsonDesert.exe+C7771DC - 48 89 C3              - mov rbx,rax
+CrimsonDesert.exe+C7771DF - E8 DC9DC8F3           - call CrimsonDesert.exe+400FC0
+CrimsonDesert.exe+C7771E4 - 8B 08                 - mov ecx,[rax]
+CrimsonDesert.exe+C7771E6 - 89 0F                 - mov [rdi],ecx
+CrimsonDesert.exe+C7771E8 - 48 8B 4B 08           - mov rcx,[rbx+08]
+CrimsonDesert.exe+C7771EC - 48 89 4F 08           - mov [rdi+08],rcx
+CrimsonDesert.exe+C7771F0 - 48 8B 4B 18           - mov rcx,[rbx+18]
+CrimsonDesert.exe+C7771F4 - 48 89 4F 18           - mov [rdi+18],rcx
+CrimsonDesert.exe+C7771F8 - 48 8B 4B 20           - mov rcx,[rbx+20]
+CrimsonDesert.exe+C7771FC - 48 89 4F 20           - mov [rdi+20],rcx
+CrimsonDesert.exe+C777200 - 48 8B 4B 28           - mov rcx,[rbx+28]
+CrimsonDesert.exe+C777204 - 48 89 4F 10           - mov [rdi+10],rcx
+CrimsonDesert.exe+C777208 - 48 8B 4B 38           - mov rcx,[rbx+38]
+CrimsonDesert.exe+C77720C - 48 89 4F 30           - mov [rdi+30],rcx
+someValueAlterationReadAOB- 48 8B 43 10           - mov rax,[rbx+10]
+CrimsonDesert.exe+C777214 - 48 89 47 38           - mov [rdi+38],rax
+CrimsonDesert.exe+C777218 - 48 8B 43 48           - mov rax,[rbx+48]
+CrimsonDesert.exe+C77721C - 48 89 47 40           - mov [rdi+40],rax
+CrimsonDesert.exe+C777220 - 0FB7 43 50            - movzx eax,word ptr [rbx+50]
+CrimsonDesert.exe+C777224 - 66 89 47 48           - mov [rdi+48],ax
+CrimsonDesert.exe+C777228 - 48 8B 43 30           - mov rax,[rbx+30]
+CrimsonDesert.exe+C77722C - 48 89 47 28           - mov [rdi+28],rax
+CrimsonDesert.exe+C777230 - 0FB6 43 52            - movzx eax,byte ptr [rbx+52]
+CrimsonDesert.exe+C777234 - 88 47 4A              - mov [rdi+4A],al
+CrimsonDesert.exe+C777237 - 0FB6 43 53            - movzx eax,byte ptr [rbx+53]
+CrimsonDesert.exe+C77723B - 88 47 4B              - mov [rdi+4B],al
+CrimsonDesert.exe+C77723E - 48 8B 43 40           - mov rax,[rbx+40]
+CrimsonDesert.exe+C777242 - 48 8B 5C 24 30        - mov rbx,[rsp+30]
+CrimsonDesert.exe+C777247 - 48 89 47 50           - mov [rdi+50],rax
+CrimsonDesert.exe+C77724B - 48 83 C4 20           - add rsp,20 { 32 }
+CrimsonDesert.exe+C77724F - 5F                    - pop rdi
+CrimsonDesert.exe+C777250 - C3                    - ret
+CrimsonDesert.exe+C777251 - CC                    - int 3
+*/
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>20</ID>
+      <Description>""</Description>
+      <Options moAlwaysHideChildren="1"/>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>36</ID>
+          <Description>"aobtest"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+aobscanmodule(aobtest,$process,4* * * 10 4* * * * 4* * * * 4* * * 40 0F * * * 66 * * 48 4* * * * 4*)
+registersymbol(aobtest)
+
+
+ 
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+unregistersymbol(aobtest)
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>16</ID>
+          <Description>"aobtest"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+aobscanmodule(aobtest,$process,4* * * * 4* * * * 4* * * * 4* * * * * 4* * * * 6* * * * 4* * * * 5* 5* 5* C3)
+registersymbol(aobtest)
+
+ 
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+unregistersymbol(aobtest)
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>21</ID>
+          <Description>""</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <GroupHeader>1</GroupHeader>
+          <Address>pStamina</Address>
+          <Offsets>
+            <Offset>0</Offset>
+          </Offsets>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>0</ID>
+              <Description>"No description"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>+8</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>1</ID>
+          <Description>"No description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>8 Bytes</VariableType>
+          <Address>pPlayerBase</Address>
+          <Offsets>
+            <Offset>20</Offset>
+            <Offset>68</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>2</ID>
+          <Description>"No Description"</Description>
+          <VariableType>4 Bytes</VariableType>
+          <Address>57C1A6D7138</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>3</ID>
+          <Description>"No Description"</Description>
+          <VariableType>4 Bytes</VariableType>
+          <Address>57C1A6D7130</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>4</ID>
+          <Description>"No description"</Description>
+          <VariableType>4 Bytes</VariableType>
+          <Address>57B21304088</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>5</ID>
+          <Description>"*"</Description>
+          <VariableType>4 Bytes</VariableType>
+          <Address>57BEA2A1888</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>6</ID>
+          <Description>"No description"</Description>
+          <VariableType>4 Bytes</VariableType>
+          <Address>57C1A6D7130</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>7</ID>
+          <Description>""</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode)
+label(exit)
+
+label(pPlayerStamina)
+registersymbol(pPlayerStamina)
+
+newmem: //this is allocated memory, you have read,write,execute access
+//place your code here
+mov r9,pPlayerStamina
+mov [r9],rsi
+
+originalcode:
+lea r9,[rsp+20]
+mov r8,rbp
+lea rdx,[rsp+28]
+mov rcx,rsi
+
+exit:
+jmp returnhere
+
+///
+pPlayerStamina:
+///
+
+"CrimsonDesert.exe"+12BCEC2:
+jmp far newmem
+nop 2
+returnhere:
+
+
+
+ 
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+dealloc(newmem)
+"CrimsonDesert.exe"+12BCEC2:
+db 4C 8D 4C 24 20 4C 8B C5 48 8D 54 24 28 48 8B CE
+//lea r9,[rsp+20]
+//mov r8,rbp
+//lea rdx,[rsp+28]
+//mov rcx,rsi
+
+unregistersymbol(pPlayerStamina)
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>9</ID>
+          <Description>"No description"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>pPlayerStamina</Address>
+          <Offsets>
+            <Offset>0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>10</ID>
+          <Description>"No Description"</Description>
+          <VariableType>4 Bytes</VariableType>
+          <Address>3D511254A88</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>11</ID>
+          <Description>"No Description"</Description>
+          <VariableType>4 Bytes</VariableType>
+          <Address>3D511254B18</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>12</ID>
+          <Description>"No Description"</Description>
+          <VariableType>4 Bytes</VariableType>
+          <Address>3D51E2EC288</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>14</ID>
+          <Description>"No Description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>8 Bytes</VariableType>
+          <Address>pPlayer+8</Address>
+          <Offsets>
+            <Offset>0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>15</ID>
+          <Description>"enable 1/2"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript Async="1">[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+aobscanmodule(playerBaseReadAOB,$process,4* * * * 4* * * * * 4* * * * * 00 00 E8 * * * * 84 C0 0F * * * * * 4* * * * 4* * * * * E8)
+registersymbol(playerBaseReadAOB)
+
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode_playerBaseReadAOB)
+label(exit)
+
+label(pPlayer)
+registersymbol(pPlayer originalcode_playerBaseReadAOB)
+
+newmem: //this is allocated memory, you have read,write,execute access
+//place your code here
+mov rdx,pPlayer
+mov [rdx],r14
+mov rax,[r14+68]
+mov rax,[rax+20]
+mov [rdx+8],rax //
+
+originalcode_playerBaseReadAOB:
+readmem(playerBaseReadAOB,16)
+//mov rax,[r14+68]
+//lea rdx,[rsp+20]
+//mov rcx,[rax+000001B0]
+
+exit:
+jmp returnhere
+
+///
+pPlayer:
+///
+
+playerBaseReadAOB: //"CrimsonDesert.exe"+20B35D0:
+jmp far newmem
+nop 2
+returnhere:
+
+
+
+ 
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+dealloc(newmem)
+playerBaseReadAOB: //"CrimsonDesert.exe"+20B35D0:
+readmem(originalcode_playerBaseReadAOB,16)
+//db 49 8B 46 68 48 8D 54 24 20 48 8B 88 B0 01 00 00
+//mov rax,[r14+68]
+//lea rdx,[rsp+20]
+//mov rcx,[rax+000001B0]
+
+unregistersymbol(pPlayer originalcode_playerBaseReadAOB)
+
+/*
+CrimsonDesert.exe+20B3570 - 48 89 5C 24 08        - mov [rsp+08],rbx
+CrimsonDesert.exe+20B3575 - 48 89 6C 24 10        - mov [rsp+10],rbp
+CrimsonDesert.exe+20B357A - 56                    - push rsi
+CrimsonDesert.exe+20B357B - 57                    - push rdi
+CrimsonDesert.exe+20B357C - 41 56                 - push r14
+CrimsonDesert.exe+20B357E - 48 83 EC 40           - sub rsp,40 { 64 }
+CrimsonDesert.exe+20B3582 - 49 8B F8              - mov rdi,r8
+CrimsonDesert.exe+20B3585 - 48 8B F2              - mov rsi,rdx
+CrimsonDesert.exe+20B3588 - 48 8B E9              - mov rbp,rcx
+CrimsonDesert.exe+20B358B - 41 83 38 00           - cmp dword ptr [r8],00 { 0 }
+CrimsonDesert.exe+20B358F - 0F84 39010000         - je CrimsonDesert.exe+20B36CE
+CrimsonDesert.exe+20B3595 - 41 83 78 04 FF        - cmp dword ptr [r8+04],-01 { 255 }
+CrimsonDesert.exe+20B359A - 0F84 2E010000         - je CrimsonDesert.exe+20B36CE
+CrimsonDesert.exe+20B35A0 - 83 3A FF              - cmp dword ptr [rdx],-01 { 255 }
+CrimsonDesert.exe+20B35A3 - 0F84 25010000         - je CrimsonDesert.exe+20B36CE
+CrimsonDesert.exe+20B35A9 - 4C 8B 71 08           - mov r14,[rcx+08]
+CrimsonDesert.exe+20B35AD - 33 DB                 - xor ebx,ebx
+CrimsonDesert.exe+20B35AF - 48 89 5C 24 20        - mov [rsp+20],rbx
+CrimsonDesert.exe+20B35B4 - 48 89 5C 24 28        - mov [rsp+28],rbx
+CrimsonDesert.exe+20B35B9 - 89 5C 24 30           - mov [rsp+30],ebx
+CrimsonDesert.exe+20B35BD - 88 5C 24 34           - mov [rsp+34],bl
+CrimsonDesert.exe+20B35C1 - B8 0C000000           - mov eax,0000000C { 12 }
+CrimsonDesert.exe+20B35C6 - 66 89 44 24 36        - mov [rsp+36],ax
+CrimsonDesert.exe+20B35CB - 48 89 5C 24 38        - mov [rsp+38],rbx
+playerBaseReadAOB         - 49 8B 46 68           - mov rax,[r14+68]
+CrimsonDesert.exe+20B35D4 - 48 8D 54 24 20        - lea rdx,[rsp+20]
+CrimsonDesert.exe+20B35D9 - 48 8B 88 B0010000     - mov rcx,[rax+000001B0]
+CrimsonDesert.exe+20B35E0 - E8 4B5DA4FF           - call CrimsonDesert.exe+1AF9330
+CrimsonDesert.exe+20B35E5 - 84 C0                 - test al,al
+CrimsonDesert.exe+20B35E7 - 0F84 E1000000         - je CrimsonDesert.exe+20B36CE
+CrimsonDesert.exe+20B35ED - 49 8B 56 08           - mov rdx,[r14+08]
+CrimsonDesert.exe+20B35F1 - 48 8D 4C 24 70        - lea rcx,[rsp+70]
+CrimsonDesert.exe+20B35F6 - E8 758F22FE           - call CrimsonDesert.AK::WriteBytesMem::Size+1270
+CrimsonDesert.exe+20B35FB - 90                    - nop
+CrimsonDesert.exe+20B35FC - 44 8B 85 C8020000     - mov r8d,[rbp+000002C8]
+CrimsonDesert.exe+20B3603 - 8B CB                 - mov ecx,ebx
+CrimsonDesert.exe+20B3605 - 45 85 C0              - test r8d,r8d
+CrimsonDesert.exe+20B3608 - 74 1D                 - je CrimsonDesert.exe+20B3627
+CrimsonDesert.exe+20B360A - 4C 8B 8D C0020000     - mov r9,[rbp+000002C0]
+CrimsonDesert.exe+20B3611 - 44 8B 16              - mov r10d,[rsi]
+CrimsonDesert.exe+20B3614 - 8B D1                 - mov edx,ecx
+CrimsonDesert.exe+20B3616 - 48 8D 04 52           - lea rax,[rdx+rdx*2]
+CrimsonDesert.exe+20B361A - 45 39 14 C1           - cmp [r9+rax*8],r10d
+CrimsonDesert.exe+20B361E - 74 1F                 - je CrimsonDesert.exe+20B363F
+CrimsonDesert.exe+20B3620 - FF C1                 - inc ecx
+CrimsonDesert.exe+20B3622 - 41 3B C8              - cmp ecx,r8d
+CrimsonDesert.exe+20B3625 - 72 ED                 - jb CrimsonDesert.exe+20B3614
+CrimsonDesert.exe+20B3627 - B3 01                 - mov bl,01 { 1 }
+CrimsonDesert.exe+20B3629 - 48 8B 4C 24 70        - mov rcx,[rsp+70]
+CrimsonDesert.exe+20B362E - 4C 8B 01              - mov r8,[rcx]
+CrimsonDesert.exe+20B3631 - B2 01                 - mov dl,01 { 1 }
+CrimsonDesert.exe+20B3633 - 41 FF 50 20           - call qword ptr [r8+20]
+CrimsonDesert.exe+20B3637 - 0FB6 C3               - movzx eax,bl
+CrimsonDesert.exe+20B363A - E9 91000000           - jmp CrimsonDesert.exe+20B36D0
+CrimsonDesert.exe+20B363F - 83 F9 FF              - cmp ecx,-01 { 255 }
+CrimsonDesert.exe+20B3642 - 74 E3                 - je CrimsonDesert.exe+20B3627
+CrimsonDesert.exe+20B3644 - 48 8D 0C 52           - lea rcx,[rdx+rdx*2]
+CrimsonDesert.exe+20B3648 - 49 8D 14 C9           - lea rdx,[r9+rcx*8]
+CrimsonDesert.exe+20B364C - 8B 4A 10              - mov ecx,[rdx+10]
+CrimsonDesert.exe+20B364F - 85 C9                 - test ecx,ecx
+CrimsonDesert.exe+20B3651 - 74 D4                 - je CrimsonDesert.exe+20B3627
+CrimsonDesert.exe+20B3653 - 48 8B 52 08           - mov rdx,[rdx+08]
+CrimsonDesert.exe+20B3657 - 44 8B 0F              - mov r9d,[rdi]
+CrimsonDesert.exe+20B365A - 66 0F1F 44 00 00      - nop word ptr [rax+rax+00]
+CrimsonDesert.exe+20B3660 - 44 8B C3              - mov r8d,ebx
+CrimsonDesert.exe+20B3663 - 49 C1 E0 04           - shl r8,04 { 4 }
+CrimsonDesert.exe+20B3667 - 4C 03 C2              - add r8,rdx
+CrimsonDesert.exe+20B366A - 45 39 08              - cmp [r8],r9d
+CrimsonDesert.exe+20B366D - 75 09                 - jne CrimsonDesert.exe+20B3678
+CrimsonDesert.exe+20B366F - 8B 47 04              - mov eax,[rdi+04]
+CrimsonDesert.exe+20B3672 - 41 39 40 04           - cmp [r8+04],eax
+CrimsonDesert.exe+20B3676 - 74 08                 - je CrimsonDesert.exe+20B3680
+CrimsonDesert.exe+20B3678 - FF C3                 - inc ebx
+CrimsonDesert.exe+20B367A - 3B D9                 - cmp ebx,ecx
+CrimsonDesert.exe+20B367C - 73 A9                 - jae CrimsonDesert.exe+20B3627
+CrimsonDesert.exe+20B367E - EB E0                 - jmp CrimsonDesert.exe+20B3660
+CrimsonDesert.exe+20B3680 - 83 FB FF              - cmp ebx,-01 { 255 }
+CrimsonDesert.exe+20B3683 - 74 A2                 - je CrimsonDesert.exe+20B3627
+CrimsonDesert.exe+20B3685 - 8B 44 24 20           - mov eax,[rsp+20]
+CrimsonDesert.exe+20B3689 - 8D 14 40              - lea edx,[rax+rax*2]
+CrimsonDesert.exe+20B368C - C1 E2 03              - shl edx,03 { 3 }
+CrimsonDesert.exe+20B368F - 8B 44 24 24           - mov eax,[rsp+24]
+CrimsonDesert.exe+20B3693 - 48 03 D0              - add rdx,rax
+CrimsonDesert.exe+20B3696 - 48 6B CA 3C           - imul rcx,rdx,3C
+CrimsonDesert.exe+20B369A - 8B 44 24 28           - mov eax,[rsp+28]
+CrimsonDesert.exe+20B369E - 48 03 C8              - add rcx,rax
+CrimsonDesert.exe+20B36A1 - 48 6B D1 3C           - imul rdx,rcx,3C
+CrimsonDesert.exe+20B36A5 - 48 63 05 FCBBB703     - movsxd  rax,dword ptr [CrimsonDesert.exe+5C2F2A8] { (7) }
+CrimsonDesert.exe+20B36AC - 48 69 C8 80510100     - imul rcx,rax,00015180 { 86400 }
+CrimsonDesert.exe+20B36B3 - 49 03 48 08           - add rcx,[r8+08]
+CrimsonDesert.exe+20B36B7 - 8B 44 24 2C           - mov eax,[rsp+2C]
+CrimsonDesert.exe+20B36BB - 48 03 C2              - add rax,rdx
+CrimsonDesert.exe+20B36BE - 48 3B C8              - cmp rcx,rax
+CrimsonDesert.exe+20B36C1 - 0F82 60FFFFFF         - jb CrimsonDesert.exe+20B3627
+CrimsonDesert.exe+20B36C7 - 32 DB                 - xor bl,bl
+CrimsonDesert.exe+20B36C9 - E9 5BFFFFFF           - jmp CrimsonDesert.exe+20B3629
+CrimsonDesert.exe+20B36CE - B0 01                 - mov al,01 { 1 }
+CrimsonDesert.exe+20B36D0 - 48 8B 5C 24 60        - mov rbx,[rsp+60]
+CrimsonDesert.exe+20B36D5 - 48 8B 6C 24 68        - mov rbp,[rsp+68]
+CrimsonDesert.exe+20B36DA - 48 83 C4 40           - add rsp,40 { 64 }
+CrimsonDesert.exe+20B36DE - 41 5E                 - pop r14
+CrimsonDesert.exe+20B36E0 - 5F                    - pop rdi
+CrimsonDesert.exe+20B36E1 - 5E                    - pop rsi
+CrimsonDesert.exe+20B36E2 - C3                    - ret
+*/
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>8</ID>
+              <Description>"2/2"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+aobscanmodule(someValueChangeAOB,$process,4* * * * 4* * * * 4* * * * 4* * * * * 4* * * * 6* * * * 4* * * * 5* 5* 5* C3)
+registersymbol(someValueChangeAOB)
+
+alloc(newmem2,2048)
+label(returnhere2)
+label(originalcode2_someValueChangeAOB)
+label(exit2)
+
+label(bMaxStamina bInfHealth dMinHealth)
+registersymbol(originalcode2_someValueChangeAOB bMaxStamina bInfHealth dMinHealth)
+
+newmem2: //this is allocated memory, you have read,write,execute access
+//place your code here
+push rax
+push rcx
+push rdx
+mov rcx,1000000000
+mov rax,pPlayer
+mov rax,[rax+8]
+mov rdx,bMaxStamina
+cmp byte ptr [rdx],1
+jne @f
+cmp r15,rcx
+jl @f
+cmp [r15],rax
+je domax2
+@@:
+lea rdx,[rdx+4]
+cmp byte ptr [rdx],1
+jne @f
+cmp r13,rcx
+jl @f
+cmp [r13],rax
+je domin2
+@@:
+jmp end2
+
+domax2:
+cmp [rdi+8],rbx
+jle @f
+mov rbx,[rdi+8]
+@@:
+jmp end2
+
+domin2:
+lea rcx,[rdx+4]
+fild dword ptr [rdi+18]
+fmul dword ptr [rcx]
+fistp dword ptr [rcx+4]
+mov rcx,[rcx+4]
+cmp rbx,rcx
+cmovl rbx,rcx
+jmp end2
+
+end2:
+pop rdx
+pop rcx
+pop rax
+
+originalcode2_someValueChangeAOB:
+readmem(someValueChangeAOB+8,17)
+//mov [rdi+08],rbx
+//mov rbx,[rsp+48]
+//mov [rdi+38],rsi
+//mov [rdi+50],bp
+
+exit2:
+jmp returnhere2
+
+///
+bMaxStamina:
+dd 0
+bInfHealth:
+dd 0
+dMinHealth:
+dd (float)0.5
+///
+
+someValueChangeAOB+8: //"CrimsonDesert.exe"+C791503:
+jmp far newmem2
+nop 3
+returnhere2:
+
+
+
+ 
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+dealloc(newmem2)
+someValueChangeAOB+8: //"CrimsonDesert.exe"+C791503:
+readmem(originalcode2_someValueChangeAOB,17)
+//db 48 89 5F 08 48 8B 5C 24 48 48 89 77 38 66 89 6F 50
+//mov [rdi+08],rbx
+//mov rbx,[rsp+48]
+//mov [rdi+38],rsi
+//mov [rdi+50],bp
+
+unregistersymbol(originalcode2_someValueChangeAOB bMaxStamina bInfHealth dMinHealth)
+
+/*
+CrimsonDesert.exe+C791450 - 48 89 5C 24 10        - mov [rsp+10],rbx
+CrimsonDesert.exe+C791455 - 55                    - push rbp
+CrimsonDesert.exe+C791456 - 56                    - push rsi
+CrimsonDesert.exe+C791457 - 57                    - push rdi
+CrimsonDesert.exe+C791458 - 48 83 EC 20           - sub rsp,20 { 32 }
+CrimsonDesert.exe+C79145C - 48 8B 59 18           - mov rbx,[rcx+18]
+CrimsonDesert.exe+C791460 - 41 0FB7 E9            - movzx ebp,r9w
+CrimsonDesert.exe+C791464 - 48 03 59 20           - add rbx,[rcx+20]
+CrimsonDesert.exe+C791468 - 48 89 D6              - mov rsi,rdx
+CrimsonDesert.exe+C79146B - 48 89 CF              - mov rdi,rcx
+CrimsonDesert.exe+C79146E - 4C 39 C3              - cmp rbx,r8
+CrimsonDesert.exe+C791471 - 7C 0C                 - jl CrimsonDesert.exe+C79147F
+CrimsonDesert.exe+C791473 - 4C 3B 41 28           - cmp r8,[rcx+28]
+CrimsonDesert.exe+C791477 - 4C 89 C3              - mov rbx,r8
+CrimsonDesert.exe+C79147A - 48 0F4C 59 28         - cmovl rbx,[rcx+28]
+CrimsonDesert.exe+C79147F - 48 83 79 30 00        - cmp qword ptr [rcx+30],00 { 0 }
+CrimsonDesert.exe+C791484 - 74 64                 - je CrimsonDesert.exe+C7914EA
+CrimsonDesert.exe+C791486 - 80 79 52 00           - cmp byte ptr [rcx+52],00 { 0 }
+CrimsonDesert.exe+C79148A - 75 30                 - jne CrimsonDesert.exe+C7914BC
+CrimsonDesert.exe+C79148C - 48 85 DB              - test rbx,rbx
+CrimsonDesert.exe+C79148F - 7E 25                 - jle CrimsonDesert.exe+C7914B6
+CrimsonDesert.exe+C791491 - 4C 8D 4C 24 58        - lea r9,[rsp+58]
+CrimsonDesert.exe+C791496 - 49 89 F0              - mov r8,rsi
+CrimsonDesert.exe+C791499 - 48 8D 54 24 40        - lea rdx,[rsp+40]
+CrimsonDesert.exe+C79149E - E8 8DC5B2F4           - call CrimsonDesert.exe+12BDA30
+CrimsonDesert.exe+C7914A3 - 48 8B 15 C8FB230B     - mov rdx,[CrimsonDesert.exe+179D1072] { (0) }
+CrimsonDesert.exe+C7914AA - 28 15 99FC230B        - sub [CrimsonDesert.exe+179D1149],dl { (44) }
+CrimsonDesert.exe+C7914B0 - 48 83 38 00           - cmp qword ptr [rax],00 { 0 }
+CrimsonDesert.exe+C7914B4 - 7F 06                 - jg CrimsonDesert.exe+C7914BC
+CrimsonDesert.exe+C7914B6 - C6 47 52 01           - mov byte ptr [rdi+52],01 { 1 }
+CrimsonDesert.exe+C7914BA - EB 2E                 - jmp CrimsonDesert.exe+C7914EA
+CrimsonDesert.exe+C7914BC - 80 7F 52 00           - cmp byte ptr [rdi+52],00 { 0 }
+CrimsonDesert.exe+C7914C0 - 74 28                 - je CrimsonDesert.exe+C7914EA
+CrimsonDesert.exe+C7914C2 - 48 3B 5F 30           - cmp rbx,[rdi+30]
+CrimsonDesert.exe+C7914C6 - 7D 1E                 - jnl CrimsonDesert.exe+C7914E6
+CrimsonDesert.exe+C7914C8 - 4C 8D 4C 24 58        - lea r9,[rsp+58]
+CrimsonDesert.exe+C7914CD - 49 89 F0              - mov r8,rsi
+CrimsonDesert.exe+C7914D0 - 48 8D 54 24 40        - lea rdx,[rsp+40]
+CrimsonDesert.exe+C7914D5 - 48 89 F9              - mov rcx,rdi
+CrimsonDesert.exe+C7914D8 - E8 53C5B2F4           - call CrimsonDesert.exe+12BDA30
+CrimsonDesert.exe+C7914DD - 48 8B 4F 30           - mov rcx,[rdi+30]
+CrimsonDesert.exe+C7914E1 - 48 39 08              - cmp [rax],rcx
+CrimsonDesert.exe+C7914E4 - 7C 04                 - jl CrimsonDesert.exe+C7914EA
+CrimsonDesert.exe+C7914E6 - C6 47 52 00           - mov byte ptr [rdi+52],00 { 0 }
+CrimsonDesert.exe+C7914EA - 31 D2                 - xor edx,edx
+CrimsonDesert.exe+C7914EC - 48 89 D8              - mov rax,rbx
+CrimsonDesert.exe+C7914EF - 48 2B 47 18           - sub rax,[rdi+18]
+CrimsonDesert.exe+C7914F3 - 48 39 5F 18           - cmp [rdi+18],rbx
+CrimsonDesert.exe+C7914F7 - 48 0F4F C2            - cmovg rax,rdx
+someValueChangeAOB        - 48 89 47 20           - mov [rdi+20],rax
+CrimsonDesert.exe+C7914FF - 48 FF 47 48           - inc qword ptr [rdi+48]
+CrimsonDesert.exe+C791503 - 48 89 5F 08           - mov [rdi+08],rbx
+CrimsonDesert.exe+C791507 - 48 8B 5C 24 48        - mov rbx,[rsp+48]
+CrimsonDesert.exe+C79150C - 48 89 77 38           - mov [rdi+38],rsi
+CrimsonDesert.exe+C791510 - 66 89 6F 50           - mov [rdi+50],bp
+CrimsonDesert.exe+C791514 - 48 83 C4 20           - add rsp,20 { 32 }
+CrimsonDesert.exe+C791518 - 5F                    - pop rdi
+CrimsonDesert.exe+C791519 - 5E                    - pop rsi
+CrimsonDesert.exe+C79151A - 5D                    - pop rbp
+CrimsonDesert.exe+C79151B - C3                    - ret
+*/
+</AssemblerScript>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>22</ID>
+          <Description>"No Description"</Description>
+          <VariableType>4 Bytes</VariableType>
+          <Address>260020F0268</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>23</ID>
+          <Description>"enable old"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript Async="1">[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+aobscanmodule(playerBaseReadAOB,$process,4* * * * 4* * * * * 4* * * * * 00 00 E8 * * * * 84 C0 0F * * * * * 4* * * * 4* * * * * E8)
+registersymbol(playerBaseReadAOB)
+
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode_playerBaseReadAOB)
+label(exit)
+
+label(pPlayer)
+registersymbol(pPlayer originalcode_playerBaseReadAOB)
+
+newmem: //this is allocated memory, you have read,write,execute access
+//place your code here
+mov rdx,pPlayer
+mov [rdx],r14
+mov rax,[r14+68]
+mov rax,[rax+20]
+mov [rdx+8],rax //
+
+originalcode_playerBaseReadAOB:
+readmem(playerBaseReadAOB,16)
+//mov rax,[r14+68]
+//lea rdx,[rsp+20]
+//mov rcx,[rax+000001B0]
+
+exit:
+jmp returnhere
+
+///
+pPlayer:
+///
+
+playerBaseReadAOB: //"CrimsonDesert.exe"+20B35D0:
+jmp far newmem
+nop 2
+returnhere:
+
+///***************************************************///
+aobscanmodule(someValueChangeAOB,$process,4* * * * 4* * * * 4* * * * 4* * * * * 4* * * * 6* * * * 4* * * * 5* 5* 5* C3)
+registersymbol(someValueChangeAOB)
+
+alloc(newmem2,2048)
+label(returnhere2)
+label(originalcode2_someValueChangeAOB)
+label(exit2)
+
+label(pStamina pHealth bMaxStamina bInfHealth dMinHealth)
+registersymbol(originalcode2_someValueChangeAOB pStamina pHealth bMaxStamina bInfHealth dMinHealth)
+
+newmem2: //this is allocated memory, you have read,write,execute access
+//place your code here
+push rax
+push rcx
+push rdx
+push rsi
+mov rcx,1000000000
+mov rax,pPlayer
+mov rax,[rax+8]
+
+mov rax,pPlayer
+mov rax,[rax]
+lea rax,[rax+300]
+mov rax,[rax+68]
+mov rax,[rax+20]
+
+chk12:
+mov rsi,pStamina
+mov rdx,bMaxStamina
+cmp byte ptr [rdx],1
+jne chk22
+cmp r15,rcx
+jl @f
+cmp [r15],rax
+je isstamina
+@@:
+cmp [rsi],rdi
+je domax2
+
+chk22:
+mov rsi,pHealth
+lea rdx,[rdx+4]
+cmp byte ptr [rdx],1
+jne chkend2
+cmp r13,rcx
+jl @f
+cmp [r13],rax
+je ishealth
+@@:
+cmp [rsi],rdi
+je domin2
+
+chkend2:
+jmp end2
+
+isstamina:
+mov [rsi],rdi
+jmp domax2
+
+ishealth:
+mov [rsi],rdi
+jmp domin2
+
+domax2:
+cmp [rdi+8],rbx
+jle @f
+mov rbx,[rdi+8]
+@@:
+jmp end2
+
+domin2:
+lea rcx,[rdx+4]
+fild dword ptr [rdi+18]
+fmul dword ptr [rcx]
+fistp dword ptr [rcx+4]
+mov rcx,[rcx+4]
+cmp rbx,rcx
+cmovl rbx,rcx
+jmp end2
+
+end2:
+pop rsi
+pop rdx
+pop rcx
+pop rax
+
+originalcode2_someValueChangeAOB:
+readmem(someValueChangeAOB+8,17)
+//mov [rdi+08],rbx
+//mov rbx,[rsp+48]
+//mov [rdi+38],rsi
+//mov [rdi+50],bp
+
+exit2:
+jmp returnhere2
+
+///
+pStamina:
+dq 0
+pHealth:
+dq 0
+bMaxStamina:
+dd 0
+bInfHealth:
+dd 0
+dMinHealth:
+dd (float)0.5
+///
+
+someValueChangeAOB+8: //"CrimsonDesert.exe"+C791503:
+jmp far newmem2
+nop 3
+returnhere2:
+
+///***************************************************///
+
+
+
+
+
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+dealloc(newmem)
+playerBaseReadAOB: //"CrimsonDesert.exe"+20B35D0:
+readmem(originalcode_playerBaseReadAOB,16)
+//db 49 8B 46 68 48 8D 54 24 20 48 8B 88 B0 01 00 00
+//mov rax,[r14+68]
+//lea rdx,[rsp+20]
+//mov rcx,[rax+000001B0]
+
+unregistersymbol(pPlayer originalcode_playerBaseReadAOB)
+
+///***************************************************///
+dealloc(newmem2)
+someValueChangeAOB+8: //"CrimsonDesert.exe"+C791503:
+readmem(originalcode2_someValueChangeAOB,17)
+//db 48 89 5F 08 48 8B 5C 24 48 48 89 77 38 66 89 6F 50
+//mov [rdi+08],rbx
+//mov rbx,[rsp+48]
+//mov [rdi+38],rsi
+//mov [rdi+50],bp
+
+unregistersymbol(originalcode2_someValueChangeAOB bMaxStamina bInfHealth dMinHealth)
+
+///***************************************************///
+
+/*
+CrimsonDesert.exe+20B3570 - 48 89 5C 24 08        - mov [rsp+08],rbx
+CrimsonDesert.exe+20B3575 - 48 89 6C 24 10        - mov [rsp+10],rbp
+CrimsonDesert.exe+20B357A - 56                    - push rsi
+CrimsonDesert.exe+20B357B - 57                    - push rdi
+CrimsonDesert.exe+20B357C - 41 56                 - push r14
+CrimsonDesert.exe+20B357E - 48 83 EC 40           - sub rsp,40 { 64 }
+CrimsonDesert.exe+20B3582 - 49 8B F8              - mov rdi,r8
+CrimsonDesert.exe+20B3585 - 48 8B F2              - mov rsi,rdx
+CrimsonDesert.exe+20B3588 - 48 8B E9              - mov rbp,rcx
+CrimsonDesert.exe+20B358B - 41 83 38 00           - cmp dword ptr [r8],00 { 0 }
+CrimsonDesert.exe+20B358F - 0F84 39010000         - je CrimsonDesert.exe+20B36CE
+CrimsonDesert.exe+20B3595 - 41 83 78 04 FF        - cmp dword ptr [r8+04],-01 { 255 }
+CrimsonDesert.exe+20B359A - 0F84 2E010000         - je CrimsonDesert.exe+20B36CE
+CrimsonDesert.exe+20B35A0 - 83 3A FF              - cmp dword ptr [rdx],-01 { 255 }
+CrimsonDesert.exe+20B35A3 - 0F84 25010000         - je CrimsonDesert.exe+20B36CE
+CrimsonDesert.exe+20B35A9 - 4C 8B 71 08           - mov r14,[rcx+08]
+CrimsonDesert.exe+20B35AD - 33 DB                 - xor ebx,ebx
+CrimsonDesert.exe+20B35AF - 48 89 5C 24 20        - mov [rsp+20],rbx
+CrimsonDesert.exe+20B35B4 - 48 89 5C 24 28        - mov [rsp+28],rbx
+CrimsonDesert.exe+20B35B9 - 89 5C 24 30           - mov [rsp+30],ebx
+CrimsonDesert.exe+20B35BD - 88 5C 24 34           - mov [rsp+34],bl
+CrimsonDesert.exe+20B35C1 - B8 0C000000           - mov eax,0000000C { 12 }
+CrimsonDesert.exe+20B35C6 - 66 89 44 24 36        - mov [rsp+36],ax
+CrimsonDesert.exe+20B35CB - 48 89 5C 24 38        - mov [rsp+38],rbx
+playerBaseReadAOB         - 49 8B 46 68           - mov rax,[r14+68]
+CrimsonDesert.exe+20B35D4 - 48 8D 54 24 20        - lea rdx,[rsp+20]
+CrimsonDesert.exe+20B35D9 - 48 8B 88 B0010000     - mov rcx,[rax+000001B0]
+CrimsonDesert.exe+20B35E0 - E8 4B5DA4FF           - call CrimsonDesert.exe+1AF9330
+CrimsonDesert.exe+20B35E5 - 84 C0                 - test al,al
+CrimsonDesert.exe+20B35E7 - 0F84 E1000000         - je CrimsonDesert.exe+20B36CE
+CrimsonDesert.exe+20B35ED - 49 8B 56 08           - mov rdx,[r14+08]
+CrimsonDesert.exe+20B35F1 - 48 8D 4C 24 70        - lea rcx,[rsp+70]
+CrimsonDesert.exe+20B35F6 - E8 758F22FE           - call CrimsonDesert.AK::WriteBytesMem::Size+1270
+CrimsonDesert.exe+20B35FB - 90                    - nop
+CrimsonDesert.exe+20B35FC - 44 8B 85 C8020000     - mov r8d,[rbp+000002C8]
+CrimsonDesert.exe+20B3603 - 8B CB                 - mov ecx,ebx
+CrimsonDesert.exe+20B3605 - 45 85 C0              - test r8d,r8d
+CrimsonDesert.exe+20B3608 - 74 1D                 - je CrimsonDesert.exe+20B3627
+CrimsonDesert.exe+20B360A - 4C 8B 8D C0020000     - mov r9,[rbp+000002C0]
+CrimsonDesert.exe+20B3611 - 44 8B 16              - mov r10d,[rsi]
+CrimsonDesert.exe+20B3614 - 8B D1                 - mov edx,ecx
+CrimsonDesert.exe+20B3616 - 48 8D 04 52           - lea rax,[rdx+rdx*2]
+CrimsonDesert.exe+20B361A - 45 39 14 C1           - cmp [r9+rax*8],r10d
+CrimsonDesert.exe+20B361E - 74 1F                 - je CrimsonDesert.exe+20B363F
+CrimsonDesert.exe+20B3620 - FF C1                 - inc ecx
+CrimsonDesert.exe+20B3622 - 41 3B C8              - cmp ecx,r8d
+CrimsonDesert.exe+20B3625 - 72 ED                 - jb CrimsonDesert.exe+20B3614
+CrimsonDesert.exe+20B3627 - B3 01                 - mov bl,01 { 1 }
+CrimsonDesert.exe+20B3629 - 48 8B 4C 24 70        - mov rcx,[rsp+70]
+CrimsonDesert.exe+20B362E - 4C 8B 01              - mov r8,[rcx]
+CrimsonDesert.exe+20B3631 - B2 01                 - mov dl,01 { 1 }
+CrimsonDesert.exe+20B3633 - 41 FF 50 20           - call qword ptr [r8+20]
+CrimsonDesert.exe+20B3637 - 0FB6 C3               - movzx eax,bl
+CrimsonDesert.exe+20B363A - E9 91000000           - jmp CrimsonDesert.exe+20B36D0
+CrimsonDesert.exe+20B363F - 83 F9 FF              - cmp ecx,-01 { 255 }
+CrimsonDesert.exe+20B3642 - 74 E3                 - je CrimsonDesert.exe+20B3627
+CrimsonDesert.exe+20B3644 - 48 8D 0C 52           - lea rcx,[rdx+rdx*2]
+CrimsonDesert.exe+20B3648 - 49 8D 14 C9           - lea rdx,[r9+rcx*8]
+CrimsonDesert.exe+20B364C - 8B 4A 10              - mov ecx,[rdx+10]
+CrimsonDesert.exe+20B364F - 85 C9                 - test ecx,ecx
+CrimsonDesert.exe+20B3651 - 74 D4                 - je CrimsonDesert.exe+20B3627
+CrimsonDesert.exe+20B3653 - 48 8B 52 08           - mov rdx,[rdx+08]
+CrimsonDesert.exe+20B3657 - 44 8B 0F              - mov r9d,[rdi]
+CrimsonDesert.exe+20B365A - 66 0F1F 44 00 00      - nop word ptr [rax+rax+00]
+CrimsonDesert.exe+20B3660 - 44 8B C3              - mov r8d,ebx
+CrimsonDesert.exe+20B3663 - 49 C1 E0 04           - shl r8,04 { 4 }
+CrimsonDesert.exe+20B3667 - 4C 03 C2              - add r8,rdx
+CrimsonDesert.exe+20B366A - 45 39 08              - cmp [r8],r9d
+CrimsonDesert.exe+20B366D - 75 09                 - jne CrimsonDesert.exe+20B3678
+CrimsonDesert.exe+20B366F - 8B 47 04              - mov eax,[rdi+04]
+CrimsonDesert.exe+20B3672 - 41 39 40 04           - cmp [r8+04],eax
+CrimsonDesert.exe+20B3676 - 74 08                 - je CrimsonDesert.exe+20B3680
+CrimsonDesert.exe+20B3678 - FF C3                 - inc ebx
+CrimsonDesert.exe+20B367A - 3B D9                 - cmp ebx,ecx
+CrimsonDesert.exe+20B367C - 73 A9                 - jae CrimsonDesert.exe+20B3627
+CrimsonDesert.exe+20B367E - EB E0                 - jmp CrimsonDesert.exe+20B3660
+CrimsonDesert.exe+20B3680 - 83 FB FF              - cmp ebx,-01 { 255 }
+CrimsonDesert.exe+20B3683 - 74 A2                 - je CrimsonDesert.exe+20B3627
+CrimsonDesert.exe+20B3685 - 8B 44 24 20           - mov eax,[rsp+20]
+CrimsonDesert.exe+20B3689 - 8D 14 40              - lea edx,[rax+rax*2]
+CrimsonDesert.exe+20B368C - C1 E2 03              - shl edx,03 { 3 }
+CrimsonDesert.exe+20B368F - 8B 44 24 24           - mov eax,[rsp+24]
+CrimsonDesert.exe+20B3693 - 48 03 D0              - add rdx,rax
+CrimsonDesert.exe+20B3696 - 48 6B CA 3C           - imul rcx,rdx,3C
+CrimsonDesert.exe+20B369A - 8B 44 24 28           - mov eax,[rsp+28]
+CrimsonDesert.exe+20B369E - 48 03 C8              - add rcx,rax
+CrimsonDesert.exe+20B36A1 - 48 6B D1 3C           - imul rdx,rcx,3C
+CrimsonDesert.exe+20B36A5 - 48 63 05 FCBBB703     - movsxd  rax,dword ptr [CrimsonDesert.exe+5C2F2A8] { (7) }
+CrimsonDesert.exe+20B36AC - 48 69 C8 80510100     - imul rcx,rax,00015180 { 86400 }
+CrimsonDesert.exe+20B36B3 - 49 03 48 08           - add rcx,[r8+08]
+CrimsonDesert.exe+20B36B7 - 8B 44 24 2C           - mov eax,[rsp+2C]
+CrimsonDesert.exe+20B36BB - 48 03 C2              - add rax,rdx
+CrimsonDesert.exe+20B36BE - 48 3B C8              - cmp rcx,rax
+CrimsonDesert.exe+20B36C1 - 0F82 60FFFFFF         - jb CrimsonDesert.exe+20B3627
+CrimsonDesert.exe+20B36C7 - 32 DB                 - xor bl,bl
+CrimsonDesert.exe+20B36C9 - E9 5BFFFFFF           - jmp CrimsonDesert.exe+20B3629
+CrimsonDesert.exe+20B36CE - B0 01                 - mov al,01 { 1 }
+CrimsonDesert.exe+20B36D0 - 48 8B 5C 24 60        - mov rbx,[rsp+60]
+CrimsonDesert.exe+20B36D5 - 48 8B 6C 24 68        - mov rbp,[rsp+68]
+CrimsonDesert.exe+20B36DA - 48 83 C4 40           - add rsp,40 { 64 }
+CrimsonDesert.exe+20B36DE - 41 5E                 - pop r14
+CrimsonDesert.exe+20B36E0 - 5F                    - pop rdi
+CrimsonDesert.exe+20B36E1 - 5E                    - pop rsi
+CrimsonDesert.exe+20B36E2 - C3                    - ret
+*/
+
+/*
+CrimsonDesert.exe+C791450 - 48 89 5C 24 10        - mov [rsp+10],rbx
+CrimsonDesert.exe+C791455 - 55                    - push rbp
+CrimsonDesert.exe+C791456 - 56                    - push rsi
+CrimsonDesert.exe+C791457 - 57                    - push rdi
+CrimsonDesert.exe+C791458 - 48 83 EC 20           - sub rsp,20 { 32 }
+CrimsonDesert.exe+C79145C - 48 8B 59 18           - mov rbx,[rcx+18]
+CrimsonDesert.exe+C791460 - 41 0FB7 E9            - movzx ebp,r9w
+CrimsonDesert.exe+C791464 - 48 03 59 20           - add rbx,[rcx+20]
+CrimsonDesert.exe+C791468 - 48 89 D6              - mov rsi,rdx
+CrimsonDesert.exe+C79146B - 48 89 CF              - mov rdi,rcx
+CrimsonDesert.exe+C79146E - 4C 39 C3              - cmp rbx,r8
+CrimsonDesert.exe+C791471 - 7C 0C                 - jl CrimsonDesert.exe+C79147F
+CrimsonDesert.exe+C791473 - 4C 3B 41 28           - cmp r8,[rcx+28]
+CrimsonDesert.exe+C791477 - 4C 89 C3              - mov rbx,r8
+CrimsonDesert.exe+C79147A - 48 0F4C 59 28         - cmovl rbx,[rcx+28]
+CrimsonDesert.exe+C79147F - 48 83 79 30 00        - cmp qword ptr [rcx+30],00 { 0 }
+CrimsonDesert.exe+C791484 - 74 64                 - je CrimsonDesert.exe+C7914EA
+CrimsonDesert.exe+C791486 - 80 79 52 00           - cmp byte ptr [rcx+52],00 { 0 }
+CrimsonDesert.exe+C79148A - 75 30                 - jne CrimsonDesert.exe+C7914BC
+CrimsonDesert.exe+C79148C - 48 85 DB              - test rbx,rbx
+CrimsonDesert.exe+C79148F - 7E 25                 - jle CrimsonDesert.exe+C7914B6
+CrimsonDesert.exe+C791491 - 4C 8D 4C 24 58        - lea r9,[rsp+58]
+CrimsonDesert.exe+C791496 - 49 89 F0              - mov r8,rsi
+CrimsonDesert.exe+C791499 - 48 8D 54 24 40        - lea rdx,[rsp+40]
+CrimsonDesert.exe+C79149E - E8 8DC5B2F4           - call CrimsonDesert.exe+12BDA30
+CrimsonDesert.exe+C7914A3 - 48 8B 15 C8FB230B     - mov rdx,[CrimsonDesert.exe+179D1072] { (0) }
+CrimsonDesert.exe+C7914AA - 28 15 99FC230B        - sub [CrimsonDesert.exe+179D1149],dl { (44) }
+CrimsonDesert.exe+C7914B0 - 48 83 38 00           - cmp qword ptr [rax],00 { 0 }
+CrimsonDesert.exe+C7914B4 - 7F 06                 - jg CrimsonDesert.exe+C7914BC
+CrimsonDesert.exe+C7914B6 - C6 47 52 01           - mov byte ptr [rdi+52],01 { 1 }
+CrimsonDesert.exe+C7914BA - EB 2E                 - jmp CrimsonDesert.exe+C7914EA
+CrimsonDesert.exe+C7914BC - 80 7F 52 00           - cmp byte ptr [rdi+52],00 { 0 }
+CrimsonDesert.exe+C7914C0 - 74 28                 - je CrimsonDesert.exe+C7914EA
+CrimsonDesert.exe+C7914C2 - 48 3B 5F 30           - cmp rbx,[rdi+30]
+CrimsonDesert.exe+C7914C6 - 7D 1E                 - jnl CrimsonDesert.exe+C7914E6
+CrimsonDesert.exe+C7914C8 - 4C 8D 4C 24 58        - lea r9,[rsp+58]
+CrimsonDesert.exe+C7914CD - 49 89 F0              - mov r8,rsi
+CrimsonDesert.exe+C7914D0 - 48 8D 54 24 40        - lea rdx,[rsp+40]
+CrimsonDesert.exe+C7914D5 - 48 89 F9              - mov rcx,rdi
+CrimsonDesert.exe+C7914D8 - E8 53C5B2F4           - call CrimsonDesert.exe+12BDA30
+CrimsonDesert.exe+C7914DD - 48 8B 4F 30           - mov rcx,[rdi+30]
+CrimsonDesert.exe+C7914E1 - 48 39 08              - cmp [rax],rcx
+CrimsonDesert.exe+C7914E4 - 7C 04                 - jl CrimsonDesert.exe+C7914EA
+CrimsonDesert.exe+C7914E6 - C6 47 52 00           - mov byte ptr [rdi+52],00 { 0 }
+CrimsonDesert.exe+C7914EA - 31 D2                 - xor edx,edx
+CrimsonDesert.exe+C7914EC - 48 89 D8              - mov rax,rbx
+CrimsonDesert.exe+C7914EF - 48 2B 47 18           - sub rax,[rdi+18]
+CrimsonDesert.exe+C7914F3 - 48 39 5F 18           - cmp [rdi+18],rbx
+CrimsonDesert.exe+C7914F7 - 48 0F4F C2            - cmovg rax,rdx
+someValueChangeAOB        - 48 89 47 20           - mov [rdi+20],rax
+CrimsonDesert.exe+C7914FF - 48 FF 47 48           - inc qword ptr [rdi+48]
+CrimsonDesert.exe+C791503 - 48 89 5F 08           - mov [rdi+08],rbx
+CrimsonDesert.exe+C791507 - 48 8B 5C 24 48        - mov rbx,[rsp+48]
+CrimsonDesert.exe+C79150C - 48 89 77 38           - mov [rdi+38],rsi
+CrimsonDesert.exe+C791510 - 66 89 6F 50           - mov [rdi+50],bp
+CrimsonDesert.exe+C791514 - 48 83 C4 20           - add rsp,20 { 32 }
+CrimsonDesert.exe+C791518 - 5F                    - pop rdi
+CrimsonDesert.exe+C791519 - 5E                    - pop rsi
+CrimsonDesert.exe+C79151A - 5D                    - pop rbp
+CrimsonDesert.exe+C79151B - C3                    - ret
+*/
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>24</ID>
+          <Description>"No Description"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>8 Bytes</VariableType>
+          <Address>pPlayer</Address>
+          <Offsets>
+            <Offset>0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>25</ID>
+          <Description>"No Description"</Description>
+          <VariableType>8 Bytes</VariableType>
+          <Address>260020F0200</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>26</ID>
+          <Description>"No Description"</Description>
+          <VariableType>8 Bytes</VariableType>
+          <Address>260020F0500</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>27</ID>
+          <Description>"Auto Assemble script"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+aobscanmodule(someValueChangeAOB,$process,4* * * * 4* * * * 4* * * * 4* * * * * 4* * * * 6* * * * 4* * * * 5* 5* 5* C3)
+registersymbol(someValueChangeAOB)
+
+alloc(newmem2,2048)
+label(returnhere2)
+label(originalcode2_someValueChangeAOB)
+label(exit2)
+
+label(pStamina pHealth bMaxStamina bInfHealth dMinHealth)
+registersymbol(originalcode2_someValueChangeAOB pStamina pHealth bMaxStamina bInfHealth dMinHealth)
+
+newmem2: //this is allocated memory, you have read,write,execute access
+//place your code here
+push rax
+push rcx
+push rdx
+push rsi
+mov rcx,1000000000
+mov rax,pPlayerBase
+mov rax,[rax]
+mov rax,[rax+68]
+mov rax,[rax+20]
+
+chk12:
+mov rsi,pStamina
+mov rdx,bMaxStamina
+cmp byte ptr [rdx],1
+jne chk22
+cmp r15,rcx
+jl @f
+cmp [r15],rax
+je isstamina
+@@:
+cmp [rsi],rdi
+je domax2
+
+chk22:
+mov rsi,pHealth
+lea rdx,[rdx+4]
+cmp byte ptr [rdx],1
+jne chkend2
+cmp r13,rcx
+jl @f
+cmp [r13],rax
+je ishealth
+@@:
+cmp [rsi],rdi
+je domin2
+
+chkend2:
+jmp end2
+
+isstamina:
+mov [rsi],rdi
+jmp domax2
+
+ishealth:
+mov [rsi],rdi
+jmp domin2
+
+domax2:
+cmp [rdi+8],rbx
+jle @f
+mov rbx,[rdi+8]
+@@:
+jmp end2
+
+domin2:
+lea rcx,[rdx+4]
+fild dword ptr [rdi+18]
+fmul dword ptr [rcx]
+fistp dword ptr [rcx+4]
+mov rcx,[rcx+4]
+cmp rbx,rcx
+cmovl rbx,rcx
+jmp end2
+
+end2:
+pop rsi
+pop rdx
+pop rcx
+pop rax
+
+originalcode2_someValueChangeAOB:
+readmem(someValueChangeAOB+8,17)
+//mov [rdi+08],rbx
+//mov rbx,[rsp+48]
+//mov [rdi+38],rsi
+//mov [rdi+50],bp
+
+exit2:
+jmp returnhere2
+
+///
+pStamina:
+dq 0
+pHealth:
+dq 0
+bMaxStamina:
+dd 0
+bInfHealth:
+dd 0
+dMinHealth:
+dd (float)0.5
+///
+
+someValueChangeAOB+8: //"CrimsonDesert.exe"+C791503:
+jmp far newmem2
+nop 3
+returnhere2:
+
+///***************************************************///
+
+
+
+
+
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+dealloc(newmem2)
+someValueChangeAOB+8: //"CrimsonDesert.exe"+C791503:
+readmem(originalcode2_someValueChangeAOB,17)
+//db 48 89 5F 08 48 8B 5C 24 48 48 89 77 38 66 89 6F 50
+//mov [rdi+08],rbx
+//mov rbx,[rsp+48]
+//mov [rdi+38],rsi
+//mov [rdi+50],bp
+
+unregistersymbol(originalcode2_someValueChangeAOB bMaxStamina bInfHealth dMinHealth)
+
+///***************************************************///
+
+/*
+CrimsonDesert.exe+C791450 - 48 89 5C 24 10        - mov [rsp+10],rbx
+CrimsonDesert.exe+C791455 - 55                    - push rbp
+CrimsonDesert.exe+C791456 - 56                    - push rsi
+CrimsonDesert.exe+C791457 - 57                    - push rdi
+CrimsonDesert.exe+C791458 - 48 83 EC 20           - sub rsp,20 { 32 }
+CrimsonDesert.exe+C79145C - 48 8B 59 18           - mov rbx,[rcx+18]
+CrimsonDesert.exe+C791460 - 41 0FB7 E9            - movzx ebp,r9w
+CrimsonDesert.exe+C791464 - 48 03 59 20           - add rbx,[rcx+20]
+CrimsonDesert.exe+C791468 - 48 89 D6              - mov rsi,rdx
+CrimsonDesert.exe+C79146B - 48 89 CF              - mov rdi,rcx
+CrimsonDesert.exe+C79146E - 4C 39 C3              - cmp rbx,r8
+CrimsonDesert.exe+C791471 - 7C 0C                 - jl CrimsonDesert.exe+C79147F
+CrimsonDesert.exe+C791473 - 4C 3B 41 28           - cmp r8,[rcx+28]
+CrimsonDesert.exe+C791477 - 4C 89 C3              - mov rbx,r8
+CrimsonDesert.exe+C79147A - 48 0F4C 59 28         - cmovl rbx,[rcx+28]
+CrimsonDesert.exe+C79147F - 48 83 79 30 00        - cmp qword ptr [rcx+30],00 { 0 }
+CrimsonDesert.exe+C791484 - 74 64                 - je CrimsonDesert.exe+C7914EA
+CrimsonDesert.exe+C791486 - 80 79 52 00           - cmp byte ptr [rcx+52],00 { 0 }
+CrimsonDesert.exe+C79148A - 75 30                 - jne CrimsonDesert.exe+C7914BC
+CrimsonDesert.exe+C79148C - 48 85 DB              - test rbx,rbx
+CrimsonDesert.exe+C79148F - 7E 25                 - jle CrimsonDesert.exe+C7914B6
+CrimsonDesert.exe+C791491 - 4C 8D 4C 24 58        - lea r9,[rsp+58]
+CrimsonDesert.exe+C791496 - 49 89 F0              - mov r8,rsi
+CrimsonDesert.exe+C791499 - 48 8D 54 24 40        - lea rdx,[rsp+40]
+CrimsonDesert.exe+C79149E - E8 8DC5B2F4           - call CrimsonDesert.exe+12BDA30
+CrimsonDesert.exe+C7914A3 - 48 8B 15 C8FB230B     - mov rdx,[CrimsonDesert.exe+179D1072] { (0) }
+CrimsonDesert.exe+C7914AA - 28 15 99FC230B        - sub [CrimsonDesert.exe+179D1149],dl { (44) }
+CrimsonDesert.exe+C7914B0 - 48 83 38 00           - cmp qword ptr [rax],00 { 0 }
+CrimsonDesert.exe+C7914B4 - 7F 06                 - jg CrimsonDesert.exe+C7914BC
+CrimsonDesert.exe+C7914B6 - C6 47 52 01           - mov byte ptr [rdi+52],01 { 1 }
+CrimsonDesert.exe+C7914BA - EB 2E                 - jmp CrimsonDesert.exe+C7914EA
+CrimsonDesert.exe+C7914BC - 80 7F 52 00           - cmp byte ptr [rdi+52],00 { 0 }
+CrimsonDesert.exe+C7914C0 - 74 28                 - je CrimsonDesert.exe+C7914EA
+CrimsonDesert.exe+C7914C2 - 48 3B 5F 30           - cmp rbx,[rdi+30]
+CrimsonDesert.exe+C7914C6 - 7D 1E                 - jnl CrimsonDesert.exe+C7914E6
+CrimsonDesert.exe+C7914C8 - 4C 8D 4C 24 58        - lea r9,[rsp+58]
+CrimsonDesert.exe+C7914CD - 49 89 F0              - mov r8,rsi
+CrimsonDesert.exe+C7914D0 - 48 8D 54 24 40        - lea rdx,[rsp+40]
+CrimsonDesert.exe+C7914D5 - 48 89 F9              - mov rcx,rdi
+CrimsonDesert.exe+C7914D8 - E8 53C5B2F4           - call CrimsonDesert.exe+12BDA30
+CrimsonDesert.exe+C7914DD - 48 8B 4F 30           - mov rcx,[rdi+30]
+CrimsonDesert.exe+C7914E1 - 48 39 08              - cmp [rax],rcx
+CrimsonDesert.exe+C7914E4 - 7C 04                 - jl CrimsonDesert.exe+C7914EA
+CrimsonDesert.exe+C7914E6 - C6 47 52 00           - mov byte ptr [rdi+52],00 { 0 }
+CrimsonDesert.exe+C7914EA - 31 D2                 - xor edx,edx
+CrimsonDesert.exe+C7914EC - 48 89 D8              - mov rax,rbx
+CrimsonDesert.exe+C7914EF - 48 2B 47 18           - sub rax,[rdi+18]
+CrimsonDesert.exe+C7914F3 - 48 39 5F 18           - cmp [rdi+18],rbx
+CrimsonDesert.exe+C7914F7 - 48 0F4F C2            - cmovg rax,rdx
+someValueChangeAOB        - 48 89 47 20           - mov [rdi+20],rax
+CrimsonDesert.exe+C7914FF - 48 FF 47 48           - inc qword ptr [rdi+48]
+CrimsonDesert.exe+C791503 - 48 89 5F 08           - mov [rdi+08],rbx
+CrimsonDesert.exe+C791507 - 48 8B 5C 24 48        - mov rbx,[rsp+48]
+CrimsonDesert.exe+C79150C - 48 89 77 38           - mov [rdi+38],rsi
+CrimsonDesert.exe+C791510 - 66 89 6F 50           - mov [rdi+50],bp
+CrimsonDesert.exe+C791514 - 48 83 C4 20           - add rsp,20 { 32 }
+CrimsonDesert.exe+C791518 - 5F                    - pop rdi
+CrimsonDesert.exe+C791519 - 5E                    - pop rsi
+CrimsonDesert.exe+C79151A - 5D                    - pop rbp
+CrimsonDesert.exe+C79151B - C3                    - ret
+*/
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>28</ID>
+          <Description>"No Description"</Description>
+          <VariableType>4 Bytes</VariableType>
+          <Address>3BE21F9AF18</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>29</ID>
+          <Description>"No Description"</Description>
+          <VariableType>4 Bytes</VariableType>
+          <Address>3BE21F9AE88</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>30</ID>
+          <Description>"Auto Assemble script"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+alloc(newmem,2048,"CrimsonDesert.exe"+12BDA77) 
+label(returnhere)
+label(originalcode)
+label(exit)
+
+newmem: //this is allocated memory, you have read,write,execute access
+//place your code here
+mov r9,pStamina
+cmp [r9],rbx
+jne @f
+mov r9,[rbx+18]
+mov [rbx+8],r9
+
+originalcode:
+mov r9,[rbx+08]
+mov r10,[rbx+28]
+
+exit:
+jmp returnhere
+
+///
+
+"CrimsonDesert.exe"+12BDA77:
+jmp newmem
+nop 3
+returnhere:
+
+
+ 
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+dealloc(newmem)
+"CrimsonDesert.exe"+12BDA77:
+db 4C 8B 4B 08 4C 8B 53 28
+//mov r9,[rbx+08]
+//mov r10,[rbx+28]
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>31</ID>
+          <Description>"No Description"</Description>
+          <VariableType>4 Bytes</VariableType>
+          <Address>3BE58A3A498</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>32</ID>
+          <Description>"Auto Assemble script"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+alloc(newmem,2048,"CrimsonDesert.exe"+C791503) 
+label(returnhere)
+label(originalcode)
+label(exit)
+
+newmem: //this is allocated memory, you have read,write,execute access
+//place your code here
+cmp dword ptr [rdi],11
+jne @f
+mov [rdi+08],rbx
+
+originalcode:
+mov [rdi+08],rbx
+mov rbx,[rsp+48]
+
+exit:
+jmp returnhere
+
+///
+
+"CrimsonDesert.exe"+C791503:
+jmp newmem
+nop 4
+returnhere:
+
+
+ 
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+dealloc(newmem)
+"CrimsonDesert.exe"+C791503:
+db 48 89 5F 08 48 8B 5C 24 48
+//mov [rdi+08],rbx
+//mov rbx,[rsp+48]
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>33</ID>
+          <Description>"Auto Assemble script"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode)
+label(exit)
+
+newmem: //this is allocated memory, you have read,write,execute access
+//place your code here
+add [rsi+10],rbx
+mov rdx,pStamina
+cmp [rdx],rsi
+jne @f
+mov rdx,[rsi+10]
+test rdx,rdx
+jge @f
+neg rdx
+mov [rsi+10],rdx
+@@:
+mov rdx,rbp
+mov rcx,rsi
+call CrimsonDesert.exe+12BD920
+jmp exit
+
+originalcode:
+add [rsi+10],rbx
+mov rdx,rbp
+mov rcx,rsi
+call CrimsonDesert.exe+12BD920
+
+exit:
+jmp returnhere
+
+///
+
+"CrimsonDesert.exe"+12BCEF7:
+jmp far newmem
+nop
+returnhere:
+
+
+ 
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+dealloc(newmem)
+"CrimsonDesert.exe"+12BCEF7:
+db 48 01 5E 10 48 8B D5 48 8B CE E8 1A 0A 00 00
+//add [rsi+10],rbx
+//mov rdx,rbp
+//mov rcx,rsi
+//call CrimsonDesert.exe+12BD920
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>34</ID>
+          <Description>"Auto Assemble script"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+alloc(newmem,2048,"CrimsonDesert.exe"+12BDA99) 
+label(returnhere)
+label(originalcode)
+label(exit)
+
+newmem: //this is allocated memory, you have read,write,execute access
+//place your code here
+mov rdx,pStamina
+cmp [rdx],rbx
+jne @f
+mov rdx,[rbx+10]
+test rdx,rdx
+jge @f
+xorps xmm2,xmm2
+jmp exit
+
+originalcode:
+cvtsi2sd xmm2,[rbx+10]
+
+exit:
+jmp returnhere
+
+///
+
+"CrimsonDesert.exe"+12BDA99:
+jmp newmem
+nop
+returnhere:
+
+
+ 
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+dealloc(newmem)
+"CrimsonDesert.exe"+12BDA99:
+db F2 48 0F 2A 53 10
+//cvtsi2sd xmm2,[rbx+10]
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>35</ID>
+              <Description>"Auto Assemble script"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+alloc(newmem2,2048)
+label(returnhere2)
+label(originalcode2)
+label(exit2)
+
+newmem2: //this is allocated memory, you have read,write,execute access
+//place your code here
+cvtsi2ss xmm0,[rdi+10]
+mov rcx,pStamina
+cmp [rcx],rdi
+jne @f
+mov rcx,[rdi+10]
+test rcx,rcx
+jge @f
+xorps xmm0,xmm0
+@@:
+cvtsi2ss xmm2,rax
+xor eax,eax
+divss xmm0,xmm1
+jmp exit2
+
+originalcode2:
+cvtsi2ss xmm0,[rdi+10]
+cvtsi2ss xmm2,rax
+xor eax,eax
+divss xmm0,xmm1
+
+exit2:
+jmp returnhere2
+
+///
+
+"CrimsonDesert.exe"+C790152:
+jmp far newmem2
+nop 3
+returnhere2:
+
+
+
+ 
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+dealloc(newmem2)
+"CrimsonDesert.exe"+C790152:
+db F3 48 0F 2A 47 10 F3 48 0F 2A D0 31 C0 F3 0F 5E C1
+//cvtsi2ss xmm0,[rdi+10]
+//cvtsi2ss xmm2,rax
+//xor eax,eax
+//divss xmm0,xmm1
+</AssemblerScript>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>37</ID>
+          <Description>"*"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript Async="1">[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+aobscanmodule(someValueAlterationReadAOB,$process,4* * * 10 4* * * * 4* * * * 4* * * 40 0F * * * 66 * * 48 4* * * * 4*)
+registersymbol(someValueAlterationReadAOB)
+
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode_someValueAlterationReadAOB)
+label(exit)
+
+registersymbol(originalcode_someValueAlterationReadAOB)
+
+newmem: //this is allocated memory, you have read,write,execute access
+//place your code here
+mov rax,pStamina
+cmp [rax],rbx
+jne nend
+readmem(someValueAlterationReadAOB,4)
+//mov rax,[rbx+10]
+test rax,rax
+jge @f
+xor rax,rax
+@@:
+readmem(someValueAlterationReadAOB+4,12)
+//mov [rdi+38],rax
+//mov rax,[rbx+48]
+//mov [rdi+40],rax
+jmp exit
+nend:
+
+originalcode_someValueAlterationReadAOB:
+readmem(someValueAlterationReadAOB,16)
+//mov rax,[rbx+10]
+//mov [rdi+38],rax
+//mov rax,[rbx+48]
+//mov [rdi+40],rax
+
+exit:
+jmp returnhere
+
+///
+
+someValueAlterationReadAOB: //"CrimsonDesert.exe"+C777210:
+jmp far newmem
+nop 2
+returnhere:
+
+
+
+ 
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+dealloc(newmem)
+someValueAlterationReadAOB: //"CrimsonDesert.exe"+C777210:
+readmem(originalcode_someValueAlterationReadAOB,16)
+//db 48 8B 43 10 48 89 47 38 48 8B 43 48 48 89 47 40
+//mov rax,[rbx+10]
+//mov [rdi+38],rax
+//mov rax,[rbx+48]
+//mov [rdi+40],rax
+
+unregistersymbol(originalcode_someValueAlterationReadAOB)
+
+/*
+CrimsonDesert.exe+C7771B3 - 66 66 66 66 2E 0F1F 84 00 00000000  - nop word ptr cs:[rax+rax+00000000]
+CrimsonDesert.exe+C7771C0 - 48 89 5C 24 08        - mov [rsp+08],rbx
+CrimsonDesert.exe+C7771C5 - 66 89 54 24 10        - mov [rsp+10],dx
+CrimsonDesert.exe+C7771CA - 57                    - push rdi
+CrimsonDesert.exe+C7771CB - 48 83 EC 20           - sub rsp,20 { 32 }
+CrimsonDesert.exe+C7771CF - 4C 89 C7              - mov rdi,r8
+CrimsonDesert.exe+C7771D2 - E8 1912B4F4           - call CrimsonDesert.exe+12B83F0
+CrimsonDesert.exe+C7771D7 - 48 8D 4C 24 38        - lea rcx,[rsp+38]
+CrimsonDesert.exe+C7771DC - 48 89 C3              - mov rbx,rax
+CrimsonDesert.exe+C7771DF - E8 DC9DC8F3           - call CrimsonDesert.exe+400FC0
+CrimsonDesert.exe+C7771E4 - 8B 08                 - mov ecx,[rax]
+CrimsonDesert.exe+C7771E6 - 89 0F                 - mov [rdi],ecx
+CrimsonDesert.exe+C7771E8 - 48 8B 4B 08           - mov rcx,[rbx+08]
+CrimsonDesert.exe+C7771EC - 48 89 4F 08           - mov [rdi+08],rcx
+CrimsonDesert.exe+C7771F0 - 48 8B 4B 18           - mov rcx,[rbx+18]
+CrimsonDesert.exe+C7771F4 - 48 89 4F 18           - mov [rdi+18],rcx
+CrimsonDesert.exe+C7771F8 - 48 8B 4B 20           - mov rcx,[rbx+20]
+CrimsonDesert.exe+C7771FC - 48 89 4F 20           - mov [rdi+20],rcx
+CrimsonDesert.exe+C777200 - 48 8B 4B 28           - mov rcx,[rbx+28]
+CrimsonDesert.exe+C777204 - 48 89 4F 10           - mov [rdi+10],rcx
+CrimsonDesert.exe+C777208 - 48 8B 4B 38           - mov rcx,[rbx+38]
+CrimsonDesert.exe+C77720C - 48 89 4F 30           - mov [rdi+30],rcx
+someValueAlterationReadAOB- 48 8B 43 10           - mov rax,[rbx+10]
+CrimsonDesert.exe+C777214 - 48 89 47 38           - mov [rdi+38],rax
+CrimsonDesert.exe+C777218 - 48 8B 43 48           - mov rax,[rbx+48]
+CrimsonDesert.exe+C77721C - 48 89 47 40           - mov [rdi+40],rax
+CrimsonDesert.exe+C777220 - 0FB7 43 50            - movzx eax,word ptr [rbx+50]
+CrimsonDesert.exe+C777224 - 66 89 47 48           - mov [rdi+48],ax
+CrimsonDesert.exe+C777228 - 48 8B 43 30           - mov rax,[rbx+30]
+CrimsonDesert.exe+C77722C - 48 89 47 28           - mov [rdi+28],rax
+CrimsonDesert.exe+C777230 - 0FB6 43 52            - movzx eax,byte ptr [rbx+52]
+CrimsonDesert.exe+C777234 - 88 47 4A              - mov [rdi+4A],al
+CrimsonDesert.exe+C777237 - 0FB6 43 53            - movzx eax,byte ptr [rbx+53]
+CrimsonDesert.exe+C77723B - 88 47 4B              - mov [rdi+4B],al
+CrimsonDesert.exe+C77723E - 48 8B 43 40           - mov rax,[rbx+40]
+CrimsonDesert.exe+C777242 - 48 8B 5C 24 30        - mov rbx,[rsp+30]
+CrimsonDesert.exe+C777247 - 48 89 47 50           - mov [rdi+50],rax
+CrimsonDesert.exe+C77724B - 48 83 C4 20           - add rsp,20 { 32 }
+CrimsonDesert.exe+C77724F - 5F                    - pop rdi
+CrimsonDesert.exe+C777250 - C3                    - ret
+CrimsonDesert.exe+C777251 - CC                    - int 3
+*/
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <CheatCodes>
+    <CodeEntry>
+      <Description>Code :cvtsi2ss xmm1,[rax+00000230]</Description>
+      <AddressString>CrimsonDesert.exe+CC4DB8</AddressString>
+      <Before>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>0F</Byte>
+        <Byte>57</Byte>
+        <Byte>C9</Byte>
+      </Before>
+      <Actual>
+        <Byte>F3</Byte>
+        <Byte>48</Byte>
+        <Byte>0F</Byte>
+        <Byte>2A</Byte>
+        <Byte>88</Byte>
+        <Byte>30</Byte>
+        <Byte>02</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>F3</Byte>
+        <Byte>0F</Byte>
+        <Byte>5E</Byte>
+        <Byte>CF</Byte>
+        <Byte>0F</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :mov r9,[rbx+08]</Description>
+      <AddressString>CrimsonDesert.exe+12BDA77</AddressString>
+      <Before>
+        <Byte>8F</Byte>
+        <Byte>ED</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>4C</Byte>
+        <Byte>8B</Byte>
+        <Byte>4B</Byte>
+        <Byte>08</Byte>
+      </Actual>
+      <After>
+        <Byte>4C</Byte>
+        <Byte>8B</Byte>
+        <Byte>53</Byte>
+        <Byte>28</Byte>
+        <Byte>4D</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :movzx r9d,word ptr [rsp+20]</Description>
+      <AddressString>CrimsonDesert.exe+12BCED7</AddressString>
+      <Before>
+        <Byte>E8</Byte>
+        <Byte>59</Byte>
+        <Byte>0B</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>44</Byte>
+        <Byte>0F</Byte>
+        <Byte>B7</Byte>
+        <Byte>4C</Byte>
+        <Byte>24</Byte>
+        <Byte>20</Byte>
+      </Actual>
+      <After>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>D5</Byte>
+        <Byte>4C</Byte>
+        <Byte>8B</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :mov rax,[rbx+68]</Description>
+      <AddressString>CrimsonDesert.exe+1C6AF1C</AddressString>
+      <Before>
+        <Byte>48</Byte>
+        <Byte>8D</Byte>
+        <Byte>4C</Byte>
+        <Byte>24</Byte>
+        <Byte>58</Byte>
+      </Before>
+      <Actual>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>43</Byte>
+        <Byte>68</Byte>
+      </Actual>
+      <After>
+        <Byte>48</Byte>
+        <Byte>89</Byte>
+        <Byte>74</Byte>
+        <Byte>24</Byte>
+        <Byte>50</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :mov rax,[rbx]</Description>
+      <AddressString>CrimsonDesert.exe+2349933</AddressString>
+      <Before>
+        <Byte>00</Byte>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>7D</Byte>
+        <Byte>E0</Byte>
+      </Before>
+      <Actual>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>03</Byte>
+      </Actual>
+      <After>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>CB</Byte>
+        <Byte>FF</Byte>
+        <Byte>90</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :mov rax,[rcx]</Description>
+      <AddressString>CrimsonDesert.exe+201A217</AddressString>
+      <Before>
+        <Byte>7D</Byte>
+        <Byte>D1</Byte>
+        <Byte>00</Byte>
+        <Byte>75</Byte>
+        <Byte>08</Byte>
+      </Before>
+      <Actual>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>01</Byte>
+      </Actual>
+      <After>
+        <Byte>FF</Byte>
+        <Byte>50</Byte>
+        <Byte>10</Byte>
+        <Byte>EB</Byte>
+        <Byte>05</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :mov rax,[rcx]</Description>
+      <AddressString>CrimsonDesert.exe+20E1F86</AddressString>
+      <Before>
+        <Byte>24</Byte>
+        <Byte>31</Byte>
+        <Byte>00</Byte>
+        <Byte>75</Byte>
+        <Byte>08</Byte>
+      </Before>
+      <Actual>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>01</Byte>
+      </Actual>
+      <After>
+        <Byte>FF</Byte>
+        <Byte>50</Byte>
+        <Byte>10</Byte>
+        <Byte>EB</Byte>
+        <Byte>05</Byte>
+      </After>
+    </CodeEntry>
+  </CheatCodes>
+  <UserdefinedSymbols/>
+  <Comments>https://fearlessrevolution.com/viewtopic.php?f=4&amp;t=38668</Comments>
+</CheatTable>

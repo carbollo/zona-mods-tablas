@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>0</ID>
+      <Description>"Table Help"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>1</ID>
+      <Description>"Auto"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[enable]
+aobscanmodule(hit, SOTTR.exe, F3 0F 11 70 2C 48 8B 8B A8 02 00 00)
+aobscanmodule(hit_caller, SOTTR.exe, 4C 8B 83 F8 04 00 00 4D 85 C0)
+registersymbol(hit)
+registersymbol(hit_caller)
+label(hit_ret)
+label(hit_new_code)
+alloc(hit_new, 512, hit)
+label(player)
+label(inf_hp_flag)
+label(ez_kill_flag)
+registersymbol(inf_hp_flag)
+registersymbol(ez_kill_flag)
+
+hit_new:
+inf_hp_flag:
+  db 00 00 00 00
+ez_kill_flag:
+  db 00 00 00 00
+hit_new_code:
+  movss [rax+2C],xmm6
+  //mov [rax+2C], (float)2000
+
+  cmp rbp, 12c
+  jbe player
+  cmp [ez_kill_flag], 00
+  je hit_ret
+  mov [rax+2C], (float)0
+jmp hit_ret
+
+player:
+  cmp [inf_hp_flag], 00
+  je hit_ret
+  mov [rax+2C], (float)2000
+jmp hit_ret
+
+hit:
+  jmp hit_new_code
+hit_ret:
+
+[disable]
+hit:
+  db F3 0F 11 70 2C
+unregistersymbol(*)
+dealloc(*)
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>3</ID>
+          <Description>"H - inf HP"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[enable]
+inf_hp_flag:
+  db 00 00 00 01
+
+[disable]
+inf_hp_flag:
+  db 00 00 00 00
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>2</ID>
+          <Description>"K - easy Kills"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[enable]
+ez_kill_flag:
+  db 00 00 00 01
+
+[disable]
+ez_kill_flag:
+  db 00 00 00 00
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>6</ID>
+      <Description>"B - inf Bullets"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[enable]
+aobscanmodule(bullets_og, SOTTR.exe, 66 89 18 48 8B 8E A8 03 00 00)
+aobscanmodule(bullets_on_clip_og, SOTTR.exe, 29 18 49 8B 86 70 03 00 00)
+
+bullets_og:
+  nop
+  nop
+  nop
+
+bullets_on_clip_og:
+  nop
+  nop
+
+[disable]
+bullets_og:
+  db 66 89 18
+
+bullets_on_clip_og:
+  db 29 18
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>4</ID>
+      <Description>"P - gain skill Points"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[enable]
+aobscanmodule(points_og, SOTTR.exe, 8B 70 4C 49 8B 04 24)
+registersymbol(points_og)
+alloc(points_new, 512, points_og)
+label(points_ret)
+
+points_new:
+  add [rax+4C], 1
+  mov esi,[rax+4C]
+  mov rax,[r12]
+jmp points_ret
+
+
+points_og:
+  jmp points_new
+  nop
+  nop
+points_ret:
+
+[disable]
+points_og:
+  db 8B 70 4C 49 8B 04 24
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>5</ID>
+      <Description>"G - Gain coins"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[enable]
+aobscanmodule(gold_og, SOTTR.exe, 0F B7 43 0C 99 F7 79 08 0F B7 F8)
+registersymbol(gold_og)
+alloc(gold_new, 512, gold_og)
+label(gold_ret)
+
+gold_new:
+  add [rbx+0C], 3e8
+  movzx eax,word ptr [rbx+0C]
+  cdq
+jmp gold_ret
+
+gold_og:
+  jmp gold_new
+gold_ret:
+
+
+[disable]
+gold_og:
+  db 0F B7 43 0C 99
+dealloc(*)
+unregistersymbol(*)
+</AssemblerScript>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

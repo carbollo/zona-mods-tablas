@@ -1,0 +1,440 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="46">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>0</ID>
+      <Description>"适用于 Dusk Pub v1.1.6"</Description>
+      <Color>008000</Color>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>1</ID>
+      <Description>"初始化"</Description>
+      <Options moHideChildren="1"/>
+      <Color>FF0000</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$LUA}
+if syntaxcheck then return end
+if not OpenGameProcess("Dusk Pub.exe", true) then return end
+
+local sDataManager = mono_getClassStaticFields("", "DataManager")
+pDataManager = sDataManager.instance
+
+DataManagerOffs = mono_getClassFieldOffsets("", "DataManager")
+SaveOffs = mono_getClassFieldOffsets("", "Save")
+
+{$ASM}
+
+
+
+[DISABLE]
+{$LUA}
+if syntaxcheck then return end
+
+pDataManager = nil
+DataManagerOffs = nil
+SaveOffs = nil
+{$ASM}
+
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>2</ID>
+          <Description>"存档数据"</Description>
+          <Options moHideChildren="1"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>3</ID>
+              <Description>"金币"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pDataManager</Address>
+              <Offsets>
+                <Offset>SaveOffs.money</Offset>
+                <Offset>DataManagerOffs.saveTemp</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>4</ID>
+              <Description>"声望"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pDataManager</Address>
+              <Offsets>
+                <Offset>SaveOffs.popularity</Offset>
+                <Offset>DataManagerOffs.saveTemp</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>5</ID>
+              <Description>"酒馆等级"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pDataManager</Address>
+              <Offsets>
+                <Offset>SaveOffs.ShopLevel</Offset>
+                <Offset>DataManagerOffs.saveTemp</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>6</ID>
+              <Description>"杂货屋累计消费"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pDataManager</Address>
+              <Offsets>
+                <Offset>SaveOffs.shopCumulativeConsumption</Offset>
+                <Offset>DataManagerOffs.saveTemp</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>7</ID>
+          <Description>"背包物品（打开 道具 页面）"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>define(address, "GameAssembly.dll"+8B1239)
+define(bytes, 8B 74 C2 0C 48 89 7C 24 40)
+
+[ENABLE]
+assert(address, bytes)
+
+alloc(newmem,2048,address)
+label(returnhere)
+label(originalcode)
+label(exit)
+
+label(pBagItem)
+registersymbol(pBagItem)
+
+newmem: //this is allocated memory, you have read,write,execute access
+mov [pBagItem],rdx
+
+originalcode:
+mov esi,[rdx+rax*8+0C]
+mov [rsp+40],rdi
+
+exit:
+jmp returnhere
+
+pBagItem:
+dq 0
+
+address:
+jmp newmem
+nop 4
+returnhere:
+
+
+
+[DISABLE]
+unregistersymbol(pBagItem)
+
+dealloc(newmem)
+address:
+db bytes
+//mov esi,[rdx+rax*8+0C]
+//mov [rsp+40],rdi
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>8</ID>
+              <Description>"物品栏1"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pBagItem</Address>
+              <Offsets>
+                <Offset>0*8+2C</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>9</ID>
+              <Description>"物品栏2"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pBagItem</Address>
+              <Offsets>
+                <Offset>2*8+2C</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>10</ID>
+              <Description>"物品栏3"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pBagItem</Address>
+              <Offsets>
+                <Offset>4*8+2C</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>11</ID>
+              <Description>"物品栏4"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pBagItem</Address>
+              <Offsets>
+                <Offset>6*8+2C</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>12</ID>
+              <Description>"物品栏5"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pBagItem</Address>
+              <Offsets>
+                <Offset>8*8+2C</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>13</ID>
+              <Description>"物品栏6"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pBagItem</Address>
+              <Offsets>
+                <Offset>A*8+2C</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>14</ID>
+              <Description>"物品栏7"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pBagItem</Address>
+              <Offsets>
+                <Offset>C*8+2C</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>15</ID>
+              <Description>"物品栏8"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pBagItem</Address>
+              <Offsets>
+                <Offset>E*8+2C</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>16</ID>
+              <Description>"物品栏9"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pBagItem</Address>
+              <Offsets>
+                <Offset>10*8+2C</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>17</ID>
+          <Description>"无限角色体力（营业时）"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>define(address, BottomCardController.RefreshHP+128)
+define(bytes, 89 BB 88 00 00 00)
+define(value, 3E8)//1000
+
+[ENABLE]
+assert(address, bytes)
+
+alloc(newmem,2048,address)
+label(returnhere)
+label(originalcode)
+label(exit)
+
+newmem: //this is allocated memory, you have read,write,execute access
+mov edi,value
+
+originalcode:
+mov [rbx+00000088],edi
+
+exit:
+jmp returnhere
+
+address:
+jmp newmem
+nop
+returnhere:
+
+
+
+[DISABLE]
+dealloc(newmem)
+address:
+db 89 BB 88 00 00 00
+//mov [rbx+00000088],edi
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>18</ID>
+          <Description>"解锁所有角色"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+{$LUA}
+if syntaxcheck then return end
+
+local instance = mono_getClassInstance("", "DebugComponent")
+if not instance or instance == 0 then
+    return
+end
+
+mono_invokeMethod("", "DebugComponent", "OnUnlockGirls", instance, {})
+
+{$ASM}
+
+assert(0,0)
+
+
+
+[DISABLE]
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>19</ID>
+          <Description>"说明"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+{$LUA}
+if syntaxcheck then return end
+
+local text = "在营业时，同时按下 S + K 键可以直接完成"
+showMessage(text)
+
+{$ASM}
+
+assert(0,0)
+
+
+[DISABLE]
+
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+  <LuaScript>local function AddCompactMenu(defaultCompact)
+    if compactMenuItem then return end
+
+    local state = not defaultCompact
+    local mainForm = getMainForm()
+    local toggleView = function()
+        compactMenuItem.Caption = state and "[ 精简视图 ]" or "[ 完整视图 ]"
+        mainForm.Splitter1.Visible = state
+        mainForm.Panel4.Visible = state
+        mainForm.Panel5.Visible = state
+    end
+
+    local menuParent = mainForm.Menu.Items
+    compactMenuItem = createMenuItem(menuParent)
+    menuParent.add(compactMenuItem)
+    compactMenuItem.OnClick = function()
+        state = not state
+        toggleView()
+    end
+    toggleView()
+end
+
+AddCompactMenu(true)
+
+function OpenGameProcess(processName, enableMono)
+    local pid = getProcessIDFromProcessName(processName)
+    if not pid then
+        showMessage("先启动游戏，然后重新开启此选项")
+        return false
+    end
+    if getOpenedProcessID() ~= pid then
+        openProcess(pid)
+    end
+    if enableMono then
+        if LaunchMonoDataCollector() == 0 then
+            showMessage("激活 Mono 功能失败！")
+            return false
+        end
+    end
+    return true
+end
+
+function mono_getClassInstance(classId_or_namespace, className)
+    local classID = classId_or_namespace
+    local namespace = classId_or_namespace
+    if className then
+        classID = mono_findClass(namespace, className)
+    else
+        namespace = mono_class_getNamespace(classID)
+    end
+
+    local instance = mono_class_findInstancesOfClassListOnly(namespace, classID)
+    if not instance or #instance == 0 then
+        return nil
+    end
+    return instance[1]
+end
+
+function mono_getClassFieldOffsets(classId_or_namespace, className)
+    local classID = classId_or_namespace
+    local namespace = classId_or_namespace
+    if className then
+        classID = mono_findClass(namespace, className)
+    end
+
+    local fields = mono_class_enumFields(classID)
+    if not fields or #fields == 0 then
+        return nil
+    end
+
+    local t = {}
+    for i = 1, #fields do
+        t[fields[i].name] = fields[i].offset
+    end
+    return t
+end
+
+function mono_getClassStaticFields(classId_or_namespace, className)
+    local classID = classId_or_namespace
+    local namespace = classId_or_namespace
+    if className then
+        classID = mono_findClass(namespace, className)
+    end
+
+    local domains = mono_enumDomains()
+    if not domains or #domains == 0 then
+        return nil
+    end
+
+    local domain = mono_enumDomains()[1]
+    local staticBaseAddress = mono_class_getStaticFieldAddress(domain, classID)
+
+    local fields = mono_class_enumFields(classID)
+    if not fields or #fields == 0 then
+        return nil
+    end
+
+    local t = {}
+    for i = 1, #fields do
+        local field = fields[i]
+        if field.isStatic then
+            t[field.name] = staticBaseAddress + field.offset
+        end
+    end
+    return t
+end
+
+function mono_invokeMethod(namespace, className, methodName, instance, args)
+    local methodId = mono_findMethod(namespace, className, methodName)
+    if not methodId or methodId == 0 then
+        showMessage("Not found method!")
+        return
+    end
+    return mono_invoke_method(namespace, methodId, instance, args)
+end
+
+</LuaScript>
+</CheatTable>
