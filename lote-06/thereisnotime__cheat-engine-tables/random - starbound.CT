@@ -1,0 +1,2765 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="28">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>274</ID>
+      <Description>"Bloodybone"</Description>
+      <Options moHideChildren="1"/>
+      <LastState/>
+      <Color>0000FF</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+if syntaxcheck then return end
+if not getAddressSafe("luaclient-x86_64.dll") then
+  if injectDLL("luaclient-x86_64.dll") then
+    openLuaServer("CELUASERVER")
+  else
+    print('Failure injecting the "luaclient-x86_64.dll"')
+  end
+end
+
+[DISABLE]
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>106</ID>
+          <Description>"AobScan"</Description>
+          <Options moHideChildren="1"/>
+          <LastState Value="" RealAddress="00000000"/>
+          <Color>008000</Color>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>2</ID>
+              <Description>"Get Base Ptr "</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <Color>FF0000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+aobscanmodule(playerhsh,starbound.exe,F3 0F 10 47 54 F3 0F 5E)
+alloc(newmem,$100,"starbound.exe") // Or starbound.Star::StatSet::resourcePercentage+41
+
+label(code)
+label(return)
+label(playerbaseptr)
+registersymbol(playerbaseptr)
+label(astrcmp)
+label(strings)
+
+newmem:
+push rcx
+push rdx
+push rax
+mov rcx,rsi // ResourceName
+mov rdx,strings // Health String
+call long astrcmp
+test al,al
+je short @f
+
+lea rcx,[rdi-20]
+mov rdx,strings
+call long astrcmp
+test al,al
+je short code
+mov [playerbaseptr],rdi
+jmp long code
+
+@@:
+mov rdx,strings+7 // Energy String
+call long astrcmp
+test al,al
+je short @f
+
+cmp [rsp+140],starbound.Star::Player::energyPercentage+48
+jne short code
+mov [playerbaseptr+8],rdi
+jmp short code
+
+@@:
+mov rdx,strings+E // Food String
+call short astrcmp
+test al,al
+je short code
+
+mov [playerbaseptr+10],rdi
+
+code:
+  pop rax
+  pop rdx
+  pop rcx
+  movss xmm0,[rdi+54]
+  jmp return
+
+astrcmp:
+push rsi
+push rdi
+mov rsi,rcx
+mov rdi,rdx
+dec rdi
+@@:
+xor rax,rax
+lodsb
+test al,al
+je short @f
+  inc rdi
+  cmp [rdi],al
+  je short @b
+  pop rdi
+  pop rsi
+  xor al,al
+  ret
+
+@@:
+pop rdi
+pop rsi
+or al,1
+ret
+
+strings:
+db 'health',0
+db 'energy',0
+db 'food',0
+
+playerbaseptr:
+dq 0
+
+playerhsh:
+  jmp newmem
+return:
+registersymbol(playerhsh)
+
+[DISABLE]
+
+playerhsh:
+  db F3 0F 10 47 54
+
+unregistersymbol(playerhsh)
+dealloc(newmem)
+unregistersymbol(playerbaseptr)
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>3</ID>
+                  <Description>"Current Health"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>[playerbaseptr]+54</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>4</ID>
+                  <Description>"Max Health"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>[playerbaseptr]+58</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>5</ID>
+                  <Description>"Current Stamina"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>[playerbaseptr+8]+54</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>6</ID>
+                  <Description>"Max Stamina"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>[playerbaseptr+8]+58</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>7</ID>
+                  <Description>"Current Hunger"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>[playerbaseptr+10]+54</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>8</ID>
+                  <Description>"Max Hunger"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>[playerbaseptr+10]+58</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>13</ID>
+              <Description>"Get Pixels Ptr"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <Color>FF0000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+aobscanmodule(getcurrency,starbound.exe,48 39 41 20 75 * 48 83)
+alloc(newmem,$1000,getcurrency)
+alloc(getpixels_bkp,1000,getcurrency)
+
+label(code)
+label(return)
+label(currencyptr)
+registersymbol(currencyptr)
+registersymbol(getpixels_bkp)
+
+getpixels_bkp:
+readmem(getcurrency,6)
+
+newmem:
+test rax,rax
+je code
+
+mov [currencyptr],rcx
+
+code:
+  cmp [rcx+20],rax
+  jmp return
+
+currencyptr:
+dq 0
+
+getcurrency:
+  jmp newmem
+  nop
+return:
+registersymbol(getcurrency)
+
+[DISABLE]
+
+getcurrency:
+  readmem(getpixels_bkp,6)
+
+unregistersymbol(getcurrency)
+dealloc(newmem)
+dealloc(newmem)
+unregistersymbol(currencyptr)
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>12</ID>
+                  <Description>"Pixels"</Description>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>[currencyptr]+20</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>14</ID>
+              <Description>"Don't lose Pixels"</Description>
+              <LastState/>
+              <Color>FF0000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+aobscanmodule(nocurrencylossondeath,starbound.exe,48 29 18 B0 01)
+
+nocurrencylossondeath:
+  db 90 90 90
+
+registersymbol(nocurrencylossondeath)
+
+[DISABLE]
+
+nocurrencylossondeath:
+  db 48 29 18
+
+unregistersymbol(nocurrencylossondeath)
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>16</ID>
+              <Description>"Get Item Base on hover over Item"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <Color>FF0000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+aobscanmodule(getitembase,starbound.exe,48 0F AF 41 60)
+alloc(newmem,$100,"starbound.exe"+258DC7)
+
+label(code)
+label(return)
+label(ibase)
+registersymbol(ibase)
+
+newmem:
+
+code:
+  mov [ibase],rcx
+  imul rax,[rcx+60]
+  jmp return
+
+ibase:
+dq 0
+
+getitembase:
+  jmp newmem
+return:
+registersymbol(getitembase)
+
+[DISABLE]
+
+getitembase:
+  db 48 0F AF 41 60
+
+unregistersymbol(getitembase)
+dealloc(newmem)
+unregistersymbol(ibase)
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>17</ID>
+                  <Description>"Current Stack"</Description>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[ibase]+60</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>18</ID>
+                  <Description>"Max Stack"</Description>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[ibase]+80</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>53</ID>
+                  <Description>"Item ID (Read Only)"</Description>
+                  <VariableType>String</VariableType>
+                  <Length>256</Length>
+                  <Unicode>0</Unicode>
+                  <CodePage>0</CodePage>
+                  <ZeroTerminate>1</ZeroTerminate>
+                  <Address>ibase</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                    <Offset>40</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>292</ID>
+                  <Description>"Name"</Description>
+                  <VariableType>String</VariableType>
+                  <Length>256</Length>
+                  <Unicode>0</Unicode>
+                  <CodePage>0</CodePage>
+                  <ZeroTerminate>1</ZeroTerminate>
+                  <Address>ibase</Address>
+                  <Offsets>
+                    <Offset>88</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>51</ID>
+                  <Description>"Name 2"</Description>
+                  <VariableType>String</VariableType>
+                  <Length>256</Length>
+                  <Unicode>0</Unicode>
+                  <CodePage>0</CodePage>
+                  <ZeroTerminate>1</ZeroTerminate>
+                  <Address>ibase</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                    <Offset>88</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>52</ID>
+                  <Description>"Category"</Description>
+                  <VariableType>String</VariableType>
+                  <Length>256</Length>
+                  <Unicode>0</Unicode>
+                  <CodePage>0</CodePage>
+                  <ZeroTerminate>1</ZeroTerminate>
+                  <Address>[ibase]+138</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>101</ID>
+                  <Description>"Pixels worth"</Description>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[ibase]+F0</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>104</ID>
+                  <Description>"Item ID Lenghts"</Description>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[ibase]+50</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>102</ID>
+                  <Description>"Category Name Lenghts"</Description>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[ibase]+148</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>103</ID>
+                  <Description>"Name Lenghts"</Description>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[ibase]+98</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>291</ID>
+                  <Description>"Item Path String"</Description>
+                  <VariableType>String</VariableType>
+                  <Length>256</Length>
+                  <Unicode>0</Unicode>
+                  <CodePage>0</CodePage>
+                  <ZeroTerminate>1</ZeroTerminate>
+                  <Address>ibase</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                    <Offset>20</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>19</ID>
+              <Description>"Max out all Items"</Description>
+              <LastState/>
+              <Color>FF0000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+aobscanmodule(everitemfullstack,starbound.exe,4C 8B 47 60 48 8B D0)
+alloc(newmem,$100,"starbound.exe"+2585FD)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  mov r8,[rdi+80]
+  mov [rdi+60],r8
+  mov rdx,rax
+  jmp return
+
+everitemfullstack:
+  jmp newmem
+  nop
+  nop
+return:
+registersymbol(everitemfullstack)
+
+[DISABLE]
+
+everitemfullstack:
+  db 4C 8B 47 60 48 8B D0
+
+unregistersymbol(everitemfullstack)
+dealloc(newmem)
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>20</ID>
+              <Description>"No Item consume on placing"</Description>
+              <LastState/>
+              <Color>FF0000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+aobscanmodule(noitemconsume,starbound.exe,72 0A 48 2B C2)
+registersymbol(noitemconsume)
+
+noitemconsume:
+  db EB 0C
+
+[DISABLE]
+
+noitemconsume:
+  db 72 0A
+
+unregistersymbol(noitemconsume)
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>21</ID>
+              <Description>"Instant break Block"</Description>
+              <LastState/>
+              <Color>FF0000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+aobscanmodule(instabreakblock,starbound.exe,F3 0F 10 05 * * * * 0F 2F 01)
+registersymbol(instabreakblock)
+
+instabreakblock:
+  db B0 01 C3
+
+[DISABLE]
+
+instabreakblock:
+  db F3 0F 10
+
+unregistersymbol(instabreakblock)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "starbound.exe"+5480A0
+
+"starbound.exe"+54808C: 77 0C                    -  ja starbound.exe+54809A
+"starbound.exe"+54808E: 80 B9 00 02 00 00 00     -  cmp byte ptr [rcx+00000200],00
+"starbound.exe"+548095: 74 03                    -  je starbound.exe+54809A
+"starbound.exe"+548097: B0 01                    -  mov al,01
+"starbound.exe"+548099: C3                       -  ret
+"starbound.exe"+54809A: 32 C0                    -  xor al,al
+"starbound.exe"+54809C: C3                       -  ret
+"starbound.exe"+54809D: CC                       -  int 3
+"starbound.exe"+54809E: CC                       -  int 3
+"starbound.exe"+54809F: CC                       -  int 3
+// ---------- INJECTING HERE ----------
+"starbound.exe"+5480A0: F3 0F 10 05 FC F3 57 00  -  movss xmm0,[starbound._real]
+// ---------- DONE INJECTING  ----------
+"starbound.exe"+5480A8: 0F 2F 01                 -  comiss xmm0,[rcx]
+"starbound.exe"+5480AB: 77 09                    -  ja starbound.exe+5480B6
+"starbound.exe"+5480AD: 80 79 14 00              -  cmp byte ptr [rcx+14],00
+"starbound.exe"+5480B1: 74 03                    -  je starbound.exe+5480B6
+"starbound.exe"+5480B3: B0 01                    -  mov al,01
+"starbound.exe"+5480B5: C3                       -  ret
+"starbound.exe"+5480B6: 32 C0                    -  xor al,al
+"starbound.exe"+5480B8: C3                       -  ret
+"starbound.exe"+5480B9: CC                       -  int 3
+"starbound.exe"+5480BA: CC                       -  int 3
+}
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>25</ID>
+              <Description>"Max Breath/Inf Health/One Hit Kill"</Description>
+              <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+              <LastState/>
+              <Color>FF0000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+aobscanmodule(breathhealthenemy,starbound.exe,F3 0F 58 70 54)
+alloc(newmem,$100,"starbound.exe")
+
+label(code)
+label(return)
+label(breath)
+label(health)
+label(enemy)
+label(breathptr)
+label(enemyptr)
+label(infbreath)
+label(infhealth)
+label(instakill)
+label(astrcmp)
+label(strings)
+registersymbol(breathptr)
+registersymbol(enemyptr)
+registersymbol(infbreath)
+registersymbol(infhealth)
+registersymbol(instakill)
+
+newmem:
+push rcx
+push rdx
+push rax
+mov rcx,rbx
+mov rdx,strings
+call long astrcmp
+test al,al
+jne short breath
+mov rdx,strings+7
+call long astrcmp
+test al,al
+jne short health
+
+breath:
+pop rax
+pop rdx
+pop rcx
+mov [breathptr],rax
+cmp [infbreath],1
+jne code
+mov [rax+54],(float)100
+jmp short code
+
+health:
+mov rcx,[rsp+10]
+add rcx,198
+mov rdx,strings+E
+call long astrcmp
+test al,al
+je short enemy
+pop rax
+pop rdx
+pop rcx
+cmp [infhealth],1
+jne short code
+push rbx
+mov rbx,[rax+58] // Max Health
+mov [rax+54],rbx
+pop rbx
+jmp short code
+
+enemy:
+pop rax
+pop rdx
+pop rcx
+mov [enemyptr],rax
+cmp [instakill],1
+jne code
+push rbx
+mov rbx,[rax+54]
+sub [rax+54],rbx
+pop rbx
+jmp code
+
+code:
+  addss xmm6,[rax+54]
+  jmp return
+
+astrcmp:
+push rsi
+push rdi
+mov rsi,rcx
+mov rdi,rdx
+dec rdi
+@@:
+xor rax,rax
+lodsb
+test al,al
+je short @f
+  inc rdi
+  cmp [rdi],al
+  je short @b
+  pop rdi
+  pop rsi
+  xor al,al
+  ret
+
+@@:
+pop rdi
+pop rsi
+or al,1
+ret
+
+breathptr:
+dq 0
+
+enemyptr:
+dq 0
+
+infbreath:
+dd 0
+
+infhealth:
+dd 0
+
+instakill:
+dd 0
+
+strings:
+db 'breat','h',0
+db 'healt','h',0
+db 'food',0
+
+breathhealthenemy:
+  jmp newmem
+return:
+registersymbol(breathhealthenemy)
+
+[DISABLE]
+
+breathhealthenemy:
+  db F3 0F 58 70 54
+
+unregistersymbol(breathhealthenemy)
+dealloc(newmem)
+unregistersymbol(breathptr)
+unregistersymbol(enemyptr)
+unregistersymbol(infbreath)
+unregistersymbol(infhealth)
+unregistersymbol(instakill)
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>26</ID>
+                  <Description>"Current Breath"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>[breathptr]+54</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>27</ID>
+                  <Description>"Max Breath"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>[breathptr]+58</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>29</ID>
+                  <Description>"Last Hit Enemy Current Health"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>[enemyptr]+54</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>30</ID>
+                  <Description>"Last Hit Enemy Max Health"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>[enemyptr]+58</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>31</ID>
+                  <Description>"Inf Health"</Description>
+                  <LastState/>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+infhealth:
+dd 1
+
+[DISABLE]
+infhealth:
+dd 0
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>32</ID>
+                  <Description>"One Hit Kill"</Description>
+                  <LastState/>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+instakill:
+dd 1
+
+[DISABLE]
+instakill:
+dd 0
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>28</ID>
+                  <Description>"Inf Breath"</Description>
+                  <LastState/>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+infbreath:
+dd 1
+
+[DISABLE]
+infbreath:
+dd 0
+</AssemblerScript>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>189</ID>
+              <Description>"Infinite Health Alternative"</Description>
+              <LastState/>
+              <Color>FF0000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+aobscanmodule(infinitehealthalternate_aob,starbound.exe,89 43 54 F3 0F 10 43 54 48 83)
+alloc(newmem,$100,"starbound.exe"+4ECC32)
+
+label(code)
+label(return)
+
+newmem:
+cmp [rbx-20],'heal'
+jne short code
+  cmp [rbx+1C0],'food'
+  jne short code
+    sub rsp,4
+    movss [rsp],xmm2 // Max
+    mov eax,[rsp]
+    add rsp,4
+code:
+  mov [rbx+54],eax
+  movss xmm0,[rbx+54]
+  jmp return
+
+infinitehealthalternate_aob:
+  jmp newmem
+  nop
+  nop
+  nop
+return:
+registersymbol(infinitehealthalternate_aob)
+
+[DISABLE]
+
+infinitehealthalternate_aob:
+  db 89 43 54 F3 0F 10 43 54
+
+unregistersymbol(infinitehealthalternate_aob)
+dealloc(newmem)
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>192</ID>
+              <Description>"Infinite Health Alternative Mod"</Description>
+              <LastState/>
+              <Color>FF0000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+aobscanmodule(setstat_aob,starbound.exe,8B 00 0F 28 74 24 20)
+alloc(newmem,$1000,"starbound.exe"+4ECC2B)
+
+label(code)
+label(return)
+
+newmem:
+cmp [rbx-20],'heal'
+jne short code
+cmp [rbx+1C0],'food'
+jne short code
+
+movss [rax],xmm2 // Max Stat
+
+code:
+  mov eax,[rax]
+  movaps xmm6,[rsp+20]
+  jmp return
+
+setstat_aob:
+  jmp newmem
+  nop
+  nop
+return:
+registersymbol(setstat_aob)
+
+[DISABLE]
+
+setstat_aob:
+  db 8B 00 0F 28 74 24 20
+
+unregistersymbol(setstat_aob)
+dealloc(newmem)
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>36</ID>
+              <Description>"Inf Jumps + Slow Fall/No Fall Damage"</Description>
+              <LastState/>
+              <Color>FF0000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+aobscanmodule(infjumps,starbound.exe,74 05 E8 * * * * 48 8D 8F 58)
+registersymbol(infjumps)
+
+infjumps:
+  db EB
+
+[DISABLE]
+
+infjumps:
+  db 74
+
+unregistersymbol(infjumps)
+{
+// ORIGINAL CODE - INJECTION POINT: "starbound.exe"+2E97A6
+
+"starbound.exe"+2E9782: E8 49 81 E3 FF              -  call starbound.exe+1218D0
+"starbound.exe"+2E9787: 80 BF 38 08 00 00 00        -  cmp byte ptr [rdi+00000838],00
+"starbound.exe"+2E978E: 75 0A                       -  jne starbound.exe+2E979A
+"starbound.exe"+2E9790: 80 7D 69 00                 -  cmp byte ptr [rbp+69],00
+"starbound.exe"+2E9794: 74 04                       -  je starbound.exe+2E979A
+"starbound.exe"+2E9796: B2 01                       -  mov dl,01
+"starbound.exe"+2E9798: EB 02                       -  jmp starbound.exe+2E979C
+"starbound.exe"+2E979A: 32 D2                       -  xor dl,dl
+"starbound.exe"+2E979C: 48 8D 8F D0 07 00 00        -  lea rcx,[rdi+000007D0]
+"starbound.exe"+2E97A3: 38 51 18                    -  cmp [rcx+18],dl
+// ---------- INJECTING HERE ----------
+"starbound.exe"+2E97A6: 74 05                       -  je starbound.exe+2E97AD
+"starbound.exe"+2E97A8: E8 23 81 E3 FF              -  call starbound.Star::NetElementBasicField&lt;bool&gt;::push
+// ---------- DONE INJECTING  ----------
+"starbound.exe"+2E97AD: 48 8D 8F 58 06 00 00        -  lea rcx,[rdi+00000658]
+"starbound.exe"+2E97B4: 0F B6 55 68                 -  movzx edx,byte ptr [rbp+68]
+"starbound.exe"+2E97B8: 38 51 18                    -  cmp [rcx+18],dl
+"starbound.exe"+2E97BB: 74 05                       -  je starbound.exe+2E97C2
+"starbound.exe"+2E97BD: E8 0E 81 E3 FF              -  call starbound.exe+1218D0
+"starbound.exe"+2E97C2: 33 C0                       -  xor eax,eax
+"starbound.exe"+2E97C4: 48 89 85 90 00 00 00        -  mov [rbp+00000090],rax
+"starbound.exe"+2E97CB: 48 8B C6                    -  mov rax,rsi
+"starbound.exe"+2E97CE: 66 90                       -  nop
+"starbound.exe"+2E97D0: F3 0F 10 84 05 90 00 00 00  -  movss xmm0,[rbp+rax+00000090]
+}
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>38</ID>
+              <Description>"Inf Jumps"</Description>
+              <LastState/>
+              <Color>FF0000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+aobscanmodule(grounded,starbound.exe,0F B6 81 E8 07 00 00)
+alloc(newmem,$100,"starbound.exe"+2F9FC0)
+
+label(code)
+label(return)
+
+newmem:
+cmp r13l,FF
+jne code
+// Inf Jumps
+mov byte ptr [rcx+000007E8],01
+jmp code
+
+code:
+  movzx eax,byte ptr [rcx+000007E8]
+  jmp return
+
+grounded:
+  jmp newmem
+  nop
+  nop
+return:
+registersymbol(grounded)
+
+[DISABLE]
+
+grounded:
+  db 0F B6 81 E8 07 00 00
+
+unregistersymbol(grounded)
+dealloc(newmem)
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>57</ID>
+              <Description>"Debug Mode"</Description>
+              <LastState/>
+              <Color>FF0000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+aobscanmodule(enabledebugmode,starbound.exe,E8 * * * * 84 C0 75 * E8 * * * * F3) //E8 * * * * = call starbound.Star::ClientCommandProcessor::debugDisplayEnabled
+alloc(debugger_bkb,5)
+debugger_bkb:
+  readmem(enabledebugmode,5)
+enabledebugmode:
+  db 90 90 90 90 90
+
+registersymbol(enabledebugmode)
+registersymbol(debugger_bkb)
+
+[DISABLE]
+
+enabledebugmode:
+  readmem(debugger_bkb,5)
+
+unregistersymbol(enabledebugmode)
+unregistersymbol(debugger_bkb)
+dealloc(debugger_bkb)
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>271</ID>
+              <Description>"Player Coordinate Stuff"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <Color>FF0000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+{$lua}
+function getAddressfromAoBlua(aobString)
+  if aobString == 0 then
+    print("AobString can't be null")
+    return nil
+  elseif readString(aobString,256,false).len == 0 then
+    print("AobString has to be longer than 0")
+    return nil
+  end
+  local AoB = AOBScan(readString(aobString,256,false))
+  if AoB.Count == 0 then
+    print("No AoB Found")
+    return nil
+  elseif AoB.Count &gt; 1 then
+    print("Found more than 1 AoB ("..AoB.Count.." AoBs)")
+    return nil
+  end
+  return tonumber(AoB[0],16)
+end
+
+{$asm}
+aobscanmodule(playercoordstuff,starbound.exe,40 53 48 83 EC 20 48 8B 89 28 F2 FF FF 48 8B DA E8 * * * * 48 8B C3)
+alloc(newmem,$1000,starbound.exe)
+
+label(return)
+label(player_position.data)
+label(player_position.end)
+label(testfunction)
+label(testfunction.null)
+label(testfunction.data)
+label(getsizeoffunction)
+label(getsizeoffunction.end)
+label(getAddressfromAoB.data)
+registersymbol(player_position.data)
+
+newmem:
+// Origignal Code
+push rbx
+sub rsp,20
+// My Code
+push rax
+push rcx
+push rdx
+mov rax,[getAddressfromAoB.data]
+test rax,rax
+jne short @f
+  mov rcx,getAddressfromAoB.data+21
+  call long getAddressfromAoB
+  test rax,rax
+  je long player_position.end
+  mov [getAddressfromAoB.data],rax
+@@:
+mov rcx,[rsp+40]
+mov rdx,rax // Should be starbound.Star::Player::render
+call long testfunction
+test rax,rax
+je long player_position.end
+  // Passed Check
+  mov rcx,[rsp+8]
+  mov [player_position.data],rcx
+player_position.end:
+pop rdx
+pop rcx
+pop rax
+jmp return
+
+testfunction:
+push rbx
+mov rbx,rcx
+mov rcx,rdx
+cmp [testfunction.data],0
+jne short @f
+  call long getsizeoffunction
+  test eax,eax
+  je testfunction.null
+    mov [testfunction.data],eax
+@@:
+mov eax,[testfunction.data]
+cmp rbx,rdx
+jb short testfunction.null
+add rdx,eax
+cmp rbx,rdx
+ja short testfunction.null
+mov rax,rbx
+pop rbx
+ret
+
+testfunction.null:
+pop rbx
+xor rax,rax
+ret
+
+getsizeoffunction:
+sub rsp,8
+push rcx
+push rdx
+push r8
+push r9
+push r10
+push r11
+push rbx
+mov rbx,rcx
+call Kernel32.IsBadCodePtr
+test al,al
+je short @f
+  xor rax,rax
+  jmp short getsizeoffunction.end
+@@:
+or rcx,-1
+@@:
+inc rcx
+mov al,[rbx+rcx]
+cmp al,C3
+jne short @b
+mov al,[rbx+rcx+1]
+cmp al,CC
+jne short @b
+mov rax,rcx
+
+getsizeoffunction.end:
+pop rbx
+pop r11
+pop r10
+pop r9
+pop r8
+pop rdx
+pop rcx
+add rsp,8
+ret
+
+getAddressfromAoB:
+push rbx
+mov rbx,rcx
+mov ecx,[getAddressfromAoB.data+8]
+test ecx,ecx
+jne short @f
+  mov rcx,getAddressfromAoB.data+C
+  call CELUA_GetFunctionReferenceFromName
+  mov [getAddressfromAoB.data+8],eax
+  mov ecx,eax
+@@:
+mov edx,1
+sub rsp,8
+mov r8,rsp
+mov [r8],rbx
+xor r9,r9
+call CELUA_ExecuteFunctionByReference
+add rsp,8
+pop rbx
+ret
+
+testfunction.data:
+dd 0 // Size
+
+getAddressfromAoB.data:
+dq 0 // Address
+dd 0
+db 'getAddressfromAoBlua',0
+db '40 55 53 56 57 41 54 41 56 41 57 48 8D AC 24 B0 FD',0 // Array of Bytes
+
+player_position.data:
+dq 0 // Base
+
+playercoordstuff:
+  jmp newmem
+  nop
+return:
+registersymbol(playercoordstuff)
+
+[DISABLE]
+
+playercoordstuff:
+  db 40 53 48 83 EC 20
+
+unregistersymbol(playercoordstuff)
+dealloc(newmem)
+unregistersymbol(player_position.data)
+
+{
+// ORIGINAL CODE - INJECTION POINT: starbound.Star::Player::position
+
+"starbound.exe"+3C2E89: 48 83 C4 50                 -  add rsp,50
+"starbound.exe"+3C2E8D: 41 5E                       -  pop r14
+"starbound.exe"+3C2E8F: C3                          -  ret 
+"starbound.exe"+3C2E90: 48 63 41 FC                 -  movsxd  rax,dword ptr [rcx-04]
+"starbound.exe"+3C2E94: 48 2B C8                    -  sub rcx,rax
+"starbound.exe"+3C2E97: E9 04 00 00 00              -  jmp starbound.exe+3C2EA0
+"starbound.exe"+3C2E9C: CC                          -  int 3 
+"starbound.exe"+3C2E9D: CC                          -  int 3 
+"starbound.exe"+3C2E9E: CC                          -  int 3 
+"starbound.exe"+3C2E9F: CC                          -  int 3 
+// ---------- INJECTING HERE ----------
+"starbound.exe"+3C2EA0: 40 53                       -  push rbx
+"starbound.exe"+3C2EA2: 48 83 EC 20                 -  sub rsp,20
+// ---------- DONE INJECTING  ----------
+"starbound.exe"+3C2EA6: 48 8B 89 28 F2 FF FF        -  mov rcx,[rcx-00000DD8]
+"starbound.exe"+3C2EAD: 48 8B DA                    -  mov rbx,rdx
+"starbound.exe"+3C2EB0: E8 2B E9 D5 FF              -  call starbound.exe+1217E0
+"starbound.exe"+3C2EB5: 48 8B C3                    -  mov rax,rbx
+"starbound.exe"+3C2EB8: 48 83 C4 20                 -  add rsp,20
+"starbound.exe"+3C2EBC: 5B                          -  pop rbx
+"starbound.exe"+3C2EBD: C3                          -  ret 
+"starbound.exe"+3C2EBE: CC                          -  int 3 
+"starbound.exe"+3C2EBF: CC                          -  int 3 
+"starbound.exe"+3C2EC0: 48 63 41 FC                 -  movsxd  rax,dword ptr [rcx-04]
+}
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>278</ID>
+                  <Description>"Player X"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>player_position.data</Address>
+                  <Offsets>
+                    <Offset>308</Offset>
+                    <Offset>-DD8</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>277</ID>
+                  <Description>"Player Y"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>player_position.data</Address>
+                  <Offsets>
+                    <Offset>3A8</Offset>
+                    <Offset>-DD8</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>81</ID>
+                  <Description>"Teleport to Cursor Activation"</Description>
+                  <Options moHideChildren="1" moActivateChildrenAsWell="1" moDeactivateChildrenAsWell="1"/>
+                  <LastState/>
+                  <Color>FF0000</Color>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+aobscanmodule(telemouse1,starbound.exe,F3 0F 10 89 50 0D 00 00)
+alloc(newmem,$1000,"starbound.exe"+3BECAB)
+
+label(code)
+label(return)
+label(cursortelex)
+label(cursorteley)
+registersymbol(cursortelex)
+registersymbol(cursorteley)
+
+newmem:
+push rdi
+mov rdi,[rcx+CB0]
+mov [cursortelex],rdi
+mov rdi,[rcx+D50]
+mov [cursorteley],rdi
+pop rdi
+
+code:
+  movss xmm1,[rcx+00000D50]
+  jmp return
+
+cursortelex:
+dq 0
+
+cursorteley:
+dq 0
+
+telemouse1:
+  jmp newmem
+  nop
+  nop
+  nop
+return:
+registersymbol(telemouse1)
+
+[DISABLE]
+
+telemouse1:
+  db F3 0F 10 89 50 0D 00 00
+
+unregistersymbol(telemouse1)
+dealloc(newmem)
+unregistersymbol(cursortelex)
+unregistersymbol(cursorteley)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "starbound.exe"+3BECAB
+
+"starbound.exe"+3BEC7F: 48 8B F1                    -  mov rsi,rcx
+"starbound.exe"+3BEC82: 8B 81 00 0C 00 00           -  mov eax,[rcx+00000C00]
+"starbound.exe"+3BEC88: 89 81 20 02 00 00           -  mov [rcx+00000220],eax
+"starbound.exe"+3BEC8E: 0F B6 81 58 0C 00 00        -  movzx eax,byte ptr [rcx+00000C58]
+"starbound.exe"+3BEC95: 88 81 98 03 00 00           -  mov [rcx+00000398],al
+"starbound.exe"+3BEC9B: E9 60 13 C2 FF              -  jmp 7FF7267E0000
+"starbound.exe"+3BECA0: 90                          -  nop
+"starbound.exe"+3BECA1: 90                          -  nop
+"starbound.exe"+3BECA2: 90                          -  nop
+"starbound.exe"+3BECA3: F3 0F 11 81 64 06 00 00     -  movss [rcx+00000664],xmm0
+// ---------- INJECTING HERE ----------
+"starbound.exe"+3BECAB: F3 0F 10 89 50 0D 00 00     -  movss xmm1,[rcx+00000D50]
+// ---------- DONE INJECTING  ----------
+"starbound.exe"+3BECB3: F3 0F 11 89 68 06 00 00     -  movss [rcx+00000668],xmm1
+"starbound.exe"+3BECBB: 0F B6 81 10 10 00 00        -  movzx eax,byte ptr [rcx+00001010]
+"starbound.exe"+3BECC2: C6 81 10 10 00 00 00        -  mov byte ptr [rcx+00001010],00
+"starbound.exe"+3BECC9: 84 C0                       -  test al,al
+"starbound.exe"+3BECCB: 74 2D                       -  je starbound.exe+3BECFA
+"starbound.exe"+3BECCD: 48 8D 91 E8 0D 00 00        -  lea rdx,[rcx+00000DE8]
+"starbound.exe"+3BECD4: 48 81 C1 F8 06 00 00        -  add rcx,000006F8
+"starbound.exe"+3BECDB: E8 C0 BD E7 FF              -  call starbound.exe+23AAA0
+"starbound.exe"+3BECE0: C6 86 20 09 00 00 01        -  mov byte ptr [rsi+00000920],01
+"starbound.exe"+3BECE7: 48 8D 96 F8 06 00 00        -  lea rdx,[rsi+000006F8]
+}
+</AssemblerScript>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>82</ID>
+                      <Description>"Teleport to Cursor Activation Player"</Description>
+                      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+                      <LastState/>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>[ENABLE]
+alloc(teleporttocursor.main,0x1000,$process)
+registersymbol(teleporttocursor.main)
+createthread(teleporttocursor.main)
+
+label(teleporttocursor.main.end)
+label(teleporttocursor.main.shouldend)
+label(teleporttocursor.main.threadstate)
+label(teleporttocursor.main.data)
+label(teleporttocursor.main.getcursor)
+label(teleporttocursor.main.setposition)
+registersymbol(teleporttocursor.main.shouldend)
+registersymbol(teleporttocursor.main.threadstate)
+registersymbol(teleporttocursor.main.data)
+
+teleporttocursor.main:
+cmp [teleporttocursor.main.data],1
+jne long teleporttocursor.main.end
+  and [teleporttocursor.main.data],0
+  mov rcx,teleporttocursor.main.data+4
+  call long teleporttocursor.main.getcursor
+  mov rcx,rax
+  call long teleporttocursor.main.setposition
+
+teleporttocursor.main.end:
+xor ecx,ecx
+call Kernel32.Sleep
+cmp [teleporttocursor.main.shouldend],1
+jne long teleporttocursor.main
+
+and [teleporttocursor.main.threadstate],0
+
+ret
+
+teleporttocursor.main.getcursor:
+mov eax,[cursortelex]
+mov [rcx],eax
+mov eax,[cursorteley]
+mov [rcx+4],eax
+mov rax,rcx
+ret
+
+teleporttocursor.main.setposition:
+mov rdx,[player_position.data]
+test rdx,rdx
+je short @f
+mov rdx,[rdx-DD8]
+test rdx,rdx
+je short @f
+mov eax,[rcx]
+mov [rdx+308],eax
+mov eax,[rcx+4]
+mov [rdx+3A8],eax
+xor eax,eax
+
+@@:
+ret
+
+teleporttocursor.main.shouldend:
+dd 0
+teleporttocursor.main.threadstate:
+dd 1
+
+teleporttocursor.main.data:
+dd 0,0,0
+
+[DISABLE]
+teleporttocursor.main.shouldend:
+dd 1
+
+{$lua}
+if syntaxcheck then return end
+local function destroyMainThread(luathread)
+  while true do
+    if not getAddressSafe("teleporttocursor.main") then
+      print("Failure")
+      break
+    end
+    if readInteger("teleporttocursor.main.threadstate") == 0 then
+      sleep(500)
+      if deAlloc("teleporttocursor.main") then
+        unregisterSymbol("teleporttocursor.main")
+        unregisterSymbol("teleporttocursor.main.shouldend")
+        unregisterSymbol("teleporttocursor.main.threadstate")
+        unregisterSymbol("teleporttocursor.main.data")
+      else
+        print("Deallocating Memory failed")
+      end
+      break
+    end
+    sleep(0)
+  end
+  print("Destroying thread done")
+  luathread.terminate()
+end
+createThread(destroyMainThread)
+</AssemblerScript>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>83</ID>
+                          <Description>"Telport to Cursor"</Description>
+                          <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">0:No
+1:Yes
+</DropDownList>
+                          <VariableType>4 Bytes</VariableType>
+                          <Address>teleporttocursor.main.data</Address>
+                          <Hotkeys>
+                            <Hotkey>
+                              <Action>Set Value</Action>
+                              <Keys>
+                                <Key>4</Key>
+                              </Keys>
+                              <Value>1</Value>
+                              <ID>0</ID>
+                            </Hotkey>
+                          </Hotkeys>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>61</ID>
+              <Description>"Cursor Coords"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <Color>FF0000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+aobscanmodule(getcursor,starbound.exe,F3 0F 10 81 B0 0C 00 00)
+alloc(newmem,$1000,"starbound.exe"+3BEC9B)
+
+label(code)
+label(return)
+label(cursor_coords)
+registersymbol(cursor_coords)
+
+newmem:
+
+code:
+  mov [cursor_coords],rcx
+  movss xmm0,[rcx+00000CB0]
+  jmp return
+
+cursor_coords:
+dq 0
+
+getcursor:
+  jmp newmem
+  nop
+  nop
+  nop
+return:
+registersymbol(getcursor)
+
+[DISABLE]
+
+getcursor:
+  db F3 0F 10 81 B0 0C 00 00
+
+unregistersymbol(getcursor)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "starbound.exe"+3BEC9B
+
+"starbound.exe"+3BEC64: 48 81 EC E0 00 00 00        -  sub rsp,000000E0
+"starbound.exe"+3BEC6B: 48 C7 44 24 20 FE FF FF FF  -  mov qword ptr [rsp+20],FFFFFFFE
+"starbound.exe"+3BEC74: 48 89 58 10                 -  mov [rax+10],rbx
+"starbound.exe"+3BEC78: 48 89 70 20                 -  mov [rax+20],rsi
+"starbound.exe"+3BEC7C: 0F B6 FA                    -  movzx edi,dl
+"starbound.exe"+3BEC7F: 48 8B F1                    -  mov rsi,rcx
+"starbound.exe"+3BEC82: 8B 81 00 0C 00 00           -  mov eax,[rcx+00000C00]
+"starbound.exe"+3BEC88: 89 81 20 02 00 00           -  mov [rcx+00000220],eax
+"starbound.exe"+3BEC8E: 0F B6 81 58 0C 00 00        -  movzx eax,byte ptr [rcx+00000C58]
+"starbound.exe"+3BEC95: 88 81 98 03 00 00           -  mov [rcx+00000398],al
+// ---------- INJECTING HERE ----------
+"starbound.exe"+3BEC9B: F3 0F 10 81 B0 0C 00 00     -  movss xmm0,[rcx+00000CB0]
+// ---------- DONE INJECTING  ----------
+"starbound.exe"+3BECA3: F3 0F 11 81 64 06 00 00     -  movss [rcx+00000664],xmm0
+"starbound.exe"+3BECAB: F3 0F 10 89 50 0D 00 00     -  movss xmm1,[rcx+00000D50]
+"starbound.exe"+3BECB3: F3 0F 11 89 68 06 00 00     -  movss [rcx+00000668],xmm1
+"starbound.exe"+3BECBB: 0F B6 81 10 10 00 00        -  movzx eax,byte ptr [rcx+00001010]
+"starbound.exe"+3BECC2: C6 81 10 10 00 00 00        -  mov byte ptr [rcx+00001010],00
+"starbound.exe"+3BECC9: 84 C0                       -  test al,al
+"starbound.exe"+3BECCB: 74 2D                       -  je starbound.exe+3BECFA
+"starbound.exe"+3BECCD: 48 8D 91 E8 0D 00 00        -  lea rdx,[rcx+00000DE8]
+"starbound.exe"+3BECD4: 48 81 C1 F8 06 00 00        -  add rcx,000006F8
+"starbound.exe"+3BECDB: E8 C0 BD E7 FF              -  call starbound.exe+23AAA0
+}
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>62</ID>
+                  <Description>"Cursor Postion 1"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>cursor_coords</Address>
+                  <Offsets>
+                    <Offset>CB0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>72</ID>
+                  <Description>"Cursor Position 2"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>cursor_coords</Address>
+                  <Offsets>
+                    <Offset>D50</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>64</ID>
+              <Description>"Get Gravity"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <Color>FF0000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+aobscanmodule(getgravity,starbound.exe,F3 0F 10 40 34)
+alloc(newmem,$100,"starbound.exe"+6C2133)
+
+label(code)
+label(return)
+label(gravityptr)
+registersymbol(gravityptr)
+
+newmem:
+cmp [rsp+68],starbound.Star::WorldClient::gravity+147 // Return Address for Gravity
+jne code
+mov [gravityptr],rax
+
+code:
+  movss xmm0,[rax+34]
+  jmp return
+
+gravityptr:
+dq 0
+
+getgravity:
+  jmp newmem
+return:
+registersymbol(getgravity)
+
+[DISABLE]
+
+getgravity:
+  db F3 0F 10 40 34
+
+unregistersymbol(getgravity)
+dealloc(newmem)
+unregistersymbol(gravityptr)
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>67</ID>
+                  <Description>"Gravity"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>[gravityptr]+34</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>178</ID>
+              <Description>"Set Gravity"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <Color>FF0000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+aobscanmodule(setgravity,starbound.exe,0F 28 F0 80 7F 04 00)
+alloc(newmem,$1000,"starbound.exe"+617267)
+
+label(code)
+label(return)
+label(setgravityvalue)
+registersymbol(setgravityvalue)
+
+newmem:
+movss xmm0,[setgravityvalue]
+
+code:
+  movaps xmm6,xmm0
+  cmp byte ptr [rdi+04],00
+  jmp return
+
+setgravityvalue:
+dd (float)80
+
+setgravity:
+  jmp newmem
+  nop
+  nop
+return:
+registersymbol(setgravity)
+
+[DISABLE]
+
+setgravity:
+  db 0F 28 F0 80 7F 04 00
+
+unregistersymbol(setgravity)
+dealloc(newmem)
+unregistersymbol(setgravityvalue)
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>179</ID>
+                  <Description>"Gravity to set to"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>setgravityvalue</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>68</ID>
+              <Description>"Full Bright"</Description>
+              <LastState/>
+              <Color>FF0000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+aobscanmodule(fullbright,starbound.exe,74 * 44 89 75 28)
+alloc(fullbright_bkb,2)
+fullbright_bkb:
+  readmem(fullbright,2)
+fullbright:
+  db 90 90
+
+registersymbol(fullbright)
+registersymbol(fullbright_bkb)
+
+[DISABLE]
+
+fullbright:
+  readmem(fullbright_bkb,2)
+
+unregistersymbol(fullbright)
+dealloc(fullbright_bkb)
+unregistersymbol(fullbright_bkb)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "starbound.exe"+5F76F3
+
+"starbound.exe"+5F76C2: 2B 44 24 60              -  sub eax,[rsp+60]
+"starbound.exe"+5F76C6: 89 45 B8                 -  mov [rbp-48],eax
+"starbound.exe"+5F76C9: 8B 44 24 6C              -  mov eax,[rsp+6C]
+"starbound.exe"+5F76CD: 2B 44 24 64              -  sub eax,[rsp+64]
+"starbound.exe"+5F76D1: 89 45 BC                 -  mov [rbp-44],eax
+"starbound.exe"+5F76D4: 41 B8 08 00 00 00        -  mov r8d,00000008
+"starbound.exe"+5F76DA: 48 8D 55 B8              -  lea rdx,[rbp-48]
+"starbound.exe"+5F76DE: 48 8D 8D 98 00 00 00     -  lea rcx,[rbp+00000098]
+"starbound.exe"+5F76E5: FF 15 ED 8F 4C 00        -  call qword ptr [starbound.exe+AC06D8]
+"starbound.exe"+5F76EB: 41 80 BD 88 01 00 00 00  -  cmp byte ptr [r13+00000188],00
+// ---------- INJECTING HERE ----------
+"starbound.exe"+5F76F3: 74 3D                    -  je starbound.exe+5F7732
+"starbound.exe"+5F76F5: 44 89 75 28              -  mov [rbp+28],r14d
+// ---------- DONE INJECTING  ----------
+"starbound.exe"+5F76F9: C6 45 2C 01              -  mov byte ptr [rbp+2C],01
+"starbound.exe"+5F76FD: 4D 8D 77 40              -  lea r14,[r15+40]
+"starbound.exe"+5F7701: 4C 8D 45 28              -  lea r8,[rbp+28]
+"starbound.exe"+5F7705: 48 8B 95 98 00 00 00     -  mov rdx,[rbp+00000098]
+"starbound.exe"+5F770C: 49 8B CE                 -  mov rcx,r14
+"starbound.exe"+5F770F: E8 3C 42 A7 FF           -  call starbound.exe+6B950
+"starbound.exe"+5F7714: 66 C7 44 24 39 FF FF     -  mov word ptr [rsp+39],FFFF
+"starbound.exe"+5F771B: C6 44 24 3B FF           -  mov byte ptr [rsp+3B],-01
+"starbound.exe"+5F7720: 48 8D 54 24 39           -  lea rdx,[rsp+39]
+"starbound.exe"+5F7725: 49 8B CE                 -  mov rcx,r14
+}
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>70</ID>
+              <Description>"Fixed Camera"</Description>
+              <LastState/>
+              <Color>FF0000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+aobscanmodule(fixedcamera,starbound.exe,0F B6 81 59 01 00 00)
+registersymbol(fixedcamera)
+
+fixedcamera:
+  db 0C 01 C3
+
+[DISABLE]
+
+fixedcamera:
+  db 0F B6 81
+
+unregistersymbol(fixedcamera)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "starbound.exe"+8AC4B0
+
+"starbound.exe"+8AC4A6: CC                          -  int 3
+"starbound.exe"+8AC4A7: CC                          -  int 3
+"starbound.exe"+8AC4A8: CC                          -  int 3
+"starbound.exe"+8AC4A9: CC                          -  int 3
+"starbound.exe"+8AC4AA: CC                          -  int 3
+"starbound.exe"+8AC4AB: CC                          -  int 3
+"starbound.exe"+8AC4AC: CC                          -  int 3
+"starbound.exe"+8AC4AD: CC                          -  int 3
+"starbound.exe"+8AC4AE: CC                          -  int 3
+"starbound.exe"+8AC4AF: CC                          -  int 3
+// ---------- INJECTING HERE ----------
+"starbound.exe"+8AC4B0: 0F B6 81 59 01 00 00        -  movzx eax,byte ptr [rcx+00000159]
+// ---------- DONE INJECTING  ----------
+"starbound.exe"+8AC4B7: C3                          -  ret
+"starbound.exe"+8AC4B8: CC                          -  int 3
+"starbound.exe"+8AC4B9: CC                          -  int 3
+"starbound.exe"+8AC4BA: CC                          -  int 3
+"starbound.exe"+8AC4BB: CC                          -  int 3
+"starbound.exe"+8AC4BC: CC                          -  int 3
+"starbound.exe"+8AC4BD: CC                          -  int 3
+"starbound.exe"+8AC4BE: CC                          -  int 3
+"starbound.exe"+8AC4BF: CC                          -  int 3
+"starbound.exe"+8AC4C0: 40 57                       -  push rdi
+}
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>48</ID>
+              <Description>"Teleport Activation"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <Color>FF0000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{
+RCX==Base to Coords
++308=x-Coord
++3A8=y-Coord
+}
+[ENABLE]
+aobscanmodule(teleportscript,starbound.exe,33 C9 48 89 8D A8 02 00 00)
+alloc(newmem,$1000,"starbound.exe"+3DF40E)
+
+label(code)
+label(return)
+label(savec)
+label(save)
+label(load)
+label(savef)
+label(loadf)
+registersymbol(savec)
+registersymbol(savef)
+registersymbol(loadf)
+
+newmem:
+cmp [savef],1
+je save
+cmp [loadf],1
+je load
+jmp code
+
+save:
+mov [savef],0
+push rax
+mov rax,[rcx+308]
+mov [savec],rax
+mov rax,[rcx+3A8]
+mov [savec+8],rax
+pop rax
+jmp code
+
+load:
+mov [loadf],0
+push rax
+mov rax,[savec]
+mov [rcx+308],rax
+mov rax,[savec+8]
+mov [rcx+3A8],rax
+pop rax
+jmp code
+
+code:
+  xor ecx,ecx
+  mov [rbp+000002A8],rcx
+  jmp return
+savef:
+dd 0
+
+loadf:
+dd 0
+
+savec:
+dq 0
+
+// Nothing Benease this because theres y stored
+
+teleportscript:
+  jmp newmem
+  nop
+  nop
+  nop
+  nop
+return:
+registersymbol(teleportscript)
+
+[DISABLE]
+
+teleportscript:
+  db 33 C9 48 89 8D A8 02 00 00
+
+unregistersymbol(teleportscript)
+dealloc(newmem)
+unregistersymbol(savec)
+unregistersymbol(savef)
+unregistersymbol(loadf)
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>172</ID>
+                  <Description>"Save Current Location"</Description>
+                  <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">0:No
+1:Yes
+</DropDownList>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>savef</Address>
+                  <Hotkeys>
+                    <Hotkey>
+                      <Action>Set Value</Action>
+                      <Keys>
+                        <Key>97</Key>
+                      </Keys>
+                      <Value>1</Value>
+                      <ID>0</ID>
+                    </Hotkey>
+                  </Hotkeys>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>173</ID>
+                  <Description>"Teleport to Save"</Description>
+                  <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">0:No
+1:Yes
+</DropDownList>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>loadf</Address>
+                  <Hotkeys>
+                    <Hotkey>
+                      <Action>Set Value</Action>
+                      <Keys>
+                        <Key>98</Key>
+                      </Keys>
+                      <Value>1</Value>
+                      <ID>0</ID>
+                    </Hotkey>
+                  </Hotkeys>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>78</ID>
+                  <Description>"Saved X-Pos"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>savec</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>79</ID>
+                  <Description>"Saved Y-Pos"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>savec+8</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87</ID>
+              <Description>"Ultimate Craft"</Description>
+              <LastState/>
+              <Color>FF0000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+aobscanmodule(craftingwidgetvivible,starbound.exe,0F 85 8C 01 00 00 4D)
+registersymbol(craftingwidgetvivible)
+
+aobscanmodule(craftbuttonalwaysactive,starbound.exe,75 18 4C 8D 45 A8)
+registersymbol(craftbuttonalwaysactive)
+
+aobscanmodule(infinitemaxitems,starbound.exe,74 0A B8 E8 03 00 00)
+registersymbol(infinitemaxitems)
+
+aobscanmodule(noitemconsume,starbound.exe,75 3D 45 8B C4)
+registersymbol(noitemconsume)
+
+craftingwidgetvivible:
+  db E9 8D 01 00 00 90
+
+craftbuttonalwaysactive:
+  db EB
+
+infinitemaxitems:
+  db 90 90
+
+noitemconsume:
+  db EB
+
+[DISABLE]
+craftingwidgetvivible:
+  db 0F 85 8C 01 00 00
+
+craftbuttonalwaysactive:
+  db 75
+
+infinitemaxitems:
+  db 74 0A
+
+noitemconsume:
+  db 75
+
+unregistersymbol(craftingwidgetvivible)
+unregistersymbol(craftbuttonalwaysactive)
+unregistersymbol(infinitemaxitems)
+unregistersymbol(noitemconsume)
+
+{
+// ORIGINAL CODE - INJECTION POINT: craftingwidgetvivible
+
+"starbound.exe"+8C6959: 48 8D 8D 50 03 00 00           -  lea rcx,[rbp+00000350]
+"starbound.exe"+8C6960: E8 DB 2B 75 FF                 -  call starbound.exe+19540
+"starbound.exe"+8C6965: 4C 8B AD 50 04 00 00           -  mov r13,[rbp+00000450]
+"starbound.exe"+8C696C: 49 8B 95 58 02 00 00           -  mov rdx,[r13+00000258]
+"starbound.exe"+8C6973: 48 8B 02                       -  mov rax,[rdx]
+"starbound.exe"+8C6976: 48 63 48 08                    -  movsxd  rcx,dword ptr [rax+08]
+"starbound.exe"+8C697A: 48 03 CA                       -  add rcx,rdx
+"starbound.exe"+8C697D: 48 8B 01                       -  mov rax,[rcx]
+"starbound.exe"+8C6980: FF 50 18                       -  call qword ptr [rax+18]
+"starbound.exe"+8C6983: 84 C0                          -  test al,al
+// ---------- INJECTING HERE ----------
+"starbound.exe"+8C6985: 0F 85 8C 01 00 00              -  jne starbound.exe+8C6B17
+// ---------- DONE INJECTING  ----------
+"starbound.exe"+8C698B: 4D 8B 04 24                    -  mov r8,[r12]
+"starbound.exe"+8C698F: 4D 3B 44 24 08                 -  cmp r8,[r12+08]
+"starbound.exe"+8C6994: 75 2D                          -  jne starbound.exe+8C69C3
+"starbound.exe"+8C6996: 49 8B 4C 24 08                 -  mov rcx,[r12+08]
+"starbound.exe"+8C699B: 49 2B C8                       -  sub rcx,r8
+"starbound.exe"+8C699E: 48 8B C7                       -  mov rax,rdi
+"starbound.exe"+8C69A1: 48 F7 E9                       -  imul rcx
+"starbound.exe"+8C69A4: 48 C1 FA 03                    -  sar rdx,03
+"starbound.exe"+8C69A8: 48 8B C2                       -  mov rax,rdx
+"starbound.exe"+8C69AB: 48 C1 E8 3F                    -  shr rax,3F
+}
+
+{
+// ORIGINAL CODE - INJECTION POINT: craftbuttonalwaysactive
+
+"starbound.exe"+8C897B: E8 00 70 9A FF        -  call starbound.exe+26F980
+"starbound.exe"+8C8980: 84 C0                 -  test al,al
+"starbound.exe"+8C8982: 75 38                 -  jne starbound.exe+8C89BC
+"starbound.exe"+8C8984: 48 8B 96 58 02 00 00  -  mov rdx,[rsi+00000258]
+"starbound.exe"+8C898B: 48 8B 02              -  mov rax,[rdx]
+"starbound.exe"+8C898E: 48 63 48 08           -  movsxd  rcx,dword ptr [rax+08]
+"starbound.exe"+8C8992: 48 03 CA              -  add rcx,rdx
+"starbound.exe"+8C8995: 48 8B 01              -  mov rax,[rcx]
+"starbound.exe"+8C8998: FF 50 18              -  call qword ptr [rax+18]
+"starbound.exe"+8C899B: 84 C0                 -  test al,al
+// ---------- INJECTING HERE ----------
+"starbound.exe"+8C899D: 75 18                 -  jne starbound.exe+8C89B7
+"starbound.exe"+8C899F: 4C 8D 45 A8           -  lea r8,[rbp-58]
+// ---------- DONE INJECTING  ----------
+"starbound.exe"+8C89A3: 48 8D 55 D0           -  lea rdx,[rbp-30]
+"starbound.exe"+8C89A7: 48 8D 8D C0 00 00 00  -  lea rcx,[rbp+000000C0]
+"starbound.exe"+8C89AE: E8 BD 80 99 FF        -  call starbound.exe+260A70
+"starbound.exe"+8C89B3: 84 C0                 -  test al,al
+"starbound.exe"+8C89B5: 74 05                 -  je starbound.exe+8C89BC
+"starbound.exe"+8C89B7: 41 B6 01              -  mov r14l,01
+"starbound.exe"+8C89BA: EB 03                 -  jmp starbound.exe+8C89BF
+"starbound.exe"+8C89BC: 45 32 F6              -  xor r14l,r14l
+"starbound.exe"+8C89BF: 48 8D 15 9A C5 38 00  -  lea rdx,[starbound.exe+C54F60]
+"starbound.exe"+8C89C6: 48 8D 4D F8           -  lea rcx,[rbp-08]
+}
+
+{
+// ORIGINAL CODE - INJECTION POINT: infinitemaxitems
+
+"starbound.exe"+8C56E4: 48 89 58 18                       -  mov [rax+18],rbx
+"starbound.exe"+8C56E8: 48 89 70 20                       -  mov [rax+20],rsi
+"starbound.exe"+8C56EC: 48 8B F1                          -  mov rsi,rcx
+"starbound.exe"+8C56EF: 4C 8B 81 58 02 00 00              -  mov r8,[rcx+00000258]
+"starbound.exe"+8C56F6: 49 8B 00                          -  mov rax,[r8]
+"starbound.exe"+8C56F9: 48 63 48 08                       -  movsxd  rcx,dword ptr [rax+08]
+"starbound.exe"+8C56FD: 49 03 C8                          -  add rcx,r8
+"starbound.exe"+8C5700: 48 8B 01                          -  mov rax,[rcx]
+"starbound.exe"+8C5703: FF 50 18                          -  call qword ptr [rax+18]
+"starbound.exe"+8C5706: 84 C0                             -  test al,al
+// ---------- INJECTING HERE ----------
+"starbound.exe"+8C5708: 74 0A                             -  je starbound.exe+8C5714
+"starbound.exe"+8C570A: B8 E8 03 00 00                    -  mov eax,000003E8
+// ---------- DONE INJECTING  ----------
+"starbound.exe"+8C570F: E9 E5 01 00 00                    -  jmp starbound.exe+8C58F9
+"starbound.exe"+8C5714: E8 07 35 BB FF                    -  call starbound.exe+478C20
+"starbound.exe"+8C5719: 48 8B C8                          -  mov rcx,rax
+"starbound.exe"+8C571C: 48 8D 54 24 20                    -  lea rdx,[rsp+20]
+"starbound.exe"+8C5721: E8 CA 0D BB FF                    -  call starbound.exe+4764F0
+"starbound.exe"+8C5726: 90                                -  nop
+"starbound.exe"+8C5727: C7 84 24 E0 01 00 00 00 00 00 00  -  mov [rsp+000001E0],00000000
+"starbound.exe"+8C5732: 48 8B 8E 38 03 00 00              -  mov rcx,[rsi+00000338]
+"starbound.exe"+8C5739: E8 52 57 F9 FF                    -  call starbound.exe+85AE90
+"starbound.exe"+8C573E: 83 CF FF                          -  or edi,-01
+}
+
+{
+// ORIGINAL CODE - INJECTION POINT: noitemconsume
+
+"starbound.exe"+8C28C3: 49 8B CE                 -  mov rcx,r14
+"starbound.exe"+8C28C6: E8 D5 30 00 00           -  call starbound.exe+8C59A0
+"starbound.exe"+8C28CB: 90                       -  nop
+"starbound.exe"+8C28CC: 49 8B 96 58 02 00 00     -  mov rdx,[r14+00000258]
+"starbound.exe"+8C28D3: 48 8B 02                 -  mov rax,[rdx]
+"starbound.exe"+8C28D6: 48 63 48 08              -  movsxd  rcx,dword ptr [rax+08]
+"starbound.exe"+8C28DA: 48 03 CA                 -  add rcx,rdx
+"starbound.exe"+8C28DD: 48 8B 01                 -  mov rax,[rcx]
+"starbound.exe"+8C28E0: FF 50 18                 -  call qword ptr [rax+18] // Player::IsAdmin
+"starbound.exe"+8C28E3: 84 C0                    -  test al,al
+// ---------- INJECTING HERE ----------
+"starbound.exe"+8C28E5: 75 3D                    -  jne starbound.exe+8C2924
+"starbound.exe"+8C28E7: 45 8B C4                 -  mov r8d,r12d
+// ---------- DONE INJECTING  ----------
+"starbound.exe"+8C28EA: 48 8D 55 20              -  lea rdx,[rbp+20]
+"starbound.exe"+8C28EE: 49 8B CE                 -  mov rcx,r14
+"starbound.exe"+8C28F1: E8 AA F4 FF FF           -  call starbound.exe+8C1DA0
+"starbound.exe"+8C28F6: 84 C0                    -  test al,al
+"starbound.exe"+8C28F8: 75 2A                    -  jne starbound.exe+8C2924
+"starbound.exe"+8C28FA: 49 8B 8E 88 02 00 00     -  mov rcx,[r14+00000288]
+"starbound.exe"+8C2901: 48 85 C9                 -  test rcx,rcx
+"starbound.exe"+8C2904: 74 08                    -  je starbound.exe+8C290E
+"starbound.exe"+8C2906: 0F 57 C9                 -  xorps xmm1,xmm1
+"starbound.exe"+8C2909: E8 32 69 84 FF           -  call starbound.exe+109240
+}
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>90</ID>
+              <Description>"Ship Level"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <Color>FF0000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+aobscanmodule(shiplevelaob,starbound.exe,8B 83 00 07 00 00)
+alloc(newmem,$1000,"starbound.exe"+47E5AC)
+
+label(code)
+label(return)
+label(shiplevel.data)
+registersymbol(shiplevel.data)
+
+newmem:
+mov [shiplevel.data],rbx
+
+code:
+  mov eax,[rbx+00000700]
+  jmp return
+
+shiplevel.data:
+dq 0
+
+shiplevelaob:
+  jmp newmem
+  nop
+return:
+registersymbol(shiplevelaob)
+
+[DISABLE]
+
+shiplevelaob:
+  db 8B 83 00 07 00 00
+
+unregistersymbol(shiplevelaob)
+dealloc(newmem)
+unregistersymbol(shiplevel.data)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "starbound.exe"+47E5AC
+
+"starbound.exe"+47E585: 48 89 5C 24 70              -  mov [rsp+70],rbx
+"starbound.exe"+47E58A: 48 8B F2                    -  mov rsi,rdx
+"starbound.exe"+47E58D: 48 8B D9                    -  mov rbx,rcx
+"starbound.exe"+47E590: 33 ED                       -  xor ebp,ebp
+"starbound.exe"+47E592: 89 6C 24 20                 -  mov [rsp+20],ebp
+"starbound.exe"+47E596: 48 8D 79 78                 -  lea rdi,[rcx+78]
+"starbound.exe"+47E59A: 48 89 7C 24 30              -  mov [rsp+30],rdi
+"starbound.exe"+47E59F: 48 8B CF                    -  mov rcx,rdi
+"starbound.exe"+47E5A2: E8 99 8D C5 FF              -  call starbound.exe+D7340
+"starbound.exe"+47E5A7: C6 44 24 38 01              -  mov byte ptr [rsp+38],01
+// ---------- INJECTING HERE ----------
+"starbound.exe"+47E5AC: 8B 83 00 07 00 00           -  mov eax,[rbx+00000700]
+// ---------- DONE INJECTING  ----------
+"starbound.exe"+47E5B2: 89 06                       -  mov [rsi],eax
+"starbound.exe"+47E5B4: 8B 83 04 07 00 00           -  mov eax,[rbx+00000704]
+"starbound.exe"+47E5BA: 89 46 04                    -  mov [rsi+04],eax
+"starbound.exe"+47E5BD: 8B 83 08 07 00 00           -  mov eax,[rbx+00000708]
+"starbound.exe"+47E5C3: 89 46 08                    -  mov [rsi+08],eax
+"starbound.exe"+47E5C6: 8B 83 0C 07 00 00           -  mov eax,[rbx+0000070C]
+"starbound.exe"+47E5CC: 89 46 0C                    -  mov [rsi+0C],eax
+"starbound.exe"+47E5CF: 8B 83 10 07 00 00           -  mov eax,[rbx+00000710]
+"starbound.exe"+47E5D5: 89 46 10                    -  mov [rsi+10],eax
+"starbound.exe"+47E5D8: 48 8D 93 18 07 00 00        -  lea rdx,[rbx+00000718]
+}
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>290</ID>
+                  <Description>"Ship Level"</Description>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>shiplevel.data</Address>
+                  <Offsets>
+                    <Offset>700</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>186</ID>
+              <Description>"Mech Energy"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <Color>FF0000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>// xmm0 == current _ 0     double
+// xmm3 == 0 _ max _ 0 _ 0 float
+define(bytes,41 0F 11 06 C6 47 0A 00)
+
+[ENABLE]
+aobscanmodule(getmechenergy,starbound.exe,41 0F 11 06 C6 47 0A 00)
+alloc(newmem,$100,"starbound.exe"+4CE73)
+registersymbol(getmechenergy)
+
+label(code)
+label(return)
+label(mechptr)
+label(infmechf)
+registersymbol(infmechf)
+registersymbol(mechptr)
+
+newmem:
+push rax
+cmp [rsp+18],starbound.math_max
+jne short code
+cmp [rsp+50],starbound.luaV_execute+361
+jne short code
+cmp [r14],0
+je short code
+mov rax,[r14+10]
+cmp [rax+18],'energy'
+jne short code
+// Get Mech Pointer
+mov [mechptr],r14
+cmp [infmechf],1
+jne short code
+// Acctually do stuff
+sub rsp,16
+movdqu [rsp],xmm2
+movaps xmm2,xmm3
+shufps xmm2,xmm2,55 // Now xmm2 = max _ max _ max _ max
+cvtss2sd xmm0,xmm2
+movdqu xmm2,[rsp]
+add rsp,16
+
+code:
+  pop rax
+  movups [r14],xmm0
+  mov byte ptr [rdi+0A],00
+  jmp return
+
+mechptr:
+dq 0
+
+infmechf:
+dd 0
+
+getmechenergy:
+  jmp newmem
+  nop
+  nop
+  nop
+return:
+
+[DISABLE]
+
+getmechenergy:
+  db bytes
+
+dealloc(newmem)
+unregistersymbol(mechptr)
+unregistersymbol(infmechf)
+unregistersymbol(getmechenergy)
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>187</ID>
+                  <Description>"Current Mech Energy"</Description>
+                  <VariableType>Double</VariableType>
+                  <Address>[mechptr]</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>188</ID>
+                  <Description>"Inf Mech Energy"</Description>
+                  <LastState/>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>{$lua}
+[ENABLE]
+writeBytes("infmechf",1)
+
+[DISABLE]
+writeBytes("infmechf",0)
+</AssemblerScript>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>99</ID>
+              <Description>"Get Is admin Pointer"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <Color>FF0000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+aobscanmodule(getadmin,starbound.exe,0F B6 81 98 03 00 00)
+alloc(newmem,$1000,"starbound.exe"+890EA0)
+
+label(code)
+label(return)
+label(isadminptr)
+registersymbol(isadminptr)
+
+newmem:
+mov [isadminptr],rcx
+
+code:
+  movzx eax,byte ptr [rcx+00000398]
+  jmp return
+
+isadminptr:
+dq 0
+
+getadmin:
+  jmp newmem
+  nop
+  nop
+return:
+registersymbol(getadmin)
+
+[DISABLE]
+
+getadmin:
+  db 0F B6 81 98 03 00 00
+
+unregistersymbol(getadmin)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "starbound.exe"+890EA0
+
+"starbound.exe"+890E87: 48 8B 5C 24 58              -  mov rbx,[rsp+58]
+"starbound.exe"+890E8C: 48 8B 6C 24 60              -  mov rbp,[rsp+60]
+"starbound.exe"+890E91: 48 8B 74 24 68              -  mov rsi,[rsp+68]
+"starbound.exe"+890E96: 48 83 C4 40                 -  add rsp,40
+"starbound.exe"+890E9A: 5F                          -  pop rdi
+"starbound.exe"+890E9B: C3                          -  ret
+"starbound.exe"+890E9C: CC                          -  int 3
+"starbound.exe"+890E9D: CC                          -  int 3
+"starbound.exe"+890E9E: CC                          -  int 3
+"starbound.exe"+890E9F: CC                          -  int 3
+// ---------- INJECTING HERE ----------
+"starbound.exe"+890EA0: 0F B6 81 98 03 00 00        -  movzx eax,byte ptr [rcx+00000398]
+// ---------- DONE INJECTING  ----------
+"starbound.exe"+890EA7: C3                          -  ret
+"starbound.exe"+890EA8: CC                          -  int 3
+"starbound.exe"+890EA9: CC                          -  int 3
+"starbound.exe"+890EAA: CC                          -  int 3
+"starbound.exe"+890EAB: CC                          -  int 3
+"starbound.exe"+890EAC: CC                          -  int 3
+"starbound.exe"+890EAD: CC                          -  int 3
+"starbound.exe"+890EAE: CC                          -  int 3
+"starbound.exe"+890EAF: CC                          -  int 3
+"starbound.exe"+890EB0: 40 53                       -  push rbx
+}
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>100</ID>
+                  <Description>"Is Player Admin?"</Description>
+                  <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">0:No
+1:Yes
+</DropDownList>
+                  <VariableType>Byte</VariableType>
+                  <Address>isadminptr</Address>
+                  <Offsets>
+                    <Offset>398</Offset>
+                  </Offsets>
+                  <Hotkeys>
+                    <Hotkey>
+                      <Action>Set Value</Action>
+                      <Keys>
+                        <Key>99</Key>
+                      </Keys>
+                      <Value>1</Value>
+                      <ID>0</ID>
+                    </Hotkey>
+                    <Hotkey>
+                      <Action>Set Value</Action>
+                      <Keys>
+                        <Key>100</Key>
+                      </Keys>
+                      <Value>0</Value>
+                      <ID>1</ID>
+                    </Hotkey>
+                  </Hotkeys>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>276</ID>
+              <Description>"Disable Tile Protection"</Description>
+              <LastState/>
+              <Color>FF0000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+aobscanmodule(disabletileprotection,starbound.exe,40 53 48 81 EC 90 01 00 00 48 C7)
+registersymbol(disabletileprotection)
+
+disabletileprotection:
+  db 31 C0 C3
+
+[DISABLE]
+
+disabletileprotection:
+  db  40 53 48
+
+unregistersymbol(disabletileprotection)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "starbound.exe"+6697F0
+
+"starbound.exe"+6697E2: 5F                          -  pop rdi
+"starbound.exe"+6697E3: E9 98 ED 02 00              -  jmp starbound.exe+698580
+"starbound.exe"+6697E8: CC                          -  int 3 
+"starbound.exe"+6697E9: CC                          -  int 3 
+"starbound.exe"+6697EA: CC                          -  int 3 
+"starbound.exe"+6697EB: CC                          -  int 3 
+"starbound.exe"+6697EC: CC                          -  int 3 
+"starbound.exe"+6697ED: CC                          -  int 3 
+"starbound.exe"+6697EE: CC                          -  int 3 
+"starbound.exe"+6697EF: CC                          -  int 3 
+// ---------- INJECTING HERE ----------
+"starbound.exe"+6697F0: 40 53                       -  push rbx
+"starbound.exe"+6697F2: 48 81 EC 90 01 00 00        -  sub rsp,00000190
+// ---------- DONE INJECTING  ----------
+"starbound.exe"+6697F9: 48 C7 44 24 20 FE FF FF FF  -  mov qword ptr [rsp+20],FFFFFFFE
+"starbound.exe"+669802: 48 8B D9                    -  mov rbx,rcx
+"starbound.exe"+669805: 80 B9 D8 0A 00 00 00        -  cmp byte ptr [rcx+00000AD8],00
+"starbound.exe"+66980C: 75 04                       -  jne starbound.exe+669812
+"starbound.exe"+66980E: 32 C0                       -  xor al,al
+"starbound.exe"+669810: EB 7A                       -  jmp starbound.exe+66988C
+"starbound.exe"+669812: 48 8B 89 A0 01 00 00        -  mov rcx,[rcx+000001A0]
+"starbound.exe"+669819: E8 E2 BF FA FF              -  call starbound.exe+615800
+"starbound.exe"+66981E: 48 8B D0                    -  mov rdx,rax
+"starbound.exe"+669821: 48 8D 4C 24 30              -  lea rcx,[rsp+30]
+}
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>287</ID>
+              <Description>"Player Can Always Beam Up"</Description>
+              <LastState/>
+              <Color>FF0000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+aobscanmodule(canalwaysbeamup,starbound.exe,84 C0 74 08 40 B7)
+registersymbol(canalwaysbeamup)
+
+canalwaysbeamup+2:
+  db 90 90
+
+[DISABLE]
+
+canalwaysbeamup+2:
+  db 74 08
+
+unregistersymbol(canalwaysbeamup)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "starbound.exe"+5630BC
+
+"starbound.exe"+563097: 90                          -  nop 
+"starbound.exe"+563098: F6 84 24 90 00 00 00 FD     -  test byte ptr [rsp+00000090],-03
+"starbound.exe"+5630A0: 0F 84 57 01 00 00           -  je starbound.exe+5631FD
+"starbound.exe"+5630A6: 48 8B 56 20                 -  mov rdx,[rsi+20]
+"starbound.exe"+5630AA: 48 8B 02                    -  mov rax,[rdx]
+"starbound.exe"+5630AD: 48 63 48 08                 -  movsxd  rcx,dword ptr [rax+08]
+"starbound.exe"+5630B1: 48 03 CA                    -  add rcx,rdx
+"starbound.exe"+5630B4: 48 8B 01                    -  mov rax,[rcx]
+"starbound.exe"+5630B7: FF 50 18                    -  call qword ptr [rax+18]
+"starbound.exe"+5630BA: 84 C0                       -  test al,al
+// ---------- INJECTING HERE ----------
+"starbound.exe"+5630BC: 74 08                       -  je starbound.exe+5630C6
+"starbound.exe"+5630BE: 40 B7 01                    -  mov dil,01
+// ---------- DONE INJECTING  ----------
+"starbound.exe"+5630C1: E9 3A 01 00 00              -  jmp starbound.exe+563200
+"starbound.exe"+5630C6: 48 8B 4E 20                 -  mov rcx,[rsi+20]
+"starbound.exe"+5630CA: E8 C1 E1 E5 FF              -  call starbound.exe+3C1290
+"starbound.exe"+5630CF: 84 C0                       -  test al,al
+"starbound.exe"+5630D1: 0F 85 26 01 00 00           -  jne starbound.exe+5631FD
+"starbound.exe"+5630D7: 48 8B 4E 20                 -  mov rcx,[rsi+20]
+"starbound.exe"+5630DB: E8 D0 E3 E5 FF              -  call starbound.exe+3C14B0
+"starbound.exe"+5630E0: 84 C0                       -  test al,al
+"starbound.exe"+5630E2: 0F 85 15 01 00 00           -  jne starbound.exe+5631FD
+"starbound.exe"+5630E8: 48 8D 94 24 F0 00 00 00     -  lea rdx,[rsp+000000F0]
+}
+</AssemblerScript>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>199</ID>
+      <Description>"Unused"</Description>
+      <Options moHideChildren="1"/>
+      <LastState Value="" RealAddress="00000000"/>
+      <Color>808080</Color>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>197</ID>
+          <Description>"Get World Server"</Description>
+          <Options moHideChildren="1"/>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>define(address,starbound.Star::WorldServer::update)
+define(bytes,40 55 53 56 57)
+
+[ENABLE]
+assert(address,bytes)
+alloc(newmem,$1000,starbound.Star::WorldServer::update)
+
+label(code)
+label(return)
+label(worldserver_data)
+registersymbol(worldserver_data)
+
+newmem:
+mov [worldserver_data],rcx
+push rax
+lea rax,[rcx+930] // starbound.Star::GameTimer
+mov [worldserver_data+8],rax
+lea rax,[rcx+190]
+mov rax,[rax] // starbound.Star::EntityMap
+mov [worldserver_data+10],rax
+mov rax,[rcx+2D0] // starbound.Star::Sky
+mov [worldserver_data+18],rax
+mov rax,[rcx+920]
+mov rax,[rax]
+mov rax,[rax+18]
+add rax,18 // starbound.Star::WorldClientState
+mov [worldserver_data+20],rax
+lea rax,[rcx+238] // starbound.Star::WorldGeometry
+mov [worldserver_data+28],rax
+lea rax,[rcx+2E0] // starbound.Star::ServerWeather
+mov [worldserver_data+30],rax
+lea rax,[rcx+1C8] // starbound.Star::Json
+mov [worldserver_data+38],rax
+lea rax,[rcx+938] // starbound.Star::LiquidCellEngine
+mov [worldserver_data+40],rax
+lea rax,[rcx+948] // starbound.Star::FallingBlocksAgent
+mov [worldserver_data+48],rax
+lea rax,[rcx+1B0] // starbound.Star::WorldStorage
+mov [worldserver_data+50],rax
+lea rax,[rcx+920]
+mov rax,[rax]
+mov rax,[rax+18] // starbound.Star::WorldServer::ClientInfo
+mov [worldserver_data+58],rax
+mov rax,[rcx+20] // starbound.Star::WorldTemplate
+mov [worldserver_data+60],rax
+lea rax,[rcx+228] // starbound.Star::LuaRoot
+mov [worldserver_data+68],rax
+pop rax
+
+code:
+  push rbp
+  push rbx
+  push rsi
+  push rdi
+  jmp return
+
+worldserver_data:
+dq 0
+
+address:
+  jmp newmem
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+dealloc(newmem)
+unregistersymbol(worldserver_data)
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>198</ID>
+              <Description>"WorldServer"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <VariableType>8 Bytes</VariableType>
+              <Address>worldserver_data</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>1</ID>
+      <Description>"Load Lua Library Alternative"</Description>
+      <LastState/>
+      <Color>0000FF</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+if syntaxcheck then return end
+local mem = allocateMemory(0x1000,process)
+registerSymbol("loadluamodulemem",mem,true)
+
+local luadlldir = getCheatEngineDir().."luaclient-x86_64.dll"
+writeString(mem+0x200,luadlldir,false)
+
+local assemblyscript =[[
+createthread(loadluamodulemem)
+label(loadluamodulemem.debug)
+
+loadluamodulemem:
+@@:
+cmp [loadluamodulemem.debug],1
+jne short @f
+  mov rcx,#100
+  call Kernel32.Sleep
+  jmp short @b
+@@:
+or rcx,-1
+mov rsi,loadluamodulemem+200
+@@:
+inc ecx
+lodsb
+test al,al
+jne short @b
+cmp ecx,14
+jg short @f
+  xor rcx,rcx
+  mov rdx,loadluamodulemem+400
+  xor r8,r8
+  mov r9,10
+  sub rsp,28
+  call user32.MessageBoxA
+  add rsp,28
+  or [loadluamodulemem+800],1
+  ret
+@@:
+mov rcx,loadluamodulemem+200
+sub rsp,28
+call Kernel32.LoadLibraryA
+add rsp,28
+test rax,rax
+jne short @f
+  xor rcx,rcx
+  mov rdx,loadluamodulemem+412
+  xor r8,r8
+  mov r9,10
+  sub rsp,28
+  call user32.MessageBoxA
+  add rsp,28
+  or [loadluamodulemem+800],1
+  ret
+@@:
+mov rbx,rax
+mov r12,Kernel32.GetProcAddress
+xor rcx,rcx
+mov rdx,loadluamodulemem+508
+mov r8,loadluamodulemem+500
+mov r9,40
+sub rsp,28
+call user32.MessageBoxA
+add rsp,28
+mov rcx,rbx
+mov rdx,loadluamodulemem+600
+sub rsp,28
+call r12
+mov [loadluamodulemem+700],rax
+mov rcx,rbx
+mov rdx,loadluamodulemem+616
+call r12
+mov [loadluamodulemem+708],rax
+mov rcx,rbx
+mov rdx,loadluamodulemem+631
+call r12
+mov [loadluamodulemem+710],rax
+mov rcx,rbx
+mov rdx,loadluamodulemem+652
+call r12
+mov [loadluamodulemem+718],rax
+mov rcx,rbx
+mov rdx,loadluamodulemem+675
+call r12
+mov [loadluamodulemem+720],rax
+mov rcx,rbx
+mov rdx,loadluamodulemem+686
+call r12
+add rsp,28
+mov [loadluamodulemem+728],rax
+
+or [loadluamodulemem+800],1
+ret
+
+loadluamodulemem+300:
+loadluamodulemem.debug:
+dd 0
+
+loadluamodulemem+400:
+db 'luadlldir.len = 0',0
+db 'Error occured while trying to Load the "luaclient-x86_64" Library',0
+loadluamodulemem+500:
+db 'Success',0
+db 'Lua Library Succesfully loaded'
+loadluamodulemem+600:
+db 'CELUA_ExecuteFunction',0
+db 'CELUA_ExecuteFunctionAsync',0
+db 'CELUA_ExecuteFunctionByReference',0
+db 'CELUA_GetFunctionReferenceFromName',0
+db 'CELUA_Initialize',0
+db 'CELUA_ServerName',0
+loadluamodulemem+700:
+dq 0,0,0,0,0,0
+]]
+
+if not autoAssemble(assemblyscript) then print("Failure Executing Assembly Script") end
+
+local function loadluamodulelistener(luathread)
+  while true do
+    if readInteger("loadluamodulemem+800") == 1 then
+      local functioncount = 0
+      if readQword("loadluamodulemem+700") ~= 0 then
+        registerSymbol("CELUA_ExecuteFunction",readQword("loadluamodulemem+700"),true)
+        functioncount = functioncount+1
+      end
+      if readQword("loadluamodulemem+708") ~= 0 then
+        registerSymbol("CELUA_ExecuteFunctionAsync",readQword("loadluamodulemem+708"),true)
+        functioncount = functioncount+1
+      end
+      if readQword("loadluamodulemem+710") ~= 0 then
+        registerSymbol("CELUA_ExecuteFunctionByReference",readQword("loadluamodulemem+710"),true)
+        functioncount = functioncount+1
+      end
+      if readQword("loadluamodulemem+718") ~= 0 then
+        registerSymbol("CELUA_GetFunctionReferenceFromName",readQword("loadluamodulemem+718"),true)
+        functioncount = functioncount+1
+      end
+      if readQword("loadluamodulemem+720") ~= 0 then
+        registerSymbol("CELUA_Initialize",readQword("loadluamodulemem+720"),true)
+        functioncount = functioncount+1
+      end
+      if readQword("loadluamodulemem+728") ~= 0 then
+        registerSymbol("CELUA_ServerName",readQword("loadluamodulemem+728"),true)
+        functioncount = functioncount+1
+      end
+      if functioncount &lt; 6 then
+        print("Not all Symbols Exported by the Lua Library Found")
+      end
+      sleep(20)
+      deAlloc("loadluamodulemem")
+      unregisterSymbol("loadluamodulemem")
+      openLuaServer("CELUASERVER")
+      break
+    end
+    sleep(10)
+  end
+  --print("Lua Thread Terminated")
+  luathread.terminate()
+end
+
+createThread(loadluamodulelistener)
+
+{$asm}
+[DISABLE]
+{$lua}
+if syntaxcheck then return end
+unregisterSymbol("CELUA_ExecuteFunction")
+unregisterSymbol("CELUA_ExecuteFunctionAsync")
+unregisterSymbol("CELUA_ExecuteFunctionByReference")
+unregisterSymbol("CELUA_GetFunctionReferenceFromName")
+unregisterSymbol("CELUA_Initialize")
+unregisterSymbol("CELUA_ServerName")
+
+autoAssemble([[
+alloc(freeluamodulemem,0x1000,$process)
+createthread(freeluamodulemem)
+label(freeluamodulemem.debug)
+
+freeluamodulemem:
+@@:
+cmp [freeluamodulemem.debug],1
+jne short @f
+  mov rcx,#100
+  call Kernel32.Sleep
+  jmp short @b
+@@:
+mov rcx,freeluamodulemem+250
+sub rsp,28
+call Kernel32.GetModuleHandleA
+add rsp,28
+test rax,rax
+jne short @f
+  xor rcx,rcx
+  mov rdx,freeluamodulemem+400
+  xor r8,r8
+  mov r9,10
+  sub rsp,28
+  call user32.MessageBoxA
+  add rsp,28
+  mov rax,freeluamodulemem+200
+  jmp rax
+@@:
+mov rbx,rax
+sub rsp,28
+xor rcx,rcx
+call Kernel32.Sleep
+mov rcx,rbx
+call Kernel32.FreeLibrary
+add rsp,28
+test rax,rax
+jne short @f
+  xor rcx,rcx
+  mov rdx,freeluamodulemem+42B
+  xor r8,r8
+  mov r9,10
+  sub rsp,28
+  call user32.MessageBoxA
+  add rsp,28
+  mov rax,freeluamodulemem+200
+  jmp rax
+@@:
+xor rcx,rcx
+mov rdx,freeluamodulemem+508
+mov r8,freeluamodulemem+500
+mov r9,40
+sub rsp,28
+call user32.MessageBoxA
+add rsp,28
+mov rax,freeluamodulemem+200
+jmp rax
+
+freeluamodulemem+200:
+mov rcx,freeluamodulemem
+xor rdx,rdx
+mov r8,8000
+jmp Kernel32.VirtualFree
+
+freeluamodulemem+250:
+db 'luaclient-x86_64',0
+
+freeluamodulemem+300:
+freeluamodulemem.debug:
+dd 0
+
+freeluamodulemem+400:
+db 'No Handle for "luaclient-x86_64.dll" found',0
+db 'The "luaclient-x86_64.dll" Library could not be freed',0
+freeluamodulemem+500:
+db 'Success',0
+db 'The "luaclient-x86_64.dll" Library was succesfully freed',0
+]])
+</AssemblerScript>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+  <Comments>By Bloodybone
+</Comments>
+  <DisassemblerComments>
+    <DisassemblerComment>
+      <Address>"starbound.exe"+13C50</Address>
+      <Comment>Loop over String
+</Comment>
+    </DisassemblerComment>
+    <DisassemblerComment>
+      <Address>"starbound.exe"+4EC53C</Address>
+      <Comment>get Resource Pointer of String
+</Comment>
+    </DisassemblerComment>
+    <DisassemblerComment>
+      <Address>"starbound.exe"+4ECBB0</Address>
+      <Comment>rsp+28 == Max
+</Comment>
+    </DisassemblerComment>
+    <DisassemblerComment>
+      <Address>"starbound.exe"+4ED1B3</Address>
+      <Comment>New Stat
+</Comment>
+    </DisassemblerComment>
+    <DisassemblerComment>
+      <Address>"starbound.exe"+4ED1B8</Address>
+      <Comment>*This
+</Comment>
+    </DisassemblerComment>
+  </DisassemblerComments>
+</CheatTable>

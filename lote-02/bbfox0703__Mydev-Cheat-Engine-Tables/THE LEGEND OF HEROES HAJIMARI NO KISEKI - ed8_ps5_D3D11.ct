@@ -1,0 +1,3657 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="46">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>32</ID>
+      <Description>"精簡模式 / コンパクトモード / Compact mode"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+if syntaxcheck then return end
+
+if not toggleCompactView then
+    function toggleCompactView(sender, forceEnable)
+        local isCompactMode = not (compactViewMenuItem.Caption == 'Compact View Mode')
+        if forceEnable ~= nil then
+            isCompactMode = not forceEnable
+        end
+
+    synchronize(function()
+        compactViewMenuItem.Caption = isCompactMode and 'Compact View Mode' or 'Full View Mode'
+        getMainForm().Splitter1.Visible = isCompactMode
+        getMainForm().Panel4.Visible    = isCompactMode
+        getMainForm().Panel5.Visible    = isCompactMode
+    end)
+end
+end
+
+if not createCompactViewMenu then
+    function createCompactViewMenu()
+        if isCompactMenuCreated then return end
+
+    synchronize(function()
+        local mainMenu = getMainForm().Menu.Items
+        compactViewMenuItem = createMenuItem(mainMenu)
+        mainMenu.add(compactViewMenuItem)
+        compactViewMenuItem.Caption = 'Compact View Mode'
+        compactViewMenuItem.OnClick = toggleCompactView
+    end)
+
+    isCompactMenuCreated = true
+end
+end
+
+createCompactViewMenu()
+toggleCompactView(nil, true)
+
+[DISABLE]
+{$lua}
+if toggleCompactView then
+    toggleCompactView(nil, false)
+end
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>136</ID>
+      <Description>"[自動選擇遊戲程序] 切換大部份指令碼 / [自動プロセス選択] ほとんどのスクリプトを切り替える / Toggle scripts"</Description>
+      <Color>0080FF</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript Async="1">[ENABLE]
+{$lua}
+if (syntaxcheck) then return end
+synchronize(function()
+  getLuaEngine().menuItem5.doClick()
+  getLuaEngine().Close()
+end)
+
+local enableBattleScripts = {
+  272, -- "設定全部Link經驗值 / 全てのリンク経験値を設定 / Set all link EXP"
+  32, -- "精簡模式 / コンパクトモード / Compact mode"
+  322, -- "道具無限 / アイテム無限 / inf. Item"
+  323, -- "傷害倍率 / ダメージ倍率 / Damage multiplier"
+  324, -- "CP無限 / Battle: inf CP"
+  326, -- "EP無限 / Battle: inf EP"
+  328, -- "設定BP值 / BP値を設定 / set max BP"
+  336, -- "取得裝備的迴路 / 装備のクオーツを取得 / Get equipped Quartz"
+  347, -- "奇襲點數無限 / アサルトアタックポイント無限 / inf. assault"
+  349, -- "取得耀晶數值 / セピスの数値を取得 / Get Mira / Sepiths"
+  363, -- "破防倍率 / ブレイク倍率 / Break multiplier"
+  370, -- "變更服裝的3D座標某軸之極限值 / 衣装の3D座標のある軸の限界値を変更する / Set costume axis coord limit"
+  379, -- "戰歷 / Get battle records"
+  407, -- "取得道具並設定數量 / アイテムを取得し、その数量を設定する / Set stock when get item"
+  414, -- "釣魚快速捲線 / 釣りで素早くリールを巻く / Fast fishing"
+  418, -- "設定裝備後移動變32 / 装備を設定後、移動力を32に変更 / Equip: Set move range to 32"
+  420, -- "設定裝備後之爆擊機率 / 装備設定後のクリティカル率を設定する / Equip: set crit%"
+  422, -- "主結晶迴路EXP倍率 / マスタークオーツのEXP倍率 / Master quartz EXP multi."
+  434, -- "瀏覽道具時設定數量 / アイテムを閲覧中に数量を設定する / browse item &amp; set #"
+  445, -- "綜合成績 / Get stats"
+  463, -- "VM遊戲：敵人HP為1 / VMゲーム：敵のHPを1 / VM : enemy 1HP"
+  464, -- "遊戲「波姆碰」 / "ポムっと" / game "Pom""
+  474, -- "勇氣指令 / オーダー / Get order info"
+}
+local addressList = getAddressList()
+synchronize(function()
+  for _, id in ipairs(enableBattleScripts) do
+    local memRec = addressList.getMemoryRecordByID(id)
+    if memRec and not memRec.Active then
+      memRec.Active = true
+      sleep(30)
+    end
+    addressList.refresh()
+  end
+end)
+synchronize(function() getLuaEngine().Close() end)
+[DISABLE]
+{$lua}
+if (syntaxcheck) then return end
+synchronize(function()
+  getLuaEngine().menuItem5.doClick()
+  getLuaEngine().Close()
+end)
+
+local disableBattleScripts = {
+  440, -- "受傷時 / ダメージを受けた時に / when hit:"
+  331, -- "Last ID."
+  474, -- "勇氣指令 / オーダー / Get order info"
+  464, -- "遊戲「波姆碰」 / "ポムっと" / game "Pom""
+  463, -- "VM遊戲：敵人HP為1 / VMゲーム：敵のHPを1 / VM : enemy 1HP"
+  445, -- "綜合成績 / Get stats"
+  434, -- "瀏覽道具時設定數量 / アイテムを閲覧中に数量を設定する / browse item &amp; set #"
+  429, -- "設定最小戰鬥獎勵 / 最低戦闘ボーナス / Set min. battle bonus"
+  424, -- "英雄傳說 創之軌跡  /  英雄伝説 創の軌跡  /  https://opencheattables.com  /  CE 7.5+"
+  422, -- "主結晶迴路EXP倍率 / マスタークオーツのEXP倍率 / Master quartz EXP multi."
+  420, -- "設定裝備後之爆擊機率 / 装備設定後のクリティカル率を設定する / Equip: set crit%"
+  418, -- "設定裝備後移動變32 / 装備を設定後、移動力を32に変更 / Equip: Set move range to 32"
+  414, -- "釣魚快速捲線 / 釣りで素早くリールを巻く / Fast fishing"
+  407, -- "取得道具並設定數量 / アイテムを取得し、その数量を設定する / Set stock when get item"
+  379, -- "戰歷 / Get battle records"
+  370, -- "變更服裝的3D座標某軸之極限值 / 衣装の3D座標のある軸の限界値を変更する / Set costume axis coord limit"
+  363, -- "破防倍率 / ブレイク倍率 / Break multiplier"
+  349, -- "取得耀晶數值 / セピスの数値を取得 / Get Mira / Sepiths"
+  347, -- "奇襲點數無限 / アサルトアタックポイント無限 / inf. assault"
+  336, -- "取得裝備的迴路 / 装備のクオーツを取得 / Get equipped Quartz"
+  328, -- "設定BP值 / BP値を設定 / set max BP"
+  326, -- "EP無限 / Battle: inf EP"
+  324, -- "CP無限 / Battle: inf CP"
+  323, -- "傷害倍率 / ダメージ倍率 / Damage multiplier"
+  322, -- "道具無限 / アイテム無限 / inf. Item"
+  32, -- "精簡模式 / コンパクトモード / Compact mode"
+  30, -- "THE LEGEND OF HEROES: HAJIMARI NO KISEKI"
+  272, -- "設定全部Link經驗值 / 全てのリンク経験値を設定 / Set all link EXP"
+}
+local addressList = getAddressList()
+synchronize(function()
+  for _, id in ipairs(disableBattleScripts) do
+    local memRec = addressList.getMemoryRecordByID(id)
+    if memRec and memRec.Active then
+      memRec.Active = false
+      sleep(30)
+    end
+    addressList.refresh()
+  end
+end)
+synchronize(function() getLuaEngine().Close() end)
+-- Comments:
+-- ID: 32, Description: "精簡模式 / コンパクトモード / Compact mode", Depth: 0
+-- ID: 136, Description: "[自動選擇遊戲程序] 切換大部份指令碼 / [自動プロセス選択] ほとんどのスクリプトを切り替える / Toggle scripts", Depth: 0
+-- ID: 272, Description: "設定全部Link經驗值 / 全てのリンク経験値を設定 / Set all link EXP", Depth: 0
+-- ID: 429, Description: "設定最小戰鬥獎勵 / 最低戦闘ボーナス / Set min. battle bonus", Depth: 0
+-- ID: 422, Description: "主結晶迴路EXP倍率 / マスタークオーツのEXP倍率 / Master quartz EXP multi.", Depth: 0
+-- ID: 407, Description: "取得道具並設定數量 / アイテムを取得し、その数量を設定する / Set stock when get item", Depth: 0
+-- ID: 434, Description: "瀏覽道具時設定數量 / アイテムを閲覧中に数量を設定する / browse item &amp; set #", Depth: 0
+-- ID: 322, Description: "道具無限 / アイテム無限 / inf. Item", Depth: 0
+--   ID: 331, Description: "Last ID.", Depth: 1
+-- ID: 326, Description: "EP無限 / Battle: inf EP", Depth: 0
+-- ID: 324, Description: "CP無限 / Battle: inf CP", Depth: 0
+-- ID: 328, Description: "設定BP值 / BP値を設定 / set max BP", Depth: 0
+-- ID: 474, Description: "勇氣指令 / オーダー / Get order info", Depth: 0
+-- ID: 347, Description: "奇襲點數無限 / アサルトアタックポイント無限 / inf. assault", Depth: 0
+-- ID: 363, Description: "破防倍率 / ブレイク倍率 / Break multiplier", Depth: 0
+-- ID: 323, Description: "傷害倍率 / ダメージ倍率 / Damage multiplier", Depth: 0
+--   ID: 440, Description: "受傷時 / ダメージを受けた時に / when hit:", Depth: 1
+-- ID: 414, Description: "釣魚快速捲線 / 釣りで素早くリールを巻く / Fast fishing", Depth: 0
+-- ID: 418, Description: "設定裝備後移動變32 / 装備を設定後、移動力を32に変更 / Equip: Set move range to 32", Depth: 0
+-- ID: 420, Description: "設定裝備後之爆擊機率 / 装備設定後のクリティカル率を設定する / Equip: set crit%", Depth: 0
+-- ID: 349, Description: "取得耀晶數值 / セピスの数値を取得 / Get Mira / Sepiths", Depth: 0
+-- ID: 336, Description: "取得裝備的迴路 / 装備のクオーツを取得 / Get equipped Quartz", Depth: 0
+-- ID: 379, Description: "戰歷 / Get battle records", Depth: 0
+-- ID: 445, Description: "綜合成績 / Get stats", Depth: 0
+-- ID: 463, Description: "VM遊戲：敵人HP為1 / VMゲーム：敵のHPを1 / VM : enemy 1HP", Depth: 0
+-- ID: 464, Description: "遊戲「波姆碰」 / "ポムっと" / game "Pom"", Depth: 0
+-- ID: 370, Description: "變更服裝的3D座標某軸之極限值 / 衣装の3D座標のある軸の限界値を変更する / Set costume axis coord limit", Depth: 0
+-- ID: 30, Description: "THE LEGEND OF HEROES: HAJIMARI NO KISEKI", Depth: 0
+-- ID: 424, Description: "英雄傳說 創之軌跡  /  英雄伝説 創の軌跡  /  https://opencheattables.com  /  CE 7.5+", Depth: 0
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>272</ID>
+      <Description>"設定全部Link經驗值 / 全てのリンク経験値を設定 / Set all link EXP"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ed8_4_PC_JP.exe
+  Version: 
+  Date   : 2024-04-09
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_SET_LINK_XP,$process,48 03 C2 8B 04 81) // should be unique
+alloc(newmem,$1000,INJECT_SET_LINK_XP)
+
+label(code)
+label(return)
+label(i_min_link_exp)
+
+newmem:
+
+code:
+  add rax,rdx
+  mov eax,[rcx+rax*4]
+
+  // code start
+  test eax, eax
+  jz return
+
+  cmp eax, [i_min_link_exp]
+  jae return
+
+  mov eax, [i_min_link_exp]
+  mov [rcx+rax*4], eax
+  // code end
+
+
+  jmp return
+align 10 cc
+  i_min_link_exp:
+  dd #1200
+
+INJECT_SET_LINK_XP:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT_SET_LINK_XP)
+registersymbol(i_min_link_exp)
+
+[DISABLE]
+
+INJECT_SET_LINK_XP:
+  db 48 03 C2 8B 04 81
+
+unregistersymbol(INJECT_SET_LINK_XP)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed8_4_PC_JP.exe+46BCEC
+
+ed8_4_PC_JP.exe+46BCCE: CC              - int 3 
+ed8_4_PC_JP.exe+46BCCF: CC              - int 3 
+ed8_4_PC_JP.exe+46BCD0: 66 83 FA 40     - cmp dx,40
+ed8_4_PC_JP.exe+46BCD4: 73 1D           - jae ed8_4_PC_JP.exe+46BCF3
+ed8_4_PC_JP.exe+46BCD6: 66 41 83 F8 40  - cmp r8w,40
+ed8_4_PC_JP.exe+46BCDB: 73 16           - jae ed8_4_PC_JP.exe+46BCF3
+ed8_4_PC_JP.exe+46BCDD: 0F B7 C2        - movzx eax,dx
+ed8_4_PC_JP.exe+46BCE0: 48 83 C0 10     - add rax,10
+ed8_4_PC_JP.exe+46BCE4: 41 0F B7 D0     - movzx edx,r8w
+ed8_4_PC_JP.exe+46BCE8: 48 C1 E0 06     - shl rax,06
+// ---------- INJECTING HERE ----------
+ed8_4_PC_JP.exe+46BCEC: 48 03 C2        - add rax,rdx
+// ---------- DONE INJECTING  ----------
+ed8_4_PC_JP.exe+46BCEF: 8B 04 81        - mov eax,[rcx+rax*4]
+ed8_4_PC_JP.exe+46BCF2: C3              - ret 
+ed8_4_PC_JP.exe+46BCF3: 33 C0           - xor eax,eax
+ed8_4_PC_JP.exe+46BCF5: C3              - ret 
+ed8_4_PC_JP.exe+46BCF6: CC              - int 3 
+ed8_4_PC_JP.exe+46BCF7: CC              - int 3 
+ed8_4_PC_JP.exe+46BCF8: CC              - int 3 
+ed8_4_PC_JP.exe+46BCF9: CC              - int 3 
+ed8_4_PC_JP.exe+46BCFA: CC              - int 3 
+ed8_4_PC_JP.exe+46BCFB: CC              - int 3 
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>280</ID>
+          <Description>"不用時關閉 / 使用しない時はオフにする / Warning: disable when done."</Description>
+          <Color>8000FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>277</ID>
+          <Description>"最小值 / Min. link EXP"</Description>
+          <DropDownList DisplayValueAsItem="1">1200:LV3+
+2000:Lv4.2
+2800:Lv5
+4000:Lv6
+5390:Lv7-
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_min_link_exp</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>429</ID>
+      <Description>"設定最小戰鬥獎勵 / 最低戦闘ボーナス / Set min. battle bonus"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ed8_ps5_D3D11.exe
+  Version: 
+  Date   : 2024-08-14
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_BATTLE_BONUS_MIN,$process,F3 0F 10 86 E8 02 00 00 F3) // should be unique
+alloc(newmem,$1000,INJECT_BATTLE_BONUS_MIN)
+
+label(code)
+label(return)
+label(vf_batt_bonus_min)
+
+newmem:
+  vmovss xmm15,[rsi+000002E8]
+  vmovss xmm14, [vf_batt_bonus_min]
+  vucomiss xmm15, xmm14
+  jae code
+  vmovss [rsi+000002E8], xmm14
+
+code:
+  movss xmm0,[rsi+000002E8]
+  jmp return
+align 10 cc
+  vf_batt_bonus_min:
+  dd (float)1.9
+
+INJECT_BATTLE_BONUS_MIN:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_BATTLE_BONUS_MIN)
+registersymbol(vf_batt_bonus_min)
+
+[DISABLE]
+
+INJECT_BATTLE_BONUS_MIN:
+  db F3 0F 10 86 E8 02 00 00
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed8_ps5_D3D11.exe+2518AF
+
+ed8_ps5_D3D11.exe+25186F: 45 33 C0                       - xor r8d,r8d
+ed8_ps5_D3D11.exe+251872: 49 8B D4                       - mov rdx,r12
+ed8_ps5_D3D11.exe+251875: 48 8B CB                       - mov rcx,rbx
+ed8_ps5_D3D11.exe+251878: E8 93 3D 00 00                 - call ed8_ps5_D3D11.exe+255610
+ed8_ps5_D3D11.exe+25187D: 44 0F 28 84 24 40 04 00 00     - movaps xmm8,[rsp+00000440]
+ed8_ps5_D3D11.exe+251886: 0F 28 BC 24 50 04 00 00        - movaps xmm7,[rsp+00000450]
+ed8_ps5_D3D11.exe+25188E: 0F 28 B4 24 60 04 00 00        - movaps xmm6,[rsp+00000460]
+ed8_ps5_D3D11.exe+251896: 43 FE 84 3E EC 02 00 00        - inc byte ptr [r14+r15+000002EC]
+ed8_ps5_D3D11.exe+25189E: 4C 8B A4 24 80 04 00 00        - mov r12,[rsp+00000480]
+ed8_ps5_D3D11.exe+2518A6: 43 C6 84 3E ED 02 00 00 00     - mov byte ptr [r14+r15+000002ED],00
+// ---------- INJECTING HERE ----------
+ed8_ps5_D3D11.exe+2518AF: F3 0F 10 86 E8 02 00 00        - movss xmm0,[rsi+000002E8]
+// ---------- DONE INJECTING  ----------
+ed8_ps5_D3D11.exe+2518B7: F3 0F 58 45 10                 - addss xmm0,[rbp+10]
+ed8_ps5_D3D11.exe+2518BC: 0F 2F 05 C9 1A 87 00           - comiss xmm0,[ed8_ps5_D3D11.exe+AC338C]
+ed8_ps5_D3D11.exe+2518C3: F3 0F 11 86 E8 02 00 00        - movss [rsi+000002E8],xmm0
+ed8_ps5_D3D11.exe+2518CB: 76 0A                          - jna ed8_ps5_D3D11.exe+2518D7
+ed8_ps5_D3D11.exe+2518CD: C7 86 E8 02 00 00 66 66 1E 41  - mov [rsi+000002E8],411E6666
+ed8_ps5_D3D11.exe+2518D7: 0F B6 45 08                    - movzx eax,byte ptr [rbp+08]
+ed8_ps5_D3D11.exe+2518DB: 4C 8D 05 AE 16 87 00           - lea r8,[ed8_ps5_D3D11.exe+AC2F90]
+ed8_ps5_D3D11.exe+2518E2: 48 8B 5D 08                    - mov rbx,[rbp+08]
+ed8_ps5_D3D11.exe+2518E6: 48 8D 4C 24 30                 - lea rcx,[rsp+30]
+ed8_ps5_D3D11.exe+2518EB: 83 E0 01                       - and eax,01
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>430</ID>
+          <Description>"min. bonus"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>Float</VariableType>
+          <Address>vf_batt_bonus_min</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>422</ID>
+      <Description>"主結晶迴路EXP倍率 / マスタークオーツのEXP倍率 / Master quartz EXP multi."</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ed8_ps5_D3D11.exe
+  Version: 
+  Date   : 2024-08-14
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_M_QUARTZ_MULTI,$process,F3 0F 59 CF F3 0F 58 C8 F3 48) // should be unique
+alloc(newmem,$1000,INJECT_M_QUARTZ_MULTI)
+
+label(code)
+label(return)
+label(vf_mqz_multi)
+newmem:
+  vmovss xmm14, [vf_mqz_multi]
+  vmulss xmm1, xmm1, xmm14
+
+code:
+  mulss xmm1,xmm7
+  addss xmm1,xmm0
+  jmp return
+align 10 cc
+  vf_mqz_multi:
+  dd (float)1.333333333
+
+INJECT_M_QUARTZ_MULTI:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_M_QUARTZ_MULTI)
+registersymbol(vf_mqz_multi)
+[DISABLE]
+
+INJECT_M_QUARTZ_MULTI:
+  db F3 0F 59 CF F3 0F 58 C8
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed8_ps5_D3D11.exe+246A7C
+
+ed8_ps5_D3D11.exe+246A50: 66 83 F8 0D           - cmp ax,0D
+ed8_ps5_D3D11.exe+246A54: 77 67                 - ja ed8_ps5_D3D11.exe+246ABD
+ed8_ps5_D3D11.exe+246A56: 8B 83 24 03 00 00     - mov eax,[rbx+00000324]
+ed8_ps5_D3D11.exe+246A5C: 0F 57 C9              - xorps xmm1,xmm1
+ed8_ps5_D3D11.exe+246A5F: 0F 57 C0              - xorps xmm0,xmm0
+ed8_ps5_D3D11.exe+246A62: BA 0F 00 00 00        - mov edx,0000000F
+ed8_ps5_D3D11.exe+246A67: F3 48 0F 2A C8        - cvtsi2ss xmm1,rax
+ed8_ps5_D3D11.exe+246A6C: 8B 83 34 03 00 00     - mov eax,[rbx+00000334]
+ed8_ps5_D3D11.exe+246A72: F3 48 0F 2A C0        - cvtsi2ss xmm0,rax
+ed8_ps5_D3D11.exe+246A77: B8 9F 86 01 00        - mov eax,0001869F
+// ---------- INJECTING HERE ----------
+ed8_ps5_D3D11.exe+246A7C: F3 0F 59 CF           - mulss xmm1,xmm7
+// ---------- DONE INJECTING  ----------
+ed8_ps5_D3D11.exe+246A80: F3 0F 58 C8           - addss xmm1,xmm0
+ed8_ps5_D3D11.exe+246A84: F3 48 0F 2C C9        - cvttss2si rcx,xmm1
+ed8_ps5_D3D11.exe+246A89: 3B C8                 - cmp ecx,eax
+ed8_ps5_D3D11.exe+246A8B: 0F 42 C1              - cmovb eax,ecx
+ed8_ps5_D3D11.exe+246A8E: 89 83 24 03 00 00     - mov [rbx+00000324],eax
+ed8_ps5_D3D11.exe+246A94: 48 8B 0D 5D DF CF 00  - mov rcx,[ed8_ps5_D3D11.exe+F449F8]
+ed8_ps5_D3D11.exe+246A9B: E8 D0 14 1C 00        - call ed8_ps5_D3D11.exe+407F70
+ed8_ps5_D3D11.exe+246AA0: 8B 93 24 03 00 00     - mov edx,[rbx+00000324]
+ed8_ps5_D3D11.exe+246AA6: 44 8B 83 20 03 00 00  - mov r8d,[rbx+00000320]
+ed8_ps5_D3D11.exe+246AAD: 41 03 D0              - add edx,r8d
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>423</ID>
+          <Description>"倍率 / multiplier"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>Float</VariableType>
+          <Address>vf_mqz_multi</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>407</ID>
+      <Description>"取得道具並設定數量 / アイテムを取得し、その数量を設定する / Set stock when get item"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ed8_ps5_D3D11.exe
+  Version:
+  Date   : 2024-08-17
+  Author : Andycbbfox@https:P//opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_SET_ITEM_CNT2,$process,41 8B 54 D1 04) // should be unique
+alloc(newmem,$1000,INJECT_SET_ITEM_CNT2)
+
+label(code)
+label(return)
+label(i_item_set_to_1)
+
+newmem:
+  cmp edx, 1
+  jb code
+
+  push r15
+  mov r15w, [r9+rdx*8]
+  cmp r15w, #319
+  je endp
+  cmp r15w, #320
+  je endp
+  cmp r15w, #321
+  je endp
+  cmp r15w, #322
+  je endp
+  //cmp r15w, #323
+  //je endp
+  //cmp r15w, #324
+  //je endp
+  //cmp r15w, #325
+  //je endp
+  //cmp r15w, #326
+  //je endp
+  cmp r15w, #327
+  je endp
+
+  cmp r15w, #300
+  jne endp_pre
+
+  cmp dword ptr [r9+rdx*8+04], 7D0
+  jae endp
+  mov dword ptr [r9+rdx*8+04], 7D0
+  jmp endp
+
+endp_pre:
+  push rbx
+  mov ebx, [i_item_set_to_1]
+  cmp dword ptr [r9+rdx*8+04], ebx
+  jae @F
+  mov dword ptr [r9+rdx*8+04], ebx
+@@:
+  pop rbx
+
+endp:
+  pop r15
+
+code:
+  mov edx,[r9+rdx*8+04]
+  jmp return
+align 10 cc
+  i_item_set_to_1:
+  dd #40
+INJECT_SET_ITEM_CNT2:
+  jmp newmem
+return:
+registersymbol(INJECT_SET_ITEM_CNT2)
+registersymbol(i_item_set_to_1)
+[DISABLE]
+
+INJECT_SET_ITEM_CNT2:
+  db 41 8B 54 D1 04
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed8_ps5_D3D11.exe+48F83C
+
+ed8_ps5_D3D11.exe+48F825: 41 5F                    - pop r15
+ed8_ps5_D3D11.exe+48F827: 41 5E                    - pop r14
+ed8_ps5_D3D11.exe+48F829: 5F                       - pop rdi
+ed8_ps5_D3D11.exe+48F82A: 5E                       - pop rsi
+ed8_ps5_D3D11.exe+48F82B: 5D                       - pop rbp
+ed8_ps5_D3D11.exe+48F82C: C3                       - ret
+ed8_ps5_D3D11.exe+48F82D: 8B 8D DC 00 00 00        - mov ecx,[rbp+000000DC]
+ed8_ps5_D3D11.exe+48F833: 48 03 D2                 - add rdx,rdx
+ed8_ps5_D3D11.exe+48F836: 8B D9                    - mov ebx,ecx
+ed8_ps5_D3D11.exe+48F838: 4D 8D 04 D1              - lea r8,[r9+rdx*8]
+// ---------- INJECTING HERE ----------
+ed8_ps5_D3D11.exe+48F83C: 41 8B 54 D1 04           - mov edx,[r9+rdx*8+04]
+// ---------- DONE INJECTING  ----------
+ed8_ps5_D3D11.exe+48F841: 2B DA                    - sub ebx,edx
+ed8_ps5_D3D11.exe+48F843: 8D 04 32                 - lea eax,[rdx+rsi]
+ed8_ps5_D3D11.exe+48F846: 3B C1                    - cmp eax,ecx
+ed8_ps5_D3D11.exe+48F848: 0F 46 DE                 - cmovbe ebx,esi
+ed8_ps5_D3D11.exe+48F84B: 80 BC 24 90 04 00 00 00  - cmp byte ptr [rsp+00000490],00
+ed8_ps5_D3D11.exe+48F853: 75 AF                    - jne ed8_ps5_D3D11.exe+48F804
+ed8_ps5_D3D11.exe+48F855: 8D 04 13                 - lea eax,[rbx+rdx]
+ed8_ps5_D3D11.exe+48F858: 41 89 40 04              - mov [r8+04],eax
+ed8_ps5_D3D11.exe+48F85C: E9 5C FF FF FF           - jmp ed8_ps5_D3D11.exe+48F7BD
+ed8_ps5_D3D11.exe+48F861: CC                       - int 3
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>470</ID>
+          <Description>"Target #:"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_item_set_to_1</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>409</ID>
+          <Description>"數量需 &gt;= 2 / 数量は2以上に設定 / # must &gt;= 2"</Description>
+          <Color>8000FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>434</ID>
+      <Description>"瀏覽道具時設定數量 / アイテムを閲覧中に数量を設定する / browse item &amp; set #"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ed8_ps5_D3D11.exe
+  Version: 
+  Date   : 2024-08-14
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_SET_ITEM_CNT_2,$process,41 8B 44 D1 04 48) // should be unique
+alloc(newmem,$1000,INJECT_SET_ITEM_CNT_2)
+
+label(code)
+label(return)
+label(i_item_set_to_2)
+label(is_force_set_item_cnt)
+
+newmem:
+  cmp dword ptr [r9+rdx*8+04], 2
+  jb code
+
+
+  push r15
+  mov r15w, [r9+rdx*8]
+  cmp r15w, #319
+  je endp
+  cmp r15w, #320
+  je endp
+  cmp r15w, #321
+  je endp
+  cmp r15w, #322
+  je endp
+  //cmp r15w, #323
+  //je endp
+  //cmp r15w, #324
+  //je endp
+  //cmp r15w, #325
+  //je endp
+  //cmp r15w, #326
+  //je endp
+  cmp r15w, #327
+  je endp
+
+  cmp r15w, #300
+  jne endp_pre
+
+  cmp dword ptr [r9+rdx*8+04], 7D0
+  jae endp
+  mov dword ptr [r9+rdx*8+04], 7D0
+  jmp endp
+
+endp_pre:
+
+  push rbx
+  mov ebx, [i_item_set_to_2]
+  cmp dword ptr [r9+rdx*8+04], ebx
+  jae @F
+  mov dword ptr [r9+rdx*8+04], ebx
+  jmp force_end
+
+force_set:
+  cmp dword ptr [is_force_set_item_cnt], 1
+  jne @F
+  mov dword ptr [r9+rdx*8+04], ebx
+
+force_end:
+  pop rbx
+
+endp:
+  pop r15
+
+code:
+  mov eax,[r9+rdx*8+04]
+  jmp return
+align 10 cc
+  i_item_set_to_2:
+  dd #40
+  is_force_set_item_cnt:
+  dd 0
+
+INJECT_SET_ITEM_CNT_2:
+  jmp newmem
+return:
+registersymbol(INJECT_SET_ITEM_CNT_2)
+registersymbol(i_item_set_to_2)
+registersymbol(is_force_set_item_cnt)
+[DISABLE]
+
+INJECT_SET_ITEM_CNT_2:
+  db 41 8B 44 D1 04
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed8_ps5_D3D11.exe+498C2A
+
+ed8_ps5_D3D11.exe+498C0E: FF C0           - inc eax
+ed8_ps5_D3D11.exe+498C10: 41 3B C0        - cmp eax,r8d
+ed8_ps5_D3D11.exe+498C13: 72 EB           - jb ed8_ps5_D3D11.exe+498C00
+ed8_ps5_D3D11.exe+498C15: 33 C0           - xor eax,eax
+ed8_ps5_D3D11.exe+498C17: 48 8B 5C 24 30  - mov rbx,[rsp+30]
+ed8_ps5_D3D11.exe+498C1C: 48 83 C4 20     - add rsp,20
+ed8_ps5_D3D11.exe+498C20: 5F              - pop rdi
+ed8_ps5_D3D11.exe+498C21: C3              - ret 
+ed8_ps5_D3D11.exe+498C22: 48 8B 5C 24 30  - mov rbx,[rsp+30]
+ed8_ps5_D3D11.exe+498C27: 48 03 D2        - add rdx,rdx
+// ---------- INJECTING HERE ----------
+ed8_ps5_D3D11.exe+498C2A: 41 8B 44 D1 04  - mov eax,[r9+rdx*8+04]
+// ---------- DONE INJECTING  ----------
+ed8_ps5_D3D11.exe+498C2F: 48 83 C4 20     - add rsp,20
+ed8_ps5_D3D11.exe+498C33: 5F              - pop rdi
+ed8_ps5_D3D11.exe+498C34: C3              - ret 
+ed8_ps5_D3D11.exe+498C35: CC              - int 3 
+ed8_ps5_D3D11.exe+498C36: CC              - int 3 
+ed8_ps5_D3D11.exe+498C37: CC              - int 3 
+ed8_ps5_D3D11.exe+498C38: CC              - int 3 
+ed8_ps5_D3D11.exe+498C39: CC              - int 3 
+ed8_ps5_D3D11.exe+498C3A: CC              - int 3 
+ed8_ps5_D3D11.exe+498C3B: CC              - int 3 
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>471</ID>
+          <Description>"Target #:"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_item_set_to_2</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>472</ID>
+          <Description>"強制設定? / 強制設定する? / force set?"</Description>
+          <DropDownList DisplayValueAsItem="1">0:No
+1:Yes
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>is_force_set_item_cnt</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>435</ID>
+          <Description>"Item count must &gt;= 2"</Description>
+          <Color>8000FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>322</ID>
+      <Description>"道具無限 / アイテム無限 / inf. Item"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ed8_ps5_D3D11.exe
+  Version: 
+  Date   : 2024-08-12
+  Author : bbfox@httpps://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_BATT_INF_ITEM,$process,41 2B C6 85 C0) // should be unique
+alloc(newmem,$1000,INJECT_BATT_INF_ITEM)
+
+label(code)
+label(return)
+label(i_base_ditem_addr)
+label(i_item_set_to_3)
+newmem:
+  // #300: UMaterial
+  // #303: 夢幻欠片
+  // #321: 赤封印石 (*)
+  // #322: 青封印石 (*)
+  push r15
+  lea r15, [r9+rdx*8]
+  mov [i_base_ditem_addr], r15
+  pop r15
+
+  //xor r14d, r14d
+
+  push r15
+  mov r15w, [r9+rdx*8]
+  cmp r15w, #319
+  je endp
+  cmp r15w, #320
+  je endp
+  cmp r15w, #321
+  je endp
+  cmp r15w, #322
+  je endp
+  //cmp r15w, #323
+  //je endp
+  //cmp r15w, #324
+  //je endp
+  //cmp r15w, #325
+  //je endp
+  //cmp r15w, #326
+  //je endp
+  cmp r15w, #327
+  je endp
+
+  cmp r15w, #303
+  je set_xK
+chk2:
+  cmp r15w, #300
+  je set_xK
+
+
+  jmp endp_pre
+
+set_xK:
+  cmp eax, 1770
+  jae endp
+  mov eax, 1770
+  jmp endp
+
+endp_pre:
+  push rbx
+  mov ebx, [i_item_set_to_3]
+  cmp eax, ebx
+  jae @F
+  mov eax, ebx
+
+@@:
+  pop rbx
+
+endp:
+  pop r15
+
+  cmp eax, #200
+  jb code
+
+  cmp eax, 3DE
+  ja code
+
+  mov eax, 3DE
+
+code:
+  sub eax,r14d
+  test eax,eax
+  jmp return
+align 10 cc
+  i_base_ditem_addr:
+  dq 0
+  i_item_set_to_3:
+  dd #40
+
+INJECT_BATT_INF_ITEM:
+  jmp newmem
+return:
+registersymbol(INJECT_BATT_INF_ITEM)
+registersymbol(i_base_ditem_addr)
+registersymbol(i_item_set_to_3)
+[DISABLE]
+
+INJECT_BATT_INF_ITEM:
+  db 41 2B C6 85 C0
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed8_ps5_D3D11.exe+49EE61
+
+ed8_ps5_D3D11.exe+49EE44: 48 03 C9                 - add rcx,rcx
+ed8_ps5_D3D11.exe+49EE47: 8B D0                    - mov edx,eax
+ed8_ps5_D3D11.exe+49EE49: 66 41 39 1C C9           - cmp [r9+rcx*8],bx
+ed8_ps5_D3D11.exe+49EE4E: 74 09                    - je ed8_ps5_D3D11.exe+49EE59
+ed8_ps5_D3D11.exe+49EE50: FF C0                    - inc eax
+ed8_ps5_D3D11.exe+49EE52: 41 3B C0                 - cmp eax,r8d
+ed8_ps5_D3D11.exe+49EE55: 72 EB                    - jb ed8_ps5_D3D11.exe+49EE42
+ed8_ps5_D3D11.exe+49EE57: EB 16                    - jmp ed8_ps5_D3D11.exe+49EE6F
+ed8_ps5_D3D11.exe+49EE59: 48 03 D2                 - add rdx,rdx
+ed8_ps5_D3D11.exe+49EE5C: 41 8B 44 D1 04           - mov eax,[r9+rdx*8+04]
+// ---------- INJECTING HERE ----------
+ed8_ps5_D3D11.exe+49EE61: 41 2B C6                 - sub eax,r14d
+// ---------- DONE INJECTING  ----------
+ed8_ps5_D3D11.exe+49EE64: 85 C0                    - test eax,eax
+ed8_ps5_D3D11.exe+49EE66: 44 0F 4F D0              - cmovg r10d,eax
+ed8_ps5_D3D11.exe+49EE6A: 45 89 54 D1 04           - mov [r9+rdx*8+04],r10d
+ed8_ps5_D3D11.exe+49EE6F: 80 BC 24 70 04 00 00 00  - cmp byte ptr [rsp+00000470],00
+ed8_ps5_D3D11.exe+49EE77: 74 0B                    - je ed8_ps5_D3D11.exe+49EE84
+ed8_ps5_D3D11.exe+49EE79: 48 8B D7                 - mov rdx,rdi
+ed8_ps5_D3D11.exe+49EE7C: 48 8B CD                 - mov rcx,rbp
+ed8_ps5_D3D11.exe+49EE7F: E8 5C F6 FF FF           - call ed8_ps5_D3D11.exe+49E4E0
+ed8_ps5_D3D11.exe+49EE84: 48 8B 8C 24 20 04 00 00  - mov rcx,[rsp+00000420]
+ed8_ps5_D3D11.exe+49EE8C: 48 33 CC                 - xor rcx,rsp
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>469</ID>
+          <Description>"Target #:"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_item_set_to_3</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>331</ID>
+          <Description>"Last ID."</Description>
+          <DropDownList DisplayValueAsItem="1">3721:防御2
+3722:破壞2
+3759:真・鋼星鈴
+3760:真・金剛盾
+3761:真・玄武刃
+3762:羅漢煌珠
+3763:不動煌珠
+3764:琥耀煌珠
+3765:神楽
+3792:魔防2
+3833:真・海星鈴
+3834:真・瀑布
+3835:真・青龍刃
+3836:仙道煌珠
+3837:氷将煌珠
+3860:攻撃2
+3861:必殺2
+3838:蒼耀煌珠
+3898:真・焔星鈴
+3899:真・憤怒
+3900:真・朱雀刃
+3901:武神煌珠
+3902:炎帝煌珠
+3903:紅耀煌珠
+3904:獅子王
+3924:回避2
+3925:移動2
+3961:真・嵐言鈴
+3962:真・蠱惑
+3963:真・革命
+3964:真・白虎刃
+3965:風神煌珠
+3966:雷神煌珠
+3967:翠耀煌珠
+3984:行動力2
+3985:駆動2
+4015:真・刻界鈴
+4016:真・冥皇
+4017:真・影輪牙
+4018:神速煌珠 / 韋駄天煌珠
+4019:魔王煌珠
+4020:黒耀煌珠
+4021:狂骨
+4038:省EP2
+4039:命中2
+4069:真・聖界鈴
+4070:真・覇道
+4071:真・熾天使
+4072:真・日輪牙
+4073:天帝煌珠
+4074:七剣煌珠
+4075:金耀煌珠
+4076:龍虎
+4083:EP 1
+4084:精神1
+4093:EP 2
+4094:精神2
+4098:月鏡
+4100:龍眼
+4113:月輪牙
+4114:賢王珠
+4115:幻狼珠
+4116:銀耀珠
+4117:八咫鏡
+4126:真・幽界鈴
+4127:真・玉藻
+4128:真・月輪牙
+4129:賢王煌珠
+4130:幻狼煌珠
+4131:銀耀煌珠
+4132:真・八咫鏡
+9999:Empty
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_base_ditem_addr</Address>
+          <Offsets>
+            <Offset>0</Offset>
+          </Offsets>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>468</ID>
+              <Description>"顯示的ID為日文/ Japanese description only"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>333</ID>
+          <Description>"Category?"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_base_ditem_addr</Address>
+          <Offsets>
+            <Offset>2</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>332</ID>
+          <Description>"Last #"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_ditem_addr</Address>
+          <Offsets>
+            <Offset>4</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>326</ID>
+      <Description>"EP無限 / Battle: inf EP"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ed8_ps5_D3D11.exe
+  Version: 
+  Date   : 2024-08-12
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_BATT_INF_EP,$process,0F B7 48 08 66 3B 4E 02) // should be unique
+alloc(newmem,$1000,INJECT_BATT_INF_EP)
+
+aobscanmodule(INJECT_BATT_INF_EP2,$process,66 89 93 E4 03 00 00) // should be unique
+alloc(newmem2,$1000,INJECT_BATT_INF_EP2)
+
+label(code)
+label(return)
+
+label(code2)
+label(return2)
+
+newmem:
+  cmp byte ptr [rax-03], 8
+  jne code
+
+  mov cx, word ptr [rax+0A]
+  mov word ptr [rax+08], cx
+
+code:
+  movzx ecx,word ptr [rax+08]
+  cmp cx,[rsi+02]
+  jmp return
+
+INJECT_BATT_INF_EP:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_BATT_INF_EP)
+
+newmem2:
+  mov dx, [rbx+000003E6]
+
+code2:
+  mov [rbx+000003E4],dx
+  jmp return2
+
+INJECT_BATT_INF_EP2:
+  jmp newmem2
+  nop 2
+return2:
+registersymbol(INJECT_BATT_INF_EP2)
+
+
+[DISABLE]
+
+INJECT_BATT_INF_EP:
+  db 0F B7 48 08 66 3B 4E 02
+
+INJECT_BATT_INF_EP2:
+  db 66 89 93 E4 03 00 00
+
+unregistersymbol(INJECT_BATT_INF_EP)
+dealloc(newmem)
+unregistersymbol(INJECT_BATT_INF_EP2)
+dealloc(newmem2)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed8_ps5_D3D11.exe+1AABF9
+
+ed8_ps5_D3D11.exe+1AABCF: 48 8B 55 50           - mov rdx,[rbp+50]
+ed8_ps5_D3D11.exe+1AABD3: 48 8B 88 28 03 00 00  - mov rcx,[rax+00000328]
+ed8_ps5_D3D11.exe+1AABDA: E8 81 00 01 00        - call ed8_ps5_D3D11.exe+1BAC60
+ed8_ps5_D3D11.exe+1AABDF: 83 F8 11              - cmp eax,11
+ed8_ps5_D3D11.exe+1AABE2: 75 0C                 - jne ed8_ps5_D3D11.exe+1AABF0
+ed8_ps5_D3D11.exe+1AABE4: 41 80 7E 1E 17        - cmp byte ptr [r14+1E],17
+ed8_ps5_D3D11.exe+1AABE9: 74 05                 - je ed8_ps5_D3D11.exe+1AABF0
+ed8_ps5_D3D11.exe+1AABEB: 66 44 89 6E 02        - mov [rsi+02],r13w
+ed8_ps5_D3D11.exe+1AABF0: 48 8B 4D 50           - mov rcx,[rbp+50]
+ed8_ps5_D3D11.exe+1AABF4: E8 07 0F 02 00        - call ed8_ps5_D3D11.exe+1CBB00
+// ---------- INJECTING HERE ----------
+ed8_ps5_D3D11.exe+1AABF9: 0F B7 48 08           - movzx ecx,word ptr [rax+08]
+// ---------- DONE INJECTING  ----------
+ed8_ps5_D3D11.exe+1AABFD: 66 3B 4E 02           - cmp cx,[rsi+02]
+ed8_ps5_D3D11.exe+1AAC01: 0F 82 09 01 00 00     - jb ed8_ps5_D3D11.exe+1AAD10
+ed8_ps5_D3D11.exe+1AAC07: B0 01                 - mov al,01
+ed8_ps5_D3D11.exe+1AAC09: 4C 8B 6C 24 60        - mov r13,[rsp+60]
+ed8_ps5_D3D11.exe+1AAC0E: 48 8B 5C 24 50        - mov rbx,[rsp+50]
+ed8_ps5_D3D11.exe+1AAC13: 4C 8B 7C 24 20        - mov r15,[rsp+20]
+ed8_ps5_D3D11.exe+1AAC18: 48 83 C4 28           - add rsp,28
+ed8_ps5_D3D11.exe+1AAC1C: 41 5E                 - pop r14
+ed8_ps5_D3D11.exe+1AAC1E: 41 5C                 - pop r12
+ed8_ps5_D3D11.exe+1AAC20: 5E                    - pop rsi
+}
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed8_ps5_D3D11.exe+1C75A1
+
+ed8_ps5_D3D11.exe+1C757F: 48 8B D8              - mov rbx,rax
+ed8_ps5_D3D11.exe+1C7582: 75 DC                 - jne ed8_ps5_D3D11.exe+1C7560
+ed8_ps5_D3D11.exe+1C7584: 0F B7 83 E4 03 00 00  - movzx eax,word ptr [rbx+000003E4]
+ed8_ps5_D3D11.exe+1C758B: 33 C9                 - xor ecx,ecx
+ed8_ps5_D3D11.exe+1C758D: 0F B7 93 E6 03 00 00  - movzx edx,word ptr [rbx+000003E6]
+ed8_ps5_D3D11.exe+1C7594: 2B C7                 - sub eax,edi
+ed8_ps5_D3D11.exe+1C7596: 85 C0                 - test eax,eax
+ed8_ps5_D3D11.exe+1C7598: 0F 4F C8              - cmovg ecx,eax
+ed8_ps5_D3D11.exe+1C759B: 3B CA                 - cmp ecx,edx
+ed8_ps5_D3D11.exe+1C759D: 66 0F 4C D1           - cmovl dx,cx
+// ---------- INJECTING HERE ----------
+ed8_ps5_D3D11.exe+1C75A1: 66 89 93 E4 03 00 00  - mov [rbx+000003E4],dx
+// ---------- DONE INJECTING  ----------
+ed8_ps5_D3D11.exe+1C75A8: 48 8B 5C 24 30        - mov rbx,[rsp+30]
+ed8_ps5_D3D11.exe+1C75AD: 48 83 C4 20           - add rsp,20
+ed8_ps5_D3D11.exe+1C75B1: 5F                    - pop rdi
+ed8_ps5_D3D11.exe+1C75B2: C3                    - ret
+ed8_ps5_D3D11.exe+1C75B3: CC                    - int 3
+ed8_ps5_D3D11.exe+1C75B4: CC                    - int 3
+ed8_ps5_D3D11.exe+1C75B5: CC                    - int 3
+ed8_ps5_D3D11.exe+1C75B6: CC                    - int 3
+ed8_ps5_D3D11.exe+1C75B7: CC                    - int 3
+ed8_ps5_D3D11.exe+1C75B8: CC                    - int 3
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>324</ID>
+      <Description>"CP無限 / Battle: inf CP"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ed8_ps5_D3D11.exe
+  Version: 
+  Date   : 2024-08-12
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_BATT_INF_CP,$process,66 89 93 E8 03 00 00) // should be unique
+alloc(newmem,$1000,INJECT_BATT_INF_CP)
+
+label(code)
+label(return)
+
+newmem:
+  cmp byte ptr [rbx+000003D9], 8
+  jne code
+
+  mov dx, [rbx+000003EA]
+
+code:
+  mov [rbx+000003E8],dx
+  jmp return
+
+INJECT_BATT_INF_CP:
+  jmp newmem
+  nop 2
+return:
+registersymbol(INJECT_BATT_INF_CP)
+
+[DISABLE]
+
+INJECT_BATT_INF_CP:
+  db 66 89 93 E8 03 00 00
+
+unregistersymbol(INJECT_BATT_INF_CP)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed8_ps5_D3D11.exe+1C74A1
+
+ed8_ps5_D3D11.exe+1C747F: 48 8B D8              - mov rbx,rax
+ed8_ps5_D3D11.exe+1C7482: 75 DC                 - jne ed8_ps5_D3D11.exe+1C7460
+ed8_ps5_D3D11.exe+1C7484: 0F B7 83 E8 03 00 00  - movzx eax,word ptr [rbx+000003E8]
+ed8_ps5_D3D11.exe+1C748B: 33 C9                 - xor ecx,ecx
+ed8_ps5_D3D11.exe+1C748D: 0F B7 93 EA 03 00 00  - movzx edx,word ptr [rbx+000003EA]
+ed8_ps5_D3D11.exe+1C7494: 2B C7                 - sub eax,edi
+ed8_ps5_D3D11.exe+1C7496: 85 C0                 - test eax,eax
+ed8_ps5_D3D11.exe+1C7498: 0F 4F C8              - cmovg ecx,eax
+ed8_ps5_D3D11.exe+1C749B: 3B CA                 - cmp ecx,edx
+ed8_ps5_D3D11.exe+1C749D: 66 0F 4C D1           - cmovl dx,cx
+// ---------- INJECTING HERE ----------
+ed8_ps5_D3D11.exe+1C74A1: 66 89 93 E8 03 00 00  - mov [rbx+000003E8],dx
+// ---------- DONE INJECTING  ----------
+ed8_ps5_D3D11.exe+1C74A8: 48 8B 5C 24 30        - mov rbx,[rsp+30]
+ed8_ps5_D3D11.exe+1C74AD: 48 83 C4 20           - add rsp,20
+ed8_ps5_D3D11.exe+1C74B1: 5F                    - pop rdi
+ed8_ps5_D3D11.exe+1C74B2: C3                    - ret 
+ed8_ps5_D3D11.exe+1C74B3: CC                    - int 3 
+ed8_ps5_D3D11.exe+1C74B4: CC                    - int 3 
+ed8_ps5_D3D11.exe+1C74B5: CC                    - int 3 
+ed8_ps5_D3D11.exe+1C74B6: CC                    - int 3 
+ed8_ps5_D3D11.exe+1C74B7: CC                    - int 3 
+ed8_ps5_D3D11.exe+1C74B8: CC                    - int 3 
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>328</ID>
+      <Description>"設定BP值 / BP値を設定 / set max BP"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ed8_ps5_D3D11.exe
+  Version:
+  Date   : 2024-08-15
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_BATT_INF_BP,$process,D3 FF 83 F8 04 75 10) // should be unique
+alloc(newmem,$1000,INJECT_BATT_INF_BP)
+
+label(code)
+label(return)
+
+newmem:
+  push rax
+  mov rax,[$process+F449F8]
+  mov byte ptr [rax+0072A8D3], 8
+  mov byte ptr [rax+0072A8D2], 8
+  mov byte ptr [rax+0072A8D1], 8
+  pop rax
+
+code:
+  cmp eax,04
+  //reassemble(INJECT_BATT_INF_BP+3)
+  jne $process+6C876A
+  jmp return
+align 10 cc
+  i_min_bp:
+  db 3
+
+INJECT_BATT_INF_BP+02:
+  jmp newmem
+return:
+registersymbol(INJECT_BATT_INF_BP)
+
+[DISABLE]
+
+INJECT_BATT_INF_BP+02:
+  db 83 F8 04 75 10
+
+unregistersymbol(INJECT_BATT_INF_BP)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed8_ps5_D3D11.exe+6C8755
+
+ed8_ps5_D3D11.exe+6C871B: 48 89 B4 24 B0 00 00 00  - mov [rsp+000000B0],rsi
+ed8_ps5_D3D11.exe+6C8723: 4C 89 B4 24 A8 00 00 00  - mov [rsp+000000A8],r14
+ed8_ps5_D3D11.exe+6C872B: 4C 89 BC 24 A0 00 00 00  - mov [rsp+000000A0],r15
+ed8_ps5_D3D11.exe+6C8733: 44 0F 29 5C 24 50        - movaps [rsp+50],xmm11
+ed8_ps5_D3D11.exe+6C8739: 74 09                    - je ed8_ps5_D3D11.exe+6C8744
+ed8_ps5_D3D11.exe+6C873B: 0F B6 B7 E8 02 00 00     - movzx esi,byte ptr [rdi+000002E8]
+ed8_ps5_D3D11.exe+6C8742: EB 42                    - jmp ed8_ps5_D3D11.exe+6C8786
+ed8_ps5_D3D11.exe+6C8744: 48 8B 0D AD C2 87 00     - mov rcx,[ed8_ps5_D3D11.exe+F449F8]
+ed8_ps5_D3D11.exe+6C874B: BA 5C 00 00 00           - mov edx,0000005C
+ed8_ps5_D3D11.exe+6C8750: E8 9B EA D3 FF           - call ed8_ps5_D3D11.exe+4071F0
+// ---------- INJECTING HERE ----------
+ed8_ps5_D3D11.exe+6C8755: 83 F8 04                 - cmp eax,04
+// ---------- DONE INJECTING  ----------
+ed8_ps5_D3D11.exe+6C8758: 75 10                    - jne ed8_ps5_D3D11.exe+6C876A
+ed8_ps5_D3D11.exe+6C875A: 48 8B 05 97 C2 87 00     - mov rax,[ed8_ps5_D3D11.exe+F449F8]
+ed8_ps5_D3D11.exe+6C8761: 0F B6 B0 D3 A8 72 00     - movzx esi,byte ptr [rax+0072A8D3]
+ed8_ps5_D3D11.exe+6C8768: EB 1C                    - jmp ed8_ps5_D3D11.exe+6C8786
+ed8_ps5_D3D11.exe+6C876A: 83 F8 01                 - cmp eax,01
+ed8_ps5_D3D11.exe+6C876D: 48 8B 05 84 C2 87 00     - mov rax,[ed8_ps5_D3D11.exe+F449F8]
+ed8_ps5_D3D11.exe+6C8774: 75 09                    - jne ed8_ps5_D3D11.exe+6C877F
+ed8_ps5_D3D11.exe+6C8776: 0F B6 B0 D1 A8 72 00     - movzx esi,byte ptr [rax+0072A8D1]
+ed8_ps5_D3D11.exe+6C877D: EB 07                    - jmp ed8_ps5_D3D11.exe+6C8786
+ed8_ps5_D3D11.exe+6C877F: 0F B6 B0 D2 A8 72 00     - movzx esi,byte ptr [rax+0072A8D2]
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>474</ID>
+      <Description>"勇氣指令 / オーダー / Get order info"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ed8_ps5_D3D11.exe
+  Version: 
+  Date   : 2024-08-17
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_ORDER_INFO,$process,FE 4B 44 80 7B 44 00) // should be unique
+alloc(newmem,$1000,INJECT_GET_ORDER_INFO)
+
+label(code)
+label(return)
+label(i_base_order_nfo_addr)
+label(is_inf_order)
+
+newmem:
+  mov [i_base_order_nfo_addr], rbx
+
+code:
+  cmp dword ptr [is_inf_order], 1
+  jne to_code
+  cmp byte ptr [rbx+44], 1
+  ja @F
+  inc byte ptr [rbx+44]
+
+to_code:
+  dec [rbx+44]
+  cmp byte ptr [rbx+44],00
+  jmp return
+align 10 cc
+  i_base_order_nfo_addr:
+  dq 0
+  is_inf_order:
+  dd 1
+
+INJECT_GET_ORDER_INFO:
+  jmp newmem
+  nop 2
+return:
+registersymbol(INJECT_GET_ORDER_INFO)
+registersymbol(i_base_order_nfo_addr)
+registersymbol(is_inf_order)
+[DISABLE]
+
+INJECT_GET_ORDER_INFO:
+  db FE 4B 44 80 7B 44 00
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed8_ps5_D3D11.exe+1BFFD2
+
+ed8_ps5_D3D11.exe+1BFFB6: 74 05                 - je ed8_ps5_D3D11.exe+1BFFBD
+ed8_ps5_D3D11.exe+1BFFB8: FE C8                 - dec al
+ed8_ps5_D3D11.exe+1BFFBA: 88 43 46              - mov [rbx+46],al
+ed8_ps5_D3D11.exe+1BFFBD: BF FF FF 00 00        - mov edi,0000FFFF
+ed8_ps5_D3D11.exe+1BFFC2: 66 39 7B 18           - cmp [rbx+18],di
+ed8_ps5_D3D11.exe+1BFFC6: 74 6F                 - je ed8_ps5_D3D11.exe+1C0037
+ed8_ps5_D3D11.exe+1BFFC8: 0F B6 43 3C           - movzx eax,byte ptr [rbx+3C]
+ed8_ps5_D3D11.exe+1BFFCC: FE C8                 - dec al
+ed8_ps5_D3D11.exe+1BFFCE: 3C FD                 - cmp al,-03
+ed8_ps5_D3D11.exe+1BFFD0: 77 03                 - ja ed8_ps5_D3D11.exe+1BFFD5
+// ---------- INJECTING HERE ----------
+ed8_ps5_D3D11.exe+1BFFD2: FE 4B 44              - dec [rbx+44]
+// ---------- DONE INJECTING  ----------
+ed8_ps5_D3D11.exe+1BFFD5: 80 7B 44 00           - cmp byte ptr [rbx+44],00
+ed8_ps5_D3D11.exe+1BFFD9: 75 4E                 - jne ed8_ps5_D3D11.exe+1C0029
+ed8_ps5_D3D11.exe+1BFFDB: 48 8B 0D 16 4A D8 00  - mov rcx,[ed8_ps5_D3D11.exe+F449F8]
+ed8_ps5_D3D11.exe+1BFFE2: 44 8B CF              - mov r9d,edi
+ed8_ps5_D3D11.exe+1BFFE5: 0F B7 53 18           - movzx edx,word ptr [rbx+18]
+ed8_ps5_D3D11.exe+1BFFE9: 45 33 C0              - xor r8d,r8d
+ed8_ps5_D3D11.exe+1BFFEC: 48 8B 89 D8 79 56 00  - mov rcx,[rcx+005679D8]
+ed8_ps5_D3D11.exe+1BFFF3: E8 98 F1 18 00        - call ed8_ps5_D3D11.exe+34F190
+ed8_ps5_D3D11.exe+1BFFF8: 48 85 C0              - test rax,rax
+ed8_ps5_D3D11.exe+1BFFFB: 74 04                 - je ed8_ps5_D3D11.exe+1C0001
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>475</ID>
+          <Description>"次數無限? / 回数無限 / inf. order?"</Description>
+          <DropDownList DisplayValueAsItem="1">0:No
+1:Yes
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>is_inf_order</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>478</ID>
+          <Description>"Char."</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_order_nfo_addr</Address>
+          <Offsets>
+            <Offset>40</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>476</ID>
+          <Description>"Count"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>Byte</VariableType>
+          <Address>i_base_order_nfo_addr</Address>
+          <Offsets>
+            <Offset>44</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>477</ID>
+          <Description>"Max"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>Byte</VariableType>
+          <Address>i_base_order_nfo_addr</Address>
+          <Offsets>
+            <Offset>45</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>347</ID>
+      <Description>"奇襲點數無限 / アサルトアタックポイント無限 / inf. assault"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ed8_ps5_D3D11.exe
+  Version:
+  Date   : 2024-08-15
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_MAX_CHARGES,$process,83 F8 04 75 09 0F B7 B9) // should be unique
+alloc(newmem,$1000,INJECT_MAX_CHARGES)
+
+label(code)
+label(return)
+
+newmem:
+  cmp word ptr [rcx+00722510], C8
+  jae chk_n1
+  mov word ptr [rcx+00722510], C8
+
+chk_n1:
+  cmp word ptr [rcx+0072250C], C8
+  jae chk_n2
+  mov word ptr [rcx+0072250C], C8
+
+chk_n2:
+  cmp word ptr [rcx+0072250E], C8
+  jae code
+  mov word ptr [rcx+0072250E], C8
+
+code:
+  cmp eax,04
+  jne $process+48E771
+  jmp return
+
+INJECT_MAX_CHARGES:
+  jmp newmem
+return:
+registersymbol(INJECT_MAX_CHARGES)
+
+[DISABLE]
+
+INJECT_MAX_CHARGES:
+  db 83 F8 04 75 09
+
+unregistersymbol(INJECT_MAX_CHARGES)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed8_ps5_D3D11.exe+48E763
+
+ed8_ps5_D3D11.exe+48E735: 48 89 6C 24 10        - mov [rsp+10],rbp
+ed8_ps5_D3D11.exe+48E73A: 48 89 74 24 18        - mov [rsp+18],rsi
+ed8_ps5_D3D11.exe+48E73F: 57                    - push rdi
+ed8_ps5_D3D11.exe+48E740: 48 83 EC 20           - sub rsp,20
+ed8_ps5_D3D11.exe+48E744: 48 8B 0D AD 62 AB 00  - mov rcx,[ed8_ps5_D3D11.exe+F449F8]
+ed8_ps5_D3D11.exe+48E74B: 0F B7 EA              - movzx ebp,dx
+ed8_ps5_D3D11.exe+48E74E: BA 5C 00 00 00        - mov edx,0000005C
+ed8_ps5_D3D11.exe+48E753: 41 0F B6 F0           - movzx esi,r8b
+ed8_ps5_D3D11.exe+48E757: E8 94 8A F7 FF        - call ed8_ps5_D3D11.exe+4071F0
+ed8_ps5_D3D11.exe+48E75C: 48 8B 0D 95 62 AB 00  - mov rcx,[ed8_ps5_D3D11.exe+F449F8]
+// ---------- INJECTING HERE ----------
+ed8_ps5_D3D11.exe+48E763: 83 F8 04              - cmp eax,04
+// ---------- DONE INJECTING  ----------
+ed8_ps5_D3D11.exe+48E766: 75 09                 - jne ed8_ps5_D3D11.exe+48E771
+ed8_ps5_D3D11.exe+48E768: 0F B7 B9 10 25 72 00  - movzx edi,word ptr [rcx+00722510]
+ed8_ps5_D3D11.exe+48E76F: EB 15                 - jmp ed8_ps5_D3D11.exe+48E786
+ed8_ps5_D3D11.exe+48E771: 83 F8 01              - cmp eax,01
+ed8_ps5_D3D11.exe+48E774: 75 09                 - jne ed8_ps5_D3D11.exe+48E77F
+ed8_ps5_D3D11.exe+48E776: 0F B7 B9 0C 25 72 00  - movzx edi,word ptr [rcx+0072250C]
+ed8_ps5_D3D11.exe+48E77D: EB 07                 - jmp ed8_ps5_D3D11.exe+48E786
+ed8_ps5_D3D11.exe+48E77F: 0F B7 B9 0E 25 72 00  - movzx edi,word ptr [rcx+0072250E]
+ed8_ps5_D3D11.exe+48E786: BA 79 00 00 00        - mov edx,00000079
+ed8_ps5_D3D11.exe+48E78B: 8D 1C 2F              - lea ebx,[rdi+rbp]
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>363</ID>
+      <Description>"破防倍率 / ブレイク倍率 / Break multiplier"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ed8_ps5_D3D11.exe
+  Version: 
+  Date   : 2024-08-12
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_BATT_BREAK_MULTI,$process,2B C7 3B C1 0F 4C C8 33 C0 85 C9 0F 48 C8 89 8B 0C 04 00 00 48 8B CB) // should be unique
+alloc(newmem,$1000,INJECT_BATT_BREAK_MULTI)
+
+label(code)
+label(return)
+label(vf_break_multi)
+
+newmem:
+  vmovss xmm14, [vf_break_multi]
+  vcvtsi2ss xmm15, xmm15, edi
+  vmulss xmm13, xmm14, xmm15
+  vcvtss2si edi, xmm13
+
+code:
+  sub eax,edi
+  cmp eax,ecx
+  cmovl ecx,eax
+  jmp return
+align 10 cc
+  vf_break_multi:
+  dd (float)1.6
+
+INJECT_BATT_BREAK_MULTI:
+  jmp newmem
+  nop 2
+return:
+registersymbol(INJECT_BATT_BREAK_MULTI)
+registersymbol(vf_break_multi)
+
+[DISABLE]
+
+INJECT_BATT_BREAK_MULTI:
+  db 2B C7 3B C1 0F 4C C8
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed8_ps5_D3D11.exe+1CA703
+
+ed8_ps5_D3D11.exe+1CA6DE: E8 ED 01 05 00     - call ed8_ps5_D3D11.exe+21A8D0
+ed8_ps5_D3D11.exe+1CA6E3: 48 85 C0           - test rax,rax
+ed8_ps5_D3D11.exe+1CA6E6: 74 0F              - je ed8_ps5_D3D11.exe+1CA6F7
+ed8_ps5_D3D11.exe+1CA6E8: 45 33 C0           - xor r8d,r8d
+ed8_ps5_D3D11.exe+1CA6EB: 8B D7              - mov edx,edi
+ed8_ps5_D3D11.exe+1CA6ED: 48 8B C8           - mov rcx,rax
+ed8_ps5_D3D11.exe+1CA6F0: E8 9B CC FF FF     - call ed8_ps5_D3D11.exe+1C7390
+ed8_ps5_D3D11.exe+1CA6F5: EB 20              - jmp ed8_ps5_D3D11.exe+1CA717
+ed8_ps5_D3D11.exe+1CA6F7: 8B 83 0C 04 00 00  - mov eax,[rbx+0000040C]
+ed8_ps5_D3D11.exe+1CA6FD: 8B 8B 10 04 00 00  - mov ecx,[rbx+00000410]
+// ---------- INJECTING HERE ----------
+ed8_ps5_D3D11.exe+1CA703: 2B C7              - sub eax,edi
+// ---------- DONE INJECTING  ----------
+ed8_ps5_D3D11.exe+1CA705: 3B C1              - cmp eax,ecx
+ed8_ps5_D3D11.exe+1CA707: 0F 4C C8           - cmovl ecx,eax
+ed8_ps5_D3D11.exe+1CA70A: 33 C0              - xor eax,eax
+ed8_ps5_D3D11.exe+1CA70C: 85 C9              - test ecx,ecx
+ed8_ps5_D3D11.exe+1CA70E: 0F 48 C8           - cmovs ecx,eax
+ed8_ps5_D3D11.exe+1CA711: 89 8B 0C 04 00 00  - mov [rbx+0000040C],ecx
+ed8_ps5_D3D11.exe+1CA717: 48 8B CB           - mov rcx,rbx
+ed8_ps5_D3D11.exe+1CA71A: E8 E1 13 00 00     - call ed8_ps5_D3D11.exe+1CBB00
+ed8_ps5_D3D11.exe+1CA71F: 83 78 30 00        - cmp dword ptr [rax+30],00
+ed8_ps5_D3D11.exe+1CA723: 75 23              - jne ed8_ps5_D3D11.exe+1CA748
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>364</ID>
+          <Description>"倍率 / multiplier"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>Float</VariableType>
+          <Address>vf_break_multi</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>323</ID>
+      <Description>"傷害倍率 / ダメージ倍率 / Damage multiplier"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ed8_ps5_D3D11.exe
+  Version: 
+  Date   : 2024-08-12
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_DAMAGE_MULTI,$process,89 9E DC 03 00 00) // should be unique
+alloc(newmem,$1000,INJECT_DAMAGE_MULTI)
+
+label(code)
+label(return)
+label(vf_damage_to_player)
+label(vf_damage_to_enemy)
+label(is_rec_ep_hit)
+label(is_rec_cp_hit)
+label(is_keep_1hp)
+label(is_dset_crit)
+label(is_dset_mov)
+label(is_dset_hit)
+label(is_dset_evade)
+newmem:
+
+  vcvtsi2ss xmm15, xmm15, ebx // xmm15 = new hp
+
+  push rbx
+  mov ebx, [rsi+000003DC]
+  vcvtsi2ss xmm13, xmm13, ebx // xmm13 = old hp
+  pop rbx
+
+  vucomiss xmm15, xmm13  // skip if new HP &gt; old HP
+  jae code
+
+  // damage calc. start
+  vsubss xmm12, xmm13, xmm15  // damage (delta) = old HP - new HP
+  vbroadcastss xmm12, xmm12
+
+  vmovaps xmm14, [vf_damage_to_player] // copy multiplier: to_player &amp; to_emeny, 0, 0
+
+  vmulps xmm12, xmm12, xmm14 // new delta; packed mul calc.
+  vbroadcastss xmm13, xmm13
+  vsubps xmm12, xmm13, xmm12 // old hp - new delta = new hp; packed sub: lower 32-bit = player; 33-64 bit = enemy
+  // damage calc end
+
+  // check if player w/ 2 conditions
+
+  push r15
+  xor r15, r15
+  cmp byte ptr [rsi+000003D9], 8
+  //jne to_enemy
+  jne to_add_2
+  inc r15d
+
+  db EB 3B 54 68 69 73 20 74
+  db 61 62 6C 65 20 63 6F 6D 65 73 20 66 72 6F 6D 20
+  db 68 74 74 70 73 3A 2F
+  db 2F 6F 70 65 6E 63 68 65
+  db 61 74
+  db 74 61 62 6C 65 73 2E 63 6F 6D
+  db 20 2F 20 43 45 20 37 2E 34 2B
+
+to_add_2:
+  cmp dword ptr [rsi+00000410], 0 // max break pt
+  //jne to_enemy
+  jne to_add_post
+  inc r15d
+
+to_add_post:
+  test r15d, r15d
+  pop r15
+
+  jz to_enemy
+
+
+to_Player:
+  cmp dword ptr [is_rec_ep_hit], 1
+  jne @F
+
+  push r15
+  mov r15w, [rsi+000003E6]
+  mov [rsi+000003E4], r15w
+  pop r15
+
+@@:
+  cmp dword ptr [is_dset_crit], 1
+  jne chk_mov
+
+  push r15
+  cmp word ptr [rsi+0000041E], 15
+  jae @F
+  mov word ptr [rsi+0000041E], 15
+
+@@:
+  pop r15
+
+chk_mov:
+  cmp dword ptr [is_dset_mov], 1
+  jne chk_hit
+
+  push r15
+  cmp word ptr [rsi+00000402], 12
+  jae @F
+  mov word ptr [rsi+00000402], 12
+
+@@:
+  pop r15
+
+chk_hit:
+  cmp dword ptr [is_dset_hit], 1
+  jne chk_evade
+
+  push r15
+  cmp word ptr [rsi+00000414], 64
+  jae @F
+  mov word ptr [rsi+00000414], 64
+
+@@:
+  pop r15
+
+
+chk_evade:
+  cmp dword ptr [is_dset_evade], 1
+  jne chk_cp
+
+  push r15
+  cmp word ptr [rsi+00000416], 15
+  jae @F
+  mov word ptr [rsi+00000416], 15
+
+@@:
+  pop r15
+
+
+chk_cp:
+  cmp dword ptr [is_rec_cp_hit], 1
+  jne @F
+
+  push r15
+  mov r15w, [rsi+000003EA]
+  mov [rsi+000003E8], r15w
+  pop r15
+
+  // check if damage multiplier to player &lt; 1
+  //
+  // i.e.
+  // ebx = 0 (new HP = 0)
+  // [rsi+00000XXX] = 100 (old HP)
+  // if multiplier &lt; 1, player will not die
+
+  vmovss xmm10, [vf_1]
+  vmovss xmm11, [vf_damage_to_player]
+  vucomiss xmm11, xmm10
+  jb @F // if multiplier &lt; 1, skip 0 HP check
+  je code // multiplier = 1
+
+  test ebx, ebx // this part will be checked only multiplier &gt; 1
+                // already 0, no need to write new Hp back
+  jz code
+
+
+@@:
+  // Write player HP back
+  vcvtss2si ebx, xmm12  // lower 32 bit float = player HP
+
+  jmp code
+
+to_enemy:
+  vmovss xmm10, [vf_1]
+  vmovss xmm11, [vf_damage_to_enemy]
+  vucomiss xmm11, xmm10
+  jb @F // if multiplier &lt; 1, skip 0 HP check
+  je code // multiplier = 1, no need to write back
+
+  test ebx, ebx // this part will be checked only multiplier &gt; 1
+                // already 0, no need to write new Hp back
+  jz code
+
+@@:
+
+  cmp ebx, 1
+  je code
+
+  vextractps [tmp1], xmm12, 1 // move xmm lower 2nd 32-bit part to memory
+  vmovd xmm12, [tmp1]
+
+
+  vxorps xmm11, xmm11, xmm11
+  vucomiss xmm12, xmm11
+  ja to_enemy_1
+
+  cmp dword ptr [is_keep_1hp], 1
+  jne @F
+  vmovss xmm12, [vf_1]
+  jmp to_enemy_1
+
+en_set_0:
+  vxorps xmm12, xmm12, xmm12
+
+to_enemy_1:
+  vcvtss2si ebx, xmm12
+
+code:
+  mov [rsi+000003DC],ebx
+  jmp return
+align 10 cc
+  // packed scaler start
+  vf_damage_to_player:
+  dd (float)1
+  vf_damage_to_enemy:
+  dd (float)1
+  dd 0
+  dd 0
+  // packed scaler end
+  is_rec_ep_hit:
+  dd 1
+  is_rec_cp_hit:
+  dd 1
+  vf_1:
+  dd (float)1
+  tmp1:
+  dd 0
+  is_keep_1hp:
+  dd 0
+  is_dset_crit:
+  dd 1
+  is_dset_mov:
+  dd 1
+  is_dset_hit:
+  dd 1
+  is_dset_evade:
+  dd 1
+INJECT_DAMAGE_MULTI:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT_DAMAGE_MULTI)
+registersymbol(vf_damage_to_player)
+registersymbol(vf_damage_to_enemy)
+registersymbol(is_rec_ep_hit)
+registersymbol(is_rec_cp_hit)
+registersymbol(is_keep_1hp)
+registersymbol(is_dset_crit)
+registersymbol(is_dset_mov)
+registersymbol(is_dset_hit)
+registersymbol(is_dset_evade)
+[DISABLE]
+
+INJECT_DAMAGE_MULTI:
+  db 89 9E DC 03 00 00
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed8_ps5_D3D11.exe+1C7710
+
+ed8_ps5_D3D11.exe+1C76EA: F7 E1                    - mul ecx
+ed8_ps5_D3D11.exe+1C76EC: C1 EA 05                 - shr edx,05
+ed8_ps5_D3D11.exe+1C76EF: 03 DA                    - add ebx,edx
+ed8_ps5_D3D11.exe+1C76F1: 45 2B FE                 - sub r15d,r14d
+ed8_ps5_D3D11.exe+1C76F4: 45 85 FF                 - test r15d,r15d
+ed8_ps5_D3D11.exe+1C76F7: 41 0F 4F FF              - cmovg edi,r15d
+ed8_ps5_D3D11.exe+1C76FB: 4C 8B BC 24 80 00 00 00  - mov r15,[rsp+00000080]
+ed8_ps5_D3D11.exe+1C7703: 3B FB                    - cmp edi,ebx
+ed8_ps5_D3D11.exe+1C7705: 0F 4C DF                 - cmovl ebx,edi
+ed8_ps5_D3D11.exe+1C7708: 48 8B BC 24 88 00 00 00  - mov rdi,[rsp+00000088]
+// ---------- INJECTING HERE ----------
+ed8_ps5_D3D11.exe+1C7710: 89 9E DC 03 00 00        - mov [rsi+000003DC],ebx
+// ---------- DONE INJECTING  ----------
+ed8_ps5_D3D11.exe+1C7716: 48 8B 9C 24 C0 00 00 00  - mov rbx,[rsp+000000C0]
+ed8_ps5_D3D11.exe+1C771E: 48 8B 4D 27              - mov rcx,[rbp+27]
+ed8_ps5_D3D11.exe+1C7722: 48 33 CC                 - xor rcx,rsp
+ed8_ps5_D3D11.exe+1C7725: E8 F6 5D 7F 00           - call ed8_ps5_D3D11.exe+9BD520
+ed8_ps5_D3D11.exe+1C772A: 48 81 C4 90 00 00 00     - add rsp,00000090
+ed8_ps5_D3D11.exe+1C7731: 41 5E                    - pop r14
+ed8_ps5_D3D11.exe+1C7733: 5E                       - pop rsi
+ed8_ps5_D3D11.exe+1C7734: 5D                       - pop rbp
+ed8_ps5_D3D11.exe+1C7735: C3                       - ret 
+ed8_ps5_D3D11.exe+1C7736: CC                       - int 3 
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>165</ID>
+          <Description>"對玩家傷害倍率 / プレイヤーへのダメージ倍率 / Damage multiplier to player"</Description>
+          <DropDownList DescriptionOnly="1" DisplayValueAsItem="1">1:Default
+0.85:0.85
+0.5:0.5
+0.0001:0.0001
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>Float</VariableType>
+          <Address>vf_damage_to_player</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>166</ID>
+          <Description>"對敵人傷害倍率 / 敵へのダメージ倍率 / Damage multiplier to enemy"</Description>
+          <DropDownList DescriptionOnly="1" DisplayValueAsItem="1">1:Default
+6:6
+12:12
+32:32
+64:64
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>Float</VariableType>
+          <Address>vf_damage_to_enemy</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>289</ID>
+          <Description>"如果過量擊殺、則先保留1點HP? / オーバーキルした場合、HPを1点残しておく? / Keep 1HP if overkill w/ damage multiplier to enemy?"</Description>
+          <DropDownList DisplayValueAsItem="1">0:No
+1:Yes
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>is_keep_1hp</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>440</ID>
+          <Description>"受傷時 / ダメージを受けた時に / when hit:"</Description>
+          <Options moHideChildren="1"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>163</ID>
+              <Description>"EP回滿? / EPが全回復? / Full EP?"</Description>
+              <DropDownList DisplayValueAsItem="1">0:No
+1:Yes
+</DropDownList>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>is_rec_ep_hit</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>164</ID>
+              <Description>"CP回滿? / CPが全回復? / Full CP?"</Description>
+              <DropDownList DisplayValueAsItem="1">0:No
+1:Yes
+</DropDownList>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>is_rec_cp_hit</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>437</ID>
+              <Description>"設定最小爆擊? / 最低クリティカル率を設定する / set crit%?"</Description>
+              <DropDownList DisplayValueAsItem="1">0:No
+1:Yes
+</DropDownList>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>is_dset_crit</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>438</ID>
+              <Description>"設定最小移動力? / 最低移動力を設定する / set min move?"</Description>
+              <DropDownList DisplayValueAsItem="1">0:No
+1:Yes
+</DropDownList>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>is_dset_mov</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>439</ID>
+              <Description>"設定命中? / 命中率を設定する / set hit%?"</Description>
+              <DropDownList DisplayValueAsItem="1">0:No
+1:Yes
+</DropDownList>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>is_dset_mov</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>443</ID>
+              <Description>"設定閃避? / 回避率を設定する / set evade%?"</Description>
+              <DropDownList DisplayValueAsItem="1">0:No
+1:Yes
+</DropDownList>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>is_dset_evade</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>414</ID>
+      <Description>"釣魚快速捲線 / 釣りで素早くリールを巻く / Fast fishing"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ed8_ps5_D3D11.exe
+  Version: 
+  Date   : 2024-08-14
+  Author : bbfox@httpps://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_FISH_FAST_CATCH,$process,F3 0F 58 83 E0 01 00 00 F3 0F 5D) // should be unique
+alloc(newmem,$1000,INJECT_FISH_FAST_CATCH)
+
+label(code)
+label(return)
+
+newmem:
+  vxorps xmm15, xmm15, xmm15
+  vucomiss xmm0, xmm15
+  jae code
+  vmovss xmm14, [vf_factor]
+  vmulss xmm0, xmm0, xmm14
+
+code:
+  addss xmm0,[rbx+000001E0]
+  jmp return
+align 10 cc
+  vf_factor:
+  dd (float)-11
+
+INJECT_FISH_FAST_CATCH:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_FISH_FAST_CATCH)
+
+[DISABLE]
+
+INJECT_FISH_FAST_CATCH:
+  db F3 0F 58 83 E0 01 00 00
+
+unregistersymbol(INJECT_FISH_FAST_CATCH)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed8_ps5_D3D11.exe+4CA9BD
+
+ed8_ps5_D3D11.exe+4CA97D: 74 18                    - je ed8_ps5_D3D11.exe+4CA997
+ed8_ps5_D3D11.exe+4CA97F: F3 0F 10 83 00 02 00 00  - movss xmm0,[rbx+00000200]
+ed8_ps5_D3D11.exe+4CA987: F3 0F 5E 83 04 02 00 00  - divss xmm0,[rbx+00000204]
+ed8_ps5_D3D11.exe+4CA98F: F3 0F 11 83 08 02 00 00  - movss [rbx+00000208],xmm0
+ed8_ps5_D3D11.exe+4CA997: 48 8B 0D 5A A0 A7 00     - mov rcx,[ed8_ps5_D3D11.exe+F449F8]
+ed8_ps5_D3D11.exe+4CA99E: 48 81 C1 94 1B 00 00     - add rcx,00001B94
+ed8_ps5_D3D11.exe+4CA9A5: E8 66 FF CC FF           - call ed8_ps5_D3D11.exe+19A910
+ed8_ps5_D3D11.exe+4CA9AA: F3 0F 59 83 DC 01 00 00  - mulss xmm0,[rbx+000001DC]
+ed8_ps5_D3D11.exe+4CA9B2: 48 8B CB                 - mov rcx,rbx
+ed8_ps5_D3D11.exe+4CA9B5: F3 0F 10 8B E4 01 00 00  - movss xmm1,[rbx+000001E4]
+// ---------- INJECTING HERE ----------
+ed8_ps5_D3D11.exe+4CA9BD: F3 0F 58 83 E0 01 00 00  - addss xmm0,[rbx+000001E0]
+// ---------- DONE INJECTING  ----------
+ed8_ps5_D3D11.exe+4CA9C5: F3 0F 5D C8              - minss xmm1,xmm0
+ed8_ps5_D3D11.exe+4CA9C9: 0F 57 C0                 - xorps xmm0,xmm0
+ed8_ps5_D3D11.exe+4CA9CC: F3 0F 5F C1              - maxss xmm0,xmm1
+ed8_ps5_D3D11.exe+4CA9D0: F3 0F 11 83 E0 01 00 00  - movss [rbx+000001E0],xmm0
+ed8_ps5_D3D11.exe+4CA9D8: E8 53 6C FF FF           - call ed8_ps5_D3D11.exe+4C1630
+ed8_ps5_D3D11.exe+4CA9DD: F3 0F 10 93 E4 01 00 00  - movss xmm2,[rbx+000001E4]
+ed8_ps5_D3D11.exe+4CA9E5: 0F B7 C7                 - movzx eax,di
+ed8_ps5_D3D11.exe+4CA9E8: F3 0F 10 8B E0 01 00 00  - movss xmm1,[rbx+000001E0]
+ed8_ps5_D3D11.exe+4CA9F0: 0F 28 C2                 - movaps xmm0,xmm2
+ed8_ps5_D3D11.exe+4CA9F3: F3 41 0F 59 C3           - mulss xmm0,xmm11
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>418</ID>
+      <Description>"設定裝備後移動變32 / 装備を設定後、移動力を32に変更 / Equip: Set move range to 32"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ed8_ps5_D3D11.exe
+  Version: 
+  Date   : 2024-08-14
+  Author : bbfox2httpps://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_SET_MOVE_RANGE,$process,0F 11 47 20 0F 28 45 17) // should be unique
+alloc(newmem,$1000,INJECT_SET_MOVE_RANGE)
+
+label(code)
+label(return)
+label(i_base_mov_addr1)
+
+newmem:
+
+code:
+
+  movups [rdi+20],xmm0
+  //
+  push r15
+  lea r15, [edi+26]
+  mov [i_base_mov_addr1], r15
+  pop r15
+  mov word ptr [rdi+26], 20
+  //
+  movaps xmm0,[rbp+17]
+  jmp return
+align 10 cc
+  i_base_mov_addr1:
+  dq 0
+INJECT_SET_MOVE_RANGE:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_SET_MOVE_RANGE)
+registersymbol(i_base_mov_addr1)
+[DISABLE]
+
+INJECT_SET_MOVE_RANGE:
+  db 0F 11 47 20 0F 28 45 17
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed8_ps5_D3D11.exe+3EFD8C
+
+ed8_ps5_D3D11.exe+3EFD5F: 66 0F C5 CE 04           - pextrw ecxxmm6,04
+ed8_ps5_D3D11.exe+3EFD64: 0F 28 B4 24 A0 00 00 00  - movaps xmm6,[rsp+000000A0]
+ed8_ps5_D3D11.exe+3EFD6C: 66 89 45 E3              - mov [rbp-1D],ax
+ed8_ps5_D3D11.exe+3EFD70: 66 3B 4D E1              - cmp cx,[rbp-1F]
+ed8_ps5_D3D11.exe+3EFD74: 66 0F 47 4D E1           - cmova cx,[rbp-1F]
+ed8_ps5_D3D11.exe+3EFD79: 66 89 4D DF              - mov [rbp-21],cx
+ed8_ps5_D3D11.exe+3EFD7D: 0F 28 45 D7              - movaps xmm0,[rbp-29]
+ed8_ps5_D3D11.exe+3EFD81: 0F 11 07                 - movups [rdi],xmm0
+ed8_ps5_D3D11.exe+3EFD84: 0F 28 45 F7              - movaps xmm0,[rbp-09]
+ed8_ps5_D3D11.exe+3EFD88: 0F 11 4F 10              - movups [rdi+10],xmm1
+// ---------- INJECTING HERE ----------
+ed8_ps5_D3D11.exe+3EFD8C: 0F 11 47 20              - movups [rdi+20],xmm0
+// ---------- DONE INJECTING  ----------
+ed8_ps5_D3D11.exe+3EFD90: 0F 28 45 17              - movaps xmm0,[rbp+17]
+ed8_ps5_D3D11.exe+3EFD94: 66 0F 7E F9              - movd ecx,xmm7
+ed8_ps5_D3D11.exe+3EFD98: 0F 28 BC 24 90 00 00 00  - movaps xmm7,[rsp+00000090]
+ed8_ps5_D3D11.exe+3EFDA0: 3B 4D 0B                 - cmp ecx,[rbp+0B]
+ed8_ps5_D3D11.exe+3EFDA3: 0F 4F 4D 0B              - cmovg ecx,[rbp+0B]
+ed8_ps5_D3D11.exe+3EFDA7: 89 4D 07                 - mov [rbp+07],ecx
+ed8_ps5_D3D11.exe+3EFDAA: 0F 28 4D 07              - movaps xmm1,[rbp+07]
+ed8_ps5_D3D11.exe+3EFDAE: 0F 11 4F 30              - movups [rdi+30],xmm1
+ed8_ps5_D3D11.exe+3EFDB2: 0F 11 47 40              - movups [rdi+40],xmm0
+ed8_ps5_D3D11.exe+3EFDB6: 48 8B BC 24 D8 00 00 00  - mov rdi,[rsp+000000D8]
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>427</ID>
+          <Description>"讀檔後失效 / ロード後に無効になる/ disabled after loadsave"</Description>
+          <Color>8000FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>432</ID>
+          <Description>"等級提升後失效 / レベルアップ後に無効になる / disabled after LV-up"</Description>
+          <Color>8000FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>441</ID>
+          <Description>"addr"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>808080</Color>
+          <VariableType>8 Bytes</VariableType>
+          <Address>i_base_mov_addr1</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>420</ID>
+      <Description>"設定裝備後之爆擊機率 / 装備設定後のクリティカル率を設定する / Equip: set crit%"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ed8_ps5_D3D11.exe
+  Version: 
+  Date   : 2024-08-14
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_SET_CRIT,$process,0F 11 47 40 48 8B BC 24 D8 00 00 00) // should be unique
+alloc(newmem,$1000,INJECT_SET_CRIT)
+
+label(code)
+label(return)
+label(i_target_crit)
+label(i_target_hit)
+label(i_target_evade)
+
+newmem:
+
+code:
+  movups [rdi+40],xmm0
+  //
+  push rax
+  mov ax, [i_target_crit]
+
+@@:
+  cmp [rdi+42], ax
+  jae @F
+  mov [rdi+42], ax
+
+@@:
+  mov ax, [i_target_hit]
+
+  cmp [rdi+38], ax
+  jae @F
+  mov [rdi+38], ax
+
+@@:
+  mov ax, [i_target_evade]
+
+  cmp [rdi+3A], ax
+  jae @F
+  mov [rdi+3A], ax
+
+@@:
+  pop rax
+  //
+  mov rdi,[rsp+000000D8]
+  jmp return
+align 10 cc
+  i_target_crit:
+  dw #66
+  i_target_hit:
+  dw 64
+  i_target_evade:
+  dw #40
+INJECT_SET_CRIT:
+  jmp newmem
+  nop 7
+return:
+registersymbol(INJECT_SET_CRIT)
+registersymbol(i_target_crit)
+registersymbol(i_target_hit)
+registersymbol(i_target_evade)
+
+[DISABLE]
+
+INJECT_SET_CRIT:
+  db 0F 11 47 40 48 8B BC 24 D8 00 00 00
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed8_ps5_D3D11.exe+3EFDB2
+
+ed8_ps5_D3D11.exe+3EFD88: 0F 11 4F 10              - movups [rdi+10],xmm1
+INJECT_SET_MOVE_RANGE: E9 6F 02 AF FF           - jmp 13FEE0000
+ed8_ps5_D3D11.exe+3EFD91: 0F 1F 00                 - nop dword ptr [rax]
+ed8_ps5_D3D11.exe+3EFD94: 66 0F 7E F9              - movd ecx,xmm7
+ed8_ps5_D3D11.exe+3EFD98: 0F 28 BC 24 90 00 00 00  - movaps xmm7,[rsp+00000090]
+ed8_ps5_D3D11.exe+3EFDA0: 3B 4D 0B                 - cmp ecx,[rbp+0B]
+ed8_ps5_D3D11.exe+3EFDA3: 0F 4F 4D 0B              - cmovg ecx,[rbp+0B]
+ed8_ps5_D3D11.exe+3EFDA7: 89 4D 07                 - mov [rbp+07],ecx
+ed8_ps5_D3D11.exe+3EFDAA: 0F 28 4D 07              - movaps xmm1,[rbp+07]
+ed8_ps5_D3D11.exe+3EFDAE: 0F 11 4F 30              - movups [rdi+30],xmm1
+// ---------- INJECTING HERE ----------
+ed8_ps5_D3D11.exe+3EFDB2: 0F 11 47 40              - movups [rdi+40],xmm0
+// ---------- DONE INJECTING  ----------
+ed8_ps5_D3D11.exe+3EFDB6: 48 8B BC 24 D8 00 00 00  - mov rdi,[rsp+000000D8]
+ed8_ps5_D3D11.exe+3EFDBE: 48 8B 4D 27              - mov rcx,[rbp+27]
+ed8_ps5_D3D11.exe+3EFDC2: 48 33 CC                 - xor rcx,rsp
+ed8_ps5_D3D11.exe+3EFDC5: E8 56 D7 5C 00           - call ed8_ps5_D3D11.exe+9BD520
+ed8_ps5_D3D11.exe+3EFDCA: 48 81 C4 B0 00 00 00     - add rsp,000000B0
+ed8_ps5_D3D11.exe+3EFDD1: 5D                       - pop rbp
+ed8_ps5_D3D11.exe+3EFDD2: C3                       - ret 
+ed8_ps5_D3D11.exe+3EFDD3: CC                       - int 3 
+ed8_ps5_D3D11.exe+3EFDD4: CC                       - int 3 
+ed8_ps5_D3D11.exe+3EFDD5: CC                       - int 3 
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>426</ID>
+          <Description>"讀檔後失效 / ロード後に無効になる/ disabled after loadsave"</Description>
+          <Color>8000FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>431</ID>
+          <Description>"等級提升後失效 / レベルアップ後に無効になる / disabled after LV-up"</Description>
+          <Color>8000FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>421</ID>
+          <Description>"Crit%"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_target_crit</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>442</ID>
+          <Description>"Hit%"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_target_hit</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>349</ID>
+      <Description>"取得耀晶數值 / セピスの数値を取得 / Get Mira / Sepiths"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ed8_ps5_D3D11.exe
+  Version: 
+  Date   : 2024-08-12
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_SEPHI,$process,8B 84 88 40 24 72 00) // should be unique
+alloc(newmem,$1000,INJECT_GET_SEPHI)
+
+label(code)
+label(return)
+label(i_base_seph_addr)
+label(is_set_min_seph)
+label(i_min_seph)
+
+newmem:
+  cmp qword ptr [i_base_seph_addr], 0
+  jne @F
+  push r15
+  lea r15, [rax+00722440]
+  mov [i_base_seph_addr], r15
+  pop r15
+
+@@:
+  cmp dword ptr [is_set_min_seph], 1
+  jne code
+
+  push r15
+  mov r15d, [i_min_seph]
+  cmp [rax+rcx*4+00722440], r15d
+  jae @F
+  mov [rax+rcx*4+00722440], r15d
+
+@@:
+  pop r15
+
+
+code:
+  mov eax,[rax+rcx*4+00722440]
+  jmp return
+align 10 cc
+  is_set_min_seph:
+  dd 1
+  i_min_seph:
+  dd #40723
+  i_base_seph_addr:
+  dq 0
+
+INJECT_GET_SEPHI:
+  jmp newmem
+  nop 2
+return:
+registersymbol(INJECT_GET_SEPHI)
+registersymbol(i_base_seph_addr)
+registersymbol(is_set_min_seph)
+registersymbol(i_min_seph)
+[DISABLE]
+
+INJECT_GET_SEPHI:
+  db 8B 84 88 40 24 72 00
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed8_ps5_D3D11.exe+49AF3A
+
+ed8_ps5_D3D11.exe+49AF28: CC                    - int 3 
+ed8_ps5_D3D11.exe+49AF29: CC                    - int 3 
+ed8_ps5_D3D11.exe+49AF2A: CC                    - int 3 
+ed8_ps5_D3D11.exe+49AF2B: CC                    - int 3 
+ed8_ps5_D3D11.exe+49AF2C: CC                    - int 3 
+ed8_ps5_D3D11.exe+49AF2D: CC                    - int 3 
+ed8_ps5_D3D11.exe+49AF2E: CC                    - int 3 
+ed8_ps5_D3D11.exe+49AF2F: CC                    - int 3 
+ed8_ps5_D3D11.exe+49AF30: 48 8B 05 C1 9A AA 00  - mov rax,[ed8_ps5_D3D11.exe+F449F8]
+ed8_ps5_D3D11.exe+49AF37: 48 63 CA              - movsxd  rcx,edx
+// ---------- INJECTING HERE ----------
+ed8_ps5_D3D11.exe+49AF3A: 8B 84 88 40 24 72 00  - mov eax,[rax+rcx*4+00722440]
+// ---------- DONE INJECTING  ----------
+ed8_ps5_D3D11.exe+49AF41: C3                    - ret 
+ed8_ps5_D3D11.exe+49AF42: CC                    - int 3 
+ed8_ps5_D3D11.exe+49AF43: CC                    - int 3 
+ed8_ps5_D3D11.exe+49AF44: CC                    - int 3 
+ed8_ps5_D3D11.exe+49AF45: CC                    - int 3 
+ed8_ps5_D3D11.exe+49AF46: CC                    - int 3 
+ed8_ps5_D3D11.exe+49AF47: CC                    - int 3 
+ed8_ps5_D3D11.exe+49AF48: CC                    - int 3 
+ed8_ps5_D3D11.exe+49AF49: CC                    - int 3 
+ed8_ps5_D3D11.exe+49AF4A: CC                    - int 3 
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>373</ID>
+          <Description>"Usage: Menu -&gt; Item"</Description>
+          <Color>8000FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>371</ID>
+          <Description>"設定最小耀晶數? / 最小セピス数を設定? / Set min. Sepiths?"</Description>
+          <DropDownList DisplayValueAsItem="1">0:No
+1:Yes
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>is_set_min_seph</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>372</ID>
+          <Description>"最小耀晶數 / 最小セピス数 / Min. Sepiths"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_min_seph</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>350</ID>
+          <Description>"地 (Earth)"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_seph_addr</Address>
+          <Offsets>
+            <Offset>0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>357</ID>
+          <Description>"水 (Water)"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_seph_addr</Address>
+          <Offsets>
+            <Offset>4</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>356</ID>
+          <Description>"火 (Fire)"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_seph_addr</Address>
+          <Offsets>
+            <Offset>8</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>355</ID>
+          <Description>"風 (Wind)"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_seph_addr</Address>
+          <Offsets>
+            <Offset>C</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>354</ID>
+          <Description>"時 (Time)"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_seph_addr</Address>
+          <Offsets>
+            <Offset>10</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>353</ID>
+          <Description>"空 (Space)"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_seph_addr</Address>
+          <Offsets>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>352</ID>
+          <Description>"幻 (Mirage)"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_seph_addr</Address>
+          <Offsets>
+            <Offset>18</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>351</ID>
+          <Description>"塊 (piece)"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_seph_addr</Address>
+          <Offsets>
+            <Offset>1C</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>358</ID>
+          <Description>"Mira"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_seph_addr</Address>
+          <Offsets>
+            <Offset>A0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>413</ID>
+          <Description>"籌碼 / メダル / Medal"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_seph_addr</Address>
+          <Offsets>
+            <Offset>B4</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>336</ID>
+      <Description>"取得裝備的迴路 / 装備のクオーツを取得 / Get equipped Quartz"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ed8_ps5_D3D11.exe
+  Version: 
+  Date   : 2024-08-12
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_EUP_QUATRZ,$process,0F B7 84 50 98 7A 72 00) // should be unique
+alloc(newmem,$1000,INJECT_GET_EUP_QUATRZ)
+
+label(code)
+label(return)
+label(i_base_quartz_1)
+newmem:
+  push r15
+  push r14
+  lea r15, [rax+rdx*2+00727A98]
+  mov r14, i_base_quartz_1
+  lea r14, [r14+rcx*8]
+  mov [r14], r15
+
+  pop r14
+  pop r15
+
+code:
+  movzx eax,word ptr [rax+rdx*2+00727A98]
+  jmp return
+align 10 cc
+  i_cnt:
+  dd 0
+align 10 cc
+  i_base_quartz_1:
+  dq 0
+align 100 0
+  db 0
+
+
+INJECT_GET_EUP_QUATRZ:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_GET_EUP_QUATRZ)
+registersymbol(i_base_quartz_1)
+
+[DISABLE]
+
+INJECT_GET_EUP_QUATRZ:
+  db 0F B7 84 50 98 7A 72 00
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed8_ps5_D3D11.exe+4954E2
+
+ed8_ps5_D3D11.exe+4954BF: CC                       - int 3 
+ed8_ps5_D3D11.exe+4954C0: 66 83 FA 40              - cmp dx,40
+ed8_ps5_D3D11.exe+4954C4: 73 25                    - jae ed8_ps5_D3D11.exe+4954EB
+ed8_ps5_D3D11.exe+4954C6: 66 41 83 F8 09           - cmp r8w,09
+ed8_ps5_D3D11.exe+4954CB: 73 1E                    - jae ed8_ps5_D3D11.exe+4954EB
+ed8_ps5_D3D11.exe+4954CD: 0F B7 C2                 - movzx eax,dx
+ed8_ps5_D3D11.exe+4954D0: 41 0F B7 C8              - movzx ecx,r8w
+ed8_ps5_D3D11.exe+4954D4: 48 8D 14 C0              - lea rdx,[rax+rax*8]
+ed8_ps5_D3D11.exe+4954D8: 48 8B 05 19 F5 AA 00     - mov rax,[ed8_ps5_D3D11.exe+F449F8]
+ed8_ps5_D3D11.exe+4954DF: 48 03 D1                 - add rdx,rcx
+// ---------- INJECTING HERE ----------
+ed8_ps5_D3D11.exe+4954E2: 0F B7 84 50 98 7A 72 00  - movzx eax,word ptr [rax+rdx*2+00727A98]
+// ---------- DONE INJECTING  ----------
+ed8_ps5_D3D11.exe+4954EA: C3                       - ret 
+ed8_ps5_D3D11.exe+4954EB: B8 0F 27 00 00           - mov eax,0000270F
+ed8_ps5_D3D11.exe+4954F0: C3                       - ret 
+ed8_ps5_D3D11.exe+4954F1: CC                       - int 3 
+ed8_ps5_D3D11.exe+4954F2: CC                       - int 3 
+ed8_ps5_D3D11.exe+4954F3: CC                       - int 3 
+ed8_ps5_D3D11.exe+4954F4: CC                       - int 3 
+ed8_ps5_D3D11.exe+4954F5: CC                       - int 3 
+ed8_ps5_D3D11.exe+4954F6: CC                       - int 3 
+ed8_ps5_D3D11.exe+4954F7: CC                       - int 3 
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>374</ID>
+          <Description>"顯示的ID為日文/ Japanese description only"</Description>
+          <Color>8000FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>337</ID>
+          <Description>"Master #1"</Description>
+          <DropDownListLink>Last ID.</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_base_quartz_1</Address>
+          <Offsets>
+            <Offset>0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>338</ID>
+          <Description>"Master #2"</Description>
+          <DropDownListLink>Last ID.</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_base_quartz_1+8</Address>
+          <Offsets>
+            <Offset>0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>339</ID>
+          <Description>"Quartz #1"</Description>
+          <DropDownListLink>Last ID.</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_base_quartz_1+10</Address>
+          <Offsets>
+            <Offset>0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>340</ID>
+          <Description>"Quartz #2"</Description>
+          <DropDownListLink>Last ID.</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_base_quartz_1+18</Address>
+          <Offsets>
+            <Offset>0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>341</ID>
+          <Description>"Quartz #3"</Description>
+          <DropDownListLink>Last ID.</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_base_quartz_1+20</Address>
+          <Offsets>
+            <Offset>0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>342</ID>
+          <Description>"Quartz #4"</Description>
+          <DropDownListLink>Last ID.</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_base_quartz_1+28</Address>
+          <Offsets>
+            <Offset>0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>343</ID>
+          <Description>"Quartz #5"</Description>
+          <DropDownListLink>Last ID.</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_base_quartz_1+30</Address>
+          <Offsets>
+            <Offset>0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>344</ID>
+          <Description>"Quartz #6"</Description>
+          <DropDownListLink>Last ID.</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_base_quartz_1+38</Address>
+          <Offsets>
+            <Offset>0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>345</ID>
+          <Description>"Quartz #7"</Description>
+          <DropDownListLink>Last ID.</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_base_quartz_1+40</Address>
+          <Offsets>
+            <Offset>0</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>379</ID>
+      <Description>"戰歷 / Get battle records"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ed8_ps5_D3D11.exe
+  Version: 
+  Date   : 2024-08-13
+  Author : bbfox@httpps://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_BATT_STATS,$process,8B 8C 88 F4 34 73 00 89 4C 24 30 48 8D 4D 00 48) // should be unique
+alloc(newmem,$1000,INJECT_GET_BATT_STATS)
+
+label(code)
+label(return)
+label(i_base_batt_stat_addr)
+
+newmem:
+  cmp ecx, 0
+  jne code
+
+  push r15
+  lea r15, [rax+rcx*4+007334F4]
+  mov [i_base_batt_stat_addr], r15
+  pop r15
+
+
+code:
+  mov ecx,[rax+rcx*4+007334F4]
+  jmp return
+align 10 cc
+  i_base_batt_stat_addr:
+  dq 0
+
+INJECT_GET_BATT_STATS:
+  jmp newmem
+  nop 2
+return:
+registersymbol(INJECT_GET_BATT_STATS)
+registersymbol(i_base_batt_stat_addr)
+
+[DISABLE]
+
+INJECT_GET_BATT_STATS:
+  db 8B 8C 88 F4 34 73 00
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed8_ps5_D3D11.exe+717BF9
+
+ed8_ps5_D3D11.exe+717BC6: 4C 8D 4D 00                       - lea r9,[rbp+00]
+ed8_ps5_D3D11.exe+717BCA: 48 8D 45 B0                       - lea rax,[rbp-50]
+ed8_ps5_D3D11.exe+717BCE: 0F 28 D7                          - movaps xmm2,xmm7
+ed8_ps5_D3D11.exe+717BD1: 48 89 44 24 20                    - mov [rsp+20],rax
+ed8_ps5_D3D11.exe+717BD6: E8 95 48 CE FF                    - call ed8_ps5_D3D11.exe+3FC470
+ed8_ps5_D3D11.exe+717BDB: 48 8B 05 16 CE 82 00              - mov rax,[ed8_ps5_D3D11.exe+F449F8]
+ed8_ps5_D3D11.exe+717BE2: 4C 8D 0D 93 FD 3E 00              - lea r9,[ed8_ps5_D3D11.exe+B0797C]
+ed8_ps5_D3D11.exe+717BE9: 48 0F BF CB                       - movsx rcx,bx
+ed8_ps5_D3D11.exe+717BED: 4C 8D 05 94 FD 3E 00              - lea r8,[ed8_ps5_D3D11.exe+B07988]
+ed8_ps5_D3D11.exe+717BF4: BA 80 00 00 00                    - mov edx,00000080
+// ---------- INJECTING HERE ----------
+ed8_ps5_D3D11.exe+717BF9: 8B 8C 88 F4 34 73 00              - mov ecx,[rax+rcx*4+007334F4]
+// ---------- DONE INJECTING  ----------
+ed8_ps5_D3D11.exe+717C00: 89 4C 24 30                       - mov [rsp+30],ecx
+ed8_ps5_D3D11.exe+717C04: 48 8D 4D 00                       - lea rcx,[rbp+00]
+ed8_ps5_D3D11.exe+717C08: 48 89 74 24 28                    - mov [rsp+28],rsi
+ed8_ps5_D3D11.exe+717C0D: 4C 89 64 24 20                    - mov [rsp+20],r12
+ed8_ps5_D3D11.exe+717C12: E8 A9 28 A8 FF                    - call ed8_ps5_D3D11.exe+19A4C0
+ed8_ps5_D3D11.exe+717C17: 0F 10 05 E2 62 6A 00              - movups xmm0,[ed8_ps5_D3D11.exe+DBDF00]
+ed8_ps5_D3D11.exe+717C1E: 48 8B 0D D3 CD 82 00              - mov rcx,[ed8_ps5_D3D11.exe+F449F8]
+ed8_ps5_D3D11.exe+717C25: 48 8D 45 C0                       - lea rax,[rbp-40]
+ed8_ps5_D3D11.exe+717C29: 0F 10 0D 80 B9 62 00              - movups xmm1,[ed8_ps5_D3D11.exe+D435B0]
+ed8_ps5_D3D11.exe+717C30: C7 84 24 C0 00 00 00 03 00 00 00  - mov [rsp+000000C0],00000003
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>401</ID>
+          <Description>"Usage: Main menu -&gt; 戰鬥"</Description>
+          <Color>8000FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>402</ID>
+          <Description>"Usage: Main menu -&gt; 戦闘"</Description>
+          <Color>8000FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>380</ID>
+          <Description>"累計戰鬥次數 / 総戦闘回数 / Number of Battles"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_batt_stat_addr</Address>
+          <Offsets>
+            <Offset>0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>381</ID>
+          <Description>"戰鬥勝利次數 / 戦闘勝利回数 / Battles Win"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_batt_stat_addr</Address>
+          <Offsets>
+            <Offset>4</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>382</ID>
+          <Description>"無法戰鬥次數 / 戦闘不能回数 / Battles lose"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_batt_stat_addr</Address>
+          <Offsets>
+            <Offset>8</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>383</ID>
+          <Description>"戰門撤退次數 / 戰闘退却回数 / Battles retreat"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_batt_stat_addr</Address>
+          <Offsets>
+            <Offset>C</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>384</ID>
+          <Description>"重試次數 / リトライ / Retry"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_batt_stat_addr</Address>
+          <Offsets>
+            <Offset>10</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>385</ID>
+          <Description>"擊敗敵人次數 / 敵擊破回数 / Enemies killed"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_batt_stat_addr</Address>
+          <Offsets>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>386</ID>
+          <Description>"先制攻擊發生次數 / 先制攻撃発生回数 / Single advantage"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_batt_stat_addr</Address>
+          <Offsets>
+            <Offset>18</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>387</ID>
+          <Description>"優勢攻擊發生次數 / 優勢攻撃発生回数 / Double advantage"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_batt_stat_addr</Address>
+          <Offsets>
+            <Offset>1C</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>388</ID>
+          <Description>"奇襲攻擊發生次數 / 奇襲攻撃発生回数 / Triple advantage"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_batt_stat_addr</Address>
+          <Offsets>
+            <Offset>20</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>389</ID>
+          <Description>"背後遇襲發生次數 / バックアタック発生回数 / Back attacks"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_batt_stat_addr</Address>
+          <Offsets>
+            <Offset>24</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>392</ID>
+          <Description>"追擊發動次數 / 追撃発動回数 / Follow attack"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_batt_stat_addr</Address>
+          <Offsets>
+            <Offset>30</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>393</ID>
+          <Description>"連續猛攻發動次數 / ラッシュ発動回数 / Rush"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_batt_stat_addr</Address>
+          <Offsets>
+            <Offset>34</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>394</ID>
+          <Description>"爆裂猛攻發動次數 / バースト発動回数 / Burst"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_batt_stat_addr</Address>
+          <Offsets>
+            <Offset>38</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>391</ID>
+          <Description>"破防發動次數 / ブレイク発動回数 / Break"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_batt_stat_addr</Address>
+          <Offsets>
+            <Offset>2C</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>395</ID>
+          <Description>"勇氣指令發動次數 / ブレイフオーダー発動回数 / Brave order"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_batt_stat_addr</Address>
+          <Offsets>
+            <Offset>3C</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>390</ID>
+          <Description>"S戰技發動次數 / Sクラフト発動回数 / S-Craft"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_batt_stat_addr</Address>
+          <Offsets>
+            <Offset>28</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>400</ID>
+          <Description>"弱點屬性魔法發動次數 / 弱点属性アーツ発動回数 / Weak arts"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_batt_stat_addr</Address>
+          <Offsets>
+            <Offset>50</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>397</ID>
+          <Description>"V攻擊發動次數 / Vアタック発動回数 / V-Attack"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_batt_stat_addr</Address>
+          <Offsets>
+            <Offset>44</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>399</ID>
+          <Description>"V魔法發動次數 / Vアーツ発動回数 / V-Arts"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_batt_stat_addr</Address>
+          <Offsets>
+            <Offset>4C</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>398</ID>
+          <Description>"V治療發動次數 / Vヒール発動回数 / V-Heal"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_batt_stat_addr</Address>
+          <Offsets>
+            <Offset>48</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>445</ID>
+      <Description>"綜合成績 / Get stats"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ed8_ps5_D3D11.exe
+  Version: 
+  Date   : 2024-08-16
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_STATS,$process,8B 84 81 B4 3C 00 00) // should be unique
+alloc(newmem,$1000,INJECT_GET_STATS)
+
+label(code)
+label(return)
+label(i_base_stat_addr)
+
+newmem:
+  cmp eax, F
+  jne code
+
+  push r15
+  lea r15,[rcx+00003CB4]
+  mov [i_base_stat_addr], r15
+  pop r15
+
+code:
+  mov eax,[rcx+rax*4+00003CB4]
+  jmp return
+align 10 cc
+  i_base_stat_addr:
+  dq 0
+
+INJECT_GET_STATS:
+  jmp newmem
+  nop 2
+return:
+registersymbol(INJECT_GET_STATS)
+registersymbol(i_base_stat_addr)
+[DISABLE]
+
+INJECT_GET_STATS:
+  db 8B 84 81 B4 3C 00 00
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed8_ps5_D3D11.exe+4071FA
+
+ed8_ps5_D3D11.exe+4071E9: CC                    - int 3 
+ed8_ps5_D3D11.exe+4071EA: CC                    - int 3 
+ed8_ps5_D3D11.exe+4071EB: CC                    - int 3 
+ed8_ps5_D3D11.exe+4071EC: CC                    - int 3 
+ed8_ps5_D3D11.exe+4071ED: CC                    - int 3 
+ed8_ps5_D3D11.exe+4071EE: CC                    - int 3 
+ed8_ps5_D3D11.exe+4071EF: CC                    - int 3 
+ed8_ps5_D3D11.exe+4071F0: 81 FA 00 02 00 00     - cmp edx,00000200
+ed8_ps5_D3D11.exe+4071F6: 73 0A                 - jae ed8_ps5_D3D11.exe+407202
+ed8_ps5_D3D11.exe+4071F8: 8B C2                 - mov eax,edx
+// ---------- INJECTING HERE ----------
+ed8_ps5_D3D11.exe+4071FA: 8B 84 81 B4 3C 00 00  - mov eax,[rcx+rax*4+00003CB4]
+// ---------- DONE INJECTING  ----------
+ed8_ps5_D3D11.exe+407201: C3                    - ret 
+ed8_ps5_D3D11.exe+407202: 33 C0                 - xor eax,eax
+ed8_ps5_D3D11.exe+407204: C3                    - ret 
+ed8_ps5_D3D11.exe+407205: CC                    - int 3 
+ed8_ps5_D3D11.exe+407206: CC                    - int 3 
+ed8_ps5_D3D11.exe+407207: CC                    - int 3 
+ed8_ps5_D3D11.exe+407208: CC                    - int 3 
+ed8_ps5_D3D11.exe+407209: CC                    - int 3 
+ed8_ps5_D3D11.exe+40720A: CC                    - int 3 
+ed8_ps5_D3D11.exe+40720B: CC                    - int 3 
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>446</ID>
+          <Description>"??"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_stat_addr</Address>
+          <Offsets>
+            <Offset>C</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>452</ID>
+          <Description>"??"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_stat_addr</Address>
+          <Offsets>
+            <Offset>10</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>451</ID>
+          <Description>"??"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_stat_addr</Address>
+          <Offsets>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>450</ID>
+          <Description>"??"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_stat_addr</Address>
+          <Offsets>
+            <Offset>18</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>449</ID>
+          <Description>"??"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_stat_addr</Address>
+          <Offsets>
+            <Offset>24</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>480</ID>
+          <Description>"MWL Ticket (event only)"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_stat_addr</Address>
+          <Offsets>
+            <Offset>28</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>448</ID>
+          <Description>"??"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_stat_addr</Address>
+          <Offsets>
+            <Offset>2C</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>447</ID>
+          <Description>"RP"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_stat_addr</Address>
+          <Offsets>
+            <Offset>3C</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>453</ID>
+          <Description>"??"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_stat_addr</Address>
+          <Offsets>
+            <Offset>94</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>454</ID>
+          <Description>"??"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_stat_addr</Address>
+          <Offsets>
+            <Offset>98</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>455</ID>
+          <Description>"??"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_stat_addr</Address>
+          <Offsets>
+            <Offset>9C</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>456</ID>
+          <Description>"??"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_stat_addr</Address>
+          <Offsets>
+            <Offset>170</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>457</ID>
+          <Description>"??"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_stat_addr</Address>
+          <Offsets>
+            <Offset>1B0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>458</ID>
+          <Description>"??"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_stat_addr</Address>
+          <Offsets>
+            <Offset>1E4</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>459</ID>
+          <Description>"??"</Description>
+          <ShowAsSigned>1</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_stat_addr</Address>
+          <Offsets>
+            <Offset>3D8</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>463</ID>
+      <Description>"VM遊戲：敵人HP為1 / VMゲーム：敵のHPを1 / VM : enemy 1HP"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ed8_ps5_D3D11.exe
+  Version: 
+  Date   : 2024-08-17
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_VM_FAST_WIN,$process,41 0F B7 81 0C 03 00 00) // should be unique
+alloc(newmem,$1000,INJECT_VM_FAST_WIN)
+
+label(code)
+label(return)
+
+newmem:
+  cmp word ptr [r9+0000030C], 1
+  jbe code
+  mov word ptr [r9+0000030C], 1
+
+code:
+  movzx eax,word ptr [r9+0000030C]
+  jmp return
+
+INJECT_VM_FAST_WIN:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_VM_FAST_WIN)
+
+[DISABLE]
+
+INJECT_VM_FAST_WIN:
+  db 41 0F B7 81 0C 03 00 00
+
+unregistersymbol(INJECT_VM_FAST_WIN)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed8_ps5_D3D11.exe+4DED1A
+
+ed8_ps5_D3D11.exe+4DECF0: 41 0F B7 C0              - movzx eax,r8w
+ed8_ps5_D3D11.exe+4DECF4: 4D 8B 0C C2              - mov r9,[r10+rax*8]
+ed8_ps5_D3D11.exe+4DECF8: 49 8B 81 F8 02 00 00     - mov rax,[r9+000002F8]
+ed8_ps5_D3D11.exe+4DECFF: 66 83 78 02 02           - cmp word ptr [rax+02],02
+ed8_ps5_D3D11.exe+4DED04: 74 0D                    - je ed8_ps5_D3D11.exe+4DED13
+ed8_ps5_D3D11.exe+4DED06: 66 41 FF C0              - inc r8w
+ed8_ps5_D3D11.exe+4DED0A: 66 41 83 F8 07           - cmp r8w,07
+ed8_ps5_D3D11.exe+4DED0F: 72 DF                    - jb ed8_ps5_D3D11.exe+4DECF0
+ed8_ps5_D3D11.exe+4DED11: EB 25                    - jmp ed8_ps5_D3D11.exe+4DED38
+ed8_ps5_D3D11.exe+4DED13: 80 B9 E6 06 00 00 2E     - cmp byte ptr [rcx+000006E6],2E
+// ---------- INJECTING HERE ----------
+ed8_ps5_D3D11.exe+4DED1A: 41 0F B7 81 0C 03 00 00  - movzx eax,word ptr [r9+0000030C]
+// ---------- DONE INJECTING  ----------
+ed8_ps5_D3D11.exe+4DED22: 66 89 81 EA 06 00 00     - mov [rcx+000006EA],ax
+ed8_ps5_D3D11.exe+4DED29: 75 0D                    - jne ed8_ps5_D3D11.exe+4DED38
+ed8_ps5_D3D11.exe+4DED2B: 66 83 F8 0A              - cmp ax,0A
+ed8_ps5_D3D11.exe+4DED2F: 0F 9E C0                 - setle al
+ed8_ps5_D3D11.exe+4DED32: 88 81 15 08 00 00        - mov [rcx+00000815],al
+ed8_ps5_D3D11.exe+4DED38: 4C 8B 89 68 01 00 00     - mov r9,[rcx+00000168]
+ed8_ps5_D3D11.exe+4DED3F: 90                       - nop 
+ed8_ps5_D3D11.exe+4DED40: 0F B7 C2                 - movzx eax,dx
+ed8_ps5_D3D11.exe+4DED43: 4D 8B 04 C1              - mov r8,[r9+rax*8]
+ed8_ps5_D3D11.exe+4DED47: 49 8B 80 F8 02 00 00     - mov rax,[r8+000002F8]
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>464</ID>
+      <Description>"遊戲「波姆碰」 / "ポムっと" / game "Pom""</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ed8_ps5_D3D11.exe
+  Version: 
+  Date   : 2024-08-17
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_PON_GAME_DATA,$process,44 8B 87 EC 7A 00 00) // should be unique
+alloc(newmem,$1000,INJECT_GET_PON_GAME_DATA)
+
+label(code)
+label(return)
+label(i_base_pdata_1)
+label(i_base_pdata_2)
+label(is_lock_cp)
+
+newmem:
+  cmp rdi, [i_base_pdata_1]
+  je code
+  cmp rdi, [i_base_pdata_2]
+  je code_pre
+  cmp qword ptr [i_base_pdata_1], 0
+  je save1
+  cmp qword ptr [i_base_pdata_2], 0
+  je save2
+
+  vxorps xmm15, xmm15, xmm15
+  movaps [i_base_pdata_1], xmm15
+
+  jmp newmem
+
+save1:
+  mov [i_base_pdata_1], rdi
+  jmp code
+
+save2:
+  cmp dword ptr [i_base_pdata_2], 0
+  jne @F
+  mov [i_base_pdata_2], rdi
+
+  push r15
+  mov r15, [i_base_pdata_1]
+  cmp rdi, r15
+  ja swap_done
+  mov [i_tmp1], r15
+  mov [i_base_pdata_1], rdi
+  mov [i_base_pdata_2], r15
+
+swap_done:
+  pop r15
+  jmp code
+
+code_pre:
+  cmp dword ptr [is_lock_cp], 1
+  jne code
+
+  push r15
+  mov r15, [i_base_pdata_1]
+  test r15, r15
+  jz @F
+
+  lea r15, [r15+00007AEC]
+  mov dword ptr [r15], #500
+
+  mov r15, [i_base_pdata_2]
+  test r15, r15
+  jz @F
+
+  lea r15, [r15+00007AEC]
+  mov dword ptr [r15], 0
+
+@@:
+  pop r15
+
+
+code:
+  mov r8d,[rdi+00007AEC]
+  jmp return
+align 10 cc
+  i_base_pdata_1:
+  dq 0
+  i_base_pdata_2:
+  dq 0
+  i_tmp1:
+  dq 0
+  is_lock_cp:
+  dd 1
+INJECT_GET_PON_GAME_DATA:
+  jmp newmem
+  nop 2
+return:
+registersymbol(INJECT_GET_PON_GAME_DATA)
+registersymbol(i_base_pdata_1)
+registersymbol(i_base_pdata_2)
+registersymbol(is_lock_cp)
+[DISABLE]
+
+INJECT_GET_PON_GAME_DATA:
+  db 44 8B 87 EC 7A 00 00
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed8_ps5_D3D11.exe+4D4CE8
+
+ed8_ps5_D3D11.exe+4D4CC0: B8 1F 85 EB 51        - mov eax,51EB851F
+ed8_ps5_D3D11.exe+4D4CC5: F7 E9                 - imul ecx
+ed8_ps5_D3D11.exe+4D4CC7: C1 FA 05              - sar edx,05
+ed8_ps5_D3D11.exe+4D4CCA: 8B C2                 - mov eax,edx
+ed8_ps5_D3D11.exe+4D4CCC: C1 E8 1F              - shr eax,1F
+ed8_ps5_D3D11.exe+4D4CCF: 03 D0                 - add edx,eax
+ed8_ps5_D3D11.exe+4D4CD1: 89 97 FC 7A 00 00     - mov [rdi+00007AFC],edx
+ed8_ps5_D3D11.exe+4D4CD7: 44 89 B7 00 7B 00 00  - mov [rdi+00007B00],r14d
+ed8_ps5_D3D11.exe+4D4CDE: 44 8B 8F F0 7A 00 00  - mov r9d,[rdi+00007AF0]
+ed8_ps5_D3D11.exe+4D4CE5: 41 8B C1              - mov eax,r9d
+// ---------- INJECTING HERE ----------
+ed8_ps5_D3D11.exe+4D4CE8: 44 8B 87 EC 7A 00 00  - mov r8d,[rdi+00007AEC]
+// ---------- DONE INJECTING  ----------
+ed8_ps5_D3D11.exe+4D4CEF: 45 3B C8              - cmp r9d,r8d
+ed8_ps5_D3D11.exe+4D4CF2: 74 73                 - je ed8_ps5_D3D11.exe+4D4D67
+ed8_ps5_D3D11.exe+4D4CF4: 7E 34                 - jle ed8_ps5_D3D11.exe+4D4D2A
+ed8_ps5_D3D11.exe+4D4CF6: 41 8B C9              - mov ecx,r9d
+ed8_ps5_D3D11.exe+4D4CF9: B8 89 88 88 88        - mov eax,88888889
+ed8_ps5_D3D11.exe+4D4CFE: 41 2B C8              - sub ecx,r8d
+ed8_ps5_D3D11.exe+4D4D01: F7 E9                 - imul ecx
+ed8_ps5_D3D11.exe+4D4D03: 41 8B C1              - mov eax,r9d
+ed8_ps5_D3D11.exe+4D4D06: 03 D1                 - add edx,ecx
+ed8_ps5_D3D11.exe+4D4D08: C1 FA 05              - sar edx,05
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>465</ID>
+          <Description>"鎖定CP? / Lock CP?"</Description>
+          <DropDownList DisplayValueAsItem="1">0:No
+1:Yes
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>is_lock_cp</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>466</ID>
+          <Description>"CP #1"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_pdata_1</Address>
+          <Offsets>
+            <Offset>7AEC</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>467</ID>
+          <Description>"CP #2"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_pdata_2</Address>
+          <Offsets>
+            <Offset>7AEC</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>370</ID>
+      <Description>"變更服裝的3D座標某軸之極限值 / 衣装の3D座標のある軸の限界値を変更する / Set costume axis coord limit"</Description>
+      <Options moHideChildren="1" moAllowManualCollapseAndExpand="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ed8_ps5_D3D11.exe
+  Version: 
+  Date   : 2024-08-13
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_SET_COSTUME_AXIS_ANGLE,$process,F3 41 0F 5D F4) // should be unique
+alloc(newmem,$1000,INJECT_SET_COSTUME_AXIS_ANGLE)
+
+label(code)
+label(return)
+
+
+newmem:
+  vmovss xmm10, [vf__89]
+  vmovss xmm12, [vf_89]
+
+code:
+  minss xmm6,xmm12
+  jmp return
+align 10 cc
+  vf__89:
+  dd (float)-89
+  vf_89:
+  dd (float)89
+
+INJECT_SET_COSTUME_AXIS_ANGLE:
+  jmp newmem
+return:
+registersymbol(INJECT_SET_COSTUME_AXIS_ANGLE)
+
+[DISABLE]
+
+INJECT_SET_COSTUME_AXIS_ANGLE:
+  db F3 41 0F 5D F4
+
+unregistersymbol(INJECT_SET_COSTUME_AXIS_ANGLE)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed8_ps5_D3D11.exe+2C185C
+
+ed8_ps5_D3D11.exe+2C1822: F3 0F 59 C6                    - mulss xmm0,xmm6
+ed8_ps5_D3D11.exe+2C1826: F3 0F 58 C8                    - addss xmm1,xmm0
+ed8_ps5_D3D11.exe+2C182A: 0F 28 C1                       - movaps xmm0,xmm1
+ed8_ps5_D3D11.exe+2C182D: E8 33 36 76 00                 - call ed8_ps5_D3D11.exe+A24E65
+ed8_ps5_D3D11.exe+2C1832: 0F 2F 05 2B D0 7E 00           - comiss xmm0,[ed8_ps5_D3D11.exe+AAE864]
+ed8_ps5_D3D11.exe+2C1839: 76 78                          - jna ed8_ps5_D3D11.exe+2C18B3
+ed8_ps5_D3D11.exe+2C183B: F3 0F 59 B4 24 28 01 00 00     - mulss xmm6,[rsp+00000128]
+ed8_ps5_D3D11.exe+2C1844: F3 0F 10 8B 74 04 00 00        - movss xmm1,[rbx+00000474]
+ed8_ps5_D3D11.exe+2C184C: F3 0F 59 35 54 7A 80 00        - mulss xmm6,[ed8_ps5_D3D11.exe+AC92A8]
+ed8_ps5_D3D11.exe+2C1854: F3 0F 58 B3 70 04 00 00        - addss xmm6,[rbx+00000470]
+// ---------- INJECTING HERE ----------
+ed8_ps5_D3D11.exe+2C185C: F3 41 0F 5D F4                 - minss xmm6,xmm12
+// ---------- DONE INJECTING  ----------
+ed8_ps5_D3D11.exe+2C1861: F3 44 0F 5F D6                 - maxss xmm10,xmm6
+ed8_ps5_D3D11.exe+2C1866: F3 44 0F 11 93 70 04 00 00     - movss [rbx+00000470],xmm10
+ed8_ps5_D3D11.exe+2C186F: F3 44 0F 10 94 24 28 01 00 00  - movss xmm10,[rsp+00000128]
+ed8_ps5_D3D11.exe+2C1879: F3 41 0F 59 FA                 - mulss xmm7,xmm10
+ed8_ps5_D3D11.exe+2C187E: F3 0F 59 3D 22 7A 80 00        - mulss xmm7,[ed8_ps5_D3D11.exe+AC92A8]
+ed8_ps5_D3D11.exe+2C1886: F3 0F 5C CF                    - subss xmm1,xmm7
+ed8_ps5_D3D11.exe+2C188A: F3 41 0F 5D CB                 - minss xmm1,xmm11
+ed8_ps5_D3D11.exe+2C188F: F3 44 0F 5F C9                 - maxss xmm9,xmm1
+ed8_ps5_D3D11.exe+2C1894: 41 0F 28 C1                    - movaps xmm0,xmm9
+ed8_ps5_D3D11.exe+2C1898: F3 44 0F 11 8B 74 04 00 00     - movss [rbx+00000474],xmm9
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>30</ID>
+      <Description>"THE LEGEND OF HEROES: HAJIMARI NO KISEKI"</Description>
+      <Options moHideChildren="1"/>
+      <Color>009100</Color>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>424</ID>
+      <Description>"英雄傳說 創之軌跡  /  英雄伝説 創の軌跡  /  https://opencheattables.com  /  CE 7.5+"</Description>
+      <Options moHideChildren="1"/>
+      <Color>009100</Color>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>425</ID>
+          <Description>"https://kamikouryaku.net/hajimari/"</Description>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+  <LuaScript>synchronize(function() AddressList.Header.OnSectionClick = nil end)
+
+</LuaScript>
+</CheatTable>

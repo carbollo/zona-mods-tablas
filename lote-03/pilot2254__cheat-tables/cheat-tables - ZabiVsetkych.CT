@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>10</ID>
+      <Description>"Cheats by @michal.flaska"</Description>
+      <Color>FFFF00</Color>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>11</ID>
+      <Description>"Activate/Deactivate Scripts"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <Color>FF00FF</Color>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>1</ID>
+          <Description>"INF. Health"</Description>
+          <Color>FF00FF</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ZabiVsetkych
+  Version: 
+  Date   : 2025-06-06
+  Author : misof
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscan(INJECT,F3 0F 11 68 48 48 8B 75) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  nop
+  jmp return
+
+INJECT:
+  jmp newmem
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db F3 0F 11 68 48
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: 1D374346310
+
+1D3743462E4: 66 90                          - nop 2
+1D3743462E6: 49 BB F0 66 A8 73 D3 01 00 00  - mov r11,000001D373A866F0
+1D3743462F0: 41 FF D3                       - call r11
+1D3743462F3: 48 8B C8                       - mov rcx,rax
+1D3743462F6: F3 0F 10 40 48                 - movss xmm0,[rax+48]
+1D3743462FB: F3 0F 5A C0                    - cvtss2sd xmm0,xmm0
+1D3743462FF: F3 0F 10 4E 34                 - movss xmm1,[rsi+34]
+1D374346304: F3 0F 5A C9                    - cvtss2sd xmm1,xmm1
+1D374346308: F2 0F 5C C1                    - subsd xmm0,xmm1
+1D37434630C: F2 0F 5A E8                    - cvtsd2ss xmm5,xmm0
+// ---------- INJECTING HERE ----------
+1D374346310: F3 0F 11 68 48                 - movss [rax+48],xmm5
+// ---------- DONE INJECTING  ----------
+1D374346315: 48 8B 75 F8                    - mov rsi,[rbp-08]
+1D374346319: 48 8D 65 00                    - lea rsp,[rbp+00]
+1D37434631D: 5D                             - pop rbp
+1D37434631E: C3                             - ret 
+1D37434631F: 00 01                          - add [rcx],al
+1D374346321: 04 02                          - add al,02
+1D374346323: 05 04 03 01 50                 - add eax,50010304
+1D374346328: 00 00                          - add [rax],al
+1D37434632A: 00 00                          - add [rax],al
+1D37434632C: 00 00                          - add [rax],al
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>4</ID>
+          <Description>"Force dmg upgrade to 100"</Description>
+          <Color>FF00FF</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ZabiVsetkych
+  Version:
+  Date   : 2025-06-06
+  Author : misof
+
+  Forces damage upgrade value to 100.0
+}
+
+[ENABLE]
+
+aobscan(INJECT,F3 41 0F 11 6F 50 E9) // should be unique
+alloc(newmem,$1000,INJECT)
+alloc(myfloat,4)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  movss xmm5,[myfloat]
+  movss [r15+50],xmm5
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT)
+registersymbol(myfloat)
+
+myfloat:
+  dd (float)100.0
+
+[DISABLE]
+
+INJECT:
+  db F3 41 0F 11 6F 50
+
+unregistersymbol(INJECT)
+unregistersymbol(myfloat)
+dealloc(newmem)
+dealloc(myfloat)
+
+{
+// ORIGINAL CODE - INJECTION POINT: 1D37435B0F6
+
+1D37435B0CB: 48 63 40 28                    - movsxd  rax,dword ptr [rax+28]
+1D37435B0CF: 83 F8 03                       - cmp eax,03
+1D37435B0D2: 75 2D                          - jne 1D37435B101
+1D37435B0D4: 41 83 3F 00                    - cmp dword ptr [r15],00
+1D37435B0D8: F3 41 0F 10 47 50              - movss xmm0,[r15+50]
+1D37435B0DE: F3 0F 5A C0                    - cvtss2sd xmm0,xmm0
+1D37435B0E2: F3 0F 10 0D 36 01 00 00        - movss xmm1,[1D37435B220]
+1D37435B0EA: F3 0F 5A C9                    - cvtss2sd xmm1,xmm1
+1D37435B0EE: F2 0F 58 C1                    - addsd xmm0,xmm1
+1D37435B0F2: F2 0F 5A E8                    - cvtsd2ss xmm5,xmm0
+// ---------- INJECTING HERE ----------
+1D37435B0F6: F3 41 0F 11 6F 50              - movss [r15+50],xmm5
+// ---------- DONE INJECTING  ----------
+1D37435B0FC: E9 8B 00 00 00                 - jmp 1D37435B18C
+}
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>8</ID>
+          <Description>"Force Regeneration upgrade to 100"</Description>
+          <Color>FF00FF</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ZabiVsetkych
+  Version: 
+  Date   : 2025-06-06
+  Author : misof
+
+  Force regeneration upgrade to 100
+}
+
+[ENABLE]
+
+aobscan(INJECT,F3 41 0F 11 6F 4C 48) // should be unique
+alloc(newmem,$1000,INJECT)
+alloc(myfloat,4)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  movss xmm5,[myfloat]
+  movss [r15+4C],xmm5
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT)
+registersymbol(myfloat)
+
+myfloat:
+  dd (float)100.0
+
+[DISABLE]
+
+INJECT:
+  db F3 41 0F 11 6F 4C
+
+unregistersymbol(INJECT)
+unregistersymbol(myfloat)
+dealloc(newmem)
+dealloc(myfloat)
+
+{
+// ORIGINAL CODE - INJECTION POINT: 1A7F5619BC6
+
+1A7F5619B9B: 48 63 40 28                    - movsxd  rax,dword ptr [rax+28]
+1A7F5619B9F: 83 F8 01                       - cmp eax,01
+1A7F5619BA2: 75 28                          - jne 1A7F5619BCC
+1A7F5619BA4: 41 83 3F 00                    - cmp dword ptr [r15],00
+1A7F5619BA8: F3 41 0F 10 47 4C              - movss xmm0,[r15+4C]
+1A7F5619BAE: F3 0F 5A C0                    - cvtss2sd xmm0,xmm0
+1A7F5619BB2: F3 0F 10 0D 96 00 00 00        - movss xmm1,[1A7F5619C50]
+1A7F5619BBA: F3 0F 5A C9                    - cvtss2sd xmm1,xmm1
+1A7F5619BBE: F2 0F 58 C1                    - addsd xmm0,xmm1
+1A7F5619BC2: F2 0F 5A E8                    - cvtsd2ss xmm5,xmm0
+// ---------- INJECTING HERE ----------
+1A7F5619BC6: F3 41 0F 11 6F 4C              - movss [r15+4C],xmm5
+// ---------- DONE INJECTING  ----------
+1A7F5619BCC: 48 8B 47 20                    - mov rax,[rdi+20]
+1A7F5619BD0: 48 8B C8                       - mov rcx,rax
+1A7F5619BD3: 33 D2                          - xor edx,edx
+1A7F5619BD5: 83 38 00                       - cmp dword ptr [rax],00
+1A7F5619BD8: 48 8D 64 24 00                 - lea rsp,[rsp+00]
+1A7F5619BDD: 90                             - nop 
+1A7F5619BDE: 49 BB 00 58 60 F5 A7 01 00 00  - mov r11,000001A7F5605800
+1A7F5619BE8: 41 FF D3                       - call r11
+1A7F5619BEB: F3 0F 10 05 4D 00 00 00        - movss xmm0,[1A7F5619C40]
+1A7F5619BF3: F3 0F 5A C0                    - cvtss2sd xmm0,xmm0
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>9</ID>
+          <Description>"Force Health upgrade to 100"</Description>
+          <Color>FF00FF</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ZabiVsetkych
+  Version: 
+  Date   : 2025-06-06
+  Author : misof
+
+  Forces health upgrade to 999.0
+}
+
+[ENABLE]
+
+aobscan(INJECT,F3 0F 11 6E 48 F3 0F 10 46 54) // should be unique
+alloc(newmem,$1000,INJECT)
+alloc(myfloat,4)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  movss xmm5,[myfloat]
+  movss [rsi+48],xmm5
+  jmp return
+
+INJECT:
+  jmp newmem
+return:
+registersymbol(INJECT)
+registersymbol(myfloat)
+
+myfloat:
+  dd (float)100.0
+
+[DISABLE]
+
+INJECT:
+  db F3 0F 11 6E 48
+
+unregistersymbol(INJECT)
+unregistersymbol(myfloat)
+dealloc(newmem)
+dealloc(myfloat)
+
+{
+// ORIGINAL CODE - INJECTION POINT: 2A6EC85FEA8
+
+2A6EC85FE7E: 00 00                    - add [rax],al
+2A6EC85FE80: 48 83 EC 08              - sub rsp,08
+2A6EC85FE84: 48 89 34 24              - mov [rsp],rsi
+2A6EC85FE88: 48 8B F1                 - mov rsi,rcx
+2A6EC85FE8B: F3 0F 10 46 48           - movss xmm0,[rsi+48]
+2A6EC85FE90: F3 0F 5A C0              - cvtss2sd xmm0,xmm0
+2A6EC85FE94: F3 0F 10 0D 54 00 00 00  - movss xmm1,[2A6EC85FEF0]
+2A6EC85FE9C: F3 0F 5A C9              - cvtss2sd xmm1,xmm1
+2A6EC85FEA0: F2 0F 58 C1              - addsd xmm0,xmm1
+2A6EC85FEA4: F2 0F 5A E8              - cvtsd2ss xmm5,xmm0
+// ---------- INJECTING HERE ----------
+2A6EC85FEA8: F3 0F 11 6E 48           - movss [rsi+48],xmm5
+// ---------- DONE INJECTING  ----------
+2A6EC85FEAD: F3 0F 10 46 54           - movss xmm0,[rsi+54]
+2A6EC85FEB2: F3 0F 5A C0              - cvtss2sd xmm0,xmm0
+2A6EC85FEB6: F3 0F 10 0D 22 00 00 00  - movss xmm1,[2A6EC85FEE0]
+2A6EC85FEBE: F3 0F 5A C9              - cvtss2sd xmm1,xmm1
+2A6EC85FEC2: F2 0F 58 C1              - addsd xmm0,xmm1
+2A6EC85FEC6: F2 0F 5A E8              - cvtsd2ss xmm5,xmm0
+2A6EC85FECA: F3 0F 11 6E 54           - movss [rsi+54],xmm5
+2A6EC85FECF: 48 8B 34 24              - mov rsi,[rsp]
+2A6EC85FED3: 48 83 C4 08              - add rsp,08
+2A6EC85FED7: C3                       - ret 
+}
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <CheatCodes>
+    <CodeEntry>
+      <Description>Code :movss [rax+48],xmm5</Description>
+      <AddressString>1D374346310</AddressString>
+      <Before>
+        <Byte>C1</Byte>
+        <Byte>F2</Byte>
+        <Byte>0F</Byte>
+        <Byte>5A</Byte>
+        <Byte>E8</Byte>
+      </Before>
+      <Actual>
+        <Byte>F3</Byte>
+        <Byte>0F</Byte>
+        <Byte>11</Byte>
+        <Byte>68</Byte>
+        <Byte>48</Byte>
+      </Actual>
+      <After>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>75</Byte>
+        <Byte>F8</Byte>
+        <Byte>48</Byte>
+      </After>
+    </CodeEntry>
+  </CheatCodes>
+  <UserdefinedSymbols/>
+</CheatTable>

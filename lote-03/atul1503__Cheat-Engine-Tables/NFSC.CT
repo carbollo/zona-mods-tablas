@@ -1,0 +1,843 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="42">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>3</ID>
+      <Description>"SPEEDER"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{$lua}
+
+[ENABLE]
+
+local mul=1+4e-3
+local ratio=2.1
+
+-- This script needs speed of turn address as "steer". You also have to adjust the ratio wrt the game. You may also have to change the sign of ratio if the car goes in opp direction to your key input.
+
+
+
+list=getAddressList()
+xspeed=list.getMemoryRecordByDescription('X SPEED')
+yspeed=list.getMemoryRecordByDescription('Y SPEED')
+steer=list.getMemoryRecordByDescription('ROTATION')
+
+
+
+
+function rotate()
+if xspeed==nil or xspeed.Value=="??" then return end
+theta=math.rad(-ratio*steer.Value)
+r=((xspeed.Value^2)+(yspeed.Value^2))^0.5
+if r==0 then return end
+x=xspeed.Value/r
+y=yspeed.Value/r
+xcomp=x*math.cos(theta)-y*math.sin(theta)
+ycomp=x*math.sin(theta)+y*math.cos(theta)
+local dmul=1
+if isKeyPressed(0x26) then dmul=mul end
+xspeed.Value=xcomp*r*dmul
+yspeed.Value=ycomp*r*dmul
+end
+
+timer=createTimer()
+timer.Interval=50
+timer.OnTimer=rotate
+timer.Enabled=true
+
+
+
+
+[DISABLE]
+timer.destroy()
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>34</ID>
+      <Description>"Turner"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{$lua}
+
+[ENABLE]
+
+local turn=0.2
+local limit=3
+
+
+
+list=getAddressList()
+xspeed=list.getMemoryRecordByDescription('X SPEED')
+yspeed=list.getMemoryRecordByDescription('Y SPEED')
+steer=list.getMemoryRecordByDescription('ROTATION')
+
+
+left=createHotkey(function()
+if tonumber(steer.Value)&gt;limit then steer.Value=0 end
+steer.Value=steer.Value-turn
+end,0x25)
+
+right=createHotkey(function()
+if tonumber(steer.Value)&lt;-limit then steer.Value=0 end
+steer.Value=steer.Value+turn
+end,0x27)
+
+
+
+[DISABLE]
+left.destroy()
+right.destroy()
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>35</ID>
+      <Description>"Become Invisible from cops"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : NFSC.exe
+  Version: 
+  Date   : 2023-06-11
+  Author : atult
+
+  This script makes your car invisible to cops! No matter where you are they wont see you.
+}
+
+[ENABLE]
+
+aobscanmodule(nopolice,NFSC.exe,8B 10 8D 4E 10 89 11 8B 50 04 89 51 04 8B 40 08) // should be unique
+
+nopolice:
+ db 90 90 8D 4E 10 89 11 90 90 90 89 51 04 90 90 90
+
+
+
+[DISABLE]
+
+nopolice:
+  db 8B 10 8D 4E 10 89 11 8B 50 04 89 51 04 8B 40 08
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>32</ID>
+      <Description>"Unlimited Nitrous"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+aobscanmodule(unitro,NFSC.exe,D8 AE F0 00 00 00) // should be unique
+registersymbol(unitro)
+
+unitro:
+db 90 90 90 90 90 90
+
+[DISABLE]
+
+unitro:
+  db D8 AE F0 00 00 00
+
+unregistersymbol(unitro)
+
+
+{
+// ORIGINAL CODE - INJECTION POINT: NFSC.exe+2E4046
+
+NFSC.exe+2E4021: FF 50 04                       - call dword ptr [eax+04]
+NFSC.exe+2E4024: D8 0D 80 28 9C 00              - fmul dword ptr [NFSC.exe+5C2880]
+NFSC.exe+2E402A: D8 05 78 24 9C 00              - fadd dword ptr [NFSC.exe+5C2478]
+NFSC.exe+2E4030: D8 4C 24 28                    - fmul dword ptr [esp+28]
+NFSC.exe+2E4034: D9 5C 24 28                    - fstp dword ptr [esp+28]
+NFSC.exe+2E4038: D9 44 24 14                    - fld dword ptr [esp+14]
+NFSC.exe+2E403C: 8B 4C 24 20                    - mov ecx,[esp+20]
+NFSC.exe+2E4040: D8 4C 24 28                    - fmul dword ptr [esp+28]
+NFSC.exe+2E4044: 51                             - push ecx
+NFSC.exe+2E4045: 55                             - push ebp
+// ---------- INJECTING HERE ----------
+NFSC.exe+2E4046: D8 AE F0 00 00 00              - fsubr dword ptr [esi+000000F0]
+// ---------- DONE INJECTING  ----------
+NFSC.exe+2E404C: D9 9E F0 00 00 00              - fstp dword ptr [esi+000000F0]
+NFSC.exe+2E4052: E8 D9 E7 FD FF                 - call NFSC.exe+2C2830
+NFSC.exe+2E4057: D9 5C 24 18                    - fstp dword ptr [esp+18]
+NFSC.exe+2E405B: 83 C4 08                       - add esp,08
+NFSC.exe+2E405E: D9 86 F0 00 00 00              - fld dword ptr [esi+000000F0]
+NFSC.exe+2E4064: C7 86 F8 00 00 00 00 00 80 3F  - mov [esi+000000F8],3F800000
+NFSC.exe+2E406E: D8 15 8C 24 9C 00              - fcom dword ptr [NFSC.exe+5C248C]
+NFSC.exe+2E4074: DF E0                          - fnstsw ax
+NFSC.exe+2E4076: F6 C4 41                       - test ah,41
+NFSC.exe+2E4079: 74 08                          - je NFSC.exe+2E4083
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>21</ID>
+      <Description>"Gear system"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{$lua}
+
+[ENABLE]
+
+local mul=1+3e-3
+local rangeMultiplier=1.5
+local Up=20
+local Down=0
+local div=0.85
+local motion=1
+local speedXString='X SPEED'
+local speedYString='Y SPEED'
+
+
+
+--Gear is increased by W and decreased by S
+
+local TempUp=Up
+local TempDown=Down
+
+
+
+hk1=createHotkey(function()
+t=getAddressList()
+x=t.getMemoryRecordByDescription(speedXString)
+y=t.getMemoryRecordByDescription(speedYString)
+r=((x.Value^2)+(y.Value^2))^0.5
+if r&gt;=motion then
+if r&gt;TempUp then
+ratio=TempUp/r
+x.Value=x.Value*ratio
+y.Value=y.Value*ratio
+elseif r&lt;TempDown then
+ratio=TempDown/r
+x.Value=x.Value*ratio
+y.Value=y.Value*ratio
+else
+x.Value=x.Value*mul
+y.Value=y.Value*mul
+end
+end
+end,0x26)
+
+
+
+hk2=createHotkey(function()
+x=getAddressList().getMemoryRecordByDescription(speedXString)
+y=getAddressList().getMemoryRecordByDescription(speedYString)
+r=((x.Value^2)+(y.Value^2))^0.5
+if r&gt;=motion then
+if r&gt;TempDown then
+x.Value=x.Value*div
+y.Value=y.Value*div
+else
+ratio=TempDown/r
+x.Value=x.Value*ratio
+y.Value=y.Value*ratio
+end
+end
+end,0x28)
+
+
+hk3=createHotkey(function()
+TempDown=TempUp
+TempUp=TempUp*rangeMultiplier
+t=getAddressList()
+x=t.getMemoryRecordByDescription(speedXString)
+y=t.getMemoryRecordByDescription(speedYString)
+r=((x.Value^2)+(y.Value^2))^0.5
+if r&gt;=motion then
+ratio=TempDown/r
+x.Value=x.Value*ratio
+y.Value=y.Value*ratio
+end
+speak('Gear Up')
+end,0x57)
+
+hk6=createHotkey(function()
+TempUp=TempDown
+TempDown=TempDown/rangeMultiplier
+t=getAddressList()
+x=t.getMemoryRecordByDescription(speedXString)
+y=t.getMemoryRecordByDescription(speedYString)
+r=((x.Value^2)+(y.Value^2))^0.5
+if r&gt;=motion then
+mid=(TempUp+TempDown)/2
+ratio=mid/r
+x.Value=x.Value*ratio
+y.Value=y.Value*ratio
+end
+speak('Gear Down')
+end,0x53)
+
+hk7=createHotkey(function()
+TempUp=Up
+TempDown=Down
+t=getAddressList()
+x=t.getMemoryRecordByDescription(speedXString)
+y=t.getMemoryRecordByDescription(speedYString)
+r=((x.Value^2)+(y.Value^2))^0.5
+if r&gt;=motion then
+ratio=TempUp/r
+x.Value=x.Value*ratio
+y.Value=y.Value*ratio
+end
+speak('Reset')
+end,0x52)
+
+
+
+[DISABLE]
+hk1.destroy()
+hk2.destroy()
+hk3.destroy()
+hk6.destroy()
+hk7.destroy()
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>14</ID>
+      <Description>"WIDTH"</Description>
+      <VariableType>Float</VariableType>
+      <Address>00AAB140</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>12</ID>
+      <Description>"HEIGHT"</Description>
+      <VariableType>Float</VariableType>
+      <Address>00AAB144</Address>
+      <Hotkeys>
+        <Hotkey>
+          <Action>Increase Value</Action>
+          <Keys>
+            <Key>74</Key>
+          </Keys>
+          <Value>600</Value>
+          <ID>0</ID>
+        </Hotkey>
+        <Hotkey>
+          <Action>Decrease Value</Action>
+          <Keys>
+            <Key>85</Key>
+          </Keys>
+          <Value>600</Value>
+          <ID>1</ID>
+        </Hotkey>
+      </Hotkeys>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>13</ID>
+      <Description>"LENGTH"</Description>
+      <VariableType>Float</VariableType>
+      <Address>00AAB148</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>19</ID>
+      <Description>"X SPEED"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>Float</VariableType>
+      <Address>00AAB150</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>25</ID>
+      <Description>"Z SPEED"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>Float</VariableType>
+      <Address>00AAB154</Address>
+      <Hotkeys>
+        <Hotkey>
+          <Action>Set Value</Action>
+          <Keys>
+            <Key>74</Key>
+          </Keys>
+          <Value>0</Value>
+          <ID>0</ID>
+        </Hotkey>
+        <Hotkey>
+          <Action>Activate</Action>
+          <Keys>
+            <Key>74</Key>
+          </Keys>
+          <ID>1</ID>
+        </Hotkey>
+        <Hotkey>
+          <Action>Deactivate</Action>
+          <Keys>
+            <Key>85</Key>
+          </Keys>
+          <ID>2</ID>
+        </Hotkey>
+      </Hotkeys>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>20</ID>
+      <Description>"Y SPEED"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>Float</VariableType>
+      <Address>00AAB158</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>8</ID>
+      <Description>"ROTATION"</Description>
+      <VariableType>Float</VariableType>
+      <Address>00AAB164</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>18</ID>
+      <Description>"TRACTION"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>Float</VariableType>
+      <Address>00AAB16C</Address>
+    </CheatEntry>
+  </CheatEntries>
+  <CheatCodes>
+    <CodeEntry>
+      <Description>fstp dword ptr [esi+20] (speed)</Description>
+      <AddressString>NFSC.exe+2E8C5D</AddressString>
+      <Before>
+        <Byte>9E</Byte>
+        <Byte>00</Byte>
+        <Byte>8B</Byte>
+        <Byte>46</Byte>
+        <Byte>24</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>5E</Byte>
+        <Byte>20</Byte>
+      </Actual>
+      <After>
+        <Byte>89</Byte>
+        <Byte>44</Byte>
+        <Byte>24</Byte>
+        <Byte>10</Byte>
+        <Byte>D9</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :fld dword ptr [ecx+000000A4] (Nitrous)</Description>
+      <AddressString>NFSC.exe+2F1030</AddressString>
+      <Before>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>81</Byte>
+        <Byte>A4</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>C3</Byte>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :mov eax,[ecx+38] (Gear)</Description>
+      <AddressString>NFSC.exe+2F11E0</AddressString>
+      <Before>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+      </Before>
+      <Actual>
+        <Byte>8B</Byte>
+        <Byte>41</Byte>
+        <Byte>38</Byte>
+      </Actual>
+      <After>
+        <Byte>C3</Byte>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+        <Byte>CC</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :fld dword ptr [ecx+04] (Nitrous Power)</Description>
+      <AddressString>NFSC.exe+2C283B</AddressString>
+      <Before>
+        <Byte>04</Byte>
+        <Byte>8B</Byte>
+        <Byte>44</Byte>
+        <Byte>24</Byte>
+        <Byte>08</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>41</Byte>
+        <Byte>04</Byte>
+      </Actual>
+      <After>
+        <Byte>85</Byte>
+        <Byte>C0</Byte>
+        <Byte>74</Byte>
+        <Byte>11</Byte>
+        <Byte>D9</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :mov eax,[eax+00024330] (Money watcher in car lot)</Description>
+      <AddressString>NFSC.exe+A094D</AddressString>
+      <Before>
+        <Byte>E8</Byte>
+        <Byte>43</Byte>
+        <Byte>22</Byte>
+        <Byte>0D</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>8B</Byte>
+        <Byte>80</Byte>
+        <Byte>30</Byte>
+        <Byte>43</Byte>
+        <Byte>02</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>8B</Byte>
+        <Byte>4C</Byte>
+        <Byte>24</Byte>
+        <Byte>04</Byte>
+        <Byte>89</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :fld dword ptr [eax+58] (Top Speed)</Description>
+      <AddressString>NFSC.exe+2C3263</AddressString>
+      <Before>
+        <Byte>D8</Byte>
+        <Byte>08</Byte>
+        <Byte>8B</Byte>
+        <Byte>46</Byte>
+        <Byte>04</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>40</Byte>
+        <Byte>58</Byte>
+      </Actual>
+      <After>
+        <Byte>D8</Byte>
+        <Byte>60</Byte>
+        <Byte>5C</Byte>
+        <Byte>D9</Byte>
+        <Byte>5C</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :fld dword ptr [esi+ecx*4+08] (transmission for every gear)</Description>
+      <AddressString>NFSC.exe+2E2F86</AddressString>
+      <Before>
+        <Byte>08</Byte>
+        <Byte>3B</Byte>
+        <Byte>C8</Byte>
+        <Byte>73</Byte>
+        <Byte>08</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>44</Byte>
+        <Byte>8E</Byte>
+        <Byte>08</Byte>
+      </Actual>
+      <After>
+        <Byte>5E</Byte>
+        <Byte>C2</Byte>
+        <Byte>04</Byte>
+        <Byte>00</Byte>
+        <Byte>6A</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :fld dword ptr [ecx+00000080] (Transmission)</Description>
+      <AddressString>NFSC.exe+2C3254</AddressString>
+      <Before>
+        <Byte>C4</Byte>
+        <Byte>04</Byte>
+        <Byte>8B</Byte>
+        <Byte>4F</Byte>
+        <Byte>04</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>81</Byte>
+        <Byte>80</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>8B</Byte>
+        <Byte>74</Byte>
+        <Byte>24</Byte>
+        <Byte>14</Byte>
+        <Byte>D8</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :fld dword ptr [ecx+eax*4+48] (front-rear tractions)</Description>
+      <AddressString>NFSC.exe+2EE969</AddressString>
+      <Before>
+        <Byte>58</Byte>
+        <Byte>D9</Byte>
+        <Byte>5C</Byte>
+        <Byte>24</Byte>
+        <Byte>24</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>44</Byte>
+        <Byte>81</Byte>
+        <Byte>48</Byte>
+      </Actual>
+      <After>
+        <Byte>D9</Byte>
+        <Byte>5C</Byte>
+        <Byte>24</Byte>
+        <Byte>1C</Byte>
+        <Byte>D9</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :fld dword ptr [ecx+eax*4+58] (front-rear traction 2)</Description>
+      <AddressString>NFSC.exe+2EE961</AddressString>
+      <Before>
+        <Byte>00</Byte>
+        <Byte>D9</Byte>
+        <Byte>5C</Byte>
+        <Byte>24</Byte>
+        <Byte>18</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>44</Byte>
+        <Byte>81</Byte>
+        <Byte>58</Byte>
+      </Actual>
+      <After>
+        <Byte>D9</Byte>
+        <Byte>5C</Byte>
+        <Byte>24</Byte>
+        <Byte>24</Byte>
+        <Byte>D9</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :mov eax,[edx+78] (slowing power while turning)</Description>
+      <AddressString>NFSC.exe+2EF584</AddressString>
+      <Before>
+        <Byte>96</Byte>
+        <Byte>90</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>8B</Byte>
+        <Byte>42</Byte>
+        <Byte>78</Byte>
+      </Actual>
+      <After>
+        <Byte>8B</Byte>
+        <Byte>4E</Byte>
+        <Byte>2C</Byte>
+        <Byte>8B</Byte>
+        <Byte>11</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :fmul dword ptr [ecx+00000088] (turning traction of front end)</Description>
+      <AddressString>NFSC.exe+2FB18D</AddressString>
+      <Before>
+        <Byte>10</Byte>
+        <Byte>DE</Byte>
+        <Byte>C1</Byte>
+        <Byte>D9</Byte>
+        <Byte>C0</Byte>
+      </Before>
+      <Actual>
+        <Byte>D8</Byte>
+        <Byte>89</Byte>
+        <Byte>88</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>8B</Byte>
+        <Byte>8B</Byte>
+        <Byte>CC</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :mov edx,[eax+04] (another car region)</Description>
+      <AddressString>NFSC.exe+2FA43B</AddressString>
+      <Before>
+        <Byte>0D</Byte>
+        <Byte>E8</Byte>
+        <Byte>52</Byte>
+        <Byte>9E</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>8B</Byte>
+        <Byte>50</Byte>
+        <Byte>04</Byte>
+      </Actual>
+      <After>
+        <Byte>89</Byte>
+        <Byte>8C</Byte>
+        <Byte>24</Byte>
+        <Byte>58</Byte>
+        <Byte>01</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :fld dword ptr [eax+10] (front end height)</Description>
+      <AddressString>NFSC.exe+2DEB65</AddressString>
+      <Before>
+        <Byte>C1</Byte>
+        <Byte>D9</Byte>
+        <Byte>5C</Byte>
+        <Byte>24</Byte>
+        <Byte>2C</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>40</Byte>
+        <Byte>10</Byte>
+      </Actual>
+      <After>
+        <Byte>D8</Byte>
+        <Byte>0D</Byte>
+        <Byte>F0</Byte>
+        <Byte>87</Byte>
+        <Byte>9C</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :fld dword ptr [eax+14] (back end height)</Description>
+      <AddressString>NFSC.exe+2DEB56</AddressString>
+      <Before>
+        <Byte>0D</Byte>
+        <Byte>F0</Byte>
+        <Byte>87</Byte>
+        <Byte>9C</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>40</Byte>
+        <Byte>14</Byte>
+      </Actual>
+      <After>
+        <Byte>D8</Byte>
+        <Byte>0D</Byte>
+        <Byte>F0</Byte>
+        <Byte>87</Byte>
+        <Byte>9C</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :fld dword ptr [ecx+78] (Aerodynamic Drag)</Description>
+      <AddressString>NFSC.exe+2DEBEE</AddressString>
+      <Before>
+        <Byte>66</Byte>
+        <Byte>4C</Byte>
+        <Byte>8B</Byte>
+        <Byte>4F</Byte>
+        <Byte>6C</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>41</Byte>
+        <Byte>78</Byte>
+      </Actual>
+      <After>
+        <Byte>D8</Byte>
+        <Byte>8E</Byte>
+        <Byte>BC</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :fld dword ptr [esi+ecx*4+48] (any gear thrust)</Description>
+      <AddressString>NFSC.exe+2E2FB7</AddressString>
+      <Before>
+        <Byte>08</Byte>
+        <Byte>3B</Byte>
+        <Byte>C8</Byte>
+        <Byte>73</Byte>
+        <Byte>08</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>44</Byte>
+        <Byte>8E</Byte>
+        <Byte>48</Byte>
+      </Actual>
+      <After>
+        <Byte>5E</Byte>
+        <Byte>C2</Byte>
+        <Byte>04</Byte>
+        <Byte>00</Byte>
+        <Byte>6A</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :fld dword ptr [esi+000000CC] (Wheel spin)</Description>
+      <AddressString>NFSC.exe+2EEA9D</AddressString>
+      <Before>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>EB</Byte>
+        <Byte>5C</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>86</Byte>
+        <Byte>CC</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>D8</Byte>
+        <Byte>1D</Byte>
+        <Byte>8C</Byte>
+        <Byte>24</Byte>
+        <Byte>9C</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :mov eax,[eax+08] (Police looks at you with this)</Description>
+      <AddressString>NFSC.exe+19CA3</AddressString>
+      <Before>
+        <Byte>50</Byte>
+        <Byte>04</Byte>
+        <Byte>89</Byte>
+        <Byte>51</Byte>
+        <Byte>04</Byte>
+      </Before>
+      <Actual>
+        <Byte>8B</Byte>
+        <Byte>40</Byte>
+        <Byte>08</Byte>
+      </Actual>
+      <After>
+        <Byte>89</Byte>
+        <Byte>41</Byte>
+        <Byte>08</Byte>
+        <Byte>8B</Byte>
+        <Byte>4E</Byte>
+      </After>
+    </CodeEntry>
+  </CheatCodes>
+  <UserdefinedSymbols/>
+</CheatTable>

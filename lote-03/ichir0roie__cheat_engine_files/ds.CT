@@ -1,0 +1,739 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>5</ID>
+      <Description>"item use"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ds.exe
+  Version: 
+  Date   : 2023-10-28
+  Author : ichir
+
+  This script does blah blah blah
+}
+
+define(address,"ds.exe"+279C963)
+define(bytes,C5 FA 11 00 76 10)
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,"ds.exe"+279C963)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  //vmovss [rax],xmm0
+  jna ds.exe+279C979
+  jmp return
+
+address:
+  jmp newmem
+  nop
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+  // vmovss [rax],xmm0
+  // jna ds.exe+279C979
+
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ds.exe+279C963
+
+ds.exe+279C93B: EB 12                    - jmp ds.exe+279C94F
+ds.exe+279C93D: 49 63 C0                 - movsxd  rax,r8d
+ds.exe+279C940: 48 8D 04 C0              - lea rax,[rax+rax*8]
+ds.exe+279C944: 48 8D 80 82 04 00 00     - lea rax,[rax+00000482]
+ds.exe+279C94B: 48 8D 04 C1              - lea rax,[rcx+rax*8]
+ds.exe+279C94F: C5 FA 10 00              - vmovss xmm0,[rax]
+ds.exe+279C953: C5 F2 5D F8              - vminss xmm7,xmm1,xmm0
+ds.exe+279C957: C5 C8 57 F6              - vxorps xmm6,xmm6,xmm6
+ds.exe+279C95B: C5 F8 2F FE              - vcomiss xmm7,xmm6
+ds.exe+279C95F: C5 FA 5C C7              - vsubss xmm0,xmm0,xmm7
+// ---------- INJECTING HERE ----------
+ds.exe+279C963: C5 FA 11 00              - vmovss [rax],xmm0
+// ---------- DONE INJECTING  ----------
+ds.exe+279C967: 76 10                    - jna ds.exe+279C979
+ds.exe+279C969: 48 8B 0D F0 0F 46 05     - mov rcx,[ds.exe+7BFD960]
+ds.exe+279C970: C5 C2 5A CF              - vcvtss2sd xmm1,xmm7,xmm7
+ds.exe+279C974: E8 C7 55 78 00           - call ds.exe+2F21F40
+ds.exe+279C979: C5 C2 59 05 DB F7 3F 01  - vmulss xmm0,xmm7,[ds.exe+3B9C15C]
+ds.exe+279C981: C5 FA 58 8B 4C 48 00 00  - vaddss xmm1,xmm0,[rbx+0000484C]
+ds.exe+279C989: C5 F8 2F F1              - vcomiss xmm6,xmm1
+ds.exe+279C98D: 77 0C                    - ja ds.exe+279C99B
+ds.exe+279C98F: C5 FA 10 05 F9 C4 3E 01  - vmovss xmm0,[ds.exe+3B88E90]
+ds.exe+279C997: C5 FA 5D F1              - vminss xmm6,xmm0,xmm1
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>6</ID>
+      <Description>"item increase"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ds.exe
+  Version: 
+  Date   : 2023-10-28
+  Author : ichir
+
+  This script does blah blah blah
+}
+
+define(address,"ds.exe"+2816A47)
+define(bytes,C5 FA 11 57 04)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,"ds.exe"+2816A47)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+//  vaddss xmm2,xmm2,
+  vmovss [rdi+04],xmm2
+  add [rdi+04],ffff
+  jmp return
+
+address:
+  jmp newmem
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+  // vmovss [rdi+04],xmm2
+
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ds.exe+2816A47
+
+ds.exe+2816A1C: 44 89 6C 24 20              - mov [rsp+20],r13d
+ds.exe+2816A21: 45 33 C0                    - xor r8d,r8d
+ds.exe+2816A24: 33 D2                       - xor edx,edx
+ds.exe+2816A26: B9 FB FE EB 4B              - mov ecx,4BEBFEFB
+ds.exe+2816A2B: E8 D0 3D 03 00              - call ds.exe+284A800
+ds.exe+2816A30: C5 FA 10 5F 08              - vmovss xmm3,[rdi+08]
+ds.exe+2816A35: C5 FA 10 57 04              - vmovss xmm2,[rdi+04]
+ds.exe+2816A3A: C4 C1 4A 59 C0              - vmulss xmm0,xmm6,xmm8
+ds.exe+2816A3F: C5 FA 58 CA                 - vaddss xmm1,xmm0,xmm2
+ds.exe+2816A43: C5 F2 5D D3                 - vminss xmm2,xmm1,xmm3
+// ---------- INJECTING HERE ----------
+ds.exe+2816A47: C5 FA 11 57 04              - vmovss [rdi+04],xmm2
+// ---------- DONE INJECTING  ----------
+ds.exe+2816A4C: 40 B6 01                    - mov sil,01
+ds.exe+2816A4F: C4 C1 7A 11 97 48 4B 00 00  - vmovss [r15+00004B48],xmm2
+ds.exe+2816A58: 80 67 14 FE                 - and byte ptr [rdi+14],-02
+ds.exe+2816A5C: 40 08 77 14                 - or [rdi+14],sil
+ds.exe+2816A60: E9 45 01 00 00              - jmp ds.exe+2816BAA
+ds.exe+2816A65: E8 B6 7E 13 00              - call ds.exe+294E920
+ds.exe+2816A6A: 84 C0                       - test al,al
+ds.exe+2816A6C: 0F 84 38 01 00 00           - je ds.exe+2816BAA
+ds.exe+2816A72: 48 8B 47 F4                 - mov rax,[rdi-0C]
+ds.exe+2816A76: C5 F8 2F 78 34              - vcomiss xmm7,[rax+34]
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>18</ID>
+      <Description>"hp change"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ds.exe
+  Version: 
+  Date   : 2023-10-28
+  Author : ichir
+
+  This script does blah blah blah
+}
+
+define(address,"ds.exe"+27401CB)
+define(bytes,C5 FA 11 83 C0 00 00 00)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,"ds.exe"+27401CB)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  vmovss [rbx+000000C0],xmm0
+  mov [rbx+000000C0],447a0000
+  jmp return
+
+address:
+  jmp newmem
+  nop 3
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+  // vmovss [rbx+000000C0],xmm0
+
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ds.exe+27401CB
+
+ds.exe+27401A9: 76 04                    - jna ds.exe+27401AF
+ds.exe+27401AB: C5 FA 5F CA              - vmaxss xmm1,xmm0,xmm2
+ds.exe+27401AF: C5 E2 5F D8              - vmaxss xmm3,xmm3,xmm0
+ds.exe+27401B3: C5 C8 57 F6              - vxorps xmm6,xmm6,xmm6
+ds.exe+27401B7: C5 F8 2F F1              - vcomiss xmm6,xmm1
+ds.exe+27401BB: 76 06                    - jna ds.exe+27401C3
+ds.exe+27401BD: C5 F8 57 C0              - vxorps xmm0,xmm0,xmm0
+ds.exe+27401C1: EB 04                    - jmp ds.exe+27401C7
+ds.exe+27401C3: C5 E2 5D C1              - vminss xmm0,xmm3,xmm1
+ds.exe+27401C7: C5 F8 2F D0              - vcomiss xmm2,xmm0
+// ---------- INJECTING HERE ----------
+ds.exe+27401CB: C5 FA 11 83 C0 00 00 00  - vmovss [rbx+000000C0],xmm0
+// ---------- DONE INJECTING  ----------
+ds.exe+27401D3: 76 59                    - jna ds.exe+274022E
+ds.exe+27401D5: 41 83 F9 01              - cmp r9d,01
+ds.exe+27401D9: 74 1F                    - je ds.exe+27401FA
+ds.exe+27401DB: 48 8B 0D 16 AE 4C 05     - mov rcx,[ds.exe+7C0AFF8]
+ds.exe+27401E2: 48 81 C1 A8 00 00 00     - add rcx,000000A8
+ds.exe+27401E9: C5 EA 5C C8              - vsubss xmm1,xmm2,xmm0
+ds.exe+27401ED: E8 3E 2E BF 00           - call ds.exe+3333030
+ds.exe+27401F2: C5 FA 10 83 C0 00 00 00  - vmovss xmm0,[rbx+000000C0]
+ds.exe+27401FA: C5 F8 2F F0              - vcomiss xmm6,xmm0
+ds.exe+27401FE: 72 2E                    - jb ds.exe+274022E
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>20</ID>
+      <Description>"weight_one"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ds.exe
+  Version: 
+  Date   : 2023-10-29
+  Author : ichir
+
+  This script does blah blah blah
+}
+
+define(address,"ds.exe"+2C9DB3F)
+define(bytes,C5 FA 11 48 0C)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,"ds.exe"+2C9DB3F)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  vmovss [rax+0C],xmm1
+  mov [rax+0C],00000000
+  jmp return
+
+address:
+  jmp newmem
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+  // vmovss [rax+0C],xmm1
+
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ds.exe+2C9DB3F
+
+ds.exe+2C9DB14: 48 89 5C 24 20     - mov [rsp+20],rbx
+ds.exe+2C9DB19: FF 15 59 CA E9 00  - call qword ptr [ds.exe+3B3A578]
+ds.exe+2C9DB1F: 85 C0              - test eax,eax
+ds.exe+2C9DB21: 75 09              - jne ds.exe+2C9DB2C
+ds.exe+2C9DB23: 48 8B CB           - mov rcx,rbx
+ds.exe+2C9DB26: FF 15 5C CA E9 00  - call qword ptr [ds.exe+3B3A588]
+ds.exe+2C9DB2C: 48 8B 46 28        - mov rax,[rsi+28]
+ds.exe+2C9DB30: C4 41 30 57 C9     - vxorps xmm9,xmm9,xmm9
+ds.exe+2C9DB35: C5 FA 10 40 0C     - vmovss xmm0,[rax+0C]
+ds.exe+2C9DB3A: C5 FA 5C 4E 14     - vsubss xmm1,xmm0,[rsi+14]
+// ---------- INJECTING HERE ----------
+ds.exe+2C9DB3F: C5 FA 11 48 0C     - vmovss [rax+0C],xmm1
+// ---------- DONE INJECTING  ----------
+ds.exe+2C9DB44: 4C 8B 66 20        - mov r12,[rsi+20]
+ds.exe+2C9DB48: 48 63 46 18        - movsxd  rax,dword ptr [rsi+18]
+ds.exe+2C9DB4C: 49 8D 04 C4        - lea rax,[r12+rax*8]
+ds.exe+2C9DB50: 4C 3B E0           - cmp r12,rax
+ds.exe+2C9DB53: 0F 84 B4 00 00 00  - je ds.exe+2C9DC0D
+ds.exe+2C9DB59: 48 8B D8           - mov rbx,rax
+ds.exe+2C9DB5C: 33 C9              - xor ecx,ecx
+ds.exe+2C9DB5E: 66 90              - nop 2
+ds.exe+2C9DB60: 4D 8B 2C 24        - mov r13,[r12]
+ds.exe+2C9DB64: 4C 8B F1           - mov r14,rcx
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>23</ID>
+      <Description>"resource"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ds.exe
+  Version: 
+  Date   : 2023-10-29
+  Author : ichir
+
+  This script does blah blah blah
+}
+
+define(address,"ds.exe"+344C7C4)
+define(bytes,4A 89 0C 12 49 83 E9 01)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,"ds.exe"+344C7C4)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  add rcx,ffff
+  mov [rdx+r10],rcx
+  sub r9,01
+  jmp return
+
+address:
+  jmp newmem
+  nop 3
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+  // mov [rdx+r10],rcx
+  // sub r9,01
+
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ds.exe+344C7C4
+
+ds.exe+344C7A5: 49 8D 14 1B           - lea rdx,[r11+rbx]
+ds.exe+344C7A9: 4C 8B 03              - mov r8,[rbx]
+ds.exe+344C7AC: 49 3B C8              - cmp rcx,r8
+ds.exe+344C7AF: 72 05                 - jb ds.exe+344C7B6
+ds.exe+344C7B1: 49 2B C8              - sub rcx,r8
+ds.exe+344C7B4: EB 0A                 - jmp ds.exe+344C7C0
+ds.exe+344C7B6: 49 2B C8              - sub rcx,r8
+ds.exe+344C7B9: 48 01 0C 1F           - add [rdi+rbx],rcx
+ds.exe+344C7BD: 48 8B C8              - mov rcx,rax
+ds.exe+344C7C0: 48 83 C3 08           - add rbx,08
+// ---------- INJECTING HERE ----------
+ds.exe+344C7C4: 4A 89 0C 12           - mov [rdx+r10],rcx
+// ---------- DONE INJECTING  ----------
+ds.exe+344C7C8: 49 83 E9 01           - sub r9,01
+ds.exe+344C7CC: 75 D2                 - jne ds.exe+344C7A0
+ds.exe+344C7CE: EB 5C                 - jmp ds.exe+344C82C
+ds.exe+344C7D0: 41 8B 92 90 00 00 00  - mov edx,[r10+00000090]
+ds.exe+344C7D7: 48 63 F9              - movsxd  rdi,ecx
+ds.exe+344C7DA: 48 8B 0D 7F 81 7A 04  - mov rcx,[ds.exe+7BF4960]
+ds.exe+344C7E1: E8 8A AB 80 FF        - call ds.exe+2C57370
+ds.exe+344C7E6: 4C 8B C0              - mov r8,rax
+ds.exe+344C7E9: 48 85 C0              - test rax,rax
+ds.exe+344C7EC: 74 3E                 - je ds.exe+344C82C
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>29</ID>
+      <Description>"item durable"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ds.exe
+  Version: 
+  Date   : 2023-10-29
+  Author : ichir
+
+  This script does blah blah blah
+}
+
+define(address,"ds.exe"+275435E)
+define(bytes,C5 FA 11 5E 0C)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,"ds.exe"+275435E)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  vmovss [rsi+0C],xmm3
+  mov [rsi+0C],447a0000
+  jmp return
+
+address:
+  jmp newmem
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+  // vmovss [rsi+0C],xmm3
+
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ds.exe+275435E
+
+ds.exe+2754331: 74 08                    - je ds.exe+275433B
+ds.exe+2754333: C5 FA 10 35 59 3C 43 01  - vmovss xmm6,[ds.exe+3B87F94]
+ds.exe+275433B: C5 FA 10 5E 0C           - vmovss xmm3,[rsi+0C]
+ds.exe+2754340: C5 F8 2F DF              - vcomiss xmm3,xmm7
+ds.exe+2754344: C5 FA 10 56 1C           - vmovss xmm2,[rsi+1C]
+ds.exe+2754349: C5 7A 10 4C 24 34        - vmovss xmm9,[rsp+34]
+ds.exe+275434F: C5 6A 58 C3              - vaddss xmm8,xmm2,xmm3
+ds.exe+2754353: 76 10                    - jna ds.exe+2754365
+ds.exe+2754355: C4 C1 62 5C C1           - vsubss xmm0,xmm3,xmm9
+ds.exe+275435A: C5 FA 5F DE              - vmaxss xmm3,xmm0,xmm6
+// ---------- INJECTING HERE ----------
+ds.exe+275435E: C5 FA 11 5E 0C           - vmovss [rsi+0C],xmm3
+// ---------- DONE INJECTING  ----------
+ds.exe+2754363: EB 2F                    - jmp ds.exe+2754394
+ds.exe+2754365: C5 F8 2F D7              - vcomiss xmm2,xmm7
+ds.exe+2754369: 76 10                    - jna ds.exe+275437B
+ds.exe+275436B: C4 C1 6A 5C C1           - vsubss xmm0,xmm2,xmm9
+ds.exe+2754370: C5 FA 5F D6              - vmaxss xmm2,xmm0,xmm6
+ds.exe+2754374: C5 FA 11 56 1C           - vmovss [rsi+1C],xmm2
+ds.exe+2754379: EB 19                    - jmp ds.exe+2754394
+ds.exe+275437B: C5 FA 10 46 24           - vmovss xmm0,[rsi+24]
+ds.exe+2754380: C5 F8 2F C7              - vcomiss xmm0,xmm7
+ds.exe+2754384: 76 0E                    - jna ds.exe+2754394
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>36</ID>
+      <Description>"add resource"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ds.exe
+  Version: 
+  Date   : 2023-10-29
+  Author : ichir
+
+  This script does blah blah blah
+}
+
+define(address,"ds.exe"+2C41592)
+define(bytes,01 81 10 02 00 00)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,"ds.exe"+2C41592)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  add [rcx+00000210],ffff
+  add [rcx+00000214],ffff
+  add [rcx+00000218],ffff
+  add [rcx+0000021C],ffff
+  add [rcx+00000220],ffff
+  add [rcx+00000224],ffff
+  jmp return
+
+address:
+  jmp newmem
+  nop
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+  // add [rcx+00000210],eax
+
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ds.exe+2C41592
+
+ds.exe+2C4156A: 41 55                    - push r13
+ds.exe+2C4156C: 41 56                    - push r14
+ds.exe+2C4156E: 41 57                    - push r15
+ds.exe+2C41570: 48 8D AC 24 70 FF FF FF  - lea rbp,[rsp-00000090]
+ds.exe+2C41578: 48 81 EC 90 01 00 00     - sub rsp,00000190
+ds.exe+2C4157F: 48 8B 05 AA FA 31 02     - mov rax,[ds.g_pAssertHook+AA90]
+ds.exe+2C41586: 48 33 C4                 - xor rax,rsp
+ds.exe+2C41589: 48 89 45 70              - mov [rbp+70],rax
+ds.exe+2C4158D: 8B 02                    - mov eax,[rdx]
+ds.exe+2C4158F: 4C 8B FA                 - mov r15,rdx
+// ---------- INJECTING HERE ----------
+ds.exe+2C41592: 01 81 10 02 00 00        - add [rcx+00000210],eax
+// ---------- DONE INJECTING  ----------
+ds.exe+2C41598: 48 8B F1                 - mov rsi,rcx
+ds.exe+2C4159B: 8B 1A                    - mov ebx,[rdx]
+ds.exe+2C4159D: 8B 42 04                 - mov eax,[rdx+04]
+ds.exe+2C415A0: 01 81 14 02 00 00        - add [rcx+00000214],eax
+ds.exe+2C415A6: 03 5A 04                 - add ebx,[rdx+04]
+ds.exe+2C415A9: 8B 42 08                 - mov eax,[rdx+08]
+ds.exe+2C415AC: 01 81 18 02 00 00        - add [rcx+00000218],eax
+ds.exe+2C415B2: 03 5A 08                 - add ebx,[rdx+08]
+ds.exe+2C415B5: 8B 42 0C                 - mov eax,[rdx+0C]
+ds.exe+2C415B8: 01 81 1C 02 00 00        - add [rcx+0000021C],eax
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>43</ID>
+      <Description>"ammo"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ds.exe
+  Version: 
+  Date   : 2023-10-29
+  Author : ichir
+
+  This script does blah blah blah
+}
+
+define(address,"ds.exe"+2CAE551)
+define(bytes,66 45 89 84 4B 0A 01 00 00)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,"ds.exe"+2CAE551)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  //mov [r11+rcx*2+0000010A],r8w
+  jmp return
+
+address:
+  jmp newmem
+  nop 4
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+  // mov [r11+rcx*2+0000010A],r8w
+
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ds.exe+2CAE551
+
+ds.exe+2CAE535: 38 10                       - cmp [rax],dl
+ds.exe+2CAE537: 74 11                       - je ds.exe+2CAE54A
+ds.exe+2CAE539: 41 FF C2                    - inc r10d
+ds.exe+2CAE53C: 49 FF C1                    - inc r9
+ds.exe+2CAE53F: 48 83 C0 06                 - add rax,06
+ds.exe+2CAE543: 49 83 F9 0A                 - cmp r9,0A
+ds.exe+2CAE547: 7C EC                       - jl ds.exe+2CAE535
+ds.exe+2CAE549: C3                          - ret 
+ds.exe+2CAE54A: 49 63 C2                    - movsxd  rax,r10d
+ds.exe+2CAE54D: 48 8D 0C 40                 - lea rcx,[rax+rax*2]
+// ---------- INJECTING HERE ----------
+ds.exe+2CAE551: 66 45 89 84 4B 0A 01 00 00  - mov [r11+rcx*2+0000010A],r8w
+// ---------- DONE INJECTING  ----------
+ds.exe+2CAE55A: C3                          - ret 
+ds.exe+2CAE55B: CC                          - int 3 
+ds.exe+2CAE55C: CC                          - int 3 
+ds.exe+2CAE55D: CC                          - int 3 
+ds.exe+2CAE55E: CC                          - int 3 
+ds.exe+2CAE55F: CC                          - int 3 
+ds.exe+2CAE560: CC                          - int 3 
+ds.exe+2CAE561: CC                          - int 3 
+ds.exe+2CAE562: CC                          - int 3 
+ds.exe+2CAE563: CC                          - int 3 
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>50</ID>
+      <Description>"battery moter power"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ds.exe
+  Version: 
+  Date   : 2023-10-29
+  Author : ichir
+
+  This script does blah blah blah
+}
+
+define(address,"ds.exe"+2F5C530)
+define(bytes,C5 FA 11 5F 08)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,"ds.exe"+2F5C530)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  //vmovss [rdi+08],xmm3
+  jmp return
+
+address:
+  jmp newmem
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+  // vmovss [rdi+08],xmm3
+
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ds.exe+2F5C530
+
+ds.exe+2F5C508: E8 C3 FA FF FF     - call ds.exe+2F5BFD0
+ds.exe+2F5C50D: C4 C1 78 2F C3     - vcomiss xmm0,xmm11
+ds.exe+2F5C512: 76 04              - jna ds.exe+2F5C518
+ds.exe+2F5C514: C5 3A 59 C0        - vmulss xmm8,xmm8,xmm0
+ds.exe+2F5C518: F6 47 48 02        - test byte ptr [rdi+48],02
+ds.exe+2F5C51C: 75 19              - jne ds.exe+2F5C537
+ds.exe+2F5C51E: C5 FA 10 47 08     - vmovss xmm0,[rdi+08]
+ds.exe+2F5C523: C4 C1 32 59 C8     - vmulss xmm1,xmm9,xmm8
+ds.exe+2F5C528: C5 FA 5C D1        - vsubss xmm2,xmm0,xmm1
+ds.exe+2F5C52C: C5 EA 5F DE        - vmaxss xmm3,xmm2,xmm6
+// ---------- INJECTING HERE ----------
+ds.exe+2F5C530: C5 FA 11 5F 08     - vmovss [rdi+08],xmm3
+// ---------- DONE INJECTING  ----------
+ds.exe+2F5C535: EB 05              - jmp ds.exe+2F5C53C
+ds.exe+2F5C537: C5 FA 10 5F 08     - vmovss xmm3,[rdi+08]
+ds.exe+2F5C53C: C5 F8 2F F3        - vcomiss xmm6,xmm3
+ds.exe+2F5C540: 72 21              - jb ds.exe+2F5C563
+ds.exe+2F5C542: C5 78 2F D6        - vcomiss xmm10,xmm6
+ds.exe+2F5C546: 76 1B              - jna ds.exe+2F5C563
+ds.exe+2F5C548: 45 84 FF           - test r15b,r15b
+ds.exe+2F5C54B: 75 09              - jne ds.exe+2F5C556
+ds.exe+2F5C54D: 8B 83 3C 01 00 00  - mov eax,[rbx+0000013C]
+ds.exe+2F5C553: 89 47 34           - mov [rdi+34],eax
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>51</ID>
+      <Description>"speed moter"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ds.exe
+  Version: 
+  Date   : 2023-10-29
+  Author : ichir
+
+  This script does blah blah blah
+}
+
+define(address,"ds.exe"+2806C48)
+define(bytes,C5 FA 11 96 10 48 00 00)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,"ds.exe"+2806C48)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  vmovss [rsi+00004810],xmm2
+  mov [rsi+00004810],447a0000
+  jmp return
+
+address:
+  jmp newmem
+  nop 3
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+  // vmovss [rsi+00004810],xmm2
+
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ds.exe+2806C48
+
+ds.exe+2806C11: 4C 8B 7C 24 48                 - mov r15,[rsp+48]
+ds.exe+2806C16: 45 32 F6                       - xor r14b,r14b
+ds.exe+2806C19: C4 41 78 2F E8                 - vcomiss xmm13,xmm8
+ds.exe+2806C1E: C5 7A 11 AE FC 47 00 00        - vmovss [rsi+000047FC],xmm13
+ds.exe+2806C26: 76 43                          - jna ds.exe+2806C6B
+ds.exe+2806C28: C7 86 F8 47 00 00 00 00 00 40  - mov [rsi+000047F8],40000000
+ds.exe+2806C32: C5 FA 10 86 10 48 00 00        - vmovss xmm0,[rsi+00004810]
+ds.exe+2806C3A: C4 C1 7A 5C CD                 - vsubss xmm1,xmm0,xmm13
+ds.exe+2806C3F: C4 C1 72 5F D0                 - vmaxss xmm2,xmm1,xmm8
+ds.exe+2806C44: C5 78 2F C2                    - vcomiss xmm8,xmm2
+// ---------- INJECTING HERE ----------
+ds.exe+2806C48: C5 FA 11 96 10 48 00 00        - vmovss [rsi+00004810],xmm2
+// ---------- DONE INJECTING  ----------
+ds.exe+2806C50: 0F 82 04 01 00 00              - jb ds.exe+2806D5A
+ds.exe+2806C56: C5 AA 59 8E 04 48 00 00        - vmulss xmm1,xmm10,[rsi+00004804]
+ds.exe+2806C5E: C5 FA 11 8E 30 4B 00 00        - vmovss [rsi+00004B30],xmm1
+ds.exe+2806C66: E9 EF 00 00 00                 - jmp ds.exe+2806D5A
+ds.exe+2806C6B: C5 FA 10 86 F8 47 00 00        - vmovss xmm0,[rsi+000047F8]
+ds.exe+2806C73: C4 C1 78 2F C0                 - vcomiss xmm0,xmm8
+ds.exe+2806C78: 76 12                          - jna ds.exe+2806C8C
+ds.exe+2806C7A: C4 C1 7A 5C C4                 - vsubss xmm0,xmm0,xmm12
+ds.exe+2806C7F: C5 FA 11 86 F8 47 00 00        - vmovss [rsi+000047F8],xmm0
+ds.exe+2806C87: E9 CE 00 00 00                 - jmp ds.exe+2806D5A
+}
+</AssemblerScript>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+  <Comments>Info about this table:
+</Comments>
+</CheatTable>

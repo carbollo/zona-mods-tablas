@@ -1,0 +1,652 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="42">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>107</ID>
+      <Description>"Selected Inventory Item"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript Async="1">[ENABLE]
+aobscanmodule(inventory,SMTS-Win64-Shipping.exe,48 63 CD 48 03 C8)
+alloc(newmem,$1000,inventory)
+
+label(inventoryPtr)
+label(code)
+label(return)
+
+newmem:
+
+code:
+  movsxd rcx,ebp
+  add rcx,rax
+  mov rax,inventoryPtr
+  mov [rax],rcx
+  jmp return
+
+align 10
+inventoryPtr:
+  dq 0
+
+inventory:
+  jmp newmem
+  nop
+return:
+registersymbol(inventory)
+registersymbol(inventoryPtr)
+
+[DISABLE]
+inventory:
+  db 48 63 CD 48 03 C8
+unregistersymbol(inventory)
+unregistersymbol(inventoryPtr)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: SMTS-Win64-Shipping.exe+252DAC8
+
+SMTS-Win64-Shipping.exe+252DAAF: 33 C9              - xor ecx,ecx
+SMTS-Win64-Shipping.exe+252DAB1: EB 1B              - jmp SMTS-Win64-Shipping.exe+252DACE
+SMTS-Win64-Shipping.exe+252DAB3: 48 8B 03           - mov rax,[rbx]
+SMTS-Win64-Shipping.exe+252DAB6: 40 84 FF           - test dil,dil
+SMTS-Win64-Shipping.exe+252DAB9: 75 0A              - jne SMTS-Win64-Shipping.exe+252DAC5
+SMTS-Win64-Shipping.exe+252DABB: A8 01              - test al,01
+SMTS-Win64-Shipping.exe+252DABD: 74 06              - je SMTS-Win64-Shipping.exe+252DAC5
+SMTS-Win64-Shipping.exe+252DABF: 48 D1 F8           - sar rax,1
+SMTS-Win64-Shipping.exe+252DAC2: 48 03 C3           - add rax,rbx
+SMTS-Win64-Shipping.exe+252DAC5: 0F AF EE           - imul ebp,esi
+// ---------- INJECTING HERE ----------
+SMTS-Win64-Shipping.exe+252DAC8: 48 63 CD           - movsxd  rcx,ebp
+// ---------- DONE INJECTING  ----------
+SMTS-Win64-Shipping.exe+252DACB: 48 03 C8           - add rcx,rax
+SMTS-Win64-Shipping.exe+252DACE: 49 8B 04 24        - mov rax,[r12]
+SMTS-Win64-Shipping.exe+252DAD2: 48 8B D1           - mov rdx,rcx
+SMTS-Win64-Shipping.exe+252DAD5: 4D 8B C1           - mov r8,r9
+SMTS-Win64-Shipping.exe+252DAD8: 49 8B CC           - mov rcx,r12
+SMTS-Win64-Shipping.exe+252DADB: FF 90 C8 00 00 00  - call qword ptr [rax+000000C8]
+SMTS-Win64-Shipping.exe+252DAE1: E9 82 00 00 00     - jmp SMTS-Win64-Shipping.exe+252DB68
+SMTS-Win64-Shipping.exe+252DAE6: 8B 43 08           - mov eax,[rbx+08]
+SMTS-Win64-Shipping.exe+252DAE9: 48 8D 54 24 40     - lea rdx,[rsp+40]
+SMTS-Win64-Shipping.exe+252DAEE: 33 C9              - xor ecx,ecx
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>108</ID>
+          <Description>"Quantity"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>inventoryPtr</Address>
+          <Offsets>
+            <Offset>10</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>48</ID>
+      <Description>"Player Stats"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript Async="1">[ENABLE]
+aobscanmodule(playerStats,$process,48 8B 0E 84 D2)
+alloc(newmem,$1000,playerStats)
+
+label(playerStatsPtr)
+label(code)
+label(return)
+
+newmem:
+  mov rcx,[rsi]
+  test rcx,rcx
+  je @f
+  cmp [rcx],1
+  jne @f
+  cmp [rcx+38],8 // XP
+  jne @f
+  mov rcx,playerStatsPtr
+  mov [rcx],rsi
+code:
+  mov rcx,[rsi]
+  test dl,dl
+  jmp return
+
+align 10
+playerStatsPtr:
+  dq 0
+
+playerStats:
+  jmp newmem
+return:
+registersymbol(playerStats)
+registersymbol(playerStatsPtr)
+
+[DISABLE]
+playerStats:
+  db 48 8B 0E 84 D2
+unregistersymbol(playerStats)
+unregistersymbol(playerStatsPtr)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: SMTS-Win64-Shipping.exe+1014D37
+
+SMTS-Win64-Shipping.exe+1014D1F: 78 7A        - js SMTS-Win64-Shipping.exe+1014D9B
+SMTS-Win64-Shipping.exe+1014D21: 8B 46 08     - mov eax,[rsi+08]
+SMTS-Win64-Shipping.exe+1014D24: 44 3B C8     - cmp r9d,eax
+SMTS-Win64-Shipping.exe+1014D27: 7D 72        - jnl SMTS-Win64-Shipping.exe+1014D9B
+SMTS-Win64-Shipping.exe+1014D29: F6 D2        - not dl
+SMTS-Win64-Shipping.exe+1014D2B: 80 E2 01     - and dl,01
+SMTS-Win64-Shipping.exe+1014D2E: 85 C0        - test eax,eax
+SMTS-Win64-Shipping.exe+1014D30: 75 05        - jne SMTS-Win64-Shipping.exe+1014D37
+SMTS-Win64-Shipping.exe+1014D32: 49 8B C6     - mov rax,r14
+SMTS-Win64-Shipping.exe+1014D35: EB 1E        - jmp SMTS-Win64-Shipping.exe+1014D55
+// ---------- INJECTING HERE ----------
+SMTS-Win64-Shipping.exe+1014D37: 48 8B 0E     - mov rcx,[rsi]
+// ---------- DONE INJECTING  ----------
+SMTS-Win64-Shipping.exe+1014D3A: 84 D2        - test dl,dl
+SMTS-Win64-Shipping.exe+1014D3C: 75 0B        - jne SMTS-Win64-Shipping.exe+1014D49
+SMTS-Win64-Shipping.exe+1014D3E: F6 C1 01     - test cl,01
+SMTS-Win64-Shipping.exe+1014D41: 74 06        - je SMTS-Win64-Shipping.exe+1014D49
+SMTS-Win64-Shipping.exe+1014D43: 48 D1 F9     - sar rcx,1
+SMTS-Win64-Shipping.exe+1014D46: 48 03 CE     - add rcx,rsi
+SMTS-Win64-Shipping.exe+1014D49: 41 8B C0     - mov eax,r8d
+SMTS-Win64-Shipping.exe+1014D4C: 41 0F AF C1  - imul eax,r9d
+SMTS-Win64-Shipping.exe+1014D50: 48 98        - cdqe 
+SMTS-Win64-Shipping.exe+1014D52: 48 03 C1     - add rax,rcx
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>49</ID>
+          <Description>"Open Inventory"</Description>
+          <Options moHideChildren="1"/>
+          <ShowAsSigned>0</ShowAsSigned>
+          <GroupHeader>1</GroupHeader>
+          <Address>playerStatsPtr</Address>
+          <Offsets>
+            <Offset>0</Offset>
+            <Offset>0</Offset>
+          </Offsets>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>50</ID>
+              <Description>"Health (Current)"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+4</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>52</ID>
+              <Description>"Mana (Current)"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+1C</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>55</ID>
+              <Description>"Level"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+34</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>54</ID>
+              <Description>"Experience"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+3C</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>67</ID>
+              <Description>"Skill Points"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+44</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>57</ID>
+              <Description>"Intellect"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+5C</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>59</ID>
+              <Description>"Strength"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+124</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>56</ID>
+              <Description>"Stamina"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+6C</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>60</ID>
+              <Description>"Wisdom"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+154</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>58</ID>
+              <Description>"Dexterity"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+84</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>61</ID>
+              <Description>"Base Health"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+18C</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>62</ID>
+              <Description>"Base Mana"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+194</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>63</ID>
+              <Description>"Base Z"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>+184</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>2</ID>
+      <Description>"Player Pointer"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript Async="1">[ENABLE]
+aobscanmodule(player,$process,48 8B 01 48 8D 54 24 ?? 0F 28 DE)
+alloc(newmem,$1000,player)
+
+label(playerBkp)
+label(playerPtr)
+label(return)
+
+newmem:
+  mov rax,playerPtr
+  mov [rax+00],rcx // PlayerInput
+  mov [rax+08],rsi // PlayerController
+playerBkp:
+  readmem(player,8)
+  jmp return
+
+align 8
+playerPtr:
+  dq 0
+  dq 0
+
+player:
+  jmp newmem
+  nop 3
+return:
+registersymbol(player)
+registersymbol(playerBkp)
+registersymbol(playerPtr)
+
+[DISABLE]
+player:
+  readmem(playerBkp,8)
+unregistersymbol(playerInput)
+unregistersymbol(playerBkp)
+unregistersymbol(playerPtr)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: SMTS-Win64-Shipping.exe+26DA75A
+
+SMTS-Win64-Shipping.exe+26DA731: 48 8B 03              - mov rax,[rbx]
+SMTS-Win64-Shipping.exe+26DA734: 48 89 44 24 30        - mov [rsp+30],rax
+SMTS-Win64-Shipping.exe+26DA739: 48 8B 43 08           - mov rax,[rbx+08]
+SMTS-Win64-Shipping.exe+26DA73D: 48 89 44 24 38        - mov [rsp+38],rax
+SMTS-Win64-Shipping.exe+26DA742: 48 8B 43 10           - mov rax,[rbx+10]
+SMTS-Win64-Shipping.exe+26DA746: 48 89 44 24 40        - mov [rsp+40],rax
+SMTS-Win64-Shipping.exe+26DA74B: 48 85 C0              - test rax,rax
+SMTS-Win64-Shipping.exe+26DA74E: 74 0A                 - je SMTS-Win64-Shipping.exe+26DA75A
+SMTS-Win64-Shipping.exe+26DA750: FF 40 08              - inc [rax+08]
+SMTS-Win64-Shipping.exe+26DA753: 48 8B 8E 48 03 00 00  - mov rcx,[rsi+00000348]
+// ---------- INJECTING HERE ----------
+SMTS-Win64-Shipping.exe+26DA75A: 48 8B 01              - mov rax,[rcx]
+// ---------- DONE INJECTING  ----------
+SMTS-Win64-Shipping.exe+26DA75D: 48 8D 54 24 30        - lea rdx,[rsp+30]
+SMTS-Win64-Shipping.exe+26DA762: 0F 28 DE              - movaps xmm3,xmm6
+SMTS-Win64-Shipping.exe+26DA765: 44 88 74 24 20        - mov [rsp+20],r14l
+SMTS-Win64-Shipping.exe+26DA76A: 44 8B C7              - mov r8d,edi
+SMTS-Win64-Shipping.exe+26DA76D: FF 90 68 02 00 00     - call qword ptr [rax+00000268]
+SMTS-Win64-Shipping.exe+26DA773: F6 86 38 04 00 00 02  - test byte ptr [rsi+00000438],02
+SMTS-Win64-Shipping.exe+26DA77A: 0F B6 E8              - movzx ebp,al
+SMTS-Win64-Shipping.exe+26DA77D: 0F 84 50 01 00 00     - je SMTS-Win64-Shipping.exe+26DA8D3
+SMTS-Win64-Shipping.exe+26DA783: 4C 8B 86 40 04 00 00  - mov r8,[rsi+00000440]
+SMTS-Win64-Shipping.exe+26DA78A: 48 63 8E 48 04 00 00  - movsxd  rcx,dword ptr [rsi+00000448]
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>26</ID>
+          <Description>"Walk Speed"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>playerPtr+8</Address>
+          <Offsets>
+            <Offset>670</Offset>
+            <Offset>580</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>79</ID>
+          <Description>"Run Speed"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>playerPtr+8</Address>
+          <Offsets>
+            <Offset>66C</Offset>
+            <Offset>580</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>64</ID>
+      <Description>"Ignore This"</Description>
+      <Options moHideChildren="1"/>
+      <Color>FFFFFF</Color>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>30</ID>
+          <Description>"readValue"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript Async="1">[ENABLE]
+aobscanmodule(readValue,VCRUNTIME140.dll,48 8B 0A 48 89 08)
+alloc(newmem,$1000,readValue)
+
+label(readCompare)
+label(code)
+label(return)
+
+newmem:
+  mov rcx,readCompare
+  mov rcx,[rcx]
+  cmp rcx,rdx
+  jne code
+  mov rcx,[rdx]
+  mov [rax],rcx
+  jmp return
+code:
+  mov rcx,[rdx]
+  mov [rax],rcx
+  jmp return
+
+align 10
+readCompare:
+  dq 0
+
+readValue:
+  jmp newmem
+  nop
+return:
+registersymbol(readValue)
+registersymbol(readCompare)
+
+[DISABLE]
+readValue:
+  db 48 8B 0A 48 89 08
+unregistersymbol(readValue)
+unregistersymbol(readCompare)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: VCRUNTIME140.memcpy+88
+
+VCRUNTIME140.memcpy+60: 48 8B C1                    - mov rax,rcx
+VCRUNTIME140.memcpy+63: 4C 8D 0D A6 EC FF FF        - lea r9,[VCRUNTIME140.dll]
+VCRUNTIME140.memcpy+6A: 43 8B 8C 81 00 60 01 00     - mov ecx,[r9+r8*4+00016000]
+VCRUNTIME140.memcpy+72: 49 03 C9                    - add rcx,r9
+VCRUNTIME140.memcpy+75: FF E1                       - jmp rcx
+VCRUNTIME140.memcpy+77: 66 0F 1F 84 00 00 00 00 00  - nop word ptr [rax+rax+00000000]
+VCRUNTIME140.memcpy+80: C3                          - ret 
+VCRUNTIME140.memcpy+81: 0F B7 0A                    - movzx ecx,word ptr [rdx]
+VCRUNTIME140.memcpy+84: 66 89 08                    - mov [rax],cx
+VCRUNTIME140.memcpy+87: C3                          - ret 
+// ---------- INJECTING HERE ----------
+VCRUNTIME140.memcpy+88: 48 8B 0A                    - mov rcx,[rdx]
+// ---------- DONE INJECTING  ----------
+VCRUNTIME140.memcpy+8B: 48 89 08                    - mov [rax],rcx
+VCRUNTIME140.memcpy+8E: C3                          - ret 
+VCRUNTIME140.memcpy+8F: 0F B7 0A                    - movzx ecx,word ptr [rdx]
+VCRUNTIME140.memcpy+92: 44 0F B6 42 02              - movzx r8d,byte ptr [rdx+02]
+VCRUNTIME140.memcpy+97: 66 89 08                    - mov [rax],cx
+VCRUNTIME140.memcpy+9A: 44 88 40 02                 - mov [rax+02],r8l
+VCRUNTIME140.memcpy+9E: C3                          - ret 
+VCRUNTIME140.memcpy+9F: 0F B6 0A                    - movzx ecx,byte ptr [rdx]
+VCRUNTIME140.memcpy+A2: 88 08                       - mov [rax],cl
+VCRUNTIME140.memcpy+A4: C3                          - ret 
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>31</ID>
+              <Description>"compare"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>8 Bytes</VariableType>
+              <Address>readCompare</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>32</ID>
+          <Description>"writeValue"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+aobscanmodule(writeInteger,VCRUNTIME140.dll,8B 0A 89 08 C3)
+alloc(newmem,$1000,writeInteger)
+
+label(writeValue)
+label(code)
+label(return)
+
+newmem:
+  mov rcx,writeValue
+  mov rcx,[rcx]
+  cmp rcx,rax
+  jne @f
+  mov ecx,[rdx]
+  mov [rax],ecx
+  ret
+  jmp return
+code:
+  mov ecx,[rdx]
+  mov [rax],ecx
+  ret
+  jmp return
+
+align 10
+writeValue:
+  dq 0
+
+writeInteger:
+  jmp newmem
+return:
+registersymbol(writeInteger)
+registersymbol(writeValue)
+
+[DISABLE]
+writeInteger:
+  db 8B 0A 89 08 C3
+unregistersymbol(writeInteger)
+unregistersymbol(writeValue)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: VCRUNTIME140.memcpy+C8
+
+VCRUNTIME140.memcpy+A9: F3 0F 7F 00     - movdqu [rax],xmm0
+VCRUNTIME140.memcpy+AD: C3              - ret 
+VCRUNTIME140.memcpy+AE: 66 90           - nop 2
+VCRUNTIME140.memcpy+B0: 4C 8B 02        - mov r8,[rdx]
+VCRUNTIME140.memcpy+B3: 0F B7 4A 08     - movzx ecx,word ptr [rdx+08]
+VCRUNTIME140.memcpy+B7: 44 0F B6 4A 0A  - movzx r9d,byte ptr [rdx+0A]
+VCRUNTIME140.memcpy+BC: 4C 89 00        - mov [rax],r8
+VCRUNTIME140.memcpy+BF: 66 89 48 08     - mov [rax+08],cx
+VCRUNTIME140.memcpy+C3: 44 88 48 0A     - mov [rax+0A],r9l
+VCRUNTIME140.memcpy+C7: C3              - ret 
+// ---------- INJECTING HERE ----------
+VCRUNTIME140.memcpy+C8: 8B 0A           - mov ecx,[rdx]
+// ---------- DONE INJECTING  ----------
+VCRUNTIME140.memcpy+CA: 89 08           - mov [rax],ecx
+VCRUNTIME140.memcpy+CC: C3              - ret 
+VCRUNTIME140.memcpy+CD: 0F 1F 00        - nop dword ptr [rax]
+VCRUNTIME140.memcpy+D0: 8B 0A           - mov ecx,[rdx]
+VCRUNTIME140.memcpy+D2: 44 0F B6 42 04  - movzx r8d,byte ptr [rdx+04]
+VCRUNTIME140.memcpy+D7: 89 08           - mov [rax],ecx
+VCRUNTIME140.memcpy+D9: 44 88 40 04     - mov [rax+04],r8l
+VCRUNTIME140.memcpy+DD: C3              - ret 
+VCRUNTIME140.memcpy+DE: 66 90           - nop 2
+VCRUNTIME140.memcpy+E0: 8B 0A           - mov ecx,[rdx]
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>33</ID>
+              <Description>"value"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>8 Bytes</VariableType>
+              <Address>writeValue</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>11</ID>
+          <Description>"PlayerController"</Description>
+          <Options moHideChildren="1"/>
+          <ShowAsSigned>0</ShowAsSigned>
+          <GroupHeader>1</GroupHeader>
+          <Address>playerPtr+8</Address>
+          <Offsets>
+            <Offset>0</Offset>
+          </Offsets>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>14</ID>
+              <Description>"PlayerCharacter"</Description>
+              <Options moHideChildren="1"/>
+              <ShowAsSigned>0</ShowAsSigned>
+              <GroupHeader>1</GroupHeader>
+              <Address>+580</Address>
+              <Offsets>
+                <Offset>0</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>3</ID>
+          <Description>"PlayerInput"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <GroupHeader>1</GroupHeader>
+          <Address>playerPtr</Address>
+          <Offsets>
+            <Offset>0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>9</ID>
+          <Description>"Movement Speed"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript Async="1">[ENABLE]
+aobscanmodule(movement,$process,FF 90 ?? ?? ?? ?? 84 C0 74 0E F3 0F 10 ?? ?? ?? 00 00 48 83 C4 20 ?? C3 F3 0F 10 83 ?? ?? 00 00)
+alloc(newmem,$1000,movement)
+
+label(movementBkp)
+label(movementSpd)
+label(return)
+
+newmem:
+  mov rbx,movementSpd
+  movss xmm0,[rbx]
+  jmp return
+movementBkp:
+  readmem(movement+18,8)
+  jmp return
+
+align 8
+movementSpd:
+  dd (float)1000
+
+movement+18:
+  jmp newmem
+  nop 3
+return:
+registersymbol(movement)
+registersymbol(movementBkp)
+registersymbol(movementSpd)
+
+[DISABLE]
+movement+18:
+  readmem(movementBkp,8)
+unregistersymbol(movement)
+unregistersymbol(movementBkp)
+unregistersymbol(movementSpd)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: SMTS-Win64-Shipping.exe+2351792
+
+SMTS-Win64-Shipping.exe+2351770: FF C8                    - dec eax
+SMTS-Win64-Shipping.exe+2351772: 83 F8 05                 - cmp eax,05
+SMTS-Win64-Shipping.exe+2351775: 77 6B                    - ja SMTS-Win64-Shipping.exe+23517E2
+SMTS-Win64-Shipping.exe+2351777: 48 8D 0D 82 E8 CA FD     - lea rcx,[SMTS-Win64-Shipping.exe]
+SMTS-Win64-Shipping.exe+235177E: 48 98                    - cdqe 
+SMTS-Win64-Shipping.exe+2351780: 8B 94 81 EC 17 35 02     - mov edx,[rcx+rax*4+023517EC]
+SMTS-Win64-Shipping.exe+2351787: 48 03 D1                 - add rdx,rcx
+SMTS-Win64-Shipping.exe+235178A: FF E2                    - jmp rdx
+SMTS-Win64-Shipping.exe+235178C: 48 8B 03                 - mov rax,[rbx]
+SMTS-Win64-Shipping.exe+235178F: 48 8B CB                 - mov rcx,rbx
+// ---------- INJECTING HERE ----------
+SMTS-Win64-Shipping.exe+2351792: FF 90 58 05 00 00        - call qword ptr [rax+00000558]
+// ---------- DONE INJECTING  ----------
+SMTS-Win64-Shipping.exe+2351798: 84 C0                    - test al,al
+SMTS-Win64-Shipping.exe+235179A: 74 0E                    - je SMTS-Win64-Shipping.exe+23517AA
+SMTS-Win64-Shipping.exe+235179C: F3 0F 10 83 90 01 00 00  - movss xmm0,[rbx+00000190]
+SMTS-Win64-Shipping.exe+23517A4: 48 83 C4 20              - add rsp,20
+SMTS-Win64-Shipping.exe+23517A8: 5B                       - pop rbx
+SMTS-Win64-Shipping.exe+23517A9: C3                       - ret 
+SMTS-Win64-Shipping.exe+23517AA: F3 0F 10 83 8C 01 00 00  - movss xmm0,[rbx+0000018C]
+SMTS-Win64-Shipping.exe+23517B2: 48 83 C4 20              - add rsp,20
+SMTS-Win64-Shipping.exe+23517B6: 5B                       - pop rbx
+SMTS-Win64-Shipping.exe+23517B7: C3                       - ret 
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>10</ID>
+              <Description>"Speed"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>movementSpd</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

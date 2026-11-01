@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>2</ID>
+      <Description>"ammo"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ACValhalla.exe
+  Version: 
+  Date   : 2023-11-26
+  Author : ichir
+
+  This script does blah blah blah
+}
+
+define(address,"ACValhalla.exe"+2572C97)
+define(bytes,44 89 03 75 0C)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,"ACValhalla.exe"+2572C97)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  add r8d,1
+  mov [rbx],r8d
+  jne ACValhalla.exe+2572CA8
+  jmp return
+
+address:
+  jmp newmem
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+  // mov [rbx],r8d
+  // jne ACValhalla.exe+2572CA8
+
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ACValhalla.exe+2572C97
+
+ACValhalla.exe+2572C77: E8 D4 66 FD FF  - call ACValhalla.exe+2549350
+ACValhalla.exe+2572C7C: 84 C0           - test al,al
+ACValhalla.exe+2572C7E: 75 28           - jne ACValhalla.exe+2572CA8
+ACValhalla.exe+2572C80: EB 04           - jmp ACValhalla.exe+2572C86
+ACValhalla.exe+2572C82: 48 8B 75 37     - mov rsi,[rbp+37]
+ACValhalla.exe+2572C86: 44 8B 03        - mov r8d,[rbx]
+ACValhalla.exe+2572C89: 41 8B C0        - mov eax,r8d
+ACValhalla.exe+2572C8C: 44 39 45 3F     - cmp [rbp+3F],r8d
+ACValhalla.exe+2572C90: 0F 46 45 3F     - cmovbe eax,[rbp+3F]
+ACValhalla.exe+2572C94: 44 2B C0        - sub r8d,eax
+// ---------- INJECTING HERE ----------
+ACValhalla.exe+2572C97: 44 89 03        - mov [rbx],r8d
+// ---------- DONE INJECTING  ----------
+ACValhalla.exe+2572C9A: 75 0C           - jne ACValhalla.exe+2572CA8
+ACValhalla.exe+2572C9C: 41 8B D4        - mov edx,r12d
+ACValhalla.exe+2572C9F: 48 8D 4E 0C     - lea rcx,[rsi+0C]
+ACValhalla.exe+2572CA3: E8 C8 09 00 00  - call ACValhalla.exe+2573670
+ACValhalla.exe+2572CA8: 48 8B 4E 40     - mov rcx,[rsi+40]
+ACValhalla.exe+2572CAC: 48 85 C9        - test rcx,rcx
+ACValhalla.exe+2572CAF: 74 0A           - je ACValhalla.exe+2572CBB
+ACValhalla.exe+2572CB1: 48 8B 01        - mov rax,[rcx]
+ACValhalla.exe+2572CB4: 48 8D 55 BF     - lea rdx,[rbp-41]
+ACValhalla.exe+2572CB8: FF 50 28        - call qword ptr [rax+28]
+}
+</AssemblerScript>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

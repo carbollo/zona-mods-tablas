@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>3</ID>
+      <Description>"stamina"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : DD2.exe
+  Version: 
+  Date   : 2024-03-31
+  Author : ichir
+
+  This script does blah blah blah
+}
+
+define(address,"DD2.exe"+A55FD8)
+define(bytes,F3 0F 11 57 20 75 0C 0F 2F D7 73 07 C7 47 20 00 00 00 00)
+
+[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+
+ 
+ 
+assert(address,bytes)
+alloc(newmem,$1000)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  movss [rdi+20],xmm2
+  mov [rdi+20],447A0000
+  jne DD2.exe+A55FEB
+  comiss xmm2,xmm7
+  jae DD2.exe+A55FEB
+  mov [rdi+20],00000000
+  jmp return
+
+address:
+  jmp far newmem
+  nop 5
+return:
+
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+address:
+  db bytes
+  // movss [rdi+20],xmm2
+  // jne DD2.exe+A55FEB
+  // comiss xmm2,xmm7
+  // jae DD2.exe+A55FEB
+  // mov [rdi+20],00000000
+
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: DD2.exe+A55FD8
+
+DD2.exe+A55FB3: F3 0F 10 57 28        - movss xmm2,[rdi+28]
+DD2.exe+A55FB8: 0F 5A C9              - cvtps2pd xmm1,xmm1
+DD2.exe+A55FBB: F3 0F 5A C6           - cvtss2sd xmm0,xmm6
+DD2.exe+A55FBF: F2 0F 58 C8           - addsd xmm1,xmm0
+DD2.exe+A55FC3: 66 0F 5A D9           - cvtpd2ps xmm3,xmm1
+DD2.exe+A55FC7: 0F 2F D3              - comiss xmm2,xmm3
+DD2.exe+A55FCA: 77 08                 - ja DD2.exe+A55FD4
+DD2.exe+A55FCC: 0F 28 D3              - movaps xmm2,xmm3
+DD2.exe+A55FCF: F3 0F 5D 57 24        - minss xmm2,[rdi+24]
+DD2.exe+A55FD4: 80 7F 2C 00           - cmp byte ptr [rdi+2C],00
+// ---------- INJECTING HERE ----------
+DD2.exe+A55FD8: F3 0F 11 57 20        - movss [rdi+20],xmm2
+// ---------- DONE INJECTING  ----------
+DD2.exe+A55FDD: 75 0C                 - jne DD2.exe+A55FEB
+DD2.exe+A55FDF: 0F 2F D7              - comiss xmm2,xmm7
+DD2.exe+A55FE2: 73 07                 - jae DD2.exe+A55FEB
+DD2.exe+A55FE4: C7 47 20 00 00 00 00  - mov [rdi+20],00000000
+DD2.exe+A55FEB: 48 8B 5C 24 50        - mov rbx,[rsp+50]
+DD2.exe+A55FF0: 0F 28 7C 24 20        - movaps xmm7,[rsp+20]
+DD2.exe+A55FF5: 48 8B 6C 24 60        - mov rbp,[rsp+60]
+DD2.exe+A55FFA: 0F 28 74 24 30        - movaps xmm6,[rsp+30]
+DD2.exe+A55FFF: 48 83 C4 40           - add rsp,40
+DD2.exe+A56003: 5F                    - pop rdi
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>5</ID>
+      <Description>"money"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : DD2.exe
+  Version: 
+  Date   : 2024-03-31
+  Author : ichir
+
+  This script does blah blah blah
+}
+
+define(address,"DD2.exe"+3D53D02)
+define(bytes,41 89 8E 98 02 00 00)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,"DD2.exe"+3D53D02)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  mov [r14+00000298],fffff
+  jmp return
+
+address:
+  jmp newmem
+  nop 2
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+  // mov [r14+00000298],ecx
+
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: DD2.exe+3D53D02
+
+DD2.exe+3D53CD6: 79 0A                    - jns DD2.exe+3D53CE2
+DD2.exe+3D53CD8: 48 8D 84 24 90 00 00 00  - lea rax,[rsp+00000090]
+DD2.exe+3D53CE0: EB 17                    - jmp DD2.exe+3D53CF9
+DD2.exe+3D53CE2: 81 FA FF E0 F5 05        - cmp edx,05F5E0FF
+DD2.exe+3D53CE8: 48 8D 84 24 80 00 00 00  - lea rax,[rsp+00000080]
+DD2.exe+3D53CF0: 48 8D 4C 24 20           - lea rcx,[rsp+20]
+DD2.exe+3D53CF5: 48 0F 4D C1              - cmovge rax,rcx
+DD2.exe+3D53CF9: 8B 18                    - mov ebx,[rax]
+DD2.exe+3D53CFB: 41 2B DC                 - sub ebx,r12d
+DD2.exe+3D53CFE: 42 8D 0C 23              - lea ecx,[rbx+r12]
+// ---------- INJECTING HERE ----------
+DD2.exe+3D53D02: 41 89 8E 98 02 00 00     - mov [r14+00000298],ecx
+// ---------- DONE INJECTING  ----------
+DD2.exe+3D53D09: 4D 85 FF                 - test r15,r15
+DD2.exe+3D53D0C: 74 0B                    - je DD2.exe+3D53D19
+DD2.exe+3D53D0E: 49 8B D7                 - mov rdx,r15
+DD2.exe+3D53D11: 48 8B CE                 - mov rcx,rsi
+DD2.exe+3D53D14: E8 57 D7 67 FC           - call DD2.exe+3D1470
+DD2.exe+3D53D19: 4C 8B BC 24 88 00 00 00  - mov r15,[rsp+00000088]
+DD2.exe+3D53D21: 45 84 ED                 - test r13b,r13b
+DD2.exe+3D53D24: 74 6B                    - je DD2.exe+3D53D91
+DD2.exe+3D53D26: 85 ED                    - test ebp,ebp
+DD2.exe+3D53D28: 7F 55                    - jg DD2.exe+3D53D7F
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>6</ID>
+      <Description>"buy item"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : DD2.exe
+  Version: 
+  Date   : 2024-03-31
+  Author : ichir
+
+  This script does blah blah blah
+}
+
+define(address,"DD2.exe"+FD1BC0)
+define(bytes,89 41 10 85 DB)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,"DD2.exe"+FD1BC0)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  //mov [rcx+10],eax
+  mov [rcx+10],f
+  test ebx,ebx
+  jmp return
+
+address:
+  jmp newmem
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+  // mov [rcx+10],eax
+  // test ebx,ebx
+
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: DD2.exe+FD1BC0
+
+DD2.exe+FD1B9A: E8 B1 35 27 FF        - call DD2.exe+245150
+DD2.exe+FD1B9F: 49 83 7E 30 00        - cmp qword ptr [r14+30],00
+DD2.exe+FD1BA4: 48 8B 88 98 00 00 00  - mov rcx,[rax+00000098]
+DD2.exe+FD1BAB: 8B 51 54              - mov edx,[rcx+54]
+DD2.exe+FD1BAE: 41 89 56 44           - mov [r14+44],edx
+DD2.exe+FD1BB2: 74 0F                 - je DD2.exe+FD1BC3
+DD2.exe+FD1BB4: 49 8B 4E 30           - mov rcx,[r14+30]
+DD2.exe+FD1BB8: 8B 41 10              - mov eax,[rcx+10]
+DD2.exe+FD1BBB: 2B C2                 - sub eax,edx
+DD2.exe+FD1BBD: 41 03 C7              - add eax,r15d
+// ---------- INJECTING HERE ----------
+DD2.exe+FD1BC0: 89 41 10              - mov [rcx+10],eax
+// ---------- DONE INJECTING  ----------
+DD2.exe+FD1BC3: 85 DB                 - test ebx,ebx
+DD2.exe+FD1BC5: 0F 84 9D 0A 00 00     - je DD2.exe+FD2668
+DD2.exe+FD1BCB: 83 EB 01              - sub ebx,01
+DD2.exe+FD1BCE: 74 5D                 - je DD2.exe+FD1C2D
+DD2.exe+FD1BD0: 83 EB 01              - sub ebx,01
+DD2.exe+FD1BD3: 0F 84 8F 0A 00 00     - je DD2.exe+FD2668
+DD2.exe+FD1BD9: 83 EB 01              - sub ebx,01
+DD2.exe+FD1BDC: 0F 84 86 0A 00 00     - je DD2.exe+FD2668
+DD2.exe+FD1BE2: 83 FB 01              - cmp ebx,01
+DD2.exe+FD1BE5: 0F 85 7D 0A 00 00     - jne DD2.exe+FD2668
+}
+</AssemblerScript>
+      <Hotkeys>
+        <Hotkey OnlyWhileDown="1">
+          <Action>Activate</Action>
+          <Keys>
+            <Key>113</Key>
+          </Keys>
+          <ID>0</ID>
+        </Hotkey>
+      </Hotkeys>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

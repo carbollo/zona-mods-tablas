@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="24">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>21</ID>
+      <Description>"Inf. House resources (IF more than 50)"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ForestVillage.exe
+  Version: 
+  Date   : 2017-05-28
+  Author : Marcelo
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+
+ 
+ 
+aobscanmodule(INJECT,ForestVillage.exe,50 74 05 8B 77 28 EB 02) // should be unique
+alloc(newmem,$1000)
+
+label(code)
+label(return)
+label(test)
+label(cody)
+
+newmem:
+
+test:
+  cmp [edi+28],#50
+  jge cody
+  jmp code
+
+cody:
+  mov [edi+28],#500
+  mov esi,[edi+28]
+  jmp ForestVillage.exe+2214BF
+  jmp return
+
+code:
+  mov esi,[edi+28]
+  jmp ForestVillage.exe+2214BF
+  jmp return
+
+INJECT+03:
+  jmp test
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+INJECT+03:
+  db 8B 77 28 EB 02
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "ForestVillage.exe"+2214B8
+
+"ForestVillage.exe"+22149E: 8B 4D 08              -  mov ecx,[ebp+08]
+"ForestVillage.exe"+2214A1: 8D 57 10              -  lea edx,[edi+10]
+"ForestVillage.exe"+2214A4: 52                    -  push edx
+"ForestVillage.exe"+2214A5: E8 D6 DA E1 FF        -  call ForestVillage.exe+3EF80
+"ForestVillage.exe"+2214AA: 85 C0                 -  test eax,eax
+"ForestVillage.exe"+2214AC: 79 02                 -  jns ForestVillage.exe+2214B0
+"ForestVillage.exe"+2214AE: 8B FE                 -  mov edi,esi
+"ForestVillage.exe"+2214B0: 8B 45 F0              -  mov eax,[ebp-10]
+"ForestVillage.exe"+2214B3: 3B 78 50              -  cmp edi,[eax+50]
+"ForestVillage.exe"+2214B6: 74 05                 -  je ForestVillage.exe+2214BD
+// ---------- INJECTING HERE ----------
+"ForestVillage.exe"+2214B8: 8B 77 28              -  mov esi,[edi+28]
+"ForestVillage.exe"+2214BB: EB 02                 -  jmp ForestVillage.exe+2214BF
+// ---------- DONE INJECTING  ----------
+"ForestVillage.exe"+2214BD: 33 F6                 -  xor esi,esi
+"ForestVillage.exe"+2214BF: C7 45 FC FF FF FF FF  -  mov [ebp-04],FFFFFFFF
+"ForestVillage.exe"+2214C6: 53                    -  push ebx
+"ForestVillage.exe"+2214C7: FF 15 AC 94 1C 01     -  call dword ptr [ForestVillage.exe+6794AC]
+"ForestVillage.exe"+2214CD: 83 C4 04              -  add esp,04
+"ForestVillage.exe"+2214D0: 85 C0                 -  test eax,eax
+"ForestVillage.exe"+2214D2: 74 0A                 -  je ForestVillage.exe+2214DE
+"ForestVillage.exe"+2214D4: 50                    -  push eax
+"ForestVillage.exe"+2214D5: FF 15 A8 94 1C 01     -  call dword ptr [ForestVillage.exe+6794A8]
+"ForestVillage.exe"+2214DB: 83 C4 04              -  add esp,04
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>33</ID>
+      <Description>"Multiplication miracle (villagers get 1-10 and deliver XX)"</Description>
+      <Options moHideChildren="1"/>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ForestVillage.exe
+  Version: 
+  Date   : 2017-05-28
+  Author : Marcelo
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+
+ 
+ 
+aobscanmodule(INJECT,ForestVillage.exe,01 41 28 8D 4D 08 E8 94) // should be unique
+alloc(newmem,$1000)
+alloc(_mns,4)
+registersymbol(_mns)
+
+label(code)
+label(return)
+
+newmem:
+  mov eax,[_mns]
+  jmp code
+
+code:
+  mov [ecx+28],eax
+  lea ecx,[ebp+08]
+  jmp return
+
+_mns:
+db a
+
+INJECT:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+INJECT:
+  db 01 41 28 8D 4D 08
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+unregistersymbol(_mns)
+dealloc(_mns)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "ForestVillage.exe"+221AA1
+
+"ForestVillage.exe"+221A88: FF D0                 -  call eax
+"ForestVillage.exe"+221A8A: 84 C0                 -  test al,al
+"ForestVillage.exe"+221A8C: 74 16                 -  je ForestVillage.exe+221AA4
+"ForestVillage.exe"+221A8E: 57                    -  push edi
+"ForestVillage.exe"+221A8F: 8D 45 E0              -  lea eax,[ebp-20]
+"ForestVillage.exe"+221A92: 50                    -  push eax
+"ForestVillage.exe"+221A93: 8D 4B 50              -  lea ecx,[ebx+50]
+"ForestVillage.exe"+221A96: E8 A5 1B E9 FF        -  call ForestVillage.exe+B3640
+"ForestVillage.exe"+221A9B: 8B 4D E0              -  mov ecx,[ebp-20]
+"ForestVillage.exe"+221A9E: 8B 47 18              -  mov eax,[edi+18]
+// ---------- INJECTING HERE ----------
+"ForestVillage.exe"+221AA1: 01 41 28              -  add [ecx+28],eax
+"ForestVillage.exe"+221AA4: 8D 4D 08              -  lea ecx,[ebp+08]
+// ---------- DONE INJECTING  ----------
+"ForestVillage.exe"+221AA7: E8 94 A4 E0 FF        -  call ForestVillage.exe+2BF40
+"ForestVillage.exe"+221AAC: 8B 45 08              -  mov eax,[ebp+08]
+"ForestVillage.exe"+221AAF: 3B C6                 -  cmp eax,esi
+"ForestVillage.exe"+221AB1: 75 C4                 -  jne ForestVillage.exe+221A77
+"ForestVillage.exe"+221AB3: 8B 3D A8 94 1C 01     -  mov edi,[ForestVillage.exe+6794A8]
+"ForestVillage.exe"+221AB9: 8D 43 50              -  lea eax,[ebx+50]
+"ForestVillage.exe"+221ABC: 50                    -  push eax
+"ForestVillage.exe"+221ABD: 8D 4B 3C              -  lea ecx,[ebx+3C]
+"ForestVillage.exe"+221AC0: E8 6B 0C 00 00        -  call ForestVillage.exe+222730
+"ForestVillage.exe"+221AC5: 8D 4D E8              -  lea ecx,[ebp-18]
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>37</ID>
+          <Description>"XX ="</Description>
+          <VariableType>4 Bytes</VariableType>
+          <Address>_mns</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols>
+    <SymbolEntry>
+      <Name>php</Name>
+      <Address>0CBF0030</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>pxp</Name>
+      <Address>0CDE0000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>phe</Name>
+      <Address>0CBF0010</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>psta</Name>
+      <Address>0CDE0020</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>plif</Name>
+      <Address>0CDE0010</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>pst</Name>
+      <Address>0CDE0030</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>pgol</Name>
+      <Address>0CDE0040</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>INJECT</Name>
+      <Address>00D6939E</Address>
+    </SymbolEntry>
+  </UserdefinedSymbols>
+  <Comments>Info about this table:
+</Comments>
+</CheatTable>

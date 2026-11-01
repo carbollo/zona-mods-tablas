@@ -1,0 +1,6006 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="52">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>329</ID>
+      <Description>"Toggle Compact View"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+if syntaxcheck then return end
+
+if not toggleCompactView then
+    function toggleCompactView(sender, forceEnable)
+        local isCompactMode = not (compactViewMenuItem.Caption == 'Compact View Mode')
+        if forceEnable ~= nil then
+            isCompactMode = not forceEnable
+        end
+
+        synchronize(function()
+            compactViewMenuItem.Caption = isCompactMode and 'Compact View Mode' or 'Full View Mode'
+            getMainForm().Splitter1.Visible = isCompactMode
+            getMainForm().Panel4.Visible    = isCompactMode
+            getMainForm().Panel5.Visible    = isCompactMode
+        end)
+    end
+end
+
+if not createCompactViewMenu then
+    function createCompactViewMenu()
+        if isCompactMenuCreated then return end
+
+        synchronize(function()
+            local mainMenu = getMainForm().Menu.Items
+            compactViewMenuItem = createMenuItem(mainMenu)
+            compactViewMenuItem.Caption = 'Compact View Mode'
+            compactViewMenuItem.OnClick = toggleCompactView
+            mainMenu.add(compactViewMenuItem)
+        end)
+
+        isCompactMenuCreated = true
+    end
+end
+
+createCompactViewMenu()
+toggleCompactView(nil, true)
+
+[DISABLE]
+{$lua}
+if toggleCompactView then
+    toggleCompactView(nil, false)
+end
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>94</ID>
+      <Description>"Turn some scripts On / off"</Description>
+      <Color>4080FF</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript Async="1">[ENABLE]
+{$lua}
+if (syntaxcheck) then return end
+synchronize(function()
+  getLuaEngine().menuItem5.doClick()
+  getLuaEngine().Close()
+end)
+
+local enableBattleScripts = {
+
+--[[
+-- attach process
+local processName = "game_exe.exe"
+local pid = getProcessIDFromProcessName(processName)
+if pid ~= nil and pid &gt; 0 then
+  local currentPid = getOpenedProcessID() or 0
+  if currentPid ~= pid then
+    openProcess(processName)
+    print("Attached to: " .. processName)
+    Sleep(333)
+  else
+    print("Already attached to: " .. processName)
+  end
+end
+synchronize(function()
+  getLuaEngine().Close()
+end)
+--]]
+
+  8, -- "Map: Open &amp; Close menu: full HP/SP"
+  9, -- "Battle: Damage control"
+  14, -- "Get money"
+  17, -- "Weapon Shop / Summon persona (全書引出し): money will not decrease"
+  31, -- "Battle: SP will not decrease"
+  33, -- "Non-hero / Persona XP multiplier"
+  43, -- "Set skill cards quantity"
+  63, -- "Get persona base attributes"
+  93, -- "Set items quantity+"
+  108, -- "Get day progress"
+  229, -- "Battle: inf. Navi SP"
+  234, -- "Battle: Theurgia / テウルギア multiplier"
+  253, -- "Battle: always have reflect / atk,def buffs..."
+  329, -- "Toggle Compact View"
+  2, -- "Set item consumables quantity"
+  40, -- "(B) Set items # (materials, sold for cash) to 80, if &gt;= 1"
+  58, -- "(A) Set accessories quantity"
+  117, -- "Quick get day progress"
+}
+local addressList = getAddressList()
+synchronize(function()
+  for _, id in ipairs(enableBattleScripts) do
+    local memRec = addressList.getMemoryRecordByID(id)
+    if memRec and not memRec.Active then
+      memRec.Active = true
+      sleep(30)
+    end
+    addressList.refresh()
+  end
+end)
+synchronize(function() getLuaEngine().Close() end)
+[DISABLE]
+{$lua}
+if (syntaxcheck) then return end
+synchronize(function()
+  getLuaEngine().menuItem5.doClick()
+  getLuaEngine().Close()
+end)
+
+local disableBattleScripts = {
+  87, -- "Step 2: no-use: set protector-foot: Set Other items quantity #2"
+  237, -- "https://altema.jp/persona3/chart1"
+  226, -- "All commu data+"
+  180, -- "Enabled commu data+"
+  83, -- "(Step1: Set Other items quantity #1"
+  328, -- "Unknown"
+  297, -- "Personality - English"
+  296, -- "Personality - 日本語"
+  287, -- "Skills - English"
+  286, -- "Skills - 日本語"
+  247, -- "Sync. to previous time period"
+  243, -- "Commu: pt. multiplier, part 2"
+  242, -- "(X) Commu: pt. multiplier, part 1"
+  238, -- "ペルソナ3リロード攻略wiki｜P3R "
+  131, -- "Get existing commu level"
+  117, -- "Quick get day progress"
+  112, -- "=&gt; Time peroid #1?"
+  110, -- "=&gt;Time peroid #2?"
+  91, -- "__in testing"
+  58, -- "(A) Set accessories quantity"
+  40, -- "(B) Set items # (materials, sold for cash) to 80, if &gt;= 1"
+  2, -- "Set item consumables quantity"
+  329, -- "Toggle Compact View"
+  307, -- "(X)Get some stats"
+  263, -- "Get equip-ed item ID / personality"
+  253, -- "Battle: always have reflect / atk,def buffs..."
+  234, -- "Battle: Theurgia / テウルギア multiplier"
+  229, -- "Battle: inf. Navi SP"
+  129, -- "Commu / social link / コミュ"
+  108, -- "Get day progress"
+  94, -- "Turn some scripts On / off"
+  93, -- "Set items quantity+"
+  63, -- "Get persona base attributes"
+  51, -- "(X)Get social status"
+  47, -- "Persona 3 Reload  /  https://opencheattables.com"
+  43, -- "Set skill cards quantity"
+  36, -- "(X)Hero XP multiplier"
+  33, -- "Non-hero / Persona XP multiplier"
+  31, -- "Battle: SP will not decrease"
+  17, -- "Weapon Shop / Summon persona (全書引出し): money will not decrease"
+  14, -- "Get money"
+  9, -- "Battle: Damage control"
+  8, -- "Map: Open &amp; Close menu: full HP/SP"
+}
+local addressList = getAddressList()
+synchronize(function()
+  for _, id in ipairs(disableBattleScripts) do
+    local memRec = addressList.getMemoryRecordByID(id)
+    if memRec and memRec.Active then
+      memRec.Active = false
+      sleep(30)
+    end
+    addressList.refresh()
+  end
+end)
+synchronize(function() getLuaEngine().Close() end)
+-- Comments:
+-- ID: 329, Description: "Toggle Compact View", Depth: 0
+-- ID: 94, Description: "Turn some scripts On / off", Depth: 0
+-- ID: 9, Description: "Battle: Damage control", Depth: 0
+-- ID: 31, Description: "Battle: SP will not decrease", Depth: 0
+-- ID: 253, Description: "Battle: always have reflect / atk,def buffs...", Depth: 0
+-- ID: 234, Description: "Battle: Theurgia / テウルギア multiplier", Depth: 0
+-- ID: 229, Description: "Battle: inf. Navi SP", Depth: 0
+-- ID: 8, Description: "Map: Open &amp; Close menu: full HP/SP", Depth: 0
+-- ID: 33, Description: "Non-hero / Persona XP multiplier", Depth: 0
+-- ID: 93, Description: "Set items quantity+", Depth: 0
+--   ID: 2, Description: "Set item consumables quantity", Depth: 1
+--   ID: 58, Description: "(A) Set accessories quantity", Depth: 1
+--   ID: 40, Description: "(B) Set items # (materials, sold for cash) to 80, if &gt;= 1", Depth: 1
+--   ID: 91, Description: "__in testing", Depth: 1
+--     ID: 83, Description: "(Step1: Set Other items quantity #1", Depth: 2
+--       ID: 87, Description: "Step 2: no-use: set protector-foot: Set Other items quantity #2", Depth: 3
+-- ID: 43, Description: "Set skill cards quantity", Depth: 0
+-- ID: 14, Description: "Get money", Depth: 0
+-- ID: 63, Description: "Get persona base attributes", Depth: 0
+--   ID: 286, Description: "Skills - 日本語", Depth: 1
+--   ID: 287, Description: "Skills - English", Depth: 1
+-- ID: 108, Description: "Get day progress", Depth: 0
+--   ID: 117, Description: "Quick get day progress", Depth: 1
+--   ID: 247, Description: "Sync. to previous time period", Depth: 1
+--   ID: 112, Description: "=&gt; Time peroid #1?", Depth: 1
+--   ID: 110, Description: "=&gt;Time peroid #2?", Depth: 1
+-- ID: 17, Description: "Weapon Shop / Summon persona (全書引出し): money will not decrease", Depth: 0
+-- ID: 263, Description: "Get equip-ed item ID / personality", Depth: 0
+--   ID: 296, Description: "Personality - 日本語", Depth: 1
+--   ID: 297, Description: "Personality - English", Depth: 1
+-- ID: 129, Description: "Commu / social link / コミュ", Depth: 0
+--   ID: 242, Description: "(X) Commu: pt. multiplier, part 1", Depth: 1
+--   ID: 243, Description: "Commu: pt. multiplier, part 2", Depth: 1
+--   ID: 131, Description: "Get existing commu level", Depth: 1
+--     ID: 180, Description: "Enabled commu data+", Depth: 2
+--     ID: 226, Description: "All commu data+", Depth: 2
+-- ID: 36, Description: "(X)Hero XP multiplier", Depth: 0
+-- ID: 51, Description: "(X)Get social status", Depth: 0
+-- ID: 307, Description: "(X)Get some stats", Depth: 0
+--   ID: 328, Description: "Unknown", Depth: 1
+-- ID: 47, Description: "Persona 3 Reload  /  https://opencheattables.com", Depth: 0
+--   ID: 238, Description: "ペルソナ3リロード攻略wiki｜P3R ", Depth: 1
+--     ID: 237, Description: "https://altema.jp/persona3/chart1", Depth: 2
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>9</ID>
+      <Description>"Battle: Damage control"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : P3R.exe
+  Version: 
+  Date   : 2024-02-03
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_HP_RECV_MULTI,$process,03 51 0C 0F 49 DA) // should be unique
+alloc(newmem,$1000,INJECT_HP_RECV_MULTI)
+
+label(code)
+label(return)
+label(vf_hp_recv_multi)
+label(vf_hp_damage_multi)
+label(vf_hp_damage_to_enemy_multi)
+label(is_also_recovery_sp)
+label(is_also_reflect)
+label(is_keep_8th_char_sp_low)
+label(i_8th_char_sp)
+
+newmem:
+  pushfq
+
+  cmp dword ptr [rcx+04], 1
+  jne to_enemy
+
+to_player:
+  cmp dword ptr [is_also_recovery_sp], 1
+  jne chk_reflect
+
+  db EB 3B 54
+  db 68 69 73 20
+  db 74 61 62 6C 65
+  db 20 63 6F 6D
+  db 65 73 20 66
+  db 72 6F 6D 20
+  db 68 74 74 70
+  db 73 3A 2F 2F
+  db 6F 70 65 6E
+  db 63 68 65 61
+  db 74 74 61 62
+  db 6C 65 73 2E
+  db 63 6F 6D 20
+  db 2F 20
+  db 43 45 20 37
+  db 2E 34 2B
+
+  // recover SP
+  push rdx
+
+  mov edx, [rcx+8]
+  cmp edx, 8
+  je @F
+  mov edx, #999
+  jmp set_sp
+
+@@:
+  mov edx, [i_8th_char_sp]
+
+set_sp:
+  mov [rcx+10], edx
+  pop rdx
+
+chk_reflect:
+  cmp dword ptr [is_also_reflect], 1
+  jne @F
+
+  push rdx
+  mov dl, 60
+  mov dh, [rcx+2E]
+  or dh, dl
+  mov [rcx+2E], dh
+  pop rdx
+
+
+@@:
+  cmp edx, 0
+  jl to_player_sub
+  vmovss xmm14, [vf_hp_recv_multi]
+  jmp code_pre
+
+to_player_sub:
+  vmovss xmm14, [vf_hp_damage_multi]
+
+to_player_all:
+  //vcvtsi2ss xmm15, xmm15, edx
+  //vmulss xmm15, xmm14, xmm15
+  //vcvtss2si edx, xmm15
+  jmp code_pre
+
+
+to_enemy:
+  cmp edx, 0
+  jge code_pre1
+  vmovss xmm14, [vf_hp_damage_to_enemy_multi]
+
+code_pre:
+  vcvtsi2ss xmm15, xmm15, edx
+  vmulss xmm15, xmm14, xmm15
+  vcvtss2si edx, xmm15
+
+code_pre1:
+
+  popfq
+
+code:
+  add edx,[rcx+0C]
+  cmovns ebx,edx
+  jmp return
+align 10 cc
+  vf_hp_recv_multi:
+  dd (float)1.75
+  vf_hp_damage_multi:
+  dd (float)0.85
+  vf_hp_damage_to_enemy_multi:
+  dd (float)1.025
+  is_also_recovery_sp:
+  dd 1
+  is_also_reflect:
+  dd 0
+  is_keep_8th_char_sp_low:
+  dd 1
+  i_8th_char_sp:
+  dd #90
+
+INJECT_HP_RECV_MULTI:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT_HP_RECV_MULTI)
+registersymbol(vf_hp_recv_multi)
+registersymbol(vf_hp_damage_multi)
+registersymbol(vf_hp_damage_to_enemy_multi)
+registersymbol(is_also_recovery_sp)
+registersymbol(is_also_reflect)
+registersymbol(is_keep_8th_char_sp_low)
+registersymbol(i_8th_char_sp)
+
+[DISABLE]
+
+INJECT_HP_RECV_MULTI:
+  db 03 51 0C 0F 49 DA
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: P3R.exe+11BAC7F
+
+P3R.exe+11BAC6B: CC              - int 3 
+P3R.exe+11BAC6C: CC              - int 3 
+P3R.exe+11BAC6D: CC              - int 3 
+P3R.exe+11BAC6E: CC              - int 3 
+P3R.exe+11BAC6F: CC              - int 3 
+P3R.exe+11BAC70: 48 89 5C 24 08  - mov [rsp+08],rbx
+P3R.exe+11BAC75: 57              - push rdi
+P3R.exe+11BAC76: 48 83 EC 20     - sub rsp,20
+P3R.exe+11BAC7A: 33 DB           - xor ebx,ebx
+P3R.exe+11BAC7C: 48 8B F9        - mov rdi,rcx
+// ---------- INJECTING HERE ----------
+P3R.exe+11BAC7F: 03 51 0C        - add edx,[rcx+0C]
+// ---------- DONE INJECTING  ----------
+P3R.exe+11BAC82: 0F 49 DA        - cmovns ebx,edx
+P3R.exe+11BAC85: E8 66 24 00 00  - call P3R.exe+11BD0F0
+P3R.exe+11BAC8A: 3B D8           - cmp ebx,eax
+P3R.exe+11BAC8C: 0F 4F D8        - cmovg ebx,eax
+P3R.exe+11BAC8F: 89 5F 0C        - mov [rdi+0C],ebx
+P3R.exe+11BAC92: 8B C3           - mov eax,ebx
+P3R.exe+11BAC94: 48 8B 5C 24 30  - mov rbx,[rsp+30]
+P3R.exe+11BAC99: 48 83 C4 20     - add rsp,20
+P3R.exe+11BAC9D: 5F              - pop rdi
+P3R.exe+11BAC9E: C3              - ret 
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>23</ID>
+          <Description>"Also recovery SP?"</Description>
+          <DropDownList DisplayValueAsItem="1">0:No
+1:Yes
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>is_also_recovery_sp</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>282</ID>
+          <Description>"Set Ken Amada (天田 乾) SP?"</Description>
+          <DropDownList DisplayValueAsItem="1">0:No
+1:Yes
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>is_keep_8th_char_sp_low</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>283</ID>
+          <Description>"Target SP of Ken Amada (天田 乾):"</Description>
+          <DropDownList DisplayValueAsItem="1">0:No
+1:Yes
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_8th_char_sp</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>254</ID>
+          <Description>"Also get reflect buff? (if got hit)"</Description>
+          <DropDownList DisplayValueAsItem="1">0:No
+1:Yes
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>is_also_reflect</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>10</ID>
+          <Description>"HP recovery multiplier"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>Float</VariableType>
+          <Address>vf_hp_recv_multi</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>21</ID>
+          <Description>"Damage to player multiplier"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>Float</VariableType>
+          <Address>vf_hp_damage_multi</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>22</ID>
+          <Description>"Damage to enemy multiplier"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>Float</VariableType>
+          <Address>vf_hp_damage_to_enemy_multi</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>31</ID>
+      <Description>"Battle: SP will not decrease"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : P3R.exe
+  Version: 
+  Date   : 2024-02-03
+  Author : bbfox@https://opencheattables.com
+
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_BATTLE_SP,$process,03 51 10 0F 49 DA) // should be unique
+alloc(newmem,$1000,INJECT_BATTLE_SP)
+
+label(code)
+label(return)
+
+newmem:
+  cmp dword ptr [rcx+4], 1
+  jne code
+
+  cmp edx, 0
+  jge code
+  xor edx, edx
+
+code:
+  add edx,[rcx+10]
+  cmovns ebx,edx
+  jmp return
+
+INJECT_BATTLE_SP:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT_BATTLE_SP)
+
+[DISABLE]
+
+INJECT_BATTLE_SP:
+  db 03 51 10 0F 49 DA
+
+unregistersymbol(INJECT_BATTLE_SP)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: P3R.exe+11BAD2F
+
+P3R.exe+11BAD1B: CC              - int 3 
+P3R.exe+11BAD1C: CC              - int 3 
+P3R.exe+11BAD1D: CC              - int 3 
+P3R.exe+11BAD1E: CC              - int 3 
+P3R.exe+11BAD1F: CC              - int 3 
+P3R.exe+11BAD20: 48 89 5C 24 08  - mov [rsp+08],rbx
+P3R.exe+11BAD25: 57              - push rdi
+P3R.exe+11BAD26: 48 83 EC 20     - sub rsp,20
+P3R.exe+11BAD2A: 33 DB           - xor ebx,ebx
+P3R.exe+11BAD2C: 48 8B F9        - mov rdi,rcx
+// ---------- INJECTING HERE ----------
+P3R.exe+11BAD2F: 03 51 10        - add edx,[rcx+10]
+// ---------- DONE INJECTING  ----------
+P3R.exe+11BAD32: 0F 49 DA        - cmovns ebx,edx
+P3R.exe+11BAD35: E8 26 25 00 00  - call P3R.exe+11BD260
+P3R.exe+11BAD3A: 3B D8           - cmp ebx,eax
+P3R.exe+11BAD3C: 0F 4F D8        - cmovg ebx,eax
+P3R.exe+11BAD3F: 89 5F 10        - mov [rdi+10],ebx
+P3R.exe+11BAD42: 8B C3           - mov eax,ebx
+P3R.exe+11BAD44: 48 8B 5C 24 30  - mov rbx,[rsp+30]
+P3R.exe+11BAD49: 48 83 C4 20     - add rsp,20
+P3R.exe+11BAD4D: 5F              - pop rdi
+P3R.exe+11BAD4E: C3              - ret 
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>253</ID>
+      <Description>"Battle: always have reflect / atk,def buffs..."</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : P3R.exe
+  Version: 
+  Date   : 2024-02-12
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_BATTLE_BUFF_CTRL,$process,8B 4B 0C 48 8B 5C 24 30) // should be unique
+alloc(newmem,$1000,INJECT_BATTLE_BUFF_CTRL)
+
+label(code)
+label(return)
+label(is_reflect_on)
+label(is_stats_buff)
+label(is_magic_double)
+label(is_atk_double)
+
+newmem:
+  cmp dword ptr [rbx+04], 1
+  jne code
+
+  mov ecx, [i_counter]
+  inc ecx
+  cmp ecx, 28
+  mov [i_counter], ecx
+  jb code
+
+
+  mov dword ptr [i_counter], 0
+
+  cmp dword ptr [is_reflect_on], 1
+  jne check2
+  mov cl, 60
+  mov ch, [rbx+2E]
+  cmp ch, cl
+  je check2
+  or ch, cl
+  mov [rbx+2E], ch
+
+check2:
+  cmp dword ptr [is_stats_buff], 1
+  jne check3:
+
+  mov cl, 11
+  mov [rbx+34], cl
+  mov [rbx+35], cl
+  mov cl, 0F
+  mov [rbx+2C], cl
+  mov cl, 22
+  mov [rbx+3E], cl
+  mov [rbx+3F], cl
+
+  cmp dword ptr [rbx+08], 1
+  jne code
+
+  mov cl, 11
+  mov [rbx+2E8], cl
+  mov [rbx+2E9], cl
+  mov cl, 0F
+  mov [rbx+2E0], cl
+  mov cl, 22
+  mov [rbx+2F2], cl
+  mov [rbx+2F3], cl
+
+check3:
+  cmp dword ptr [is_magic_double], 1
+  jne check4
+
+  mov cl, 1
+  mov [rbx+2F], cl
+
+
+check4:
+  cmp dword ptr [is_atk_double], 1
+  jne @F
+  mov cl, 80
+  mov [rbx+2E], cl
+
+code:
+  mov ecx,[rbx+0C]
+  mov rbx,[rsp+30]
+  jmp return
+align 10 cc
+  i_counter:
+  dd 0
+  is_reflect_on:
+  dd 1
+  is_stats_buff:
+  dd 0
+  is_magic_double:
+  dd 0
+  is_atk_double:
+  dd 0
+
+INJECT_BATTLE_BUFF_CTRL:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_BATTLE_BUFF_CTRL)
+registersymbol(is_reflect_on)
+registersymbol(is_stats_buff)
+registersymbol(is_magic_double)
+registersymbol(is_atk_double)
+[DISABLE]
+
+INJECT_BATTLE_BUFF_CTRL:
+  db 8B 4B 0C 48 8B 5C 24 30
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: P3R.exe+11A53EA
+
+P3R.exe+11A53CC: 48 8B D9        - mov rbx,rcx
+P3R.exe+11A53CF: BA 00 00 08 00  - mov edx,00080000
+P3R.exe+11A53D4: E8 A7 5F 01 00  - call P3R.exe+11BB380
+P3R.exe+11A53D9: 84 C0           - test al,al
+P3R.exe+11A53DB: 74 0D           - je P3R.exe+11A53EA
+P3R.exe+11A53DD: B0 01           - mov al,01
+P3R.exe+11A53DF: 48 8B 5C 24 30  - mov rbx,[rsp+30]
+P3R.exe+11A53E4: 48 83 C4 20     - add rsp,20
+P3R.exe+11A53E8: 5F              - pop rdi
+P3R.exe+11A53E9: C3              - ret 
+// ---------- INJECTING HERE ----------
+P3R.exe+11A53EA: 8B 4B 0C        - mov ecx,[rbx+0C]
+// ---------- DONE INJECTING  ----------
+P3R.exe+11A53ED: 48 8B 5C 24 30  - mov rbx,[rsp+30]
+P3R.exe+11A53F2: 03 CF           - add ecx,edi
+P3R.exe+11A53F4: 85 C9           - test ecx,ecx
+P3R.exe+11A53F6: 0F 9E C0        - setle al
+P3R.exe+11A53F9: 48 83 C4 20     - add rsp,20
+P3R.exe+11A53FD: 5F              - pop rdi
+P3R.exe+11A53FE: C3              - ret 
+P3R.exe+11A53FF: CC              - int 3 
+P3R.exe+11A5400: 48 89 5C 24 08  - mov [rsp+08],rbx
+P3R.exe+11A5405: 57              - push rdi
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>255</ID>
+          <Description>"Disable if game lags"</Description>
+          <Color>8000FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>303</ID>
+          <Description>"Reflect buffs?"</Description>
+          <DropDownList DisplayValueAsItem="1">0:No
+1:Yes
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>is_reflect_on</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>302</ID>
+          <Description>"atk, def, hit% buffs?"</Description>
+          <DropDownListLink>Reflect buffs?</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>is_stats_buff</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>304</ID>
+          <Description>"Magic atk 2x?"</Description>
+          <DropDownListLink>Reflect buffs?</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>is_magic_double</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>305</ID>
+          <Description>"Phys atk 2x?"</Description>
+          <DropDownListLink>Reflect buffs?</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>is_atk_double</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>234</ID>
+      <Description>"Battle: Theurgia / テウルギア multiplier"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : P3R.exe
+  Version: 
+  Date   : 2024-02-08
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_Theurgia_MULTI,$process,01 51 14 B8 E8 03 00 00) // should be unique
+alloc(newmem,$1000,INJECT_Theurgia_MULTI)
+
+label(code)
+label(return)
+label(vf_theu_multi)
+
+newmem:
+  cmp edx, 0
+  jle code
+
+  vmovss xmm14, [vf_theu_multi]
+  vcvtsi2ss xmm15, xmm15, edx
+  vmulss xmm15, xmm14, xmm15
+  vcvtss2si edx, xmm15
+
+code:
+  add [rcx+14],edx
+  mov eax,000003E8
+  jmp return
+align 10 cc
+  vf_theu_multi:
+  dd (float)3.3333333
+
+INJECT_Theurgia_MULTI:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_Theurgia_MULTI)
+registersymbol(vf_theu_multi)
+
+[DISABLE]
+
+INJECT_Theurgia_MULTI:
+  db 01 51 14 B8 E8 03 00 00
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: P3R.exe+11BAFDA
+
+P3R.exe+11BAFCA: CC              - int 3 
+P3R.exe+11BAFCB: CC              - int 3 
+P3R.exe+11BAFCC: CC              - int 3 
+P3R.exe+11BAFCD: CC              - int 3 
+P3R.exe+11BAFCE: CC              - int 3 
+P3R.exe+11BAFCF: CC              - int 3 
+P3R.exe+11BAFD0: 66 83 79 04 02  - cmp word ptr [rcx+04],02
+P3R.exe+11BAFD5: 75 03           - jne P3R.exe+11BAFDA
+P3R.exe+11BAFD7: 33 C0           - xor eax,eax
+P3R.exe+11BAFD9: C3              - ret 
+// ---------- INJECTING HERE ----------
+P3R.exe+11BAFDA: 01 51 14        - add [rcx+14],edx
+// ---------- DONE INJECTING  ----------
+P3R.exe+11BAFDD: B8 E8 03 00 00  - mov eax,000003E8
+P3R.exe+11BAFE2: 8B 51 14        - mov edx,[rcx+14]
+P3R.exe+11BAFE5: 3B D0           - cmp edx,eax
+P3R.exe+11BAFE7: 7E 04           - jle P3R.exe+11BAFED
+P3R.exe+11BAFE9: 89 41 14        - mov [rcx+14],eax
+P3R.exe+11BAFEC: C3              - ret 
+P3R.exe+11BAFED: 8B C2           - mov eax,edx
+P3R.exe+11BAFEF: C3              - ret 
+P3R.exe+11BAFF0: 4C 8B DC        - mov r11,rsp
+P3R.exe+11BAFF3: 49 89 5B 18     - mov [r11+18],rbx
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>235</ID>
+          <Description>"multiplier"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>Float</VariableType>
+          <Address>vf_theu_multi</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>229</ID>
+      <Description>"Battle: inf. Navi SP"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : P3R.exe
+  Version: 
+  Date   : 2024-02-08
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_INF_ANALYZE,$process,C2 89 51 10 C3 CC) // should be unique
+alloc(newmem,$1000,INJECT_INF_ANALYZE)
+
+label(code)
+label(return)
+
+newmem:
+  mov edx, [rcx+0C]
+
+code:
+  mov [rcx+10],edx
+  ret 
+  int 3 
+  jmp return
+
+INJECT_INF_ANALYZE+01:
+  jmp newmem
+return:
+registersymbol(INJECT_INF_ANALYZE)
+
+[DISABLE]
+
+INJECT_INF_ANALYZE+01:
+  db 89 51 10 C3 CC
+
+unregistersymbol(INJECT_INF_ANALYZE)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: P3R.exe+11BE4D3
+
+P3R.exe+11BE4BC: CC              - int 3 
+P3R.exe+11BE4BD: CC              - int 3 
+P3R.exe+11BE4BE: CC              - int 3 
+P3R.exe+11BE4BF: CC              - int 3 
+P3R.exe+11BE4C0: B8 E7 03 00 00  - mov eax,000003E7
+P3R.exe+11BE4C5: 3B D0           - cmp edx,eax
+P3R.exe+11BE4C7: 7E 08           - jle P3R.exe+11BE4D1
+P3R.exe+11BE4C9: 66 83 79 04 02  - cmp word ptr [rcx+04],02
+P3R.exe+11BE4CE: 0F 45 D0        - cmovne edx,eax
+P3R.exe+11BE4D1: 8B C2           - mov eax,edx
+// ---------- INJECTING HERE ----------
+P3R.exe+11BE4D3: 89 51 10        - mov [rcx+10],edx
+// ---------- DONE INJECTING  ----------
+P3R.exe+11BE4D6: C3              - ret 
+P3R.exe+11BE4D7: CC              - int 3 
+P3R.exe+11BE4D8: CC              - int 3 
+P3R.exe+11BE4D9: CC              - int 3 
+P3R.exe+11BE4DA: CC              - int 3 
+P3R.exe+11BE4DB: CC              - int 3 
+P3R.exe+11BE4DC: CC              - int 3 
+P3R.exe+11BE4DD: CC              - int 3 
+P3R.exe+11BE4DE: CC              - int 3 
+P3R.exe+11BE4DF: CC              - int 3 
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>8</ID>
+      <Description>"Map: Open &amp; Close menu: full HP/SP"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : P3R.exe
+  Version:
+  Date   : 2025-07-10
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_CLS_MNU_MAX_HPSP,$process,48 8B F8 8B 58 0C) // should be unique
+alloc(newmem,$1000,INJECT_CLS_MNU_MAX_HPSP)
+
+label(code)
+label(return)
+label(is_fill_8th_char_sp)
+
+newmem:
+  mov ebx, [rax+8]
+  cmp ebx, 8
+  mov ebx, #999
+  jne full_rec
+  cmp dword ptr [is_fill_8th_char_sp], 0
+  je full_hp
+
+full_rec:
+  //mov ebx, #999
+  mov [rax+10], ebx  // SP
+
+full_hp:
+  mov [rax+0C], ebx // HP
+
+endp:
+
+code:
+  mov rdi,rax
+  mov ebx,[rax+0C]
+  jmp return
+align 10 cc
+  is_fill_8th_char_sp:
+  dd 0
+
+INJECT_CLS_MNU_MAX_HPSP:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT_CLS_MNU_MAX_HPSP)
+registersymbol(is_fill_8th_char_sp)
+
+[DISABLE]
+
+INJECT_CLS_MNU_MAX_HPSP:
+  db 48 8B F8 8B 58 0C
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: P3R.exe+1205885
+
+P3R.exe+1205860: 48 89 5C 24 08  - mov [rsp+08],rbx
+P3R.exe+1205865: 48 89 74 24 10  - mov [rsp+10],rsi
+P3R.exe+120586A: 57              - push rdi
+P3R.exe+120586B: 48 83 EC 20     - sub rsp,20
+P3R.exe+120586F: 0F B7 D9        - movzx ebx,cx
+P3R.exe+1205872: E8 F9 4D 02 00  - call P3R.exe+122A670
+P3R.exe+1205877: 48 8B C8        - mov rcx,rax
+P3R.exe+120587A: 0F B7 D3        - movzx edx,bx
+P3R.exe+120587D: E8 FE 54 02 00  - call P3R.exe+122AD80
+P3R.exe+1205882: 48 8B C8        - mov rcx,rax
+// ---------- INJECTING HERE ----------
+P3R.exe+1205885: 48 8B F8        - mov rdi,rax
+// ---------- DONE INJECTING  ----------
+P3R.exe+1205888: 8B 58 0C        - mov ebx,[rax+0C]
+P3R.exe+120588B: E8 F0 BC FF FF  - call P3R.exe+1201580
+P3R.exe+1205890: 8B D0           - mov edx,eax
+P3R.exe+1205892: 8B CB           - mov ecx,ebx
+P3R.exe+1205894: E8 67 20 E9 FF  - call P3R.exe+1097900
+P3R.exe+1205899: BE E7 03 00 00  - mov esi,000003E7
+P3R.exe+120589E: 3B C6           - cmp eax,esi
+P3R.exe+12058A0: 7E 08           - jle P3R.exe+12058AA
+P3R.exe+12058A2: 66 83 7F 04 02  - cmp word ptr [rdi+04],02
+P3R.exe+12058A7: 0F 45 C6        - cmovne eax,esi
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>284</ID>
+          <Description>"is full Ken Amada (天田 乾) SP?"</Description>
+          <DropDownList DisplayValueAsItem="1">0:No
+1:Yes
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>is_fill_8th_char_sp</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>33</ID>
+      <Description>"Non-hero / Persona XP multiplier"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : P3R.exe
+  Version: 
+  Date   : 2024-02-03
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_XP_MULTI,$process,8B 97 10 01 00 00 48 8B CB E8 ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? 30) // should be unique
+alloc(newmem,$1000,INJECT_XP_MULTI)
+
+label(code)
+label(return)
+label(vf_xp_multi)
+label(vf_xp_extra)
+label(i_orig_xp)
+label(i_new_xp)
+
+newmem:
+
+code:
+  mov edx,[rdi+00000110]
+
+  //code start
+  cmp edx, 0
+  je return
+
+  mov [i_orig_xp], edx
+  vcvtsi2ss xmm15, xmm15, edx
+  vmovss xmm14, [vf_xp_multi]
+  vmulss xmm15, xmm14, xmm15
+
+  vmovss [i_new_xp], xmm15
+
+  vmovss xmm14, [vf_xp_extra]
+  vaddss xmm15, xmm14, xmm15
+  vcvtss2si edx, xmm15
+
+
+  jmp return
+align 10 cc
+  vf_xp_multi:
+  dd (float)1.3
+  vf_xp_extra:
+  dd (float)99
+  i_orig_xp:
+  dd 0
+  i_new_xp:
+  dd 0
+
+INJECT_XP_MULTI:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT_XP_MULTI)
+registersymbol(vf_xp_multi)
+registersymbol(vf_xp_extra)
+registersymbol(i_orig_xp)
+registersymbol(i_new_xp)
+
+[DISABLE]
+
+INJECT_XP_MULTI:
+  db 8B 97 10 01 00 00
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: P3R.exe+14E4B7B
+
+P3R.exe+14E4B5E: CC                 - int 3
+P3R.exe+14E4B5F: CC                 - int 3
+P3R.exe+14E4B60: 48 89 5C 24 08     - mov [rsp+08],rbx
+P3R.exe+14E4B65: 57                 - push rdi
+P3R.exe+14E4B66: 48 83 EC 20        - sub rsp,20
+P3R.exe+14E4B6A: 48 8B FA           - mov rdi,rdx
+P3R.exe+14E4B6D: 48 8B D9           - mov rbx,rcx
+P3R.exe+14E4B70: E8 EB 05 D2 FF     - call P3R.exe+1205160
+P3R.exe+14E4B75: 66 83 F8 63        - cmp ax,63
+P3R.exe+14E4B79: 7D 0E              - jnl P3R.exe+14E4B89
+// ---------- INJECTING HERE ----------
+P3R.exe+14E4B7B: 8B 97 10 01 00 00  - mov edx,[rdi+00000110]
+// ---------- DONE INJECTING  ----------
+P3R.exe+14E4B81: 48 8B CB           - mov rcx,rbx
+P3R.exe+14E4B84: E8 C7 DB D1 FF     - call P3R.exe+1202750
+P3R.exe+14E4B89: 48 8B D7           - mov rdx,rdi
+P3R.exe+14E4B8C: 48 8B CB           - mov rcx,rbx
+P3R.exe+14E4B8F: 48 8B 5C 24 30     - mov rbx,[rsp+30]
+P3R.exe+14E4B94: 48 83 C4 20        - add rsp,20
+P3R.exe+14E4B98: 5F                 - pop rdi
+P3R.exe+14E4B99: E9 82 DE D1 FF     - jmp P3R.exe+1202A20
+P3R.exe+14E4B9E: CC                 - int 3
+P3R.exe+14E4B9F: CC                 - int 3
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>34</ID>
+          <Description>"multiplier"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>Float</VariableType>
+          <Address>vf_xp_multi</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>95</ID>
+          <Description>"Extra XP"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>Float</VariableType>
+          <Address>vf_xp_extra</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>102</ID>
+          <Description>"XP allocated after distribution"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C0C0C0</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_orig_xp</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>104</ID>
+          <Description>"new XP (without extra)"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C0C0C0</Color>
+          <VariableType>Float</VariableType>
+          <Address>i_new_xp</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>93</ID>
+      <Description>"Set items quantity+"</Description>
+      <Options moHideChildren="1"/>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>2</ID>
+          <Description>"Set item consumables quantity"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript Async="1">{ Game   : P3R.exe
+  Version: 
+  Date   : 2024-02-03
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+//aobscanmodule(INJECT_SET_COMSUMABLE_CNT,$process,0F B6 84 03 00 0E 00 00) // should be unique
+aobscanmodule(INJECT_SET_COMSUMABLE_CNT,$process,48 89 C1 E8 ?? ?? ?? ?? 0F B6 84 03 ?? ?? 00 ?? 48 83 C4 20 5B C3) // should be unique
+alloc(newmem,$1000,INJECT_SET_COMSUMABLE_CNT)
+
+alloc(INJECT_SET_COMSUMABLE_CNTo,8)
+
+label(code)
+label(return)
+label(ib_min_cons_value)
+label(ib_max_cons_value)
+
+
+INJECT_SET_COMSUMABLE_CNTo:
+  readmem(INJECT_SET_COMSUMABLE_CNT+8, 8)
+
+newmem:
+  push r15
+  push rcx
+  push r14
+  mov r14d, [INJECT_SET_COMSUMABLE_CNTo+4]
+  xor r15, r15
+  lea r15, [r15+r14d]
+  lea r15, [r15+rbx]
+  lea r15, [r15+rax]
+
+  //lea r15, [rbx+rax+00000E00]
+  mov cl, [r15]
+  cmp cl, [ib_min_cons_value]
+  jb endp
+  cmp cl, [ib_max_cons_value]
+  jae endp
+
+  mov cl, [ib_max_cons_value]
+  mov [r15], cl
+
+
+endp:
+  pop r14
+  pop rcx
+  pop r15
+
+code:
+  readmem(INJECT_SET_COMSUMABLE_CNT+8, 8)
+  //movzx eax,byte ptr [rbx+rax+00000E00]
+  jmp return
+align 10 cc
+  ib_min_cons_value:
+  db 2
+  ib_max_cons_value:
+  db 50
+
+INJECT_SET_COMSUMABLE_CNT+8:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_SET_COMSUMABLE_CNT)
+registersymbol(ib_min_cons_value)
+registersymbol(ib_max_cons_value)
+registersymbol(INJECT_SET_COMSUMABLE_CNTo)
+[DISABLE]
+
+INJECT_SET_COMSUMABLE_CNT+8:
+  //db 0F B6 84 03 00 0E 00 00
+  readmem(INJECT_SET_COMSUMABLE_CNTo, 8)
+
+dealloc(INJECT_SET_COMSUMABLE_CNTo)
+unregistersymbol(*)
+dealloc(newmem)
+unregistersymbol(INJECT_SET_COMSUMABLE_CNTo)
+{
+// ORIGINAL CODE - INJECTION POINT: P3R.exe+B8AE4A1
+
+P3R.exe+B8AE482: 48 83 EC 20              - sub rsp,20
+P3R.exe+B8AE486: 0F B7 D9                 - movzx ebx,cx
+P3R.exe+B8AE489: E8 D2 5B 91 F5           - call P3R.exe+11C4060
+P3R.exe+B8AE48E: 48 85 C0                 - test rax,rax
+P3R.exe+B8AE491: 75 06                    - jne P3R.exe+B8AE499
+P3R.exe+B8AE493: 48 83 C4 20              - add rsp,20
+P3R.exe+B8AE497: 5B                       - pop rbx
+P3R.exe+B8AE498: C3                       - ret 
+P3R.exe+B8AE499: 48 89 C1                 - mov rcx,rax
+P3R.exe+B8AE49C: E8 5F 4B 92 F5           - call P3R.exe+11D3000
+// ---------- INJECTING HERE ----------
+P3R.exe+B8AE4A1: 0F B6 84 03 00 0E 00 00  - movzx eax,byte ptr [rbx+rax+00000E00]
+// ---------- DONE INJECTING  ----------
+P3R.exe+B8AE4A9: 48 83 C4 20              - add rsp,20
+P3R.exe+B8AE4AD: 5B                       - pop rbx
+P3R.exe+B8AE4AE: C3                       - ret 
+P3R.exe+B8AE4AF: CC                       - int 3 
+P3R.exe+B8AE4B0: B1 4E                    - mov cl,4E
+P3R.exe+B8AE4B2: EA 00 00 00 00 B8 5E     - jmp 5EB8:00000000
+P3R.exe+B8AE4B9: 49 7C 4A                 - jl P3R.exe+B8AE506
+P3R.exe+B8AE4BC: 01 00                    - add [rax],eax
+P3R.exe+B8AE4BE: 00 00                    - add [rax],al
+P3R.exe+B8AE4C0: 50                       - push rax
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>5</ID>
+              <Description>"Usage: open the consumables menu"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>3</ID>
+              <Description>"value must &gt;="</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>Byte</VariableType>
+              <Address>ib_min_cons_value</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>4</ID>
+              <Description>"Set to"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>Byte</VariableType>
+              <Address>ib_max_cons_value</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>58</ID>
+          <Description>"(A) Set accessories quantity"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : P3R.exe
+  Version: 
+  Date   : 2024-02-03
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_SET_ACCE_ITEM,$process,0F B6 84 03 00 0C 00 00) // should be unique
+//C3 48 8B C8 E8 ?? ?? ?? ?? 0F B6 84 03 ?? ?? ?? ?? 48 83 C4 20 5B C3 CC 40 53
+alloc(newmem,$1000,INJECT_SET_ACCE_ITEM)
+
+label(code)
+label(return)
+label(i_min_acce_cnt)
+label(i_max_acce_cnt)
+
+newmem:
+  pushfq
+  push rdx
+
+  mov dl, byte ptr [rbx+rax+00000C00]
+  cmp dl, [i_min_acce_cnt]
+  jb endp
+  cmp dl, [i_max_acce_cnt]
+  jae endp
+  mov dl, [i_max_acce_cnt]
+  mov byte ptr [rbx+rax+00000C00], dl
+
+
+endp:
+  pop rdx
+  popfq
+
+code:
+  movzx eax,byte ptr [rbx+rax+00000C00]
+  jmp return
+align 10 cc
+  i_min_acce_cnt:
+  db 2
+  i_max_acce_cnt:
+  db 50
+
+INJECT_SET_ACCE_ITEM:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_SET_ACCE_ITEM)
+registersymbol(i_min_acce_cnt)
+registersymbol(i_max_acce_cnt)
+
+[DISABLE]
+
+INJECT_SET_ACCE_ITEM:
+  db 0F B6 84 03 00 0C 00 00
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: P3R.exe+11B5B41
+
+P3R.exe+11B5B22: 48 83 EC 20              - sub rsp,20
+P3R.exe+11B5B26: 0F B7 D9                 - movzx ebx,cx
+P3R.exe+11B5B29: E8 32 E5 00 00           - call P3R.exe+11C4060
+P3R.exe+11B5B2E: 48 85 C0                 - test rax,rax
+P3R.exe+11B5B31: 75 06                    - jne P3R.exe+11B5B39
+P3R.exe+11B5B33: 48 83 C4 20              - add rsp,20
+P3R.exe+11B5B37: 5B                       - pop rbx
+P3R.exe+11B5B38: C3                       - ret 
+P3R.exe+11B5B39: 48 8B C8                 - mov rcx,rax
+P3R.exe+11B5B3C: E8 BF D4 01 00           - call P3R.exe+11D3000
+// ---------- INJECTING HERE ----------
+P3R.exe+11B5B41: 0F B6 84 03 00 0C 00 00  - movzx eax,byte ptr [rbx+rax+00000C00]
+// ---------- DONE INJECTING  ----------
+P3R.exe+11B5B49: 48 83 C4 20              - add rsp,20
+P3R.exe+11B5B4D: 5B                       - pop rbx
+P3R.exe+11B5B4E: C3                       - ret 
+P3R.exe+11B5B4F: CC                       - int 3 
+P3R.exe+11B5B50: 40 53                    - push rbx
+P3R.exe+11B5B52: 48 83 EC 20              - sub rsp,20
+P3R.exe+11B5B56: 0F B7 D9                 - movzx ebx,cx
+P3R.exe+11B5B59: E8 02 E5 00 00           - call P3R.exe+11C4060
+P3R.exe+11B5B5E: 48 85 C0                 - test rax,rax
+P3R.exe+11B5B61: 75 06                    - jne P3R.exe+11B5B69
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>61</ID>
+              <Description>"Usage: Menu -&gt; Equip -&gt; Select char -&gt; select accessories"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>59</ID>
+              <Description>"# of stock must &gt;="</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>Byte</VariableType>
+              <Address>i_min_acce_cnt</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>60</ID>
+              <Description>"Set value to"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>Byte</VariableType>
+              <Address>i_max_acce_cnt</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>40</ID>
+          <Description>"(B) Set items # (materials, sold for cash) to 80, if &gt;= 1"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : P3R.exe
+  Version: 
+  Date   : 2024-02-03
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_SET_ITEM_SOLD_4_CASH,$process,0F B6 84 03 00 13 00 00) // should be unique
+alloc(newmem,$1000,INJECT_SET_ITEM_SOLD_4_CASH)
+
+label(code)
+label(return)
+
+newmem:
+
+  pushfq
+  push rdx
+
+  mov dl, [rbx+rax+00001300]
+  cmp dl, 0
+  je endp
+  cmp dl, 50
+  jae endp
+  mov dl, 50
+  mov [rbx+rax+00001300], dl
+
+
+endp:
+  pop rdx
+  popfq
+
+code:
+  movzx eax,byte ptr [rbx+rax+00001300]
+  jmp return
+
+INJECT_SET_ITEM_SOLD_4_CASH:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_SET_ITEM_SOLD_4_CASH)
+
+[DISABLE]
+
+INJECT_SET_ITEM_SOLD_4_CASH:
+  db 0F B6 84 03 00 13 00 00
+
+unregistersymbol(INJECT_SET_ITEM_SOLD_4_CASH)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: P3R.exe+11B5C31
+
+P3R.exe+11B5C12: 48 83 EC 20              - sub rsp,20
+P3R.exe+11B5C16: 0F B7 D9                 - movzx ebx,cx
+P3R.exe+11B5C19: E8 42 E4 00 00           - call P3R.exe+11C4060
+P3R.exe+11B5C1E: 48 85 C0                 - test rax,rax
+P3R.exe+11B5C21: 75 06                    - jne P3R.exe+11B5C29
+P3R.exe+11B5C23: 48 83 C4 20              - add rsp,20
+P3R.exe+11B5C27: 5B                       - pop rbx
+P3R.exe+11B5C28: C3                       - ret 
+P3R.exe+11B5C29: 48 8B C8                 - mov rcx,rax
+P3R.exe+11B5C2C: E8 CF D3 01 00           - call P3R.exe+11D3000
+// ---------- INJECTING HERE ----------
+P3R.exe+11B5C31: 0F B6 84 03 00 13 00 00  - movzx eax,byte ptr [rbx+rax+00001300]
+// ---------- DONE INJECTING  ----------
+P3R.exe+11B5C39: 48 83 C4 20              - add rsp,20
+P3R.exe+11B5C3D: 5B                       - pop rbx
+P3R.exe+11B5C3E: C3                       - ret 
+P3R.exe+11B5C3F: CC                       - int 3 
+P3R.exe+11B5C40: 40 53                    - push rbx
+P3R.exe+11B5C42: 48 83 EC 20              - sub rsp,20
+P3R.exe+11B5C46: 0F B7 D9                 - movzx ebx,cx
+P3R.exe+11B5C49: E8 12 E4 00 00           - call P3R.exe+11C4060
+P3R.exe+11B5C4E: 48 85 C0                 - test rax,rax
+P3R.exe+11B5C51: 75 06                    - jne P3R.exe+11B5C59
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>91</ID>
+          <Description>"__in testing"</Description>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>92</ID>
+              <Description>"** Only use them when you enabled (A) &amp; (B)"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>83</ID>
+              <Description>"(Step1: Set Other items quantity #1"</Description>
+              <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{ Game   : P3R.exe
+  Version: 
+  Date   : 2024-02-04
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+//aobscanmodule(INJECT_SET_ACCE_ITEM,$process,0F B6 84 03 00 0C 00 00) // should be unique
+aobscanmodule(INJECT_SET_ACCE_ITEM_O1,$process,48 8B C8 E8 ?? ?? ?? ?? 0F B6 84 03 ?? ?? ?? ?? 48 83 C4 20 5B C3 CC 40 53)
+//C3 48 8B C8 E8 ?? ?? ?? ?? 0F B6 84 03 ?? ?? ?? ?? 48 83 C4 20 5B C3 CC 40 53
+alloc(newmem,$1000,INJECT_SET_ACCE_ITEM_O1)
+
+alloc(INJECT_SET_ACCE_ITEM_O1o,8)
+
+
+label(code)
+label(return)
+label(i_min_acce_cnt_o1)
+label(i_max_acce_cnt_o1)
+
+INJECT_SET_ACCE_ITEM_O1o:
+  readmem(INJECT_SET_ACCE_ITEM_O1+8, 8)
+
+
+newmem:
+  pushfq
+  push r15
+  push rcx
+  push r14
+  mov r14d, [INJECT_SET_ACCE_ITEM_O1o+4]
+  xor r15, r15
+  lea r15, [r15+r14d]
+  lea r15, [r15+rbx]
+  lea r15, [r15+rax]
+
+  //lea r15, [rbx+rax+00000E00]
+  mov cl, [r15]
+  cmp cl, [i_min_acce_cnt_o1]
+  jb endp
+  cmp cl, [i_max_acce_cnt_o1]
+  jae endp
+
+  mov cl, [i_max_acce_cnt_o1]
+  mov [r15], cl
+
+
+endp:
+  pop r14
+  pop rcx
+  pop r15
+  popfq
+
+code:
+  //movzx eax,byte ptr [rbx+rax+0000????], ???? = 0800 or 1700
+  readmem(INJECT_SET_ACCE_ITEM_O1+8, 8)
+  jmp return
+align 10 cc
+  i_min_acce_cnt_o1:
+  db 2
+  i_max_acce_cnt_o1:
+  db 50
+
+INJECT_SET_ACCE_ITEM_O1+8:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_SET_ACCE_ITEM_O1)
+registersymbol(i_min_acce_cnt_o1)
+registersymbol(i_max_acce_cnt_o1)
+registersymbol(INJECT_SET_ACCE_ITEM_O1o)
+[DISABLE]
+
+INJECT_SET_ACCE_ITEM_O1+8:
+  //db 0F B6 84 03 00 0C 00 00
+  readmem(INJECT_SET_ACCE_ITEM_O1o, 8)
+
+dealloc(INJECT_SET_ACCE_ITEM_O1o)
+unregistersymbol(*)
+dealloc(newmem)
+unregistersymbol(INJECT_SET_ACCE_ITEM_O1o)
+{
+// ORIGINAL CODE - INJECTION POINT: P3R.exe+11B5B41
+
+P3R.exe+11B5B22: 48 83 EC 20              - sub rsp,20
+P3R.exe+11B5B26: 0F B7 D9                 - movzx ebx,cx
+P3R.exe+11B5B29: E8 32 E5 00 00           - call P3R.exe+11C4060
+P3R.exe+11B5B2E: 48 85 C0                 - test rax,rax
+P3R.exe+11B5B31: 75 06                    - jne P3R.exe+11B5B39
+P3R.exe+11B5B33: 48 83 C4 20              - add rsp,20
+P3R.exe+11B5B37: 5B                       - pop rbx
+P3R.exe+11B5B38: C3                       - ret 
+P3R.exe+11B5B39: 48 8B C8                 - mov rcx,rax
+P3R.exe+11B5B3C: E8 BF D4 01 00           - call P3R.exe+11D3000
+// ---------- INJECTING HERE ----------
+P3R.exe+11B5B41: 0F B6 84 03 00 0C 00 00  - movzx eax,byte ptr [rbx+rax+0000????]
+// ---------- DONE INJECTING  ----------
+P3R.exe+11B5B49: 48 83 C4 20              - add rsp,20
+P3R.exe+11B5B4D: 5B                       - pop rbx
+P3R.exe+11B5B4E: C3                       - ret 
+P3R.exe+11B5B4F: CC                       - int 3 
+P3R.exe+11B5B50: 40 53                    - push rbx
+P3R.exe+11B5B52: 48 83 EC 20              - sub rsp,20
+P3R.exe+11B5B56: 0F B7 D9                 - movzx ebx,cx
+P3R.exe+11B5B59: E8 02 E5 00 00           - call P3R.exe+11C4060
+P3R.exe+11B5B5E: 48 85 C0                 - test rax,rax
+P3R.exe+11B5B61: 75 06                    - jne P3R.exe+11B5B69
+}
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>84</ID>
+                  <Description>"Usage: Menu -&gt; Equip -&gt; Select char -&gt; select protector-foot"</Description>
+                  <Color>8000FF</Color>
+                  <GroupHeader>1</GroupHeader>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>85</ID>
+                  <Description>"# of stock must &gt;="</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>C08000</Color>
+                  <VariableType>Byte</VariableType>
+                  <Address>i_min_acce_cnt_o1</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>86</ID>
+                  <Description>"Set value to"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>C08000</Color>
+                  <VariableType>Byte</VariableType>
+                  <Address>i_max_acce_cnt_o1</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>87</ID>
+                  <Description>"Step 2: no-use: set protector-foot: Set Other items quantity #2"</Description>
+                  <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript Async="1">{ Game   : P3R.exe
+  Version: 
+  Date   : 2024-02-04
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+//aobscanmodule(INJECT_SET_ACCE_ITEM,$process,0F B6 84 03 00 0C 00 00) // should be unique
+aobscanmodule(INJECT_SET_ACCE_ITEM_O2,$process,C3 48 8B C8 E8 ?? ?? ?? ?? 0F B6 84 03 ?? ?? ?? ?? 48 83 C4 20 5B C3 CC 40 53) // should be unique
+//C3 48 8B C8 E8 ?? ?? ?? ?? 0F B6 84 03 ?? ?? ?? ?? 48 83 C4 20 5B C3 CC 40 53
+alloc(newmem,$1000,INJECT_SET_ACCE_ITEM_O2)
+
+alloc(INJECT_SET_ACCE_ITEM_O2o,8)
+
+
+label(code)
+label(return)
+label(i_min_acce_cnt_o2)
+label(i_max_acce_cnt_o2)
+
+INJECT_SET_ACCE_ITEM_O2o:
+  readmem(INJECT_SET_ACCE_ITEM_O2+9, 8)
+
+
+newmem:
+  pushfq
+  push r15
+  push rcx
+  push r14
+  mov r14d, [INJECT_SET_ACCE_ITEM_O2o+4]
+  xor r15, r15
+  lea r15, [r15+r14d]
+  lea r15, [r15+rbx]
+  lea r15, [r15+rax]
+
+  //lea r15, [rbx+rax+00000E00]
+  mov cl, [r15]
+  cmp cl, [i_min_acce_cnt_o2]
+  jb endp
+  cmp cl, [i_max_acce_cnt_o2]
+  jae endp
+
+  mov cl, [i_max_acce_cnt_o2]
+  mov [r15], cl
+
+
+endp:
+  pop r14
+  pop rcx
+  pop r15
+  popfq
+
+code:
+  //movzx eax,byte ptr [rbx+rax+0000????], ???? = 0800 or 1700
+  readmem(INJECT_SET_ACCE_ITEM_O2+9, 8)
+  jmp return
+align 10 cc
+  i_min_acce_cnt_o2:
+  db 2
+  i_max_acce_cnt_o2:
+  db 50
+
+INJECT_SET_ACCE_ITEM_O2+9:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_SET_ACCE_ITEM_O2)
+registersymbol(i_min_acce_cnt_o2)
+registersymbol(i_max_acce_cnt_o2)
+registersymbol(INJECT_SET_ACCE_ITEM_O2o)
+
+[DISABLE]
+
+INJECT_SET_ACCE_ITEM_O2+9:
+  //db 0F B6 84 03 00 0C 00 00
+  readmem(INJECT_SET_ACCE_ITEM_O2o, 8)
+
+dealloc(INJECT_SET_ACCE_ITEM_O2o)
+unregistersymbol(*)
+dealloc(newmem)
+unregistersymbol(INJECT_SET_ACCE_ITEM_O2o)
+{
+// ORIGINAL CODE - INJECTION POINT: P3R.exe+11B5B41
+
+P3R.exe+11B5B22: 48 83 EC 20              - sub rsp,20
+P3R.exe+11B5B26: 0F B7 D9                 - movzx ebx,cx
+P3R.exe+11B5B29: E8 32 E5 00 00           - call P3R.exe+11C4060
+P3R.exe+11B5B2E: 48 85 C0                 - test rax,rax
+P3R.exe+11B5B31: 75 06                    - jne P3R.exe+11B5B39
+P3R.exe+11B5B33: 48 83 C4 20              - add rsp,20
+P3R.exe+11B5B37: 5B                       - pop rbx
+P3R.exe+11B5B38: C3                       - ret 
+P3R.exe+11B5B39: 48 8B C8                 - mov rcx,rax
+P3R.exe+11B5B3C: E8 BF D4 01 00           - call P3R.exe+11D3000
+// ---------- INJECTING HERE ----------
+P3R.exe+11B5B41: 0F B6 84 03 00 0C 00 00  - movzx eax,byte ptr [rbx+rax+0000????]
+// ---------- DONE INJECTING  ----------
+P3R.exe+11B5B49: 48 83 C4 20              - add rsp,20
+P3R.exe+11B5B4D: 5B                       - pop rbx
+P3R.exe+11B5B4E: C3                       - ret 
+P3R.exe+11B5B4F: CC                       - int 3 
+P3R.exe+11B5B50: 40 53                    - push rbx
+P3R.exe+11B5B52: 48 83 EC 20              - sub rsp,20
+P3R.exe+11B5B56: 0F B7 D9                 - movzx ebx,cx
+P3R.exe+11B5B59: E8 02 E5 00 00           - call P3R.exe+11C4060
+P3R.exe+11B5B5E: 48 85 C0                 - test rax,rax
+P3R.exe+11B5B61: 75 06                    - jne P3R.exe+11B5B69
+}
+</AssemblerScript>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>88</ID>
+                      <Description>"Usage: Menu -&gt; Equip -&gt; Select char -&gt; select ?????"</Description>
+                      <Color>8000FF</Color>
+                      <GroupHeader>1</GroupHeader>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>89</ID>
+                      <Description>"# of stock must &gt;="</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>C08000</Color>
+                      <VariableType>Byte</VariableType>
+                      <Address>i_min_acce_cnt_o2</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>90</ID>
+                      <Description>"Set value to"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>C08000</Color>
+                      <VariableType>Byte</VariableType>
+                      <Address>i_max_acce_cnt_o2</Address>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>43</ID>
+      <Description>"Set skill cards quantity"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : P3R.exe
+  Version: 
+  Date   : 2024-02-03
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_SET_SKILL_CARD_CNT,$process,0F B6 84 03 00 17 00 00) // should be unique
+alloc(newmem,$1000,INJECT_SET_SKILL_CARD_CNT)
+
+label(code)
+label(return)
+label(i_min_skc_cnt)
+label(i_max_skc_cnt)
+
+newmem:
+  pushfq
+  push rdx
+
+  mov dl, byte ptr [rbx+rax+00001700]
+  cmp dl, [i_min_skc_cnt]
+  jb endp
+  cmp dl, [i_max_skc_cnt]
+  jae endp
+  mov dl, [i_max_skc_cnt]
+  mov byte ptr [rbx+rax+00001700], dl
+
+
+endp:
+  pop rdx
+  popfq
+
+code:
+  movzx eax,byte ptr [rbx+rax+00001700]
+  jmp return
+align 10 cc
+  i_min_skc_cnt:
+  db 2
+  i_max_skc_cnt:
+  db 50
+
+
+
+INJECT_SET_SKILL_CARD_CNT:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_SET_SKILL_CARD_CNT)
+registersymbol(i_min_skc_cnt)
+registersymbol(i_max_skc_cnt)
+
+
+[DISABLE]
+
+INJECT_SET_SKILL_CARD_CNT:
+  db 0F B6 84 03 00 17 00 00
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: P3R.exe+11B5C91
+
+P3R.exe+11B5C72: 48 83 EC 20              - sub rsp,20
+P3R.exe+11B5C76: 0F B7 D9                 - movzx ebx,cx
+P3R.exe+11B5C79: E8 E2 E3 00 00           - call P3R.exe+11C4060
+P3R.exe+11B5C7E: 48 85 C0                 - test rax,rax
+P3R.exe+11B5C81: 75 06                    - jne P3R.exe+11B5C89
+P3R.exe+11B5C83: 48 83 C4 20              - add rsp,20
+P3R.exe+11B5C87: 5B                       - pop rbx
+P3R.exe+11B5C88: C3                       - ret 
+P3R.exe+11B5C89: 48 8B C8                 - mov rcx,rax
+P3R.exe+11B5C8C: E8 6F D3 01 00           - call P3R.exe+11D3000
+// ---------- INJECTING HERE ----------
+P3R.exe+11B5C91: 0F B6 84 03 00 17 00 00  - movzx eax,byte ptr [rbx+rax+00001700]
+// ---------- DONE INJECTING  ----------
+P3R.exe+11B5C99: 48 83 C4 20              - add rsp,20
+P3R.exe+11B5C9D: 5B                       - pop rbx
+P3R.exe+11B5C9E: C3                       - ret 
+P3R.exe+11B5C9F: CC                       - int 3 
+P3R.exe+11B5CA0: 40 53                    - push rbx
+P3R.exe+11B5CA2: 48 83 EC 20              - sub rsp,20
+P3R.exe+11B5CA6: 0F B7 D9                 - movzx ebx,cx
+P3R.exe+11B5CA9: E8 B2 E3 00 00           - call P3R.exe+11C4060
+P3R.exe+11B5CAE: 48 85 C0                 - test rax,rax
+P3R.exe+11B5CB1: 75 06                    - jne P3R.exe+11B5CB9
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>46</ID>
+          <Description>"Usage: open the item menu =&gt; skill cards"</Description>
+          <Color>8000FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>44</ID>
+          <Description>"# of stock must &gt;="</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>Byte</VariableType>
+          <Address>i_min_skc_cnt</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>45</ID>
+          <Description>"Set to"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>Byte</VariableType>
+          <Address>i_max_skc_cnt</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>14</ID>
+      <Description>"Get money"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : P3R.exe
+  Version:
+  Date   : 2025-07-10
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_MONEY,$process,44 8B 88 60 42 00 00) // should be unique
+alloc(newmem,$1000,INJECT_GET_MONEY)
+
+label(code)
+label(return)
+label(i_base_money_addr)
+
+newmem:
+  mov [i_base_money_addr], rax
+
+code:
+  //mov r9d,[rax+00003CF8]
+  mov r9d,[rax+00004260]
+  jmp return
+align 10 cc
+  i_base_money_addr:
+  dq 0
+
+INJECT_GET_MONEY:
+  jmp newmem
+  nop 2
+return:
+registersymbol(INJECT_GET_MONEY)
+registersymbol(i_base_money_addr)
+
+[DISABLE]
+
+INJECT_GET_MONEY:
+  db 44 8B 88 60 42 00 00
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: P3R.exe+1320A85
+
+P3R.exe+1320A54: 89 44 24 58           - mov [rsp+58],eax
+P3R.exe+1320A58: 49 8B D7              - mov rdx,r15
+P3R.exe+1320A5B: C7 45 A4 0C 00 00 00  - mov [rbp-5C],0000000C
+P3R.exe+1320A62: 48 8D 4C 24 40        - lea rcx,[rsp+40]
+P3R.exe+1320A67: E8 84 18 04 00        - call P3R.exe+13622F0
+P3R.exe+1320A6C: E8 FF 9B F0 FF        - call P3R.exe+122A670
+P3R.exe+1320A71: 48 89 5D C0           - mov [rbp-40],rbx
+P3R.exe+1320A75: 4C 8D 05 D8 64 FF 02  - lea r8,[P3R.exe+4316F54]
+P3R.exe+1320A7C: BA 08 00 00 00        - mov edx,00000008
+P3R.exe+1320A81: 48 8D 4D C0           - lea rcx,[rbp-40]
+// ---------- INJECTING HERE ----------
+P3R.exe+1320A85: 44 8B 88 60 42 00 00  - mov r9d,[rax+00004260]
+// ---------- DONE INJECTING  ----------
+P3R.exe+1320A8C: E8 BF AD CE FF        - call P3R.exe+100B850
+P3R.exe+1320A91: BF 07 00 00 00        - mov edi,00000007
+P3R.exe+1320A96: 48 8B C3              - mov rax,rbx
+P3R.exe+1320A99: 44 8B F7              - mov r14d,edi
+P3R.exe+1320A9C: 0F 1F 40 00           - nop dword ptr [rax+00]
+P3R.exe+1320AA0: 80 7C 05 C0 30        - cmp byte ptr [rbp+rax-40],30
+P3R.exe+1320AA5: 75 0B                 - jne P3R.exe+1320AB2
+P3R.exe+1320AA7: 41 FF CE              - dec r14d
+P3R.exe+1320AAA: 48 FF C0              - inc rax
+P3R.exe+1320AAD: 48 3B C7              - cmp rax,rdi
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>16</ID>
+          <Description>"Usage: open menu"</Description>
+          <Color>8000FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>15</ID>
+          <Description>"value"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_money_addr</Address>
+          <Offsets>
+            <Offset>4260</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>63</ID>
+      <Description>"Get persona base attributes"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : P3R.exe
+  Version: 
+  Date   : 2024-02-04
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_EQUIP_PERSONA_DATA,$process,0F B6 44 08 1C C3) // should be unique
+alloc(newmem,$1000,INJECT_GET_EQUIP_PERSONA_DATA)
+
+label(code)
+label(return)
+label(i_base_str_addr)
+
+newmem:
+  pushfq
+  cmp eax, 0
+  je code_pre
+
+  push r14
+  lea r14, [rax+rcx+1C]
+  mov [i_base_str_addr], r14
+  pop r14
+
+code_pre:
+  popfq
+
+code:
+  movzx eax,byte ptr [rax+rcx+1C]
+  jmp return
+align 10 cc
+  i_base_str_addr:
+  dq 0
+
+
+INJECT_GET_EQUIP_PERSONA_DATA:
+  jmp newmem
+
+return:
+registersymbol(INJECT_GET_EQUIP_PERSONA_DATA)
+registersymbol(i_base_str_addr)
+
+[DISABLE]
+
+INJECT_GET_EQUIP_PERSONA_DATA:
+  db 0F B6 44 08 1C
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: P3R.exe+11AC653
+
+P3R.exe+11AC62D: 48 8B 43 30     - mov rax,[rbx+30]
+P3R.exe+11AC631: 48 6B CE 13     - imul rcx,rsi,13
+P3R.exe+11AC635: 48 03 CF        - add rcx,rdi
+P3R.exe+11AC638: 0F B7 0C 48     - movzx ecx,word ptr [rax+rcx*2]
+P3R.exe+11AC63C: 48 8B 5C 24 30  - mov rbx,[rsp+30]
+P3R.exe+11AC641: 48 8B 74 24 38  - mov rsi,[rsp+38]
+P3R.exe+11AC646: 48 83 C4 20     - add rsp,20
+P3R.exe+11AC64A: 5F              - pop rdi
+P3R.exe+11AC64B: E9 80 FB 00 00  - jmp P3R.exe+11BC1D0
+P3R.exe+11AC650: 0F B7 C2        - movzx eax,dx
+// ---------- INJECTING HERE ----------
+P3R.exe+11AC653: 0F B6 44 08 1C  - movzx eax,byte ptr [rax+rcx+1C]
+// ---------- DONE INJECTING  ----------
+P3R.exe+11AC658: C3              - ret 
+P3R.exe+11AC659: CC              - int 3 
+P3R.exe+11AC65A: CC              - int 3 
+P3R.exe+11AC65B: CC              - int 3 
+P3R.exe+11AC65C: CC              - int 3 
+P3R.exe+11AC65D: CC              - int 3 
+P3R.exe+11AC65E: CC              - int 3 
+P3R.exe+11AC65F: CC              - int 3 
+P3R.exe+11AC660: 48 89 5C 24 08  - mov [rsp+08],rbx
+P3R.exe+11AC665: 48 89 6C 24 10  - mov [rsp+10],rbp
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>78</ID>
+          <Description>"Usage: Menu -&gt; Status -&gt; Select char -&gt; press [X] or RT"</Description>
+          <Color>8000FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>79</ID>
+          <Description>"Or: Menu -&gt; Persona (for hero), not for Theurgia info"</Description>
+          <Color>8000FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>77</ID>
+          <Description>"Team pos? (valid: &lt;= 10?)"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_str_addr</Address>
+          <Offsets>
+            <Offset>-48</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>100</ID>
+          <Description>"Persona ID?"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_base_str_addr</Address>
+          <Offsets>
+            <Offset>-1E</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>101</ID>
+          <Description>"Level"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_str_addr</Address>
+          <Offsets>
+            <Offset>-1C</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>99</ID>
+          <Description>"EXP"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_str_addr</Address>
+          <Offsets>
+            <Offset>-18</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>98</ID>
+          <Description>"St / 力"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>Byte</VariableType>
+          <Address>i_base_str_addr</Address>
+          <Offsets>
+            <Offset>-4</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>65</ID>
+          <Description>"Ma / 魔"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>Byte</VariableType>
+          <Address>i_base_str_addr</Address>
+          <Offsets>
+            <Offset>-3</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>66</ID>
+          <Description>"En / 耐"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>Byte</VariableType>
+          <Address>i_base_str_addr</Address>
+          <Offsets>
+            <Offset>-2</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>67</ID>
+          <Description>"Ag / 速"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>Byte</VariableType>
+          <Address>i_base_str_addr</Address>
+          <Offsets>
+            <Offset>-1</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>68</ID>
+          <Description>"Lu / 運"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>Byte</VariableType>
+          <Address>i_base_str_addr</Address>
+          <Offsets>
+            <Offset>0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>286</ID>
+          <Description>"Skills - 日本語"</Description>
+          <Options moHideChildren="1"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>69</ID>
+              <Description>"Skill #1"</Description>
+              <DropDownListLink>-sKILL id-</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_base_str_addr</Address>
+              <Offsets>
+                <Offset>-14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>70</ID>
+              <Description>"Skill #2"</Description>
+              <DropDownListLink>-sKILL id-</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_base_str_addr</Address>
+              <Offsets>
+                <Offset>-12</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>71</ID>
+              <Description>"Skill #3"</Description>
+              <DropDownListLink>-sKILL id-</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_base_str_addr</Address>
+              <Offsets>
+                <Offset>-10</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>72</ID>
+              <Description>"Skill #4"</Description>
+              <DropDownListLink>-sKILL id-</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_base_str_addr</Address>
+              <Offsets>
+                <Offset>-E</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>73</ID>
+              <Description>"Skill #5"</Description>
+              <DropDownListLink>-sKILL id-</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_base_str_addr</Address>
+              <Offsets>
+                <Offset>-C</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>74</ID>
+              <Description>"Skill #6"</Description>
+              <DropDownListLink>-sKILL id-</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_base_str_addr</Address>
+              <Offsets>
+                <Offset>-A</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>75</ID>
+              <Description>"Skill #7"</Description>
+              <DropDownListLink>-sKILL id-</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_base_str_addr</Address>
+              <Offsets>
+                <Offset>-8</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>76</ID>
+              <Description>"Skill #8"</Description>
+              <DropDownListLink>-sKILL id-</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_base_str_addr</Address>
+              <Offsets>
+                <Offset>-6</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>287</ID>
+          <Description>"Skills - English"</Description>
+          <Options moHideChildren="1"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>288</ID>
+              <Description>"Skill #1"</Description>
+              <DropDownListLink>-sKILL id-En-</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_base_str_addr</Address>
+              <Offsets>
+                <Offset>-14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>289</ID>
+              <Description>"Skill #2"</Description>
+              <DropDownListLink>-sKILL id-En-</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_base_str_addr</Address>
+              <Offsets>
+                <Offset>-12</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>290</ID>
+              <Description>"Skill #3"</Description>
+              <DropDownListLink>-sKILL id-En-</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_base_str_addr</Address>
+              <Offsets>
+                <Offset>-10</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>291</ID>
+              <Description>"Skill #4"</Description>
+              <DropDownListLink>-sKILL id-En-</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_base_str_addr</Address>
+              <Offsets>
+                <Offset>-E</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>292</ID>
+              <Description>"Skill #5"</Description>
+              <DropDownListLink>-sKILL id-En-</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_base_str_addr</Address>
+              <Offsets>
+                <Offset>-C</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>293</ID>
+              <Description>"Skill #6"</Description>
+              <DropDownListLink>-sKILL id-En-</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_base_str_addr</Address>
+              <Offsets>
+                <Offset>-A</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>294</ID>
+              <Description>"Skill #7"</Description>
+              <DropDownListLink>-sKILL id-En-</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_base_str_addr</Address>
+              <Offsets>
+                <Offset>-8</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>295</ID>
+              <Description>"Skill #8"</Description>
+              <DropDownListLink>-sKILL id-En-</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_base_str_addr</Address>
+              <Offsets>
+                <Offset>-6</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>281</ID>
+          <Description>"Have Item?"</Description>
+          <DropDownList DisplayValueAsItem="1">1:N/A
+7:Yes
+11:Got
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>Byte</VariableType>
+          <Address>i_base_str_addr</Address>
+          <Offsets>
+            <Offset>-20</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>236</ID>
+          <Description>"------"</Description>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>228</ID>
+          <Description>"Theurgia / テウルギア (stats menu only)"</Description>
+          <DropDownList DisplayValueAsItem="1">260:(!)カデンツァ
+261:(!)ジャックブラザイズ
+262:(!)おおさまとおいら
+263:(!)ベストフレンド
+264:(!)紅蓮華斬殺
+265:(!)トリックスター
+266:(!)ハルマゲドン
+280:(!)サイクロンアロー
+281:(!)バーストスイング
+282:(!)ライトニングスフィア
+283:(!)ブリザードイッジ
+284:(!)オラクル
+285:(!)オルギアモード起動
+286:(!)天誅
+287:(!)ブラックハウンド
+288:(!)ブラッディストライク
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_base_str_addr</Address>
+          <Offsets>
+            <Offset>232</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>108</ID>
+      <Description>"Get day progress"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : P3R.exe
+  Version: 
+  Date   : 2024-02-05
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_DAY_PROGRESS,$process,0F B6 40 0C EB 02) // should be unique
+alloc(newmem,$1000,INJECT_GET_DAY_PROGRESS)
+
+label(code)
+label(return)
+label(i_base_day_data_addr)
+label(i_prev_val1)
+label(i_prev_val2)
+label(is_sync_to_prev)
+
+newmem:
+  mov [i_base_day_data_addr], rax
+  push rbx
+  mov bl, byte ptr [rax+0C]
+  mov bh, byte ptr [rax+04]
+
+  cmp bl, [i_tmp2]
+  jne store2
+  jmp test1
+
+store2:
+  mov [i_prev_val2], bl
+
+test1:
+  cmp bh, [i_tmp1]
+  jne store1
+  jmp endp
+
+store1:
+  mov [i_prev_val1], bh
+
+endp:
+  cmp byte ptr [i_prev_val1], 1
+  jne @F
+  cmp dword ptr [is_sync_to_prev], 1
+  jne @F
+  mov dword ptr [is_sync_to_prev], 0
+  mov bl, [i_prev_val2]
+  mov bh, [i_prev_val1]
+  mov byte ptr [rax+0C], bl
+  mov byte ptr [rax+04], bh
+
+@@:
+  mov [i_tmp2], bl
+  mov [i_tmp1], bh
+  pop rbx
+
+code:
+  movzx eax,byte ptr [rax+0C]
+  reassemble(INJECT_GET_DAY_PROGRESS+4)
+  //jmp P3R.exe+A688009
+  jmp return
+align 10 cc
+  i_base_day_data_addr:
+  dq 0
+  is_sync_to_prev:
+  dd 0
+  i_prev_val1:
+  db 0
+  i_prev_val2:
+  db 0
+  i_tmp1:
+  db 0
+  i_tmp2:
+  db 0
+
+
+INJECT_GET_DAY_PROGRESS:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT_GET_DAY_PROGRESS)
+registersymbol(i_base_day_data_addr)
+registersymbol(i_prev_val1)
+registersymbol(i_prev_val2)
+registersymbol(is_sync_to_prev)
+[DISABLE]
+
+INJECT_GET_DAY_PROGRESS:
+  db 0F B6 40 0C EB 02
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: P3R.exe+A688001
+
+P3R.exe+A687FE0: 74 05                 - je P3R.exe+A687FE7
+P3R.exe+A687FE2: 8B 48 08              - mov ecx,[rax+08]
+P3R.exe+A687FE5: EB 02                 - jmp P3R.exe+A687FE9
+P3R.exe+A687FE7: 31 C9                 - xor ecx,ecx
+P3R.exe+A687FE9: 89 8F 8C 02 00 00     - mov [rdi+0000028C],ecx
+P3R.exe+A687FEF: E8 6C C0 B3 F6        - call P3R.exe+11C4060
+P3R.exe+A687FF4: 48 85 C0              - test rax,rax
+P3R.exe+A687FF7: 74 0E                 - je P3R.exe+A688007
+P3R.exe+A687FF9: 48 05 78 A3 00 00     - add rax,0000A378
+P3R.exe+A687FFF: 74 06                 - je P3R.exe+A688007
+// ---------- INJECTING HERE ----------
+P3R.exe+A688001: 0F B6 40 0C           - movzx eax,byte ptr [rax+0C]
+// ---------- DONE INJECTING  ----------
+P3R.exe+A688005: EB 02                 - jmp P3R.exe+A688009
+P3R.exe+A688007: B0 01                 - mov al,01
+P3R.exe+A688009: 88 87 90 02 00 00     - mov [rdi+00000290],al
+P3R.exe+A68800F: 0F B6 97 90 02 00 00  - movzx edx,byte ptr [rdi+00000290]
+P3R.exe+A688016: 8B 8F 8C 02 00 00     - mov ecx,[rdi+0000028C]
+P3R.exe+A68801C: 80 FA 09              - cmp dl,09
+P3R.exe+A68801F: 75 30                 - jne P3R.exe+A688051
+P3R.exe+A688021: 8D 59 01              - lea ebx,[rcx+01]
+P3R.exe+A688024: E8 37 C0 B3 F6        - call P3R.exe+11C4060
+P3R.exe+A688029: 48 85 C0              - test rax,rax
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>117</ID>
+          <Description>"Quick get day progress"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : P3R.exe
+  Version: 
+  Date   : 2024-02-05
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_DAY_PROGRESS_M2,$process,0F B6 40 04 48 83 C4 28) // should be unique
+alloc(newmem,$1000,INJECT_GET_DAY_PROGRESS_M2)
+
+label(code)
+label(return)
+
+newmem:
+  push rbx
+
+  cmp byte ptr [i_prev_val1], 0
+  je @F
+  cmp dword ptr [is_sync_to_prev], 1
+  jne @F
+  mov dword ptr [is_sync_to_prev], 0
+  mov bl, [i_prev_val2]
+  mov bh, [i_prev_val1]
+  mov byte ptr [rax+0C], bl
+  mov byte ptr [rax+04], bh
+
+@@:
+  pop rbx
+
+
+  cmp qword ptr [i_base_day_data_addr], rax
+  je code
+
+  mov [i_base_day_data_addr], rax
+
+code:
+  movzx eax,byte ptr [rax+04]
+  add rsp,28
+  jmp return
+
+INJECT_GET_DAY_PROGRESS_M2:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_GET_DAY_PROGRESS_M2)
+
+[DISABLE]
+
+INJECT_GET_DAY_PROGRESS_M2:
+  db 0F B6 40 04 48 83 C4 28
+
+unregistersymbol(INJECT_GET_DAY_PROGRESS_M2)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: P3R.exe+1026BB6
+
+P3R.exe+1026B9C: CC                 - int 3 
+P3R.exe+1026B9D: CC                 - int 3 
+P3R.exe+1026B9E: CC                 - int 3 
+P3R.exe+1026B9F: CC                 - int 3 
+P3R.exe+1026BA0: 48 83 EC 28        - sub rsp,28
+P3R.exe+1026BA4: E8 B7 D4 19 00     - call P3R.exe+11C4060
+P3R.exe+1026BA9: 48 85 C0           - test rax,rax
+P3R.exe+1026BAC: 74 11              - je P3R.exe+1026BBF
+P3R.exe+1026BAE: 48 05 78 A3 00 00  - add rax,0000A378
+P3R.exe+1026BB4: 74 09              - je P3R.exe+1026BBF
+// ---------- INJECTING HERE ----------
+P3R.exe+1026BB6: 0F B6 40 04        - movzx eax,byte ptr [rax+04]
+// ---------- DONE INJECTING  ----------
+P3R.exe+1026BBA: 48 83 C4 28        - add rsp,28
+P3R.exe+1026BBE: C3                 - ret 
+P3R.exe+1026BBF: B0 01              - mov al,01
+P3R.exe+1026BC1: 48 83 C4 28        - add rsp,28
+P3R.exe+1026BC5: C3                 - ret 
+P3R.exe+1026BC6: CC                 - int 3 
+P3R.exe+1026BC7: CC                 - int 3 
+P3R.exe+1026BC8: CC                 - int 3 
+P3R.exe+1026BC9: CC                 - int 3 
+P3R.exe+1026BCA: CC                 - int 3 
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>247</ID>
+          <Description>"Sync. to previous time period"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+//NO_ACTIVATE
+is_sync_to_prev:
+dd 1
+ 
+ 
+[DISABLE]
+
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>248</ID>
+              <Description>"Use with caution!"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>249</ID>
+              <Description>"Actived after switch back to game screen"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>109</ID>
+          <Description>"Day ?"</Description>
+          <DropDownList DisplayValueAsItem="1">68:6/8
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_day_data_addr</Address>
+          <Offsets>
+            <Offset>0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>112</ID>
+          <Description>"=&gt; Time peroid #1?"</Description>
+          <DropDownList DisplayValueAsItem="1">2:Early morning / 朝
+3:Morning / 午前
+4:Noon break / 昼休み
+5:Daytime,Afternoon / 昼間,午後
+6:After school / 放課後
+7:Night / 夜
+8:Dark Hour / 影時間
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>Byte</VariableType>
+          <Address>i_base_day_data_addr</Address>
+          <Offsets>
+            <Offset>4</Offset>
+          </Offsets>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>245</ID>
+              <Description>"Prev #1"</Description>
+              <DropDownListLink>=&gt; Time peroid #1?</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>808080</Color>
+              <VariableType>Byte</VariableType>
+              <Address>i_prev_val1</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>113</ID>
+          <Description>"??"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>Byte</VariableType>
+          <Address>i_base_day_data_addr</Address>
+          <Offsets>
+            <Offset>5</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>114</ID>
+          <Description>"??"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>Byte</VariableType>
+          <Address>i_base_day_data_addr</Address>
+          <Offsets>
+            <Offset>6</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>115</ID>
+          <Description>"??"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>Byte</VariableType>
+          <Address>i_base_day_data_addr</Address>
+          <Offsets>
+            <Offset>7</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>111</ID>
+          <Description>"Day?"</Description>
+          <DropDownListLink>Day ?</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_day_data_addr</Address>
+          <Offsets>
+            <Offset>8</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>110</ID>
+          <Description>"=&gt;Time peroid #2?"</Description>
+          <DropDownList DisplayValueAsItem="1">3:Early morning / 朝
+4:Morning / 午前
+5:Noon break / 昼休み
+6:Afternoon / 午後
+7:After school / 放課後 / Commu Event
+8:Night / 夜
+9:Dark Hour / 影時間
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_base_day_data_addr</Address>
+          <Offsets>
+            <Offset>C</Offset>
+          </Offsets>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>246</ID>
+              <Description>"Prev #2"</Description>
+              <DropDownListLink>=&gt;Time peroid #2?</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>808080</Color>
+              <VariableType>Byte</VariableType>
+              <Address>i_prev_val2</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>17</ID>
+      <Description>"Weapon Shop / Summon persona (全書引出し): money will not decrease"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : P3R.exe
+  Version: 
+  Date   : 2024-02-03
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_BUY_ITEM_SET_MONEY,$process,48 8B D9 41 B8 7F 96 98 00) // should be unique
+alloc(newmem,$1000,INJECT_BUY_ITEM_SET_MONEY)
+
+label(code)
+label(return)
+
+newmem:
+  // abs edx
+  mov ebx, edx
+  neg edx
+  cmovl edx, ebx
+  //
+
+code:
+  mov rbx,rcx
+  mov r8d,0098967F
+  jmp return
+
+INJECT_BUY_ITEM_SET_MONEY:
+  jmp newmem
+  nop 4
+return:
+registersymbol(INJECT_BUY_ITEM_SET_MONEY)
+
+[DISABLE]
+
+INJECT_BUY_ITEM_SET_MONEY:
+  db 48 8B D9 41 B8 7F 96 98 00
+
+unregistersymbol(INJECT_BUY_ITEM_SET_MONEY)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: P3R.exe+11B8706
+
+P3R.exe+11B86F8: CC                 - int 3 
+P3R.exe+11B86F9: CC                 - int 3 
+P3R.exe+11B86FA: CC                 - int 3 
+P3R.exe+11B86FB: CC                 - int 3 
+P3R.exe+11B86FC: CC                 - int 3 
+P3R.exe+11B86FD: CC                 - int 3 
+P3R.exe+11B86FE: CC                 - int 3 
+P3R.exe+11B86FF: CC                 - int 3 
+P3R.exe+11B8700: 40 53              - push rbx
+P3R.exe+11B8702: 48 83 EC 20        - sub rsp,20
+// ---------- INJECTING HERE ----------
+P3R.exe+11B8706: 48 8B D9           - mov rbx,rcx
+// ---------- DONE INJECTING  ----------
+P3R.exe+11B8709: 41 B8 7F 96 98 00  - mov r8d,0098967F
+P3R.exe+11B870F: 8B 89 F8 3C 00 00  - mov ecx,[rcx+00003CF8]
+P3R.exe+11B8715: 03 CA              - add ecx,edx
+P3R.exe+11B8717: 33 D2              - xor edx,edx
+P3R.exe+11B8719: E8 C2 10 EB FF     - call P3R.exe+10697E0
+P3R.exe+11B871E: 89 83 F8 3C 00 00  - mov [rbx+00003CF8],eax
+P3R.exe+11B8724: 48 83 C4 20        - add rsp,20
+P3R.exe+11B8728: 5B                 - pop rbx
+P3R.exe+11B8729: C3                 - ret 
+P3R.exe+11B872A: CC                 - int 3 
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>263</ID>
+      <Description>"Get equip-ed item ID / personality"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : P3R.exe
+  Version: 
+  Date   : 2024-02-12
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_EQP_IDs,$process,0F B7 84 41 8C 02 00 00) // should be unique
+alloc(newmem,$1000,INJECT_GET_EQP_IDs)
+
+label(code)
+label(return)
+label(i_base_eqp_addr)
+
+newmem:
+  test dx, dx
+  jnz code
+
+  mov [i_base_eqp_addr], rcx
+
+
+code:
+  movzx eax,word ptr [rcx+rax*2+0000028C]
+  jmp return
+align 10 cc
+  i_base_eqp_addr:
+  dq 0
+
+INJECT_GET_EQP_IDs:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_GET_EQP_IDs)
+registersymbol(i_base_eqp_addr)
+[DISABLE]
+
+INJECT_GET_EQP_IDs:
+  db 0F B7 84 41 8C 02 00 00
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: P3R.exe+11BCF23
+
+P3R.exe+11BCF09: 0F B7 CA                 - movzx ecx,dx
+P3R.exe+11BCF0C: E9 6F 33 FF FF           - jmp P3R.exe+11B0280
+P3R.exe+11BCF11: 66 85 C9                 - test cx,cx
+P3R.exe+11BCF14: 0F 85 26 39 FF FF        - jne P3R.exe+11B0840
+P3R.exe+11BCF1A: 33 C0                    - xor eax,eax
+P3R.exe+11BCF1C: C3                       - ret 
+P3R.exe+11BCF1D: CC                       - int 3 
+P3R.exe+11BCF1E: CC                       - int 3 
+P3R.exe+11BCF1F: CC                       - int 3 
+P3R.exe+11BCF20: 0F B7 C2                 - movzx eax,dx
+// ---------- INJECTING HERE ----------
+P3R.exe+11BCF23: 0F B7 84 41 8C 02 00 00  - movzx eax,word ptr [rcx+rax*2+0000028C]
+// ---------- DONE INJECTING  ----------
+P3R.exe+11BCF2B: C3                       - ret 
+P3R.exe+11BCF2C: CC                       - int 3 
+P3R.exe+11BCF2D: CC                       - int 3 
+P3R.exe+11BCF2E: CC                       - int 3 
+P3R.exe+11BCF2F: CC                       - int 3 
+P3R.exe+11BCF30: E9 AB 14 76 0A           - jmp P3R.exe+B91E3E0
+P3R.exe+11BCF35: BE 97 BE 78 8B           - mov esi,8B78BE97
+P3R.exe+11BCF3A: E9 34 EC 23 00           - jmp P3R.exe+13FBB73
+P3R.exe+11BCF3F: 54                       - push rsp
+P3R.exe+11BCF40: 0D 94 1A BB E9           - or eax,E9BB1A94
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>269</ID>
+          <Description>"Usage: Equip-&gt;select char-&gt;Enter equip setup screen"</Description>
+          <Color>8000FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>332</ID>
+          <Description>"?? (HP?)"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_base_eqp_addr</Address>
+          <Offsets>
+            <Offset>C</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>333</ID>
+          <Description>"?? (SP?)"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_base_eqp_addr</Address>
+          <Offsets>
+            <Offset>10</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>330</ID>
+          <Description>"Weapon"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_base_eqp_addr</Address>
+          <Offsets>
+            <Offset>28C</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>265</ID>
+          <Description>"Protector-Body"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_base_eqp_addr</Address>
+          <Offsets>
+            <Offset>28E</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>266</ID>
+          <Description>"Protector-Foot"</Description>
+          <DropDownList DisplayValueAsItem="1">8201:素足(コロマル)
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_base_eqp_addr</Address>
+          <Offsets>
+            <Offset>290</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>267</ID>
+          <Description>"Accessories"</Description>
+          <DropDownList DisplayValueAsItem="1">12559:アムリタイトの首飾り
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_base_eqp_addr</Address>
+          <Offsets>
+            <Offset>292</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>268</ID>
+          <Description>"Clothes"</Description>
+          <DropDownList DisplayValueAsItem="1">32769:腕章付き制服 (主人公)
+32770:腕章付き制服 (ゆかり)
+32771:腕章付き制服 (順平)
+32772:腕章付き制服 (明彥)
+32773:腕章付き制服 (美鶴)
+32774:腕章付き制服 (風花)
+32775:通常潜入服 (アイギス)
+32776:腕章付き制服 (乾)
+32777:通常潜入服 (コロマル)
+32779:SEES制式戦闘服 (主人公)
+32780:SEES制式戦闘服 (ゆかり)
+32781:SEES制式戦闘服 (順平)
+32782:SEES制式戦闘服 (明彥)
+32783:SEES制式戦闘服 (美鶴)
+32784:SEES制式戦闘服 (風花)
+32785:SEES制式戦闘服 (アイギス)
+32786:SEES制式戦闘服 (乾)
+32787:SEES制式戦闘服 (コロマル)
+32794:ハイレグアーマー (ゆかり)
+32813:セクシアーマー (美鶴)
+32816:美鶴メイド服 (美鶴)
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_base_eqp_addr</Address>
+          <Offsets>
+            <Offset>294</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>296</ID>
+          <Description>"Personality - 日本語"</Description>
+          <Options moHideChildren="1"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>276</ID>
+              <Description>"Personality #2?"</Description>
+              <DropDownListLink>-sKILL id-</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_base_eqp_addr</Address>
+              <Offsets>
+                <Offset>2A0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>277</ID>
+              <Description>"Personality #3 (overwrite #2)"</Description>
+              <DropDownListLink>-sKILL id-</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_base_eqp_addr</Address>
+              <Offsets>
+                <Offset>2A2</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>278</ID>
+              <Description>"Personality #2 for hero?"</Description>
+              <DropDownListLink>-sKILL id-</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_base_eqp_addr</Address>
+              <Offsets>
+                <Offset>2A6</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>279</ID>
+              <Description>"Personality #3 for hero? (overwrite #2)"</Description>
+              <DropDownListLink>-sKILL id-</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_base_eqp_addr</Address>
+              <Offsets>
+                <Offset>2A8</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>297</ID>
+          <Description>"Personality - English"</Description>
+          <Options moHideChildren="1"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>298</ID>
+              <Description>"Personality #2?"</Description>
+              <DropDownListLink>-sKILL id-En-</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_base_eqp_addr</Address>
+              <Offsets>
+                <Offset>2A0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>299</ID>
+              <Description>"Personality #3 (overwrite #2)"</Description>
+              <DropDownListLink>-sKILL id-En-</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_base_eqp_addr</Address>
+              <Offsets>
+                <Offset>2A2</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>300</ID>
+              <Description>"Personality #2 for hero?"</Description>
+              <DropDownListLink>-sKILL id-En-</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_base_eqp_addr</Address>
+              <Offsets>
+                <Offset>2A6</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>301</ID>
+              <Description>"Personality #3 for hero? (overwrite #2)"</Description>
+              <DropDownListLink>-sKILL id-En-</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_base_eqp_addr</Address>
+              <Offsets>
+                <Offset>2A8</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>129</ID>
+      <Description>"Commu / social link / コミュ"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>242</ID>
+          <Description>"(X) Commu: pt. multiplier, part 1"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : P3R.exe
+  Version: 
+  Date   : 2024-02-08
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_COMMU_MULTI,$process,66 01 50 02 41 0F B7 0E) // should be unique
+alloc(newmem,$1000,INJECT_COMMU_MULTI)
+
+label(code)
+label(return)
+label(vf_commu_multi)
+label(vf_orig_commu_val)
+
+
+newmem:
+  push rcx
+
+  xor rcx, rcx
+  mov cx, dx
+  vcvtsi2ss xmm15, xmm15, ecx
+  vmovss [vf_orig_commu_val], xmm15
+  vmovss xmm14, [vf_commu_multi]
+  vmulss xmm15, xmm14, xmm15
+  vcvtss2si ecx, xmm15
+  mov dx, cx
+  pop rcx
+
+code:
+  add [rax+02],dx
+  movzx ecx,word ptr [r14]
+  jmp return
+align 10 cc
+  vf_commu_multi:
+  dd (float)2.5
+  vf_orig_commu_val:
+  dd 0
+
+INJECT_COMMU_MULTI:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_COMMU_MULTI)
+registersymbol(vf_commu_multi)
+registersymbol(vf_orig_commu_val)
+[DISABLE]
+
+INJECT_COMMU_MULTI:
+  db 66 01 50 02 41 0F B7 0E
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: P3R.exe+10844BB
+
+P3R.exe+1084495: 41 8B D7                 - mov edx,r15d
+P3R.exe+1084498: 48 8B CF                 - mov rcx,rdi
+P3R.exe+108449B: E8 B0 3E 00 00           - call P3R.exe+1088350
+P3R.exe+10844A0: 41 0F B7 C4              - movzx eax,r12w
+P3R.exe+10844A4: F3 0F 59 C6              - mulss xmm0,xmm6
+P3R.exe+10844A8: 66 0F 6E C8              - movd xmm1,eax
+P3R.exe+10844AC: 49 8B 46 08              - mov rax,[r14+08]
+P3R.exe+10844B0: 0F 5B C9                 - cvtdq2ps xmm1,xmm1
+P3R.exe+10844B3: F3 0F 59 C1              - mulss xmm0,xmm1
+P3R.exe+10844B7: F3 0F 2C D0              - cvttss2si edx,xmm0
+// ---------- INJECTING HERE ----------
+P3R.exe+10844BB: 66 01 50 02              - add [rax+02],dx
+// ---------- DONE INJECTING  ----------
+P3R.exe+10844BF: 41 0F B7 0E              - movzx ecx,word ptr [r14]
+P3R.exe+10844C3: E8 28 9E FE FF           - call P3R.exe+106E2F0
+P3R.exe+10844C8: E8 13 14 14 00           - call P3R.exe+11C58E0
+P3R.exe+10844CD: 0F 28 B4 24 C0 00 00 00  - movaps xmm6,[rsp+000000C0]
+P3R.exe+10844D5: 48 8B D8                 - mov rbx,rax
+P3R.exe+10844D8: 48 8B B4 24 10 01 00 00  - mov rsi,[rsp+00000110]
+P3R.exe+10844E0: 48 8B AC 24 08 01 00 00  - mov rbp,[rsp+00000108]
+P3R.exe+10844E8: 48 85 C0                 - test rax,rax
+P3R.exe+10844EB: 74 51                    - je P3R.exe+108453E
+P3R.exe+10844ED: 48 8D 4C 24 30           - lea rcx,[rsp+30]
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>179</ID>
+              <Description>"multiplier"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>Float</VariableType>
+              <Address>vf_commu_multi</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>243</ID>
+          <Description>"Commu: pt. multiplier, part 2"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : P3R.exe
+  Version: 
+  Date   : 2024-02-08
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_COMMU_MULTI2,$process,66 01 5A 02 0F B7 D3) // should be unique
+alloc(newmem,$1000,INJECT_COMMU_MULTI2)
+
+label(code)
+label(return)
+label(vf_commu_multi2)
+label(vf_orig_commu_val2)
+
+
+newmem:
+newmem:
+  push rcx
+
+  xor rcx, rcx
+  mov cx, bx
+  vcvtsi2ss xmm15, xmm15, ecx
+  vmovss [vf_orig_commu_val2], xmm15
+  vmovss xmm14, [vf_commu_multi2]
+  vmulss xmm15, xmm14, xmm15
+  vcvtss2si ecx, xmm15
+  mov bx, cx
+  pop rcx
+
+code:
+  add [rdx+02],bx
+  movzx edx,bx
+  jmp return
+align 10 cc
+  vf_commu_multi2:
+  dd (float)2.5
+  vf_orig_commu_val2:
+  dd 0
+
+INJECT_COMMU_MULTI2:
+  jmp newmem
+  nop 2
+return:
+registersymbol(INJECT_COMMU_MULTI2)
+registersymbol(vf_commu_multi2)
+registersymbol(vf_orig_commu_val2)
+[DISABLE]
+
+INJECT_COMMU_MULTI2:
+  db 66 01 5A 02 0F B7 D3
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: P3R.exe+108321C
+
+P3R.exe+10831F6: 41 8B D6        - mov edx,r14d
+P3R.exe+10831F9: 48 8B CD        - mov rcx,rbp
+P3R.exe+10831FC: E8 4F 51 00 00  - call P3R.exe+1088350
+P3R.exe+1083201: 49 8B 57 08     - mov rdx,[r15+08]
+P3R.exe+1083205: 41 0F B7 C4     - movzx eax,r12w
+P3R.exe+1083209: F3 0F 59 C6     - mulss xmm0,xmm6
+P3R.exe+108320D: 66 0F 6E C8     - movd xmm1,eax
+P3R.exe+1083211: 0F 5B C9        - cvtdq2ps xmm1,xmm1
+P3R.exe+1083214: F3 0F 59 C1     - mulss xmm0,xmm1
+P3R.exe+1083218: F3 0F 2C D8     - cvttss2si ebx,xmm0
+// ---------- INJECTING HERE ----------
+P3R.exe+108321C: 66 01 5A 02     - add [rdx+02],bx
+// ---------- DONE INJECTING  ----------
+P3R.exe+1083220: 0F B7 D3        - movzx edx,bx
+P3R.exe+1083223: 41 0F B7 0F     - movzx ecx,word ptr [r15]
+P3R.exe+1083227: E8 C4 B0 FE FF  - call P3R.exe+106E2F0
+P3R.exe+108322C: 48 8B 6C 24 70  - mov rbp,[rsp+70]
+P3R.exe+1083231: 8B C3           - mov eax,ebx
+P3R.exe+1083233: 48 8B 5C 24 68  - mov rbx,[rsp+68]
+P3R.exe+1083238: 0F 28 74 24 20  - movaps xmm6,[rsp+20]
+P3R.exe+108323D: 48 83 C4 30     - add rsp,30
+P3R.exe+1083241: 41 5F           - pop r15
+P3R.exe+1083243: 41 5E           - pop r14
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>244</ID>
+              <Description>"multiplier"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>Float</VariableType>
+              <Address>vf_commu_multi2</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>131</ID>
+          <Description>"Get existing commu level"</Description>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : P3R.exe
+  Version: 
+  Date   : 2024-02-07
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_COMMU_LEVEL_XP,$process,48 8B 41 08 0F B7 00) // should be unique
+alloc(newmem,$1000,INJECT_GET_COMMU_LEVEL_XP)
+
+label(code)
+label(return)
+label(i_base_commu_addr)
+label(i_min_commu_addr)
+newmem:
+  push r13
+  push r14
+  push r15
+
+  lea r15, [rcx+08]
+  xor r14, r14
+
+loop1:
+  mov r13, i_base_commu_addr
+  lea r13, [r13+r14d*8]
+
+  cmp [r13], r15
+  je endp
+  cmp [r13], 0
+  je store_it
+
+  jmp do_next
+
+store_it:
+  mov [r13], r15
+
+  // store min. address of level
+
+  // r13 ==&gt; other use
+  mov r13, [r15]
+  cmp qword ptr [i_min_commu_addr], 0
+  jne save_min_next1
+
+
+  mov [i_min_commu_addr], r13
+  jmp endp
+
+save_min_next1:
+  cmp qword ptr [i_min_commu_addr], r13
+  jbe endp
+  mov [i_min_commu_addr], r13
+
+  jmp endp
+
+do_next:
+  inc r14d
+  cmp r14d, #22
+  jae endp
+  jmp loop1
+
+endp:
+  pop r15
+  pop r14
+  pop r13
+
+code:
+  mov rax,[rcx+08]
+  movzx eax,word ptr [rax]
+  jmp return
+align 10 cc
+  i_base_commu_addr:
+  dq 0
+  align 100 0
+  db 0
+  align 60 0
+  db 0
+  i_min_commu_addr:
+  dq 0
+
+
+INJECT_GET_COMMU_LEVEL_XP:
+  jmp newmem
+  nop 2
+return:
+registersymbol(INJECT_GET_COMMU_LEVEL_XP)
+registersymbol(i_base_commu_addr)
+registersymbol(i_min_commu_addr)
+[DISABLE]
+
+INJECT_GET_COMMU_LEVEL_XP:
+  db 48 8B 41 08 0F B7 00
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: P3R.exe+1087F70
+
+P3R.exe+1087F59: 48 85 C0     - test rax,rax
+P3R.exe+1087F5C: 74 09        - je P3R.exe+1087F67
+P3R.exe+1087F5E: 48 8B 40 38  - mov rax,[rax+38]
+P3R.exe+1087F62: 48 83 C4 28  - add rsp,28
+P3R.exe+1087F66: C3           - ret 
+P3R.exe+1087F67: 33 C0        - xor eax,eax
+P3R.exe+1087F69: 48 83 C4 28  - add rsp,28
+P3R.exe+1087F6D: C3           - ret 
+P3R.exe+1087F6E: CC           - int 3 
+P3R.exe+1087F6F: CC           - int 3 
+// ---------- INJECTING HERE ----------
+P3R.exe+1087F70: 48 8B 41 08  - mov rax,[rcx+08]
+// ---------- DONE INJECTING  ----------
+P3R.exe+1087F74: 0F B7 00     - movzx eax,word ptr [rax]
+P3R.exe+1087F77: C3           - ret 
+P3R.exe+1087F78: CC           - int 3 
+P3R.exe+1087F79: CC           - int 3 
+P3R.exe+1087F7A: CC           - int 3 
+P3R.exe+1087F7B: CC           - int 3 
+P3R.exe+1087F7C: CC           - int 3 
+P3R.exe+1087F7D: CC           - int 3 
+P3R.exe+1087F7E: CC           - int 3 
+P3R.exe+1087F7F: CC           - int 3 
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>143</ID>
+              <Description>"Usage: Close commu menu -&gt; Enable -&gt; open commu menu"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>197</ID>
+              <Description>"Disable when not needed"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>180</ID>
+              <Description>"Enabled commu data+"</Description>
+              <Options moHideChildren="1"/>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>134</ID>
+                  <Description>"base"</Description>
+                  <ShowAsHex>1</ShowAsHex>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>C0C0C0</Color>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>i_base_commu_addr</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>135</ID>
+                  <Description>"Lv 1"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>136</ID>
+                  <Description>"XP 1"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr</Address>
+                  <Offsets>
+                    <Offset>2</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>132</ID>
+                  <Description>"Lv 2"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+8</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>133</ID>
+                  <Description>"XP 2"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+8</Address>
+                  <Offsets>
+                    <Offset>2</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>137</ID>
+                  <Description>"Lv 3"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+10</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>138</ID>
+                  <Description>"XP 3"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+10</Address>
+                  <Offsets>
+                    <Offset>2</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>139</ID>
+                  <Description>"Lv 4"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+18</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>140</ID>
+                  <Description>"XP 4"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+18</Address>
+                  <Offsets>
+                    <Offset>2</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>141</ID>
+                  <Description>"Lv 5"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+20</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>142</ID>
+                  <Description>"XP 5"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+20</Address>
+                  <Offsets>
+                    <Offset>2</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>144</ID>
+                  <Description>"Lv 6"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+28</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>145</ID>
+                  <Description>"XP 6"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+28</Address>
+                  <Offsets>
+                    <Offset>2</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>146</ID>
+                  <Description>"Lv 7"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+30</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>147</ID>
+                  <Description>"XP 7"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+30</Address>
+                  <Offsets>
+                    <Offset>2</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>148</ID>
+                  <Description>"Lv 8"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+38</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>149</ID>
+                  <Description>"XP 8"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+38</Address>
+                  <Offsets>
+                    <Offset>2</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>150</ID>
+                  <Description>"Lv 9"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+40</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>151</ID>
+                  <Description>"XP 9"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+40</Address>
+                  <Offsets>
+                    <Offset>2</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>152</ID>
+                  <Description>"Lv 10"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+48</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>153</ID>
+                  <Description>"XP 10"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+48</Address>
+                  <Offsets>
+                    <Offset>2</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>154</ID>
+                  <Description>"Lv 11"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+50</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>155</ID>
+                  <Description>"XP 11"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+50</Address>
+                  <Offsets>
+                    <Offset>2</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>156</ID>
+                  <Description>"Lv 12"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+58</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>157</ID>
+                  <Description>"XP 12"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+58</Address>
+                  <Offsets>
+                    <Offset>2</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>158</ID>
+                  <Description>"Lv 13"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+60</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>159</ID>
+                  <Description>"XP 13"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+60</Address>
+                  <Offsets>
+                    <Offset>2</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>160</ID>
+                  <Description>"Lv 14"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+68</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>161</ID>
+                  <Description>"XP 14"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+68</Address>
+                  <Offsets>
+                    <Offset>2</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>162</ID>
+                  <Description>"Lv 15"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+70</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>163</ID>
+                  <Description>"XP 15"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+70</Address>
+                  <Offsets>
+                    <Offset>2</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>164</ID>
+                  <Description>"Lv 16"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+78</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>165</ID>
+                  <Description>"XP 16"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+78</Address>
+                  <Offsets>
+                    <Offset>2</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>166</ID>
+                  <Description>"Lv 17"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+80</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>167</ID>
+                  <Description>"XP 17"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+80</Address>
+                  <Offsets>
+                    <Offset>2</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>168</ID>
+                  <Description>"Lv 18"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+88</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>169</ID>
+                  <Description>"XP 18"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+88</Address>
+                  <Offsets>
+                    <Offset>2</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>170</ID>
+                  <Description>"Lv 19"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+90</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>171</ID>
+                  <Description>"XP 19"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+90</Address>
+                  <Offsets>
+                    <Offset>2</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>172</ID>
+                  <Description>"Lv 20"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+98</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>173</ID>
+                  <Description>"XP 20"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+98</Address>
+                  <Offsets>
+                    <Offset>2</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>176</ID>
+                  <Description>"Lv 21"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+A0</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>177</ID>
+                  <Description>"XP 21"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+A0</Address>
+                  <Offsets>
+                    <Offset>2</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>174</ID>
+                  <Description>"Lv 22"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+A8</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>175</ID>
+                  <Description>"XP 22"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_base_commu_addr+A8</Address>
+                  <Offsets>
+                    <Offset>2</Offset>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>226</ID>
+              <Description>"All commu data+"</Description>
+              <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>181</ID>
+                  <Description>"Fool / 愚者 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>182</ID>
+                  <Description>"Fool / 愚者 XP"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>2</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>183</ID>
+                  <Description>"Magician / 魔術師 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>8</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>186</ID>
+                  <Description>"Magician / 魔術師 XP"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>A</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>185</ID>
+                  <Description>"Priestess / 女教皇 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>10</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>184</ID>
+                  <Description>"Priestess / 女教皇 XP"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>12</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>187</ID>
+                  <Description>"Empress / 女帝 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>18</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>188</ID>
+                  <Description>"Empress / 女帝 XP"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>1A</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>189</ID>
+                  <Description>"Emperor / 皇帝 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>20</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>190</ID>
+                  <Description>"Emperor / 皇帝 XP"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>22</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>191</ID>
+                  <Description>"Hierophant / 法王 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>28</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>192</ID>
+                  <Description>"Hierophant / 法王 XP"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>2A</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>193</ID>
+                  <Description>"Lovers / 恋愛 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>30</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>194</ID>
+                  <Description>"Lovers / 恋愛 XP"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>32</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>195</ID>
+                  <Description>"Chariot / 戦車 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>38</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>196</ID>
+                  <Description>"Chariot / 戦車 XP"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>3A</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>198</ID>
+                  <Description>"Justice / 正義 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>40</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>199</ID>
+                  <Description>"Justice / 正義 XP"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>42</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>200</ID>
+                  <Description>"Hermit / 隠者 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>48</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>201</ID>
+                  <Description>"Hermit / 隠者 XP"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>4A</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>202</ID>
+                  <Description>"Fortune / 運命 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>50</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>203</ID>
+                  <Description>"Fortune / 運命 XP"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>52</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>204</ID>
+                  <Description>"Strength / 剛毅 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>58</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>205</ID>
+                  <Description>"Strength / 剛毅 XP"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>5A</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>206</ID>
+                  <Description>"Hanged / 刑死者 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>60</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>207</ID>
+                  <Description>"Hanged / 刑死者 XP"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>62</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>208</ID>
+                  <Description>"Death / 死神 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>68</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>209</ID>
+                  <Description>"Death / 死神 XP"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>6A</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>210</ID>
+                  <Description>"Temperance / 節制 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>70</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>211</ID>
+                  <Description>"Temperance / 節制 XP"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>72</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>212</ID>
+                  <Description>"Devil / 悪魔 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>78</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>213</ID>
+                  <Description>"Devil / 悪魔 XP"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>7A</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>214</ID>
+                  <Description>"Tower / 塔 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>80</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>215</ID>
+                  <Description>"Tower / 塔 XP"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>82</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>216</ID>
+                  <Description>"Star / 星 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>88</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>217</ID>
+                  <Description>"Star / 星 XP"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>8A</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>218</ID>
+                  <Description>"Moon / 月 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>90</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>219</ID>
+                  <Description>"Moon / 月 XP"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>92</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>220</ID>
+                  <Description>"Sun / 太陽 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>98</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>221</ID>
+                  <Description>"Sun / 太陽 XP"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>9A</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>222</ID>
+                  <Description>"Judgement / 審判 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>A0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>223</ID>
+                  <Description>"Judgement / 審判 XP"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>A2</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>224</ID>
+                  <Description>"Aeon / 永劫 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>A8</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>225</ID>
+                  <Description>"Aeon / 永劫 XP"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>408000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_commu_addr</Address>
+                  <Offsets>
+                    <Offset>AA</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>36</ID>
+      <Description>"(X)Hero XP multiplier"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : P3R.exe
+  Version: 
+  Date   : 2024-02-03
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_HERO_XP_MULTI,$process,89 98 84 04 00 00) // should be unique
+alloc(newmem,$1000,INJECT_HERO_XP_MULTI)
+
+label(code)
+label(return)
+label(vf_main_pl_xp_multi)
+label(vf_main_pl_xp_extra)
+label(i_orig_hero_xp)
+newmem:
+  push r15
+  mov r15d, [rax+00000484]
+  cmp r15d, ebx
+  jae endp
+
+
+
+  vcvtsi2ss xmm15, xmm15, r15d
+  vcvtsi2ss xmm14, xmm14, ebx
+
+  vsubss xmm14, xmm14, xmm15
+
+  vmovss [i_orig_hero_xp], xmm14
+
+  vmovss xmm13, [vf_main_pl_xp_multi]
+  vmulss xmm14, xmm14, xmm13
+  vaddss xmm14, xmm14, xmm15
+  vmovss xmm13, [vf_main_pl_xp_extra]
+  vaddss xmm14, xmm13, xmm14
+  vcvtss2si ebx, xmm14
+
+
+endp:
+  pop r15
+
+code:
+  mov [rax+00000484],ebx
+  jmp return
+align 10 cc
+  vf_main_pl_xp_multi:
+  dd (float)1.333
+  vf_main_pl_xp_extra:
+  dd (float)99
+  i_orig_hero_xp:
+  dd 0
+
+
+INJECT_HERO_XP_MULTI:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT_HERO_XP_MULTI)
+registersymbol(vf_main_pl_xp_multi)
+registersymbol(vf_main_pl_xp_extra)
+registersymbol(i_orig_hero_xp)
+
+[DISABLE]
+
+INJECT_HERO_XP_MULTI:
+  db 89 98 84 04 00 00
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: P3R.exe+11BE2F2
+
+P3R.exe+11BE2DC: CC                 - int 3 
+P3R.exe+11BE2DD: CC                 - int 3 
+P3R.exe+11BE2DE: CC                 - int 3 
+P3R.exe+11BE2DF: CC                 - int 3 
+P3R.exe+11BE2E0: 66 83 F9 01        - cmp cx,01
+P3R.exe+11BE2E4: 75 17              - jne P3R.exe+11BE2FD
+P3R.exe+11BE2E6: 53                 - push rbx
+P3R.exe+11BE2E7: 48 83 EC 20        - sub rsp,20
+P3R.exe+11BE2EB: 8B DA              - mov ebx,edx
+P3R.exe+11BE2ED: E8 6E 5D 00 00     - call P3R.exe+11C4060
+// ---------- INJECTING HERE ----------
+P3R.exe+11BE2F2: 89 98 84 04 00 00  - mov [rax+00000484],ebx
+// ---------- DONE INJECTING  ----------
+P3R.exe+11BE2F8: 48 83 C4 20        - add rsp,20
+P3R.exe+11BE2FC: 5B                 - pop rbx
+P3R.exe+11BE2FD: C3                 - ret 
+P3R.exe+11BE2FE: CC                 - int 3 
+P3R.exe+11BE2FF: CC                 - int 3 
+P3R.exe+11BE300: 66 83 F9 01        - cmp cx,01
+P3R.exe+11BE304: 75 19              - jne P3R.exe+11BE31F
+P3R.exe+11BE306: 53                 - push rbx
+P3R.exe+11BE307: 48 83 EC 20        - sub rsp,20
+P3R.exe+11BE30B: 0F B7 DA           - movzx ebx,dx
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>37</ID>
+          <Description>"multiplier"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>Float</VariableType>
+          <Address>vf_main_pl_xp_multi</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>96</ID>
+          <Description>"Extra XP"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>Float</VariableType>
+          <Address>vf_main_pl_xp_extra</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>103</ID>
+          <Description>"XP allocated after distribution"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C0C0C0</Color>
+          <VariableType>Float</VariableType>
+          <Address>i_orig_hero_xp</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>51</ID>
+      <Description>"Get social status"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript Async="1">{
+  Generated by AOBMaker,  bbfox@https://opencheattables.com
+  Date   : 2026/07/07
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_PER_PARAM,$process,?? 8B ?? D0 04 ?? 03 ?? ?? 3B)
+// raw AOB: C3 40 53 48 83 EC 20 48 8B 41 30 33 DB 4C 63 D2 44 8B CB 4D 8B C2 49 C1 E0 04 4C 03 40 30 49 8B 10 49 63 40 08 4C 8D 04 82 49 3B D0 74 ?? 48 8B 41 28 42 8B 4C D0 04 44 03 0A 41 3B C9 7C ?? FF C3 48 83 C2 04 49 3B D0 75 ?? E8 ?? ?? ?? ?? 84 C0 B9 06 00 00 00 0F 45 D9 8B C3 48 83 C4 20 5B C3 48 89 5C 24 08
+// injection point AOB: ?? 8B ?? D0 04 ?? 03 ?? ?? 3B ?? 7C ?? FF ?? ?? 83 ?? 04 ?? 3B ?? 75 ?? E8 ?? ?? ?? ?? 84 ?? ?? 06 00 00 00 0F 45 ?? 8B ?? 48 83 C4 20 ?? C3 ?? 89 ?? 24
+alloc(newmem,$1000,INJECT_GET_PER_PARAM)
+
+alloc(INJECT_GET_PER_PARAMo, $5)
+
+INJECT_GET_PER_PARAMo:
+  readmem(INJECT_GET_PER_PARAM, 5)
+
+label(code)
+label(return)
+label(i_base_courage)
+label(i_base_charm)
+label(i_base_knowledge)
+
+newmem:
+  push r15
+  lea r15, [rax+r10*8+04]
+
+  cmp qword ptr [i_base_knowledge], r15
+  je endp
+  cmp qword ptr [i_base_charm], r15
+  je endp
+  cmp qword ptr [i_base_courage], r15
+  je endp
+
+
+  cmp qword ptr [i_base_knowledge], 0
+  jne next2
+  mov [i_base_knowledge], r15
+  jmp endp
+
+next2:
+  cmp qword ptr [i_base_charm], 0
+  jne next3
+  mov [i_base_charm], r15
+  jmp endp
+
+next3:
+  cmp qword ptr [i_base_courage], 0
+  jne endp
+  mov [i_base_courage], r15
+
+endp:
+next_s0:
+  mov r15, [i_base_courage]
+  cmp r15, [i_base_charm]
+  ja next_s1
+
+  mov [i_temp1], r15
+  mov r15, [i_base_charm]
+  mov [i_base_courage], r15
+  mov r15, [i_temp1]
+  mov [i_base_charm], r15
+
+next_s1:
+  mov r15, [i_base_charm]
+  cmp r15, [i_base_knowledge]
+  ja next_s2
+
+  mov [i_temp1], r15
+  mov r15, [i_base_knowledge]
+  mov [i_base_charm], r15
+  mov r15, [i_temp1]
+  mov [i_base_knowledge], r15
+
+next_s2:
+  pop r15
+
+code:
+  // mov ecx,[rax+r10*8+04]
+  reassemble(INJECT_GET_PER_PARAM)
+  jmp return
+align 10 cc
+  i_base_courage:
+  dq 0
+  i_base_charm:
+  dq 0
+  i_base_knowledge:
+  dq 0
+  i_temp1:
+  dq 0
+
+INJECT_GET_PER_PARAM:
+  jmp newmem
+return:
+registersymbol(INJECT_GET_PER_PARAM INJECT_GET_PER_PARAMo)
+registersymbol(i_base_courage)
+registersymbol(i_base_charm)
+registersymbol(i_base_knowledge)
+[DISABLE]
+
+INJECT_GET_PER_PARAM:
+  readmem(INJECT_GET_PER_PARAMo, $5)
+
+dealloc(newmem)
+dealloc(INJECT_GET_PER_PARAMo)
+unregistersymbol(*)
+
+
+{
+// ORIGINAL CODE - INJECTION POINT: P3R.exe+10CCFD1
+
+P3R.exe+10CCF9F: C3                                 - ret
+P3R.exe+10CCFA0: 40 53                              - push rbx
+P3R.exe+10CCFA2: 48 83 EC 20                        - sub rsp,20
+P3R.exe+10CCFA6: 48 8B 41 30                        - mov rax,[rcx+30]
+P3R.exe+10CCFAA: 33 DB                              - xor ebx,ebx
+P3R.exe+10CCFAC: 4C 63 D2                           - movsxd  r10,edx
+P3R.exe+10CCFAF: 44 8B CB                           - mov r9d,ebx
+P3R.exe+10CCFB2: 4D 8B C2                           - mov r8,r10
+P3R.exe+10CCFB5: 49 C1 E0 04                        - shl r8,04
+P3R.exe+10CCFB9: 4C 03 40 30                        - add r8,[rax+30]
+P3R.exe+10CCFBD: 49 8B 10                           - mov rdx,[r8]
+P3R.exe+10CCFC0: 49 63 40 08                        - movsxd  rax,dword ptr [r8+08]
+P3R.exe+10CCFC4: 4C 8D 04 82                        - lea r8,[rdx+rax*4]
+P3R.exe+10CCFC8: 49 3B D0                           - cmp rdx,r8
+P3R.exe+10CCFCB: 74 1C                              - je P3R.exe+10CCFE9
+P3R.exe+10CCFCD: 48 8B 41 28                        - mov rax,[rcx+28]
+// ---------- INJECTING HERE ----------
+P3R.exe+10CCFD1: 42 8B 4C D0 04                     - mov ecx,[rax+r10*8+04]
+// ---------- DONE INJECTING  ----------
+P3R.exe+10CCFD6: 44 03 0A                           - add r9d,[rdx]
+P3R.exe+10CCFD9: 41 3B C9                           - cmp ecx,r9d
+P3R.exe+10CCFDC: 7C 0B                              - jl P3R.exe+10CCFE9
+P3R.exe+10CCFDE: FF C3                              - inc ebx
+P3R.exe+10CCFE0: 48 83 C2 04                        - add rdx,04
+P3R.exe+10CCFE4: 49 3B D0                           - cmp rdx,r8
+P3R.exe+10CCFE7: 75 ED                              - jne P3R.exe+10CCFD6
+P3R.exe+10CCFE9: E8 12 E3 EF FF                     - call P3R.exe+FCB300
+P3R.exe+10CCFEE: 84 C0                              - test al,al
+P3R.exe+10CCFF0: B9 06 00 00 00                     - mov ecx,00000006
+P3R.exe+10CCFF5: 0F 45 D9                           - cmovne ebx,ecx
+P3R.exe+10CCFF8: 8B C3                              - mov eax,ebx
+P3R.exe+10CCFFA: 48 83 C4 20                        - add rsp,20
+P3R.exe+10CCFFE: 5B                                 - pop rbx
+P3R.exe+10CCFFF: C3                                 - ret
+P3R.exe+10CD000: 48 89 5C 24 08                     - mov [rsp+08],rbx
+}
+
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>55</ID>
+          <Description>"Usage: Menu -&gt; Status -&gt; Select main hero -&gt; press [S]"</Description>
+          <Color>8000FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>80</ID>
+          <Description>"Re-enable when load from save / or data is incorrect"</Description>
+          <Color>8000FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>52</ID>
+          <Description>"Courage / 勇気"</Description>
+          <DropDownList DisplayValueAsItem="1">45:4
+60:5
+79:Before 6
+80:6
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_courage</Address>
+          <Offsets>
+            <Offset>0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>53</ID>
+          <Description>"Charm / 魅力"</Description>
+          <DropDownList DisplayValueAsItem="1">45:4
+70:5
+99:Before 6
+100:6
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_charm</Address>
+          <Offsets>
+            <Offset>0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>54</ID>
+          <Description>"Academics / 学力"</Description>
+          <DropDownList DisplayValueAsItem="1">100:4
+155:5
+229:Before 6
+230:6
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_knowledge</Address>
+          <Offsets>
+            <Offset>0</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>307</ID>
+      <Description>"(X)Get some stats"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : P3R.exe
+  Version: 
+  Date   : 2024-02-18
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_STATS_DATA,$process,8B 84 81 3C 43 00 00) // should be unique
+alloc(newmem,$1000,INJECT_GET_STATS_DATA)
+
+label(code)
+label(return)
+label(i_base_stat_data_addr)
+
+newmem:
+  cmp edx, E5
+  jne code
+  push r15
+  lea r15, [rcx+14]
+  mov [i_base_stat_data_addr], r15
+  pop r15
+
+code:
+  mov eax,[rcx+rax*4+0000433C]
+  jmp return
+align 10 cc
+  i_base_stat_data_addr:
+  dq 0
+
+INJECT_GET_STATS_DATA:
+  jmp newmem
+  nop 2
+return:
+registersymbol(INJECT_GET_STATS_DATA)
+registersymbol(i_base_stat_data_addr)
+
+[DISABLE]
+
+INJECT_GET_STATS_DATA:
+  db 8B 84 81 3C 43 00 00
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: P3R.exe+11C21B3
+
+P3R.exe+11C21A7: CC                    - int 3 
+P3R.exe+11C21A8: CC                    - int 3 
+P3R.exe+11C21A9: CC                    - int 3 
+P3R.exe+11C21AA: CC                    - int 3 
+P3R.exe+11C21AB: CC                    - int 3 
+P3R.exe+11C21AC: CC                    - int 3 
+P3R.exe+11C21AD: CC                    - int 3 
+P3R.exe+11C21AE: CC                    - int 3 
+P3R.exe+11C21AF: CC                    - int 3 
+P3R.exe+11C21B0: 48 63 C2              - movsxd  rax,edx
+// ---------- INJECTING HERE ----------
+P3R.exe+11C21B3: 8B 84 81 3C 43 00 00  - mov eax,[rcx+rax*4+0000433C]
+// ---------- DONE INJECTING  ----------
+P3R.exe+11C21BA: C3                    - ret 
+P3R.exe+11C21BB: CC                    - int 3 
+P3R.exe+11C21BC: CC                    - int 3 
+P3R.exe+11C21BD: CC                    - int 3 
+P3R.exe+11C21BE: CC                    - int 3 
+P3R.exe+11C21BF: CC                    - int 3 
+P3R.exe+11C21C0: 40 53                 - push rbx
+P3R.exe+11C21C2: 48 83 EC 20           - sub rsp,20
+P3R.exe+11C21C6: 48 8B 05 43 FF 40 04  - mov rax,[P3R.exe+55D2110]
+P3R.exe+11C21CD: 48 8B 58 60           - mov rbx,[rax+60]
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>312</ID>
+          <Description>"Group Attack"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_stat_data_addr</Address>
+          <Offsets>
+            <Offset>448C</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>311</ID>
+          <Description>"S.E.E.E. Advantage"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_stat_data_addr</Address>
+          <Offsets>
+            <Offset>4490</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>316</ID>
+          <Description>"Chest opened"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_stat_data_addr</Address>
+          <Offsets>
+            <Offset>46D0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>315</ID>
+          <Description>"Floor?"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_stat_data_addr</Address>
+          <Offsets>
+            <Offset>4708</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>309</ID>
+          <Description>"Monsters killed"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_stat_data_addr</Address>
+          <Offsets>
+            <Offset>476C</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>328</ID>
+          <Description>"Unknown"</Description>
+          <Options moHideChildren="1"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>308</ID>
+              <Description>"??"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_stat_data_addr</Address>
+              <Offsets>
+                <Offset>4480</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>325</ID>
+              <Description>"??"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_stat_data_addr</Address>
+              <Offsets>
+                <Offset>4498</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>310</ID>
+              <Description>"??"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_stat_data_addr</Address>
+              <Offsets>
+                <Offset>4670</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>321</ID>
+              <Description>"??"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_stat_data_addr</Address>
+              <Offsets>
+                <Offset>46B4</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>326</ID>
+              <Description>"??"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_stat_data_addr</Address>
+              <Offsets>
+                <Offset>46BC</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>320</ID>
+              <Description>"??"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_stat_data_addr</Address>
+              <Offsets>
+                <Offset>46C8</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>317</ID>
+              <Description>"??"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_stat_data_addr</Address>
+              <Offsets>
+                <Offset>46CC</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>322</ID>
+              <Description>"??"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_stat_data_addr</Address>
+              <Offsets>
+                <Offset>46D4</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>323</ID>
+              <Description>"??"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_stat_data_addr</Address>
+              <Offsets>
+                <Offset>46D8</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>313</ID>
+              <Description>"??"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_stat_data_addr</Address>
+              <Offsets>
+                <Offset>46EC</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>319</ID>
+              <Description>"??"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_stat_data_addr</Address>
+              <Offsets>
+                <Offset>4700</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>314</ID>
+              <Description>"??"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_stat_data_addr</Address>
+              <Offsets>
+                <Offset>4758</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>327</ID>
+              <Description>"??"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_stat_data_addr</Address>
+              <Offsets>
+                <Offset>4768</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>318</ID>
+              <Description>"??"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_stat_data_addr</Address>
+              <Offsets>
+                <Offset>47A4</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>324</ID>
+              <Description>"??"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_stat_data_addr</Address>
+              <Offsets>
+                <Offset>47B8</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>47</ID>
+      <Description>"Persona 3 Reload  /  https://opencheattables.com"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <Color>00A600</Color>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>238</ID>
+          <Description>"ペルソナ3リロード攻略wiki｜P3R "</Description>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>237</ID>
+              <Description>"https://altema.jp/persona3/chart1"</Description>
+              <Options moHideChildren="1"/>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>239</ID>
+                  <Description>"-sKILL id-"</Description>
+                  <DropDownList DisplayValueAsItem="1">0:--NONE--
+10:アギ
+11:アギラオ
+12:アギダイン
+13:マハラギ
+14:マハラギオン
+15:マハラギダイン
+16:インフェルノ
+18:マララギダイン
+20:ブフ
+21:ブフーラ
+22:ブフダイン
+23:マハブフ
+24:マハブフーラ
+25:マハブフダイン
+26:ダイアモンドダスト
+30:ガル
+31:ガルーラ
+32:ガルダイン
+33:マハガル
+34:マハガルーラ
+35:マハガルダイン
+36:万物流転
+40:ジオ
+41:ジオンガ
+42:ジオダイン
+43:マハジオ
+44:マハジオンガ
+45:マハジオダイン
+46:真理の雷
+50:ハマ
+51:ハマオン
+52:マハンマ
+53:マハンマオン
+54:回転説法
+56:コウハ
+57:コウガ
+58:コウガオン
+59:マハコウハ
+60:マハコウガ
+61:マハコウガオン
+62:神の審判
+64:ムド
+65:ムドオン
+66:マハムド
+67:マハムドオン
+68:死んでくれる？
+70:エイハ
+71:エイガ
+72:エイガオン
+73:マハエイハ
+74:マハエイガ
+75:マハエイガオン
+76:悪魔の審判
+78:メギド
+79:メギドラ
+80:メギドラオン
+81:漆黒の蛇
+82:明けの明星
+85:ポイズマ
+86:ポイズンミスト
+87:マリンカリン
+88:セクシーダンス
+89:ネコダマシ
+90:フラッシュノイズ
+91:プリンパ
+92:テンタラフー
+93:デビルタッチ
+94:デビルスマイル
+95:バリゾーゴン
+96:終末の予言
+100:亡者の嘆き
+101:淀んだ吐息
+102:淀んだ空気
+103:吸血
+104:吸魔
+105:ウィルスブレス
+110:パワースラッシュ
+111:デッドエンド
+112:五月雨斬り
+113:真空斬
+114:利剣乱舞
+115:デスバウンド
+116:ブレイブザッパー
+117:空間殺法
+118:天軍の剣
+119:月影
+120:残影
+121:ニューロクランチ
+125:突撃
+126:アサルトダイブ
+127:ギガンフィスト
+128:ラクカジャ
+129:金剛発破
+130:ヒートウェイブ
+131:ゴッドハンド
+132:アカシャアーツ
+133:ソニックパンチ
+139:シングルショット
+140:エンジェルアロー
+141:ミリオンシュート
+142:マッドアサルト
+143:アローシャワー
+144:刹那五月雨撃
+145:バスタアタック
+146:イノセントタック
+147:プララヤ
+148:ポイズンアロー
+155:ディア
+156:ディアラマ
+157:ディアラハン
+160:メディア
+161:メディラマ
+162:メディアラハン
+163:メシアライザー
+165:リカーム
+166:サマリカーム
+170:パトラ
+171:メパトラ
+172:バイスディ
+173:マハバイスディ
+176:アムリタシャワー
+177:アムリタドロップ
+180:タルカジャ
+181:ラクカジャ
+182:スクカジャ
+185:マハタルカジャ
+186:マハラクカジャ
+187:マハスクカジャ
+188:ヒートライザ
+190:タルンダ
+191:ラクンダ
+192:スクンダ
+195:マハタルンダ
+196:マハラクンダ
+197:マハスクンダ
+198:ランダマイザ
+200:デカジャ
+201:デクンダ
+205:チャージ
+206:コンセントレイト
+207:ブラッディチャージ
+210:リベリオン
+211:レボリューション
+215:テトラカーン
+216:マカラカーン
+220:火炎ガードキル
+221:氷結ガードキル
+222:疾風ガードキル
+223:電撃ガードキル
+230:大罪の徹甲弾
+231:エル・ジハード
+232:真空波
+233:大炎上
+234:大氷河期
+235:コズミックフレア
+236:ワンショットキル
+237:反逆の刃
+238:マスカレイド
+239:十文字斬り
+240:マガツマンダラ
+241:輝矢
+245:ハイアナライズ
+246:エスケープロード
+247:ジャミング
+248:タルタロスサーチ
+249:シルフィードオーラ
+250:ショックノイズ
+700:斬撃耐性
+701:斬撃無効
+702:斬撃反射
+703:斬撃吸収
+704:打撃耐性
+705:打撃無効
+706:打撃反射
+707:打撃吸収
+708:貫通耐性
+709:貫通無効
+710:貫通反射
+711:貫通吸収
+712:火炎耐性
+713:火炎無効
+714:火炎反射
+715:火炎吸収
+716:氷結耐性
+717:氷結無効
+718:氷結反射
+719:氷結吸収
+720:疾風耐性
+721:疾風無効
+722:疾風反射
+723:疾風吸收
+724:電撃耐性
+725:電撃無効
+726:電撃反射
+727:電撃吸収
+728:光耐性
+729:光無効
+730:光反射
+731:光吸収
+732:闇耐性
+733:闇無効
+734:闇反射
+735:闇吸収
+741:毒無効
+742:惱殺耐性
+744:動揺耐性
+746:混乱耐性
+748:恐怖耐性
+752:凍結耐性
+754:感耐性電
+755:感電無効
+756:不動心
+757:狀態異常耐性
+759:斬撃見切リ
+760:真・斬撃見切リ
+761:打撃見切リ
+762:真・打撃見切リ
+763:貫通見切リ
+764:真・貫通見切リ
+765:火炎見切リ
+766:真・火炎見切リ
+767:氷結見切リ
+768:真・氷結見切リ
+769:疾風見切リ
+770:真・疾風見切リ
+771:電撃見切リ
+772:真・電撃見切リ
+779:カウンタ
+780:ヘビーカウンタ
+781:ハイパーカウンタ
+784:小治癒促進
+785:中治癒促進
+786:大治癒促進
+788:小気功
+789:中気功
+790:大気功
+792:斬撃ブースタ
+793:斬撃ハイブースタ
+794:打擊ブースタ
+795:打擊ハイブースタ
+796:貫通ブースタ
+797:貫通ハイブースタ
+798:火炎ブースタ
+799:火炎ハイブースタ
+800:氷結ブースタ
+801:氷結ハイブースタ
+802:電撃ブースタ
+803:電撃ハイブースタ
+804:疾風ブースタ
+805:疾風ハイブースタ
+806:光ブースタ
+807:光ハイブースタ
+808:闇ブースタ
+809:闇ハイブースタ
+811:気絶率UP
+812:毒率UP
+813:惱殺率UP
+814:動揺率UP
+815:混乱率UP
+816:恐怖率UP
+817:ヤケクソ率UP
+818:凍結率UP
+819:感電率UP
+820:狀態異常成功率UP
+821:ハマ成功率UP
+822:ムド成功率UP
+825:スクカジャオート
+826:ラクカジャオート
+827:スクカジャオート
+829:マハラクカオート
+830:マハスクカオート
+831:リベリオンオート
+833:コーチング
+834:アドバンス
+835:食いしばり
+836:不屈の闘志
+838:勝利の息吹
+839:勝利の雄たけび
+841:神々の加護
+842:大天使の加護
+843:大虎
+844:明王の加護
+845:ローグロウ
+846:ミドルグロウ
+847:ハイグロウ
+848:アリ・ダンス
+850:光からの生還
+851:光からの大生還
+852:闇からの生還
+853:闇からの大生還
+854:生還トリック
+856:武道の素養
+857:魔術の素養
+863:万能ブースタ
+864:万能ハイブースタ
+865:魔導の才能
+866:魔導の極意
+869:急速回復
+870:瞬間回復
+871:物理耐性
+872:物理無効
+875:斬撃メガブースタ
+876:打擊メガブースタ
+877:貫通メガブースタ
+878:火炎メガブースタ
+879:氷結メガブースタ
+880:電撃メガブースタ
+881:疾風メガブースタ
+882:光メガブースタ
+883:闇メガブースタ
+884:クリティカルUP
+885:クリティカル大UP
+886:防炎の心得
+887:防氷の心得
+888:防雷の心得
+889:防風の心得
+890:ソウルシフト
+891:ソウルチェイン
+892:真・ソウルチェイン
+893:シフトブースタ
+894:シフトハイブースタ
+895:吸引の才能
+896:シングルブースタ
+897:マルチブースタ
+901:ウィークブースタ
+902:ウィークハイブースタ
+903:治癒の素養
+904:治癒の極致
+905:会心ブースタ
+906:会心ハイブースタ
+907:カジャブースタ
+908:カジャハイブースタ
+909:異常発破ブースタ
+910:異常発破ハイブースタ
+911:ウィークケア
+912:ウィークハイケア
+913:物理ブースタ
+914:物理ハイブースタ
+915:精神回復
+916:精神大回復
+917:スクンダオート
+918:マハスクンダオート
+919:強化オート
+920:ヒートライザオート
+</DropDownList>
+                  <GroupHeader>1</GroupHeader>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>285</ID>
+                  <Description>"-sKILL id-En-"</Description>
+                  <DropDownList DisplayValueAsItem="1">10:Agi
+11:Agilao
+12:Agidyne
+13:Maragi
+14:Maragion
+15:Maragidyne
+16:Inferno
+18:Maralagidyne
+20:Bufu
+21:Bufula
+22:Bufudyne
+23:Maufu
+24:Mabufula
+25:Mabufdyne
+26:Diamond Dust
+30:Garu
+31:Garula
+32:Garudyne
+33:Magaru
+34:Magarula
+35:Magarudyne
+36:Panta Rhei
+40:Zio
+41:Zionga
+42:Ziodyne
+43:Mazio
+44:Mazionga
+45:Maziodyne
+46:Thunder Reign
+50:Hama
+51:Hamaon
+52:Mahama
+53:Mahamaon
+54:Samsara
+56:Kouha
+57:Kouga
+58:Kougaon
+59:Makouha
+60:Makouga
+61:Makougaon
+62:Divine Judgement
+64:Mudo
+65:Mudoon
+66:Mamudo
+67:Mamudoon
+68:Die For Me!
+70:Eiha
+71:Eiga
+72:Eigaon
+73:Maeiha
+74:Maeiga
+75:Maeigaon
+76:Demonic Decree
+78:Megido
+79:Megidola
+80:Megidolaon
+81:Black Viper
+82:Morning Star
+85:Poisma
+86:Poison Mist
+87:Marin Karin
+88:Sexy Dance
+89:Bewilder
+90:Eerie Sound
+91:Pulinpa
+92:Tentarafoo
+93:Evil Touch
+94:Evil Smile
+95:Provoke
+96:Infuriate
+100:Ghastly Wail
+101:Foul Breath
+102:Stagnant Air
+103:Life Drain
+104:Spirit Drain
+105:Virus Breath
+110:Power Slash
+111:Fatal End
+112:Tempest Slash
+113:Vacuum Slash
+114:Blade of Fury
+115:Death Bound
+116:Brave Blade
+117:Vorpal Blade
+118:Heaven's Blade
+119:Getsu-ei
+120:Zan-ei
+121:Neuro Slash
+125:Bash
+126:Assult Dive
+127:Gigantic Fist
+128:Swift Strike
+129:Herculean Strike
+130:Heat Wave
+131:God's Hand
+132:Akasha Arts
+133:Sonic Punch
+140:Holy Arrow
+141:Torrent Shot
+142:Vile Assault
+143:Arrow Rain
+144:Myriad Arrows
+145:Cruel Attack
+146:Primal Force
+147:Pralaya
+148:Poison Arrow
+155:Dia
+156:Diarama
+157:Diarahan
+160:Media
+161:Mediarama
+162:Mediarahan
+163:Salvation
+165:Recarm
+166:Samarecarm
+167:Recarmdra
+170:Patra
+171:Me Patra
+172:Baisudi
+173:Mabaisudi
+176:Amtita Shower
+177:Amrita Drop
+180:Tarukaja
+181:Rakukaja
+182:Sukukaja
+185:Matarukaja
+186:Marakukaja
+187:Masukukaja
+188:Heat Riser
+189:Marakukaja
+190:Tarunda
+191:Rakunda
+192:Sukunda
+195:Matarunda
+196:Marakunda
+197:Masukunda
+198:Debilitate
+200:Dekaja
+201:Dekunda
+205:Charge
+206:Concentrate
+207:Bloody Charge
+210:Rebellion
+211:Revolution
+215:Tetrakarn
+216:Makarakarn
+220:Fire Break
+221:Ice Break
+222:Wind Break
+223:Elec Break
+230:Sinful Shell
+231:Wild Thunder
+232:Vacuum Wave
+233:Blazing Hell
+234:Ice Age
+235:Cosmic Flare
+236:One-Shot Kill
+237:Rebellion Blade
+238:Masquerade
+239:Cross Slash
+240:Magatsu Mandala
+241:Shining Arrows
+245:Full Analysis
+246:Escape Route
+247:Jamming
+248:Tartarus Search
+249:Sylphid Aura
+250:Shock Noise
+260:Cadenza
+261:Jack Brothers
+262:King and I
+263:Best Friends
+264:Scarlet Havoc
+265:Trickster
+266:Armageddon
+270:272	Oracle
+273:277	Revelation
+280:Cyclone Arrow
+281:Hack n' Blast
+282:Lightning Spike
+283:Blizzard Edge
+284:Oracle
+285:Orhia Mode
+286:Divine Retribution
+287:Hound of Hades
+288:Bleeding Fury
+310:All-Out Attack
+390:Death
+529:All Ailments (High)
+603:Precious Egg
+614:Soma
+700:Resist Slash
+701:Null Slash
+702:Repel Slash
+703:Drain Slash
+704:Strike Resist
+705:Null Strike
+706:Repel Strike
+707:Drain Strike
+708:Resist Pierce
+709:Null Pierce
+710:Repel Pierce
+711:Drain Pierce
+712:Resist Fire
+713:Null Fire
+714:Repel Fire
+715:Drain Fire
+716:Resist Ice
+717:Null Ice
+718:Repel Ice
+719:Drain Ice
+720:Resist Wind
+721:Null Wind
+722:Repel Wind
+723:Drain Wind
+724:Resist Elec
+725:Null Elec
+726:Repel Elec
+727:Drain Elec
+728:Resist Light
+729:Null Light
+730:Repel Light
+731:Drain Light
+732:Resist Dark
+733:Null Dark
+734:Repel Dark
+735:Drain Dark
+738:Resist Dizzy
+739:Null Dizzy
+740:Resist Poison
+741:Null Poison
+742:Resist Charm
+743:Null Charm
+744:Resist Distress
+745:Null Distress
+746:Resist Confuse
+747:Null Confuse
+748:Resist Fear
+749:Null Fear
+750:Resist Rage
+751:Null Rage
+752:Resist Freeze
+753:Null Freeze
+754:Resist Shock
+755:Null Shock
+756:Unshaken Will
+757:Resist Ailmets
+759:Dodge Slash
+760:Evade Slash
+761:Dodge Strike
+762:Evade Strike
+763:Dodge Pierce
+764:Evade Pierce
+765:Dodge Fire
+766:Evade Fire
+767:Dodge Ice
+768:Evade Ice
+769:Dodge Wind
+770:Evade Wind
+771:Dodge Elec
+772:Evade Elec
+773:Dodge Light
+774:Evade Light
+775:Dodge Dark
+776:Evade Dark
+779:Counter
+780:Counterstrike
+781:High Counter
+784:Regen 1
+785:Regen 2
+786:Regen 3
+788:Invigorate 1
+789:Invigorate 2
+790:Invigorate 3
+792:Slash Boost
+793:Slash Amp
+794:Strike Boost
+795:Strike Amp
+796:Pierce Boost
+797:Peirce Amp
+798:Fire Boost
+799:Fire Amp
+800:Ice Boost
+801:Ice Amp
+802:Wind Boost
+803:Wind Amp
+804:Elec Boost
+805:Elec Amp
+806:Light Boost
+807:Light Amp
+808:Dark Boost
+809:Dark Amp
+811:Dizzy Boost
+812:Poison Boost
+813:Charm Boost
+814:Distress Boost
+815:Confuse Boost
+816:Fear Boost
+817:Rage Boost
+818:Freeze Boost
+819:Shock Boost
+820:Ailment Boost
+821:Hama Boost
+822:Mudo Boost
+825:Auto Tarukaja
+826:Auto Rakukaja
+827:Auto Sukukaja
+828:Auto Mataru
+829:Auto Maraku
+830:Auto Masuku
+831:Auto Rebelion
+834:Apt Pupil
+835:Endure
+836:Enduring Soul
+838:Life Aid
+839:Victory Cry
+841:Divine Grace
+842:Angelic Grace
+843:Raging Tiger
+844:Vidyaraja's Blessing
+845:Growth 1
+846:Growth 2
+847:Growth 3
+848:Ali Dance
+849:Firm Stance
+850:Survive Light
+851:Endure Light
+852:Survive Dark
+853:Endure Dark
+854:Survival Trick
+856:Arms Master
+857:Spell Master
+863:Almighty Boost
+864:Almighty Amp
+865:Magic Ability
+866:Magic Mastery
+869:Fast Heal
+870:Insta-Heal
+871:Resist Phys
+872:Null Phys
+875:Slash Driver
+876:Strike Driver
+877:Pierce Driver
+878:Fire Driver
+879:Ice Driver
+880:Elec Driver
+881:Wind Driver
+882:Light Driver
+883:Dark Driver
+884:Crit Rate Boost
+885:Crit Rate Amp
+886:Anti-Fire Master
+887:Anti-Ice Master
+888:Anti-Elec Master
+889:Anti-Wind Master
+890:Soul Shift
+891:Soul Chain
+892:Soul Link
+893:Shift Boost
+894:Shift Amp
+895:Drain Ability
+896:Single Target Boost
+897:Multi-Target Boost
+</DropDownList>
+                  <GroupHeader>1</GroupHeader>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+  <LuaScript>function onMemRecPostExecute(memoryrecord, newState, succeeded )
+    if memoryrecord.Type == vtAutoAssembler and memoryrecord.Script:find("NO_ACTIVATE") and newState and succeeded then
+        memoryrecord.disableWithoutExecute()
+    end
+end
+
+IDs = { 239,237,  23,10,21,22,235,37,34,179,95,96  }
+
+function contains(table, val)
+   local i = 0
+   for i=1, #table do
+      if table[i] == val then
+         return true
+      end
+   end
+   return false
+end
+
+
+function onMemRecPreExecute(memoryrecord, newstate)
+    if contains(IDs, memoryrecord.ID) and newstate then
+	    memoryrecord.OnActivate = function(memoryrecord, before, currentstate)
+		    return false
+	    end
+    end
+end
+
+AddressList.Header.OnSectionClick = nil
+
+</LuaScript>
+</CheatTable>

@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="51">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>0</ID>
+      <Description>"Activate Mono V1.19.0"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{$lua}
+[ENABLE]
+LaunchMonoDataCollector();
+
+[DISABLE]
+
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>4</ID>
+          <Description>"Ultra HP"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : Echo Generation.exe
+  Version: 
+  Date   : 2026-07-20
+  Author : lixiang
+  描述 : 
+
+  &lt;Optional info&gt;
+}
+
+[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+
+ 
+ 
+aobscanmodule(INJECT,GameAssembly.dll,89 58 38 48 8B 5C 24 30) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+//  mov [rax+38],ebx
+  mov rbx,[rsp+30]
+  jmp return
+
+code:
+  mov [rax+38],ebx
+  mov rbx,[rsp+30]
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+INJECT:
+  db 89 58 38 48 8B 5C 24 30
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+4CEDEE
+
+GameAssembly.dll+4CEDCC: E8 7F AE FF FF  - call Cococucumber.MyEnums.GetSaveDataFromCharacter
+GameAssembly.dll+4CEDD1: 48 85 C0        - test rax,rax
+GameAssembly.dll+4CEDD4: 75 13           - jne GameAssembly.dll+4CEDE9
+GameAssembly.dll+4CEDD6: 89 5F 1C        - mov [rdi+1C],ebx
+GameAssembly.dll+4CEDD9: 48 8B 5C 24 30  - mov rbx,[rsp+30]
+GameAssembly.dll+4CEDDE: 48 8B 74 24 38  - mov rsi,[rsp+38]
+GameAssembly.dll+4CEDE3: 48 83 C4 20     - add rsp,20
+GameAssembly.dll+4CEDE7: 5F              - pop rdi
+GameAssembly.dll+4CEDE8: C3              - ret 
+GameAssembly.dll+4CEDE9: 48 8B 74 24 38  - mov rsi,[rsp+38]
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+4CEDEE: 89 58 38        - mov [rax+38],ebx
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+4CEDF1: 48 8B 5C 24 30  - mov rbx,[rsp+30]
+GameAssembly.dll+4CEDF6: 48 83 C4 20     - add rsp,20
+GameAssembly.dll+4CEDFA: 5F              - pop rdi
+GameAssembly.dll+4CEDFB: C3              - ret 
+GameAssembly.dll+4CEDFC: CC              - int 3 
+GameAssembly.dll+4CEDFD: CC              - int 3 
+GameAssembly.dll+4CEDFE: CC              - int 3 
+GameAssembly.dll+4CEDFF: CC              - int 3 
+Cococucumber.StatHandler.SetTempStrength: 89 51 24        - mov [rcx+24],edx
+GameAssembly.dll+4CEE03: C3              - ret 
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>12</ID>
+          <Description>"EXP+65535"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : Echo Generation.exe
+  Version: 
+  Date   : 2026-08-28
+  Author : lixiang
+  描述 : 
+
+  &lt;Optional info&gt;
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,GameAssembly.dll,89 68 30 75 13) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+  mov [rax+30],ebp
+  add [rax+30],ffff
+  jne GameAssembly.dll+4C4AE9
+  jmp return
+
+code:
+  mov [rax+30],ebp
+  jne GameAssembly.dll+4C4AE9
+  jmp return
+
+INJECT:
+  jmp newmem
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db 89 68 30 75 13
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+4C4AD1
+
+GameAssembly.dll+4C4AA7: 8B 78 2C              - mov edi,[rax+2C]
+GameAssembly.dll+4C4AAA: 83 B9 E4 00 00 00 00  - cmp dword ptr [rcx+000000E4],00
+GameAssembly.dll+4C4AB1: 75 05                 - jne GameAssembly.dll+4C4AB8
+GameAssembly.dll+4C4AB3: E8 A8 41 E0 FF        - call GameAssembly.il2cpp_runtime_class_init
+GameAssembly.dll+4C4AB8: 33 D2                 - xor edx,edx
+GameAssembly.dll+4C4ABA: 8B CF                 - mov ecx,edi
+GameAssembly.dll+4C4ABC: E8 5F AA 00 00        - call Cococucumber.MyEnums.GetSaveDataFromCharacter
+GameAssembly.dll+4C4AC1: 48 85 C0              - test rax,rax
+GameAssembly.dll+4C4AC4: 0F 84 BC 00 00 00     - je GameAssembly.dll+4C4B86
+GameAssembly.dll+4C4ACA: 80 3D F1 D8 A0 02 00  - cmp byte ptr [GameAssembly.dll+2ED23C2],00
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+4C4AD1: 89 68 30              - mov [rax+30],ebp
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+4C4AD4: 75 13                 - jne GameAssembly.dll+4C4AE9
+GameAssembly.dll+4C4AD6: 48 8D 0D 83 68 89 02  - lea rcx,[GameAssembly.dll+2D5B360]
+GameAssembly.dll+4C4ADD: E8 AE 3E E0 FF        - call GameAssembly.il2cpp_get_exception_argument_null+500
+GameAssembly.dll+4C4AE2: C6 05 D9 D8 A0 02 01  - mov byte ptr [GameAssembly.dll+2ED23C2],01
+GameAssembly.dll+4C4AE9: 48 8B 43 10           - mov rax,[rbx+10]
+GameAssembly.dll+4C4AED: 48 85 C0              - test rax,rax
+GameAssembly.dll+4C4AF0: 0F 84 90 00 00 00     - je GameAssembly.dll+4C4B86
+GameAssembly.dll+4C4AF6: 48 8B 0D 63 68 89 02  - mov rcx,[GameAssembly.dll+2D5B360]
+GameAssembly.dll+4C4AFD: 8B 78 2C              - mov edi,[rax+2C]
+GameAssembly.dll+4C4B00: 83 B9 E4 00 00 00 00  - cmp dword ptr [rcx+000000E4],00
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>15</ID>
+          <Description>"Money Add"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : Echo Generation.exe
+  Version: 
+  Date   : 2026-08-28
+  Author : lixiang
+  描述 : 
+
+  &lt;Optional info&gt;
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,GameAssembly.dll,F3 0F 11 B3 00 01 00 00) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+  addss xmm6,[rbx+00000100]
+  movss [rbx+00000100],xmm6
+  jmp return
+
+code:
+  movss [rbx+00000100],xmm6
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db F3 0F 11 B3 00 01 00 00
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+3EFD62
+
+GameAssembly.dll+3EFD34: 45 33 C9                 - xor r9d,r9d
+GameAssembly.dll+3EFD37: 41 B8 01 00 00 00        - mov r8d,00000001
+GameAssembly.dll+3EFD3D: 48 8B CF                 - mov rcx,rdi
+GameAssembly.dll+3EFD40: 48 8B 80 B8 00 00 00     - mov rax,[rax+000000B8]
+GameAssembly.dll+3EFD47: F2 0F 10 00              - movsd xmm0,[rax]
+GameAssembly.dll+3EFD4B: 8B 40 08                 - mov eax,[rax+08]
+GameAssembly.dll+3EFD4E: F2 0F 11 44 24 40        - movsd [rsp+40],xmm0
+GameAssembly.dll+3EFD54: 89 44 24 48              - mov [rsp+48],eax
+GameAssembly.dll+3EFD58: E8 73 CF FD FF           - call AudioManager.PlayAudioFX
+GameAssembly.dll+3EFD5D: 48 8B 7C 24 70           - mov rdi,[rsp+70]
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+3EFD62: F3 0F 11 B3 00 01 00 00  - movss [rbx+00000100],xmm6
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+3EFD6A: 0F 28 74 24 50           - movaps xmm6,[rsp+50]
+GameAssembly.dll+3EFD6F: 48 83 C4 60              - add rsp,60
+GameAssembly.dll+3EFD73: 5B                       - pop rbx
+GameAssembly.dll+3EFD74: C3                       - ret 
+GameAssembly.dll+3EFD75: E8 56 8E ED FF           - call GameAssembly.mono_method_get_class+B0
+GameAssembly.dll+3EFD7A: CC                       - int 3 
+GameAssembly.dll+3EFD7B: CC                       - int 3 
+GameAssembly.dll+3EFD7C: CC                       - int 3 
+GameAssembly.dll+3EFD7D: CC                       - int 3 
+GameAssembly.dll+3EFD7E: CC                       - int 3 
+}
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <CheatCodes>
+    <CodeEntry>
+      <Description>HP 代码 :mov [rax+38],ebx</Description>
+      <AddressString>GameAssembly.dll+4CEDEE</AddressString>
+      <Before>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>74</Byte>
+        <Byte>24</Byte>
+        <Byte>38</Byte>
+      </Before>
+      <Actual>
+        <Byte>89</Byte>
+        <Byte>58</Byte>
+        <Byte>38</Byte>
+      </Actual>
+      <After>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>5C</Byte>
+        <Byte>24</Byte>
+        <Byte>30</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>EXP 代码 :mov [rax+30],ebp</Description>
+      <AddressString>GameAssembly.dll+4C4AD1</AddressString>
+      <Before>
+        <Byte>F1</Byte>
+        <Byte>D8</Byte>
+        <Byte>A0</Byte>
+        <Byte>02</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>89</Byte>
+        <Byte>68</Byte>
+        <Byte>30</Byte>
+      </Actual>
+      <After>
+        <Byte>75</Byte>
+        <Byte>13</Byte>
+        <Byte>48</Byte>
+        <Byte>8D</Byte>
+        <Byte>0D</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Money 代码 :movss [rbx+00000100],xmm6</Description>
+      <AddressString>GameAssembly.dll+3EFD62</AddressString>
+      <Before>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>7C</Byte>
+        <Byte>24</Byte>
+        <Byte>70</Byte>
+      </Before>
+      <Actual>
+        <Byte>F3</Byte>
+        <Byte>0F</Byte>
+        <Byte>11</Byte>
+        <Byte>B3</Byte>
+        <Byte>00</Byte>
+        <Byte>01</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>0F</Byte>
+        <Byte>28</Byte>
+        <Byte>74</Byte>
+        <Byte>24</Byte>
+        <Byte>50</Byte>
+      </After>
+    </CodeEntry>
+  </CheatCodes>
+  <UserdefinedSymbols/>
+</CheatTable>

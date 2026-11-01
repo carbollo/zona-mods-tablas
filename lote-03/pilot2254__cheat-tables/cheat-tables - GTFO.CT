@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>5</ID>
+      <Description>"Weapons"</Description>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>6</ID>
+          <Description>"Ammo"</Description>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>7</ID>
+              <Description>"Primary"</Description>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>1</ID>
+                  <Description>"Primary - Reloading does not decrease ammo"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>{ Game   : GTFO
+  Version: 
+  Date   : 2025-06-23
+  Author : misof
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,GameAssembly.dll,89 B9 00 01 00 00) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  nop
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db 89 B9 00 01 00 00
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+799846
+
+GameAssembly.dll+79981D: E8 DE 5A 59 01           - call GameAssembly.dll+1D2F300
+GameAssembly.dll+799822: 84 C0                    - test al,al
+GameAssembly.dll+799824: 74 2B                    - je GameAssembly.dll+799851
+GameAssembly.dll+799826: 48 8B 4C 24 30           - mov rcx,[rsp+30]
+GameAssembly.dll+79982B: 48 85 C9                 - test rcx,rcx
+GameAssembly.dll+79982E: 74 36                    - je GameAssembly.dll+799866
+GameAssembly.dll+799830: F3 0F 10 44 24 50        - movss xmm0,[rsp+50]
+GameAssembly.dll+799836: 33 D2                    - xor edx,edx
+GameAssembly.dll+799838: F3 0F 11 81 04 01 00 00  - movss [rcx+00000104],xmm0
+GameAssembly.dll+799840: 89 B1 FC 00 00 00        - mov [rcx+000000FC],esi
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+799846: 89 B9 00 01 00 00        - mov [rcx+00000100],edi
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+79984C: E8 CF ED FF FF           - call GameAssembly.dll+798620
+GameAssembly.dll+799851: 48 8B 5C 24 38           - mov rbx,[rsp+38]
+GameAssembly.dll+799856: 48 8B 6C 24 40           - mov rbp,[rsp+40]
+GameAssembly.dll+79985B: 48 8B 74 24 48           - mov rsi,[rsp+48]
+GameAssembly.dll+799860: 48 83 C4 20              - add rsp,20
+GameAssembly.dll+799864: 5F                       - pop rdi
+GameAssembly.dll+799865: C3                       - ret 
+GameAssembly.dll+799866: E8 B5 3F B5 FF           - call GameAssembly.dll+2ED820
+GameAssembly.dll+79986B: CC                       - int 3 
+GameAssembly.dll+79986C: CC                       - int 3 
+}
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>2</ID>
+                  <Description>"Primary - Bullets do not decrease"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>{ Game   : GTFO
+  Version: 
+  Date   : 2025-06-23
+  Author : misof
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,GameAssembly.dll,FF 8B 90 02 00 00 48 8B 90 B8 0A 00 00 FF) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  nop
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db FF 8B 90 02 00 00
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+53A6B2
+
+GameAssembly.dll+53A693: 48 8B 83 20 02 00 00        - mov rax,[rbx+00000220]
+GameAssembly.dll+53A69A: FF C6                       - inc esi
+GameAssembly.dll+53A69C: 49 83 C6 08                 - add r14,08
+GameAssembly.dll+53A6A0: 8B CE                       - mov ecx,esi
+GameAssembly.dll+53A6A2: 48 8B F8                    - mov rdi,rax
+GameAssembly.dll+53A6A5: 48 85 C0                    - test rax,rax
+GameAssembly.dll+53A6A8: 74 7A                       - je GameAssembly.dll+53A724
+GameAssembly.dll+53A6AA: EB A4                       - jmp GameAssembly.dll+53A650
+GameAssembly.dll+53A6AC: 48 8B 03                    - mov rax,[rbx]
+GameAssembly.dll+53A6AF: 48 8B CB                    - mov rcx,rbx
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+53A6B2: FF 8B 90 02 00 00           - dec [rbx+00000290]
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+53A6B8: 48 8B 90 B8 0A 00 00        - mov rdx,[rax+00000AB8]
+GameAssembly.dll+53A6BF: FF 90 B0 0A 00 00           - call qword ptr [rax+00000AB0]
+GameAssembly.dll+53A6C5: 44 0F 28 94 24 C0 00 00 00  - movaps xmm10,[rsp+000000C0]
+GameAssembly.dll+53A6CE: 44 0F 28 8C 24 D0 00 00 00  - movaps xmm9,[rsp+000000D0]
+GameAssembly.dll+53A6D7: 44 0F 28 84 24 E0 00 00 00  - movaps xmm8,[rsp+000000E0]
+GameAssembly.dll+53A6E0: 0F 28 BC 24 F0 00 00 00     - movaps xmm7,[rsp+000000F0]
+GameAssembly.dll+53A6E8: 0F 28 B4 24 00 01 00 00     - movaps xmm6,[rsp+00000100]
+GameAssembly.dll+53A6F0: 4C 8B BC 24 10 01 00 00     - mov r15,[rsp+00000110]
+GameAssembly.dll+53A6F8: 4C 8B B4 24 18 01 00 00     - mov r14,[rsp+00000118]
+GameAssembly.dll+53A700: 4C 8B AC 24 58 01 00 00     - mov r13,[rsp+00000158]
+}
+</AssemblerScript>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>8</ID>
+              <Description>"Secondary"</Description>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>3</ID>
+                  <Description>"Secondary - Bullets do not decrease"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>{ Game   : GTFO
+  Version: 
+  Date   : 2025-06-23
+  Author : misof
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,GameAssembly.dll,FF 8B 90 02 00 00) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  nop
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db FF 8B 90 02 00 00
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+49DCF5
+
+GameAssembly.dll+49DCC9: 74 18                       - je GameAssembly.dll+49DCE3
+GameAssembly.dll+49DCCB: 83 B8 E0 00 00 00 00        - cmp dword ptr [rax+000000E0],00
+GameAssembly.dll+49DCD2: 75 0F                       - jne GameAssembly.dll+49DCE3
+GameAssembly.dll+49DCD4: 48 8B C8                    - mov rcx,rax
+GameAssembly.dll+49DCD7: E8 E4 66 DD FF              - call GameAssembly.il2cpp_runtime_class_init
+GameAssembly.dll+49DCDC: 48 8B 05 CD 28 15 03        - mov rax,[GameAssembly.dll+35F05B0]
+GameAssembly.dll+49DCE3: 48 8B 80 B8 00 00 00        - mov rax,[rax+000000B8]
+GameAssembly.dll+49DCEA: F3 0F 11 70 18              - movss [rax+18],xmm6
+GameAssembly.dll+49DCEF: 48 8B 03                    - mov rax,[rbx]
+GameAssembly.dll+49DCF2: 48 8B CB                    - mov rcx,rbx
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+49DCF5: FF 8B 90 02 00 00           - dec [rbx+00000290]
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+49DCFB: 48 8B 90 B8 0A 00 00        - mov rdx,[rax+00000AB8]
+GameAssembly.dll+49DD02: 44 0F 28 94 24 50 01 00 00  - movaps xmm10,[rsp+00000150]
+GameAssembly.dll+49DD0B: 44 0F 28 8C 24 60 01 00 00  - movaps xmm9,[rsp+00000160]
+GameAssembly.dll+49DD14: 44 0F 28 84 24 70 01 00 00  - movaps xmm8,[rsp+00000170]
+GameAssembly.dll+49DD1D: 0F 28 BC 24 80 01 00 00     - movaps xmm7,[rsp+00000180]
+GameAssembly.dll+49DD25: 0F 28 B4 24 90 01 00 00     - movaps xmm6,[rsp+00000190]
+GameAssembly.dll+49DD2D: 4C 8B BC 24 A0 01 00 00     - mov r15,[rsp+000001A0]
+GameAssembly.dll+49DD35: 4C 8B B4 24 A8 01 00 00     - mov r14,[rsp+000001A8]
+GameAssembly.dll+49DD3D: 4C 8B AC 24 B0 01 00 00     - mov r13,[rsp+000001B0]
+GameAssembly.dll+49DD45: 4C 8B A4 24 E8 01 00 00     - mov r12,[rsp+000001E8]
+}
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>4</ID>
+                  <Description>"Secondary - Reloading does not decrease ammo"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>{ Game   : GTFO
+  Version: 
+  Date   : 2025-06-23
+  Author : misof
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,GameAssembly.dll,89 B9 00 01 00 00) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  nop
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db 89 B9 00 01 00 00
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+799846
+
+GameAssembly.dll+79981D: E8 DE 5A 59 01           - call GameAssembly.dll+1D2F300
+GameAssembly.dll+799822: 84 C0                    - test al,al
+GameAssembly.dll+799824: 74 2B                    - je GameAssembly.dll+799851
+GameAssembly.dll+799826: 48 8B 4C 24 30           - mov rcx,[rsp+30]
+GameAssembly.dll+79982B: 48 85 C9                 - test rcx,rcx
+GameAssembly.dll+79982E: 74 36                    - je GameAssembly.dll+799866
+GameAssembly.dll+799830: F3 0F 10 44 24 50        - movss xmm0,[rsp+50]
+GameAssembly.dll+799836: 33 D2                    - xor edx,edx
+GameAssembly.dll+799838: F3 0F 11 81 04 01 00 00  - movss [rcx+00000104],xmm0
+GameAssembly.dll+799840: 89 B1 FC 00 00 00        - mov [rcx+000000FC],esi
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+799846: 89 B9 00 01 00 00        - mov [rcx+00000100],edi
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+79984C: E8 CF ED FF FF           - call GameAssembly.dll+798620
+GameAssembly.dll+799851: 48 8B 5C 24 38           - mov rbx,[rsp+38]
+GameAssembly.dll+799856: 48 8B 6C 24 40           - mov rbp,[rsp+40]
+GameAssembly.dll+79985B: 48 8B 74 24 48           - mov rsi,[rsp+48]
+GameAssembly.dll+799860: 48 83 C4 20              - add rsp,20
+GameAssembly.dll+799864: 5F                       - pop rdi
+GameAssembly.dll+799865: C3                       - ret 
+GameAssembly.dll+799866: E8 B5 3F B5 FF           - call GameAssembly.dll+2ED820
+GameAssembly.dll+79986B: CC                       - int 3 
+GameAssembly.dll+79986C: CC                       - int 3 
+}
+</AssemblerScript>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>9</ID>
+      <Description>"Cheats created by @michal.flaska"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>10</ID>
+      <Description>"WORK IN PROGRESS"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+  </CheatEntries>
+  <CheatCodes>
+    <CodeEntry>
+      <Description>Code :mov [rcx+00000100],edi</Description>
+      <AddressString>GameAssembly.dll+799846</AddressString>
+      <Before>
+        <Byte>B1</Byte>
+        <Byte>FC</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>89</Byte>
+        <Byte>B9</Byte>
+        <Byte>00</Byte>
+        <Byte>01</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>E8</Byte>
+        <Byte>CF</Byte>
+        <Byte>ED</Byte>
+        <Byte>FF</Byte>
+        <Byte>FF</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Change of dec [rbx+00000290]</Description>
+      <AddressString>GameAssembly.dll+53A6B2</AddressString>
+      <Before>
+        <Byte>8B</Byte>
+        <Byte>03</Byte>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>CB</Byte>
+      </Before>
+      <Actual>
+        <Byte>FF</Byte>
+        <Byte>8B</Byte>
+        <Byte>90</Byte>
+        <Byte>02</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>90</Byte>
+        <Byte>B8</Byte>
+        <Byte>0A</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :dec [rbx+00000290]</Description>
+      <AddressString>GameAssembly.dll+49DCF5</AddressString>
+      <Before>
+        <Byte>8B</Byte>
+        <Byte>03</Byte>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>CB</Byte>
+      </Before>
+      <Actual>
+        <Byte>FF</Byte>
+        <Byte>8B</Byte>
+        <Byte>90</Byte>
+        <Byte>02</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>90</Byte>
+        <Byte>B8</Byte>
+        <Byte>0A</Byte>
+      </After>
+    </CodeEntry>
+  </CheatCodes>
+  <UserdefinedSymbols/>
+</CheatTable>

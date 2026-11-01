@@ -1,0 +1,651 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>10</ID>
+      <Description>"Enable Valheim"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{$lua}
+
+[ENABLE]
+openProcess("valheim.exe")
+if process then
+    mono_initialize()
+    LaunchMonoDataCollector()
+else
+    error('Cannot find Valheim')
+end
+
+[DISABLE]
+</AssemblerScript>
+      <Hotkeys>
+        <Hotkey Active="0">
+          <Action>Toggle Activation</Action>
+          <Keys/>
+          <ID>0</ID>
+        </Hotkey>
+      </Hotkeys>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>13</ID>
+      <Description>"Stamina"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+//aobScan(_scan04, 48 63 46 38 FF C8 89 46 38 48 8B CF )
+//registersymbol(_scan04)
+Player:RPC_UseStamina:
+ret
+nop
+nop
+nop
+
+
+
+
+/*
+203DFEE0C17 - 48 63 46 38  - movsxd  rax,dword ptr [rsi+38]
+203DFEE0C1B - FF C8  - dec eax
+203DFEE0C1D - 89 46 38  - mov [rsi+38],eax &lt;&lt;
+203DFEE0C20 - 48 8B CF  - mov rcx,rdi
+203DFEE0C23 - 66 66 90 - nop 3
+*/
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+Player:RPC_UseStamina:
+db 48 83 EC 18
+</AssemblerScript>
+      <Hotkeys>
+        <Hotkey Active="0">
+          <Action>Toggle Activation</Action>
+          <Keys/>
+          <ID>0</ID>
+        </Hotkey>
+      </Hotkeys>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>21</ID>
+      <Description>"Eitr"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+//aobScan(_scan04, 48 63 46 38 FF C8 89 46 38 48 8B CF )
+//registersymbol(_scan04)
+Player:RPC_UseEitr:
+ret
+nop
+nop
+nop
+
+
+
+
+/*
+Player:RPC_UseEitr - 48 83 EC 18           - sub rsp,18 { 24 }
+Player:RPC_UseEitr+4- 48 89 34 24           - mov [rsp],rsi
+Player:RPC_UseEitr+8- 48 8B F1              - mov rsi,rcx
+Player:RPC_UseEitr+b- F3 0F11 54 24 10      - movss [rsp+10],xmm2
+Player:RPC_UseEitr+11- F3 0F10 44 24 10      - movss xmm0,[rsp+10]
+Player:RPC_UseEitr+17- F3 0F5A C0            - cvtss2sd xmm0,xmm0
+
+*/
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+Player:RPC_UseEitr:
+db 48 83 EC 18
+</AssemblerScript>
+      <Hotkeys>
+        <Hotkey Active="0">
+          <Action>Toggle Activation</Action>
+          <Keys/>
+          <ID>0</ID>
+        </Hotkey>
+      </Hotkeys>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>11</ID>
+      <Description>"Inf Food"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+//aobScan(_scan04, 48 63 46 38 FF C8 89 46 38 48 8B CF )
+//registersymbol(_scan04)
+Inventory:RemoveOneItem:
+ret
+
+
+
+
+/*
+203DFEE0C17 - 48 63 46 38  - movsxd  rax,dword ptr [rsi+38]
+203DFEE0C1B - FF C8  - dec eax
+203DFEE0C1D - 89 46 38  - mov [rsi+38],eax &lt;&lt;
+203DFEE0C20 - 48 8B CF  - mov rcx,rdi
+203DFEE0C23 - 66 66 90 - nop 3
+*/
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+Inventory:RemoveOneItem:
+db 55
+</AssemblerScript>
+      <Hotkeys>
+        <Hotkey Active="0">
+          <Action>Toggle Activation</Action>
+          <Keys/>
+          <ID>0</ID>
+        </Hotkey>
+      </Hotkeys>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>18</ID>
+      <Description>"AlwaysFull"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+//aobScan(_scan04, 48 63 46 38 FF C8 89 46 38 48 8B CF )
+//registersymbol(_scan04)
+Player:UpdateFood+13f:
+nop
+nop
+nop
+nop
+
+
+
+
+/*
+Player:UpdateFood+127 - 48 8B C1              - mov rax,rcx
+Player:UpdateFood+12a - F3 0F10 41 20         - movss xmm0,[rcx+20]
+Player:UpdateFood+12f - F3 0F5A C0            - cvtss2sd xmm0,xmm0
+Player:UpdateFood+133 - F3 0F10 0D 35050000   - movss xmm1,[Player:UpdateFood+670] { (1.00) }
+Player:UpdateFood+13b - F3 0F5A C9            - cvtss2sd xmm1,xmm1
+Player:UpdateFood+13f - F2 0F5C C1            - subsd xmm0,xmm1 &lt;&lt;
+Player:UpdateFood+143 - F2 0F5A E8            - cvtsd2ss xmm5,xmm0
+Player:UpdateFood+147 - F3 41 0F11 6F 20      - movss [r15+20],xmm5
+Player:UpdateFood+14d - F3 41 0F10 47 20      - movss xmm0,[r15+20]
+Player:UpdateFood+153 - F3 0F5A C0            - cvtss2sd xmm0,xmm0
+Player:UpdateFood+157 - 49 8B 47 18           - mov rax,[r15+18]
+
+*/
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+Player:UpdateFood+13f:
+db F2 0F 5C C1
+</AssemblerScript>
+      <Hotkeys>
+        <Hotkey Active="0">
+          <Action>Toggle Activation</Action>
+          <Keys/>
+          <ID>0</ID>
+        </Hotkey>
+      </Hotkeys>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>20</ID>
+      <Description>"DontDropWhenDead"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+//aobScan(_scan04, 48 63 46 38 FF C8 89 46 38 48 8B CF )
+//registersymbol(_scan04)
+Player:CreateTombStone:
+ret
+
+
+
+
+/*
+21929A038CA: 00 00                          - add [rax],al
+21929A038CC: 00 00                          - add [rax],al
+21929A038CE: 00 00                          - add [rax],al
+// ---------- INJECTING HERE ----------
+Player:CreateTombStone: 55                             - push rbp
+// ---------- DONE INJECTING  ----------
+Player:CreateTombStone+1: 48 8B EC                       - mov rbp,rsp
+Player:CreateTombStone+4: 48 81 EC 90 00 00 00           - sub rsp,00000090
+Player:CreateTombStone+b: 48 89 75 F0                    - mov [rbp-10],rsi
+Player:CreateTombStone+f: 48 89 7D F8                    - mov [rbp-08],rdi
+Player:CreateTombStone+13: 48 8B F1                       - mov rsi,rcx
+Player:CreateTombStone+16: 48 8B 86 80 03 00 00           - mov rax,[rsi+00000380]
+Player:CreateTombStone+1d: 48 8B C8                       - mov rcx,rax
+Player:CreateTombStone+20: 83 39 00                       - cmp dword ptr [rcx],00
+
+*/
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+Player:CreateTombStone:
+db 55
+</AssemblerScript>
+      <Hotkeys>
+        <Hotkey Active="0">
+          <Action>Toggle Activation</Action>
+          <Keys/>
+          <ID>0</ID>
+        </Hotkey>
+      </Hotkeys>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>19</ID>
+      <Description>"QuickBowDraw"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+aobScanRegion(aob_quickbowdraw, Humanoid:GetAttackDrawPercentage, Humanoid:GetAttackDrawPercentage+200, 66 0F 57 C9  66 0F 2F C8 7A 06 0F 82 15 00 00 00)
+//aobScan(aob_quickbowdraw, 66 0F 57 C9  66 0F 2F C8 7A 06 0F 82 15 00 00 00)
+registersymbol(aob_quickbowdraw)
+aob_quickbowdraw+8:
+db EB
+
+
+
+
+/*
+Humanoid:GetAttackDrawPercentage+f7 - F2 0F5A E8            - cvtsd2ss xmm5,xmm0
+Humanoid:GetAttackDrawPercentage+fb - F3 0F11 6D E8         - movss [rbp-18],xmm5
+Humanoid:GetAttackDrawPercentage+100- F3 0F10 45 E8         - movss xmm0,[rbp-18]
+Humanoid:GetAttackDrawPercentage+105- F3 0F5A C0            - cvtss2sd xmm0,xmm0
+Humanoid:GetAttackDrawPercentage+109- 66 0F57 C9            - xorpd xmm1,xmm1
+Humanoid:GetAttackDrawPercentage+10d- 66 0F2F C8            - comisd xmm1,xmm0
+Humanoid:GetAttackDrawPercentage+111- 7A 06                 - jp Humanoid:GetAttackDrawPercentage+119
+Humanoid:GetAttackDrawPercentage+113- 0F82 15000000         - jb Humanoid:GetAttackDrawPercentage+12e
+Humanoid:GetAttackDrawPercentage+119- F3 0F10 05 5F000000   - movss xmm0,[Humanoid:GetAttackDrawPercentage+180] { (1.00) }
+Humanoid:GetAttackDrawPercentage+121- F3 0F5A C0            - cvtss2sd xmm0,xmm0
+Humanoid:GetAttackDrawPercentage+125- F2 0F5A C0            - cvtsd2ss xmm0,xmm0
+Humanoid:GetAttackDrawPercentage+129- E9 3F000000           - jmp Humanoid:GetAttackDrawPercentage+16d
+Humanoid:GetAttackDrawPercentage+12e- F3 0F10 86 E8040000   - movss xmm0,[rsi+000004E8]
+Humanoid:GetAttackDrawPercentage+136- F3 0F5A C0            - cvtss2sd xmm0,xmm0
+Humanoid:GetAttackDrawPercentage+13a- F3 0F10 4D E8         - movss xmm1,[rbp-18]
+
+ */
+
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+aob_quickbowdraw+8:
+db 7A
+</AssemblerScript>
+      <Hotkeys>
+        <Hotkey Active="0">
+          <Action>Toggle Activation</Action>
+          <Keys/>
+          <ID>0</ID>
+        </Hotkey>
+      </Hotkeys>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>12</ID>
+      <Description>"Inf Duplicate"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+aobScanRegion(aob_scan02, Inventory:AddItem+200, Inventory:AddItem+300, 49 63 46 38 41 2B C7 41 89 46 38 B8 01 00 00 00 4C 0F B6 E0)
+registersymbol(aob_scan02)
+
+
+aob_scan02+4:
+   db 90 90 90
+
+
+/*
+2EEAE360EBB - 49 63 46 38  - movsxd  rax,dword ptr [r14+38]
+2EEAE360EBF - 41 2B C7  - sub eax,r15d
+2EEAE360EC2 - 41 89 46 38  - mov [r14+38],eax &lt;&lt;
+2EEAE360EC6 - B8 01000000 - mov eax,00000001
+2EEAE360ECB - 4C 0FB6 E0  - movzx r12,al
+*/
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+aob_scan02:
+   db 49 63 46 38 41 2B C7
+</AssemblerScript>
+      <Hotkeys>
+        <Hotkey>
+          <Action>Toggle Activation</Action>
+          <Keys>
+            <Key>114</Key>
+          </Keys>
+          <ID>0</ID>
+        </Hotkey>
+      </Hotkeys>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>2</ID>
+      <Description>"ScanCodes"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+
+// Inf Stamina
+// Stamina == Float
+/*
+2EED56E9DE4 - F2 0F5C C1  - subsd xmm0,xmm1
+2EED56E9DE8 - F2 0F5A E8  - cvtsd2ss xmm5,xmm0
+2EED56E9DEC - F3 0F11 AE 50070000  - movss [rsi+00000750],xmm5 &lt;&lt;
+2EED56E9DF4 - F3 0F10 86 50070000  - movss xmm0,[rsi+00000750]
+2EED56E9DFC - F3 0F5A C0  - cvtss2sd xmm0,xmm0
+*/
+//aobScan(_scan01, F2 0F 5C C1 F2 0F 5A E8 F3 0F 11 AE 50 07 00 00 F3 0F 10 86 50 07 00 00)
+//registersymbol(_scan01)
+
+
+
+//Inf Duplicate Items
+// Items == 4 byte
+/*
+2EEAE360EBB - 49 63 46 38  - movsxd  rax,dword ptr [r14+38]
+2EEAE360EBF - 41 2B C7  - sub eax,r15d
+2EEAE360EC2 - 41 89 46 38  - mov [r14+38],eax &lt;&lt;
+2EEAE360EC6 - B8 01000000 - mov eax,00000001
+2EEAE360ECB - 4C 0FB6 E0  - movzx r12,al
+*/
+//aobScan(_scan02, 49 63 46 38 41 2B C7 41 89 46 38 B8 01 00 00 00 4C 0F B6 E0)
+//registersymbol(_scan02)
+
+
+
+// Inf Arrow
+// Items == 4 bite
+/*
+2EED5C32283 - 48 63 47 38  - movsxd  rax,dword ptr [rdi+38]
+2EED5C32287 - 2B C6  - sub eax,esi
+2EED5C32289 - 89 47 38  - mov [rdi+38],eax &lt;&lt;
+2EED5C3228C - 49 8B CF  - mov rcx,r15
+2EED5C3228F - 48 8D AD 00000000  - lea rbp,[rbp+00000000]
+*/
+aobScan(_scan03, 48 63 47 38 2B C6 89 47 38 49 8B CF 48 8D AD 00 00 00 00)
+registersymbol(_scan03)
+
+
+// Inf Food
+// Items == 4 bite
+/*
+203DFEE0C17 - 48 63 46 38  - movsxd  rax,dword ptr [rsi+38]
+203DFEE0C1B - FF C8  - dec eax
+203DFEE0C1D - 89 46 38  - mov [rsi+38],eax &lt;&lt;
+203DFEE0C20 - 48 8B CF  - mov rcx,rdi
+203DFEE0C23 - 66 66 90 - nop 3
+*/
+//aobScan(_scan04, 48 63 46 38 FF C8 89 46 38 48 8B CF )
+//registersymbol(_scan04)
+
+
+
+// Inf Craft resources
+aobScan(aob_infcraft, 49 63 44 24 38 2B C7 41 89 44 24 38 )
+registersymbol(aob_infcraft)
+
+/*
+Inventory:RemoveItem
+
+233BE0752DA - 49 63 44 24 38  - movsxd  rax,dword ptr [r12+38]
+233BE0752DF - 2B C7  - sub eax,edi
+233BE0752E1 - 41 89 44 24 38  - mov [r12+38],eax &lt;&lt;
+233BE0752E6 - 44 2B FF  - sub r15d,edi
+233BE0752E9 - 49 8B C7  - mov rax,r15
+ */
+
+
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+//unregistersymbol(_scan01)
+//unregistersymbol(_scan02)
+unregistersymbol(_scan03)
+//unregistersymbol(_scan04)
+unregistersymbol(aob_infcraft)
+
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>4</ID>
+          <Description>"* Inf Arrow"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+//aobScan(_scan03, 48 63 47 38 2B C6 89 47 38 49 8B CF 48 8D AD 00 00 00 00)
+//aobScanRegion(_scan03, Inventory:RemoveItem+70, Inventory:RemoveItem+90, 2B C6 89 47 38 )
+//registersymbol(_scan03)
+
+aobScan(_scan03, 48 63 47 38 2B C6 89 47 38 49 8B CF 48 8D AD 00 00 00 00)
+registersymbol(_scan03)
+
+_scan03+4:
+nop
+nop
+
+
+/*
+Inventory:RemoveItem+6f - 33 C0                 - xor eax,eax
+Inventory:RemoveItem+71 - EB 25                 - jmp Inventory:RemoveItem+98
+Inventory:RemoveItem+73 - 48 63 47 38           - movsxd  rax,dword ptr [rdi+38]
+
+Inventory:RemoveItem+77 - 2B C6                 - sub eax,esi
+
+Inventory:RemoveItem+79 - 89 47 38              - mov [rdi+38],eax &lt;&lt;
+Inventory:RemoveItem+7c - 49 8B CF              - mov rcx,r15
+Inventory:RemoveItem+7f - 48 8D AD 00000000     - lea rbp,[rbp+00000000]
+Inventory:RemoveItem+86 - 49 BB 702E73272F020000 - mov r11,Inventory:Changed { (-326416299) }
+Inventory:RemoveItem+90 - 41 FF D3              - call r11
+
+*/
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+_scan03+4:
+   db 2B C6
+</AssemblerScript>
+          <Hotkeys>
+            <Hotkey>
+              <Action>Toggle Activation</Action>
+              <Keys/>
+              <ID>0</ID>
+            </Hotkey>
+          </Hotkeys>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>17</ID>
+          <Description>"* Inf Craft"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+//aobScanRegion(aob_infcraft, :Inventory:RemoveItem, :Inventory:RemoveItem+150, 49 63 44 24 38 2B C7)
+//aobScanRegion(aob_infcraft, valheim.exe:Inventory:RemoveItem, valheim.exe:Inventory:RemoveItem+150, 49 63 44 24 38 2B C7)
+//aobScan(aob_infcraft, 49 63 44 24 38 2B C7 41 89 44 24 38 )
+//registersymbol(aob_infcraft)
+
+aobScan(aob_infcraft, 49 63 44 24 38 2B C7 41 89 44 24 38 )
+registersymbol(aob_infcraft)
+
+aob_infcraft+5:
+nop
+nop
+
+
+
+
+/*
+Inventory:RemoveItem
+
+233BE0752DA - 49 63 44 24 38  - movsxd  rax,dword ptr [r12+38]
+233BE0752DF - 2B C7  - sub eax,edi
+233BE0752E1 - 41 89 44 24 38  - mov [r12+38],eax &lt;&lt;
+233BE0752E6 - 44 2B FF  - sub r15d,edi
+233BE0752E9 - 49 8B C7  - mov rax,r15
+ */
+
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+aob_infcraft+5:
+db 2B C7
+</AssemblerScript>
+          <Hotkeys>
+            <Hotkey Active="0">
+              <Action>Toggle Activation</Action>
+              <Keys/>
+              <ID>0</ID>
+            </Hotkey>
+          </Hotkeys>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>15</ID>
+          <Description>"DEPRECATED - Inf Duplicate"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+//aobScan(_scan02, 49 63 46 38 41 2B C7 41 89 46 38 B8 01 00 00 00 4C 0F B6 E0)
+//registersymbol(_scan02)
+
+
+_scan02+4:
+   db 90 90 90
+
+
+/*
+2EEAE360EBB - 49 63 46 38  - movsxd  rax,dword ptr [r14+38]
+2EEAE360EBF - 41 2B C7  - sub eax,r15d
+2EEAE360EC2 - 41 89 46 38  - mov [r14+38],eax &lt;&lt;
+2EEAE360EC6 - B8 01000000 - mov eax,00000001
+2EEAE360ECB - 4C 0FB6 E0  - movzx r12,al
+*/
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+_scan02:
+   db 49 63 46 38 41 2B C7
+</AssemblerScript>
+          <Hotkeys>
+            <Hotkey>
+              <Action>Toggle Activation</Action>
+              <Keys/>
+              <ID>0</ID>
+            </Hotkey>
+          </Hotkeys>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>6</ID>
+          <Description>"DEPRECATED - Inf Stamina"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+//aobScan(_scan01, F2 0F 5C C1 F2 0F 5A E8 F3 0F 11 AE 50 07 00 00 F3 0F 10 86 50 07 00 00)
+//registersymbol(_scan01)
+
+
+_scan01:
+   db 90 90 90 90
+
+
+/*
+2EED56E9DE4 - F2 0F5C C1  - subsd xmm0,xmm1
+2EED56E9DE8 - F2 0F5A E8  - cvtsd2ss xmm5,xmm0
+2EED56E9DEC - F3 0F11 AE 50070000  - movss [rsi+00000750],xmm5 &lt;&lt;
+2EED56E9DF4 - F3 0F10 86 50070000  - movss xmm0,[rsi+00000750]
+2EED56E9DFC - F3 0F5A C0  - cvtss2sd xmm0,xmm0
+*/
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+_scan01:
+   db F2 0F 5C C1
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>8</ID>
+          <Description>"DEPRECATED - Inf Food"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+//aobScan(_scan04, 48 63 46 38 FF C8 89 46 38 48 8B CF )
+//registersymbol(_scan04)
+
+
+_scan04+4:
+   db 90 90
+
+
+/*
+203DFEE0C17 - 48 63 46 38  - movsxd  rax,dword ptr [rsi+38]
+203DFEE0C1B - FF C8  - dec eax
+203DFEE0C1D - 89 46 38  - mov [rsi+38],eax &lt;&lt;
+203DFEE0C20 - 48 8B CF  - mov rcx,rdi
+203DFEE0C23 - 66 66 90 - nop 3
+*/
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+_scan04:
+   db 48 63 46 38 FF C8
+</AssemblerScript>
+          <Hotkeys>
+            <Hotkey Active="0">
+              <Action>Toggle Activation</Action>
+              <Keys/>
+              <ID>0</ID>
+            </Hotkey>
+          </Hotkeys>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>22</ID>
+      <Description>"No description"</Description>
+      <VariableType>4 Bytes</VariableType>
+      <Address>22FA02E08F8</Address>
+    </CheatEntry>
+  </CheatEntries>
+  <CheatCodes>
+    <CodeEntry>
+      <Description>FreeFood</Description>
+      <AddressString>1B527139F4F</AddressString>
+      <Before>
+        <Byte>00</Byte>
+        <Byte>F3</Byte>
+        <Byte>0F</Byte>
+        <Byte>5A</Byte>
+        <Byte>C9</Byte>
+      </Before>
+      <Actual>
+        <Byte>F2</Byte>
+        <Byte>0F</Byte>
+        <Byte>5C</Byte>
+        <Byte>C1</Byte>
+      </Actual>
+      <After>
+        <Byte>F2</Byte>
+        <Byte>0F</Byte>
+        <Byte>5A</Byte>
+        <Byte>E8</Byte>
+        <Byte>F3</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Change of sub rsp,18</Description>
+      <AddressString>1EFC24728F0</AddressString>
+      <Before>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>48</Byte>
+        <Byte>83</Byte>
+        <Byte>EC</Byte>
+        <Byte>18</Byte>
+      </Actual>
+      <After>
+        <Byte>48</Byte>
+        <Byte>83</Byte>
+        <Byte>C4</Byte>
+        <Byte>18</Byte>
+        <Byte>C3</Byte>
+      </After>
+    </CodeEntry>
+  </CheatCodes>
+  <UserdefinedSymbols/>
+</CheatTable>

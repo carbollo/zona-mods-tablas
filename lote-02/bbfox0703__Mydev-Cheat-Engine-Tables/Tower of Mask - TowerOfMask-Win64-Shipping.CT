@@ -1,0 +1,1256 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="46">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>62</ID>
+      <Description>"Turn some scripts on/off"</Description>
+      <Color>4080FF</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript Async="1">[ENABLE]
+{$lua}
+if (syntaxcheck) then return end
+synchronize(function()
+  getLuaEngine().menuItem5.doClick()
+  getLuaEngine().Close()
+end)
+
+local enableBattleScripts = {
+  0, -- "Get HP"
+  4, -- "inf. item durability"
+  7, -- "Pointers"
+  19, -- "Get player misc data [Dynamic]"
+  8, -- "Get player base data [Dynamic]"
+  51, -- "Attributes"
+}
+local addressList = getAddressList()
+synchronize(function()
+  for _, id in ipairs(enableBattleScripts) do
+    local memRec = addressList.getMemoryRecordByID(id)
+    if memRec then
+      memRec.Active = true
+      sleep(50)
+    end
+    addressList.refresh()
+  end
+end)
+synchronize(function() getLuaEngine().Close() end)
+[DISABLE]
+{$lua}
+if (syntaxcheck) then return end
+synchronize(function()
+  getLuaEngine().menuItem5.doClick()
+  getLuaEngine().Close()
+end)
+
+local disableBattleScripts = {
+  21, -- "+Item Data (do not delete this one)"
+  51, -- "Attributes"
+  34, -- "First 4  inventory.."
+  20, -- "Generate inventory data"
+  8, -- "Get player base data [Dynamic]"
+  61, -- "Get inventory size"
+  19, -- "Get player misc data [Dynamic]"
+  7, -- "Pointers"
+  60, -- "Tower of Mask  /  https://opencheattables.com"
+  4, -- "inf. item durability"
+  0, -- "Get HP"
+}
+local addressList = getAddressList()
+synchronize(function()
+  for _, id in ipairs(disableBattleScripts) do
+    local memRec = addressList.getMemoryRecordByID(id)
+    if memRec then
+      memRec.Active = false
+      sleep(50)
+    end
+    addressList.refresh()
+  end
+end)
+synchronize(function() getLuaEngine().Close() end)
+-- Comments:
+-- ID: 62, Description: "Turn some scripts on/off", Depth: 0
+-- ID: 0, Description: "Get HP", Depth: 0
+-- ID: 4, Description: "inf. item durability", Depth: 0
+-- ID: 7, Description: "Pointers", Depth: 0
+--   ID: 8, Description: "Get player base data [Dynamic]", Depth: 1
+--   ID: 19, Description: "Get player misc data [Dynamic]", Depth: 1
+--     ID: 20, Description: "Generate inventory data", Depth: 2
+--       ID: 21, Description: "+Item Data (do not delete this one)", Depth: 3
+--     ID: 34, Description: "First 4  inventory..", Depth: 2
+--     ID: 51, Description: "Attributes", Depth: 2
+-- ID: 60, Description: "Tower of Mask  /  https://opencheattables.com", Depth: 0
+--   ID: 61, Description: "Get inventory size", Depth: 1
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>0</ID>
+      <Description>"Get HP"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : TowerOfMask-Win64-Shipping.exe
+  Version:
+  Date   : 2024-12-08
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_HP,$process,E9 A4 03 00 00 49 8D) // should be unique
+alloc(newmem,$1000,INJECT_GET_HP)
+
+label(code)
+label(return)
+label(i_base_hp_addr)
+
+newmem:
+  cmp qword ptr [i_base_hp_addr], 0
+  jne code
+  test rdx, rdx
+  jz code
+  cmp dword ptr [rdx+40], 0
+  jne code
+
+  vmovss xmm15, [vf_3000]
+  vmovss xmm14, [rdx+48]
+  vucomiss xmm14, xmm14
+  jp code // NaN
+  vucomiss xmm15, xmm14
+  jne code
+
+  mov [i_base_hp_addr], rdx
+  jmp code
+
+  push r15
+  mov r15d, [rdx]
+
+@@:
+  pop r15
+
+code:
+  reassemble(INJECT_GET_HP)
+  //jmp TowerOfMask-Win64-Shipping.exe+102D572
+  jmp return
+align 10 cc
+  i_base_hp_addr:
+  dq 0
+  vf_3000:
+  dd (float)3000
+
+
+
+INJECT_GET_HP:
+  jmp newmem
+return:
+registersymbol(INJECT_GET_HP)
+registersymbol(i_base_hp_addr)
+[DISABLE]
+
+INJECT_GET_HP:
+  db E9 A4 03 00 00
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: TowerOfMask-Win64-Shipping.exe+102D1C9
+
+TowerOfMask-Win64-Shipping.exe+102D1A4: 75 28              - jne TowerOfMask-Win64-Shipping.exe+102D1CE
+TowerOfMask-Win64-Shipping.exe+102D1A6: 4D 63 41 4C        - movsxd  r8,dword ptr [r9+4C]
+TowerOfMask-Win64-Shipping.exe+102D1AA: 4D 03 C5           - add r8,r13
+TowerOfMask-Win64-Shipping.exe+102D1AD: 4D 89 46 38        - mov [r14+38],r8
+TowerOfMask-Win64-Shipping.exe+102D1B1: 4D 85 D2           - test r10,r10
+TowerOfMask-Win64-Shipping.exe+102D1B4: 0F 84 B8 03 00 00  - je TowerOfMask-Win64-Shipping.exe+102D572
+TowerOfMask-Win64-Shipping.exe+102D1BA: 49 8B 01           - mov rax,[r9]
+TowerOfMask-Win64-Shipping.exe+102D1BD: 49 8B D2           - mov rdx,r10
+TowerOfMask-Win64-Shipping.exe+102D1C0: 49 8B C9           - mov rcx,r9
+TowerOfMask-Win64-Shipping.exe+102D1C3: FF 90 D0 00 00 00  - call qword ptr [rax+000000D0]
+// ---------- INJECTING HERE ----------
+TowerOfMask-Win64-Shipping.exe+102D1C9: E9 A4 03 00 00     - jmp TowerOfMask-Win64-Shipping.exe+102D572
+// ---------- DONE INJECTING  ----------
+TowerOfMask-Win64-Shipping.exe+102D1CE: 49 8D 49 28        - lea rcx,[r9+28]
+TowerOfMask-Win64-Shipping.exe+102D1D2: 48 8D 54 24 20     - lea rdx,[rsp+20]
+TowerOfMask-Win64-Shipping.exe+102D1D7: E8 D4 98 E0 FF     - call TowerOfMask-Win64-Shipping.exe+E36AB0
+TowerOfMask-Win64-Shipping.exe+102D1DC: EB 4B              - jmp TowerOfMask-Win64-Shipping.exe+102D229
+TowerOfMask-Win64-Shipping.exe+102D1DE: BA 05 00 00 00     - mov edx,00000005
+TowerOfMask-Win64-Shipping.exe+102D1E3: 48 89 5C 24 20     - mov [rsp+20],rbx
+TowerOfMask-Win64-Shipping.exe+102D1E8: 48 8D 4C 24 20     - lea rcx,[rsp+20]
+TowerOfMask-Win64-Shipping.exe+102D1ED: 48 89 5C 24 28     - mov [rsp+28],rbx
+TowerOfMask-Win64-Shipping.exe+102D1F2: E8 39 CC 79 FF     - call TowerOfMask-Win64-Shipping.exe+7C9E30
+TowerOfMask-Win64-Shipping.exe+102D1F7: 8B 54 24 28        - mov edx,[rsp+28]
+}
+
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>1</ID>
+          <Description>"Notice: reenable if HP is incorrect"</Description>
+          <Color>8000FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>2</ID>
+          <Description>"HP"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>Float</VariableType>
+          <Address>i_base_hp_addr</Address>
+          <Offsets>
+            <Offset>0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>3</ID>
+          <Description>"Max HP"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>Float</VariableType>
+          <Address>i_base_hp_addr</Address>
+          <Offsets>
+            <Offset>4</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>4</ID>
+      <Description>"inf. item durability"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : TowerOfMask-Win64-Shipping.exe
+  Version: 
+  Date   : 2024-12-08
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_SET_ITEM_DUR,$process,FF 90 C8 00 00 00 E9) // should be unique
+alloc(newmem,$1000,INJECT_SET_ITEM_DUR)
+
+label(code)
+label(return)
+
+newmem:
+  mov byte ptr [i_item_flag], 0
+  movaps [i_buf_xmm1], xmm1
+  movaps [i_buf_xmm1], xmm2
+  shufps xmm1, xmm1, 0xe6
+  shufps xmm2, xmm2, 0xe6
+  vucomiss xmm1, xmm1
+  jp endp // NaN
+  vucomiss xmm2, xmm2
+  jp endp
+
+  vxorps xmm15, xmm15, xmm15
+  vucomiss xmm15, xmm1
+  je endp
+  vucomiss xmm1, xmm2
+  jne endp
+  vucomiss xmm1, [vf_10]
+  jbe endp
+
+  mov byte ptr [i_item_flag], 1
+
+endp:
+  movaps xmm1, [i_buf_xmm1]
+  movaps xmm2, [i_buf_xmm1]
+code:
+  call qword ptr [rax+000000C8]
+  cmp byte ptr [i_item_flag], 1
+  jne return
+  movss xmm15, [vf_100]
+  movss [rcx+8], xmm15
+  jmp return
+align 10 cc
+  i_buf_xmm1:
+  dq 0
+  dq 0
+  i_buf_xmm2:
+  dq 0
+  dq 0
+  vf_100:
+  dd (float)100
+  vf_10:
+  dd (float)10
+  i_item_flag:
+  db 0
+
+
+INJECT_SET_ITEM_DUR:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT_SET_ITEM_DUR)
+
+[DISABLE]
+
+INJECT_SET_ITEM_DUR:
+  db FF 90 C8 00 00 00
+
+unregistersymbol(INJECT_SET_ITEM_DUR)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: TowerOfMask-Win64-Shipping.exe+27AD73B
+
+TowerOfMask-Win64-Shipping.exe+27AD71D: 74 06              - je TowerOfMask-Win64-Shipping.exe+27AD725
+TowerOfMask-Win64-Shipping.exe+27AD71F: 48 D1 F8           - sar rax,1
+TowerOfMask-Win64-Shipping.exe+27AD722: 48 03 C3           - add rax,rbx
+TowerOfMask-Win64-Shipping.exe+27AD725: 0F AF EE           - imul ebp,esi
+TowerOfMask-Win64-Shipping.exe+27AD728: 48 63 CD           - movsxd  rcx,ebp
+TowerOfMask-Win64-Shipping.exe+27AD72B: 48 03 C8           - add rcx,rax
+TowerOfMask-Win64-Shipping.exe+27AD72E: 49 8B 04 24        - mov rax,[r12]
+TowerOfMask-Win64-Shipping.exe+27AD732: 48 8B D1           - mov rdx,rcx
+TowerOfMask-Win64-Shipping.exe+27AD735: 4D 8B C1           - mov r8,r9
+TowerOfMask-Win64-Shipping.exe+27AD738: 49 8B CC           - mov rcx,r12
+// ---------- INJECTING HERE ----------
+TowerOfMask-Win64-Shipping.exe+27AD73B: FF 90 C8 00 00 00  - call qword ptr [rax+000000C8]
+// ---------- DONE INJECTING  ----------
+TowerOfMask-Win64-Shipping.exe+27AD741: E9 82 00 00 00     - jmp TowerOfMask-Win64-Shipping.exe+27AD7C8
+TowerOfMask-Win64-Shipping.exe+27AD746: 8B 43 08           - mov eax,[rbx+08]
+TowerOfMask-Win64-Shipping.exe+27AD749: 48 8D 54 24 40     - lea rdx,[rsp+40]
+TowerOfMask-Win64-Shipping.exe+27AD74E: 33 C9              - xor ecx,ecx
+TowerOfMask-Win64-Shipping.exe+27AD750: 85 C0              - test eax,eax
+TowerOfMask-Win64-Shipping.exe+27AD752: 8D 58 FF           - lea ebx,[rax-01]
+TowerOfMask-Win64-Shipping.exe+27AD755: 0F 4E D9           - cmovle ebx,ecx
+TowerOfMask-Win64-Shipping.exe+27AD758: 49 8D 4D 28        - lea rcx,[r13+28]
+TowerOfMask-Win64-Shipping.exe+27AD75C: E8 4F 93 68 FE     - call TowerOfMask-Win64-Shipping.exe+E36AB0
+TowerOfMask-Win64-Shipping.exe+27AD761: 83 7C 24 48 00     - cmp dword ptr [rsp+48],00
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>5</ID>
+          <Description>"Not 100% stable. Game may crash if this script always enabled."</Description>
+          <Color>8000FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>6</ID>
+          <Description>"script will skip any item taht dur. &lt; 10"</Description>
+          <Color>8000FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>7</ID>
+      <Description>"Pointers"</Description>
+      <Options moHideChildren="1"/>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>8</ID>
+          <Description>"Get player base data [Dynamic]"</Description>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : TowerOfMask-Win64-Shipping.exe
+  Version: 
+  Date   : 2024-12-09
+  Author : bbox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_PLAYER_PTR,$process,24 48 8B 10 48 8B C8) // should be unique
+alloc(newmem,$1000,INJECT_GET_PLAYER_PTR)
+
+label(code)
+label(return)
+label(i_base_player_ptr)
+
+newmem:
+  mov [i_base_player_ptr], rax
+
+code:
+  mov rdx,[rax]
+  mov rcx,rax
+  jmp return
+align 10 cc
+  i_base_player_ptr:
+  dq 0
+
+INJECT_GET_PLAYER_PTR+01:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT_GET_PLAYER_PTR)
+registersymbol(i_base_player_ptr)
+[DISABLE]
+
+INJECT_GET_PLAYER_PTR+01:
+  db 48 8B 10 48 8B C8
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: TowerOfMask-Win64-Shipping.exe+299CDBE
+
+TowerOfMask-Win64-Shipping.exe+299CD97: 0F 28 CE                 - movaps xmm1,xmm6
+TowerOfMask-Win64-Shipping.exe+299CD9A: FF 90 70 07 00 00        - call qword ptr [rax+00000770]
+TowerOfMask-Win64-Shipping.exe+299CDA0: 48 8B 06                 - mov rax,[rsi]
+TowerOfMask-Win64-Shipping.exe+299CDA3: 48 8B CE                 - mov rcx,rsi
+TowerOfMask-Win64-Shipping.exe+299CDA6: FF 90 B8 06 00 00        - call qword ptr [rax+000006B8]
+TowerOfMask-Win64-Shipping.exe+299CDAC: 48 83 BE B8 02 00 00 00  - cmp qword ptr [rsi+000002B8],00
+TowerOfMask-Win64-Shipping.exe+299CDB4: 48 8B D8                 - mov rbx,rax
+TowerOfMask-Win64-Shipping.exe+299CDB7: 74 29                    - je TowerOfMask-Win64-Shipping.exe+299CDE2
+TowerOfMask-Win64-Shipping.exe+299CDB9: 48 85 C0                 - test rax,rax
+TowerOfMask-Win64-Shipping.exe+299CDBC: 74 24                    - je TowerOfMask-Win64-Shipping.exe+299CDE2
+// ---------- INJECTING HERE ----------
+TowerOfMask-Win64-Shipping.exe+299CDBE: 48 8B 10                 - mov rdx,[rax]
+// ---------- DONE INJECTING  ----------
+TowerOfMask-Win64-Shipping.exe+299CDC1: 48 8B C8                 - mov rcx,rax
+TowerOfMask-Win64-Shipping.exe+299CDC4: FF 92 C8 05 00 00        - call qword ptr [rdx+000005C8]
+TowerOfMask-Win64-Shipping.exe+299CDCA: 84 C0                    - test al,al
+TowerOfMask-Win64-Shipping.exe+299CDCC: 74 14                    - je TowerOfMask-Win64-Shipping.exe+299CDE2
+TowerOfMask-Win64-Shipping.exe+299CDCE: 48 8B 13                 - mov rdx,[rbx]
+TowerOfMask-Win64-Shipping.exe+299CDD1: 48 8B CB                 - mov rcx,rbx
+TowerOfMask-Win64-Shipping.exe+299CDD4: FF 92 D0 05 00 00        - call qword ptr [rdx+000005D0]
+TowerOfMask-Win64-Shipping.exe+299CDDA: 84 C0                    - test al,al
+TowerOfMask-Win64-Shipping.exe+299CDDC: 0F 84 F1 00 00 00        - je TowerOfMask-Win64-Shipping.exe+299CED3
+TowerOfMask-Win64-Shipping.exe+299CDE2: F6 86 94 02 00 00 02     - test byte ptr [rsi+00000294],02
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>9</ID>
+              <Description>"base"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>808080</Color>
+              <VariableType>8 Bytes</VariableType>
+              <Address>i_base_player_ptr</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>10</ID>
+              <Description>"bCanBeDamaged"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Binary</VariableType>
+              <BitStart>0</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>i_base_player_ptr</Address>
+              <Offsets>
+                <Offset>5A</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>11</ID>
+              <Description>"Health"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>i_base_player_ptr</Address>
+              <Offsets>
+                <Offset>6BC</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>12</ID>
+              <Description>"Max_Health"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>i_base_player_ptr</Address>
+              <Offsets>
+                <Offset>6C0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>13</ID>
+              <Description>"Weapon"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>i_base_player_ptr</Address>
+              <Offsets>
+                <Offset>6D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>14</ID>
+              <Description>"SubWeapon"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>i_base_player_ptr</Address>
+              <Offsets>
+                <Offset>6D1</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>15</ID>
+              <Description>"Mask"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>i_base_player_ptr</Address>
+              <Offsets>
+                <Offset>6D2</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>16</ID>
+              <Description>"AIState"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>i_base_player_ptr</Address>
+              <Offsets>
+                <Offset>701</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>17</ID>
+              <Description>"Active"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>i_base_player_ptr</Address>
+              <Offsets>
+                <Offset>702</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>18</ID>
+              <Description>"ActivateDistance"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>i_base_player_ptr</Address>
+              <Offsets>
+                <Offset>704</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>19</ID>
+          <Description>"Get player misc data [Dynamic]"</Description>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : TowerOfMask-Win64-Shipping.exe
+  Version: 
+  Date   : 2024-12-09
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_CONTROLLER_BASE,$process,48 8B 01 4C 8D 47 0C) // should be unique
+alloc(newmem,$1000,INJECT_GET_CONTROLLER_BASE)
+
+label(code)
+label(return)
+label(i_base_player_ctrl_ptr)
+
+newmem:
+  mov [i_base_player_ctrl_ptr], rcx
+
+code:
+  mov rax,[rcx]
+  lea r8,[rdi+0C]
+  jmp return
+align 10 cc
+  i_base_player_ctrl_ptr:
+  dq 0
+
+INJECT_GET_CONTROLLER_BASE:
+  jmp newmem
+  nop 2
+return:
+registersymbol(INJECT_GET_CONTROLLER_BASE i_base_player_ctrl_ptr)
+
+[DISABLE]
+
+INJECT_GET_CONTROLLER_BASE:
+  db 48 8B 01 4C 8D 47 0C
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: TowerOfMask-Win64-Shipping.exe+27EAB72
+
+TowerOfMask-Win64-Shipping.exe+27EAB43: 44 88 BC 24 40 06 00 00  - mov [rsp+00000640],r15b
+TowerOfMask-Win64-Shipping.exe+27EAB4B: 48 85 C9                 - test rcx,rcx
+TowerOfMask-Win64-Shipping.exe+27EAB4E: 74 05                    - je TowerOfMask-Win64-Shipping.exe+27EAB55
+TowerOfMask-Win64-Shipping.exe+27EAB50: E8 BB B8 54 FE           - call TowerOfMask-Win64-Shipping.exe+D36410
+TowerOfMask-Win64-Shipping.exe+27EAB55: 48 8B 45 30              - mov rax,[rbp+30]
+TowerOfMask-Win64-Shipping.exe+27EAB59: 48 8B 88 B8 02 00 00     - mov rcx,[rax+000002B8]
+TowerOfMask-Win64-Shipping.exe+27EAB60: 48 8B 01                 - mov rax,[rcx]
+TowerOfMask-Win64-Shipping.exe+27EAB63: FF 90 D0 06 00 00        - call qword ptr [rax+000006D0]
+TowerOfMask-Win64-Shipping.exe+27EAB69: F3 0F 11 47 18           - movss [rdi+18],xmm0
+TowerOfMask-Win64-Shipping.exe+27EAB6E: 48 8B 4D 30              - mov rcx,[rbp+30]
+// ---------- INJECTING HERE ----------
+TowerOfMask-Win64-Shipping.exe+27EAB72: 48 8B 01                 - mov rax,[rcx]
+// ---------- DONE INJECTING  ----------
+TowerOfMask-Win64-Shipping.exe+27EAB75: 4C 8D 47 0C              - lea r8,[rdi+0C]
+TowerOfMask-Win64-Shipping.exe+27EAB79: 48 8B D7                 - mov rdx,rdi
+TowerOfMask-Win64-Shipping.exe+27EAB7C: FF 90 18 07 00 00        - call qword ptr [rax+00000718]
+TowerOfMask-Win64-Shipping.exe+27EAB82: 48 8B 45 70              - mov rax,[rbp+70]
+TowerOfMask-Win64-Shipping.exe+27EAB86: 4C 8D 44 24 28           - lea r8,[rsp+28]
+TowerOfMask-Win64-Shipping.exe+27EAB8B: 48 8D 54 24 48           - lea rdx,[rsp+48]
+TowerOfMask-Win64-Shipping.exe+27EAB90: 48 8B 88 E0 00 00 00     - mov rcx,[rax+000000E0]
+TowerOfMask-Win64-Shipping.exe+27EAB97: 48 8D 05 1A B6 FC 00     - lea rax,[TowerOfMask-Win64-Shipping.exe+37B61B8]
+TowerOfMask-Win64-Shipping.exe+27EAB9E: 48 89 4C 24 30           - mov [rsp+30],rcx
+TowerOfMask-Win64-Shipping.exe+27EABA3: 48 8B 0D AE D3 07 02     - mov rcx,[GEngine]
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>20</ID>
+              <Description>"Generate inventory data"</Description>
+              <Options moHideChildren="1"/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+{$lua}
+if syntaxcheck then return end
+if memrec then print(memrec.Description) end
+synchronize(function() getLuaEngine().menuItem5.doClick() end)
+-- 符號名稱
+local symbolName = "i_base_player_ctrl_ptr"
+
+-- 指標鏈偏移
+local offset1 = 0x228
+local offset2 = 0x328
+local offset3 = 0xB0
+local inv_offset3 = 0xB8
+
+-- 每個格子的偏移量
+local itemSize = 0x10
+
+-- 父記憶體記錄 ID
+local parentMemoryRecordID = 21
+
+-- 動態生成的記憶體記錄清單
+if not dynamicRecords then
+  dynamicRecords = {}
+end
+
+-- 獲取符號地址
+local baseAddress = getAddressSafe(symbolName)
+if not baseAddress then
+  print("Symbol not found: " .. symbolName)
+  return
+end
+
+-- 獲取父記憶體記錄
+local parentRecord = getAddressList().getMemoryRecordByID(parentMemoryRecordID)
+if not parentRecord then
+  print("Parent MemoryRecord not found: " .. tostring(parentMemoryRecordID))
+  return
+end
+
+-- 指標鏈
+local ptr1 = readPointer(baseAddress)
+if not ptr1 then error("Invalid pointer at base") end
+
+local ptr2 = readPointer(ptr1 + offset1)
+if not ptr2 then error("Invalid pointer at offset1") end
+
+local ptr3 = readPointer(ptr2 + offset2)
+if not ptr3 then error("Invalid pointer at offset2") end
+
+local slotCount = readInteger(ptr3 + inv_offset3)
+
+local finalBasePtr = readPointer(ptr3 + offset3)
+if not finalBasePtr then error("Invalid pointer at offset3") end
+
+-- 動態生成 MemoryRecords
+local addressList = getAddressList()
+
+synchronize(function()
+--syn. func start
+for i = 0, slotCount - 1 do
+  local currentAddress = finalBasePtr + (i * itemSize)
+
+  -- [i] Item ID
+  local itemID = addressList.createMemoryRecord()
+  itemID.Description = string.format("[%d] Item ID", i)
+  itemID.Address = string.format("0x%X", currentAddress)
+  itemID.Type = vtByte
+  itemID.Parent = parentRecord
+  table.insert(dynamicRecords, itemID)
+
+  -- [i] Amount
+  local amount = addressList.createMemoryRecord()
+  amount.Description = string.format("[%d] Amount", i)
+  amount.Address = string.format("0x%X", currentAddress + 0x4)
+  amount.Type = vtDword
+  amount.ShowAsSigned = true -- 設定為顯示有符號
+  amount.Parent = parentRecord
+  table.insert(dynamicRecords, amount)
+
+  -- [i] Durability
+  local durability = addressList.createMemoryRecord()
+  durability.Description = string.format("[%d] Durability", i)
+  durability.Address = string.format("0x%X", currentAddress + 0x8)
+  durability.Type = vtSingle
+  durability.Parent = parentRecord
+  table.insert(dynamicRecords, durability)
+
+  -- [i] ChargedBallets
+  local chargedBallets = addressList.createMemoryRecord()
+  chargedBallets.Description = string.format("[%d] ChargedBallets", i)
+  chargedBallets.Address = string.format("0x%X", currentAddress + 0xC)
+  chargedBallets.Type = vtDword
+  chargedBallets.ShowAsSigned = true -- 設定為顯示有符號
+  chargedBallets.Parent = parentRecord
+  table.insert(dynamicRecords, chargedBallets)
+end
+--syn. func end
+end)
+
+print(string.format("Successfully created %d slots under MemoryRecord ID %d", slotCount, parentMemoryRecordID))
+synchronize(function() getLuaEngine().Close() end)
+{$asm}
+
+[DISABLE]
+{$lua}
+if syntaxcheck then return end
+if memrec then print(memrec.Description) end
+synchronize(function() getLuaEngine().menuItem5.doClick() end)
+-- 刪除動態生成的 MemoryRecords
+if dynamicRecords then
+  synchronize(function()
+    for _, record in ipairs(dynamicRecords) do
+      if record and not record.isDestroyed then
+        record.destroy()
+      end
+    end
+  end)
+  dynamicRecords = nil
+  print("All dynamically generated MemoryRecords have been deleted.")
+else
+  print("No dynamically generated MemoryRecords found to delete.")
+end
+synchronize(function() getLuaEngine().Close() end)
+{$asm}
+
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>21</ID>
+                  <Description>"+Item Data (do not delete this one)"</Description>
+                  <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+                  <GroupHeader>1</GroupHeader>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>22</ID>
+              <Description>"base"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>808080</Color>
+              <VariableType>8 Bytes</VariableType>
+              <Address>i_base_player_ctrl_ptr</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>23</ID>
+              <Description>"Weapon_AttackDamage"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>i_base_player_ctrl_ptr</Address>
+              <Offsets>
+                <Offset>7A0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>24</ID>
+              <Description>"Weapon_AttackRate"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>i_base_player_ctrl_ptr</Address>
+              <Offsets>
+                <Offset>7A4</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>25</ID>
+              <Description>"Weapon_AttackDistance"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>i_base_player_ctrl_ptr</Address>
+              <Offsets>
+                <Offset>7A8</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>26</ID>
+              <Description>"Weapon_FocusTime"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>i_base_player_ctrl_ptr</Address>
+              <Offsets>
+                <Offset>7AC</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>27</ID>
+              <Description>"Difficulty"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_player_ctrl_ptr</Address>
+              <Offsets>
+                <Offset>7C0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>28</ID>
+              <Description>"bCanBeDamaged?"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>808080</Color>
+              <VariableType>Binary</VariableType>
+              <BitStart>0</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>i_base_player_ctrl_ptr</Address>
+              <Offsets>
+                <Offset>5A</Offset>
+                <Offset>260</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>29</ID>
+              <Description>"bHidden?"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>808080</Color>
+              <VariableType>Binary</VariableType>
+              <BitStart>0</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>i_base_player_ctrl_ptr</Address>
+              <Offsets>
+                <Offset>58</Offset>
+                <Offset>260</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>30</ID>
+              <Description>"bAlwaysRelevant?"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>808080</Color>
+              <VariableType>Binary</VariableType>
+              <BitStart>4</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>i_base_player_ctrl_ptr</Address>
+              <Offsets>
+                <Offset>58</Offset>
+                <Offset>260</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>31</ID>
+              <Description>"bOnlyRelevantToOwner?"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>808080</Color>
+              <VariableType>Binary</VariableType>
+              <BitStart>7</BitStart>
+              <BitLength>1</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>i_base_player_ctrl_ptr</Address>
+              <Offsets>
+                <Offset>58</Offset>
+                <Offset>260</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>32</ID>
+              <Description>"DebugView"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>i_base_player_ctrl_ptr</Address>
+              <Offsets>
+                <Offset>5C9</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>33</ID>
+              <Description>"ResetCamera"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>i_base_player_ctrl_ptr</Address>
+              <Offsets>
+                <Offset>7B0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>34</ID>
+              <Description>"First 4  inventory.."</Description>
+              <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>35</ID>
+                  <Description>"Inventory#0 -&gt; [0] Item"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Byte</VariableType>
+                  <Address>i_base_player_ctrl_ptr</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                    <Offset>B0</Offset>
+                    <Offset>328</Offset>
+                    <Offset>228</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>36</ID>
+                  <Description>"Inventory#0 -&gt; [0] Amount"</Description>
+                  <ShowAsSigned>1</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>i_base_player_ctrl_ptr</Address>
+                  <Offsets>
+                    <Offset>4</Offset>
+                    <Offset>B0</Offset>
+                    <Offset>328</Offset>
+                    <Offset>228</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>37</ID>
+                  <Description>"Inventory#0 -&gt; [0] Durability"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>i_base_player_ctrl_ptr</Address>
+                  <Offsets>
+                    <Offset>8</Offset>
+                    <Offset>B0</Offset>
+                    <Offset>328</Offset>
+                    <Offset>228</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>38</ID>
+                  <Description>"Inventory#0 -&gt; [0] ChargedBallets"</Description>
+                  <ShowAsSigned>1</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>i_base_player_ctrl_ptr</Address>
+                  <Offsets>
+                    <Offset>C</Offset>
+                    <Offset>B0</Offset>
+                    <Offset>328</Offset>
+                    <Offset>228</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>39</ID>
+                  <Description>"Inventory#0 -&gt; [1] Item"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Byte</VariableType>
+                  <Address>i_base_player_ctrl_ptr</Address>
+                  <Offsets>
+                    <Offset>10</Offset>
+                    <Offset>B0</Offset>
+                    <Offset>328</Offset>
+                    <Offset>228</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>40</ID>
+                  <Description>"Inventory#0 -&gt; [1] Amount"</Description>
+                  <ShowAsSigned>1</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>i_base_player_ctrl_ptr</Address>
+                  <Offsets>
+                    <Offset>14</Offset>
+                    <Offset>B0</Offset>
+                    <Offset>328</Offset>
+                    <Offset>228</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>41</ID>
+                  <Description>"Inventory#0 -&gt; [1] Durability"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>i_base_player_ctrl_ptr</Address>
+                  <Offsets>
+                    <Offset>18</Offset>
+                    <Offset>B0</Offset>
+                    <Offset>328</Offset>
+                    <Offset>228</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>42</ID>
+                  <Description>"Inventory#0 -&gt; [1] ChargedBallets"</Description>
+                  <ShowAsSigned>1</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>i_base_player_ctrl_ptr</Address>
+                  <Offsets>
+                    <Offset>1C</Offset>
+                    <Offset>B0</Offset>
+                    <Offset>328</Offset>
+                    <Offset>228</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>43</ID>
+                  <Description>"Inventory#0 -&gt; [2] Item"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Byte</VariableType>
+                  <Address>i_base_player_ctrl_ptr</Address>
+                  <Offsets>
+                    <Offset>20</Offset>
+                    <Offset>B0</Offset>
+                    <Offset>328</Offset>
+                    <Offset>228</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>44</ID>
+                  <Description>"Inventory#0 -&gt; [2] Amount"</Description>
+                  <ShowAsSigned>1</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>i_base_player_ctrl_ptr</Address>
+                  <Offsets>
+                    <Offset>24</Offset>
+                    <Offset>B0</Offset>
+                    <Offset>328</Offset>
+                    <Offset>228</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>45</ID>
+                  <Description>"Inventory#0 -&gt; [2] Durability"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>i_base_player_ctrl_ptr</Address>
+                  <Offsets>
+                    <Offset>28</Offset>
+                    <Offset>B0</Offset>
+                    <Offset>328</Offset>
+                    <Offset>228</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>46</ID>
+                  <Description>"Inventory#0 -&gt; [2] ChargedBallets"</Description>
+                  <ShowAsSigned>1</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>i_base_player_ctrl_ptr</Address>
+                  <Offsets>
+                    <Offset>2C</Offset>
+                    <Offset>B0</Offset>
+                    <Offset>328</Offset>
+                    <Offset>228</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>47</ID>
+                  <Description>"Inventory#0 -&gt; [3] Item"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Byte</VariableType>
+                  <Address>i_base_player_ctrl_ptr</Address>
+                  <Offsets>
+                    <Offset>30</Offset>
+                    <Offset>B0</Offset>
+                    <Offset>328</Offset>
+                    <Offset>228</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>48</ID>
+                  <Description>"Inventory#0 -&gt; [3] Amount"</Description>
+                  <ShowAsSigned>1</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>i_base_player_ctrl_ptr</Address>
+                  <Offsets>
+                    <Offset>34</Offset>
+                    <Offset>B0</Offset>
+                    <Offset>328</Offset>
+                    <Offset>228</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>49</ID>
+                  <Description>"Inventory#0 -&gt; [3] Durability"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>i_base_player_ctrl_ptr</Address>
+                  <Offsets>
+                    <Offset>38</Offset>
+                    <Offset>B0</Offset>
+                    <Offset>328</Offset>
+                    <Offset>228</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>50</ID>
+                  <Description>"Inventory#0 -&gt; [3] ChargedBallets"</Description>
+                  <ShowAsSigned>1</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>i_base_player_ctrl_ptr</Address>
+                  <Offsets>
+                    <Offset>3C</Offset>
+                    <Offset>B0</Offset>
+                    <Offset>328</Offset>
+                    <Offset>228</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>51</ID>
+              <Description>"Attributes"</Description>
+              <Options moHideChildren="1"/>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>52</ID>
+                  <Description>"[0] HumanLevels_Value (Level)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[i_base_player_ctrl_ptr]+5F0</Address>
+                  <Offsets>
+                    <Offset>4</Offset>
+                    <Offset>1A8</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>53</ID>
+                  <Description>"[7] HumanLevels_Value (Exp.)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[i_base_player_ctrl_ptr]+5F0</Address>
+                  <Offsets>
+                    <Offset>74</Offset>
+                    <Offset>1A8</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>54</ID>
+                  <Description>"[1] HumanLevels_Value (Health)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[i_base_player_ctrl_ptr]+5F0</Address>
+                  <Offsets>
+                    <Offset>14</Offset>
+                    <Offset>1A8</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>55</ID>
+                  <Description>"[2] HumanLevels_Value (Strength)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[i_base_player_ctrl_ptr]+5F0</Address>
+                  <Offsets>
+                    <Offset>24</Offset>
+                    <Offset>1A8</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>56</ID>
+                  <Description>"[3] HumanLevels_Value (Dexterity)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[i_base_player_ctrl_ptr]+5F0</Address>
+                  <Offsets>
+                    <Offset>34</Offset>
+                    <Offset>1A8</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>57</ID>
+                  <Description>"[4] HumanLevels_Value (Protection)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[i_base_player_ctrl_ptr]+5F0</Address>
+                  <Offsets>
+                    <Offset>44</Offset>
+                    <Offset>1A8</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>58</ID>
+                  <Description>"[5] HumanLevels_Value (Agility)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[i_base_player_ctrl_ptr]+5F0</Address>
+                  <Offsets>
+                    <Offset>54</Offset>
+                    <Offset>1A8</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>59</ID>
+                  <Description>"[6] HumanLevels_Value (Willpower)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[i_base_player_ctrl_ptr]+5F0</Address>
+                  <Offsets>
+                    <Offset>64</Offset>
+                    <Offset>1A8</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>60</ID>
+      <Description>"Tower of Mask  /  https://opencheattables.com  /  CE 7.6"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <Color>00AA00</Color>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>61</ID>
+          <Description>"Get inventory size"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+{$lua}
+if syntaxcheck then return end
+
+-- 定義符號名稱
+local symbolName = "i_base_player_ctrl_ptr"
+
+-- 獲取符號地址
+local baseAddress = getAddressSafe(symbolName)
+if not baseAddress then
+  print("Symbol not found: " .. symbolName)
+  return
+end
+
+-- 指標鏈偏移
+local offset1 = 0x228
+local offset2 = 0x328
+local offset3 = 0xB8
+
+-- 遍歷指標鏈
+local ptr1 = readPointer(baseAddress)
+if not ptr1 then
+  print("Invalid pointer at base")
+  return
+end
+
+local ptr2 = readPointer(ptr1 + offset1)
+if not ptr2 then
+  print("Invalid pointer at offset1")
+  return
+end
+
+local ptr3 = readPointer(ptr2 + offset2)
+if not ptr3 then
+  print("Invalid pointer at offset2")
+  return
+end
+
+local finalValue = readInteger(ptr3 + offset3)
+if finalValue then
+  print(string.format("Final value at pointer chain: %d", finalValue))
+else
+  print("Failed to read the final value")
+end
+{$asm}
+
+[DISABLE]
+
+
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

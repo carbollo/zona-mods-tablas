@@ -1,0 +1,452 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="29">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>70</ID>
+      <Description>"v1.1.2 (GoG)"</Description>
+      <LastState Value="" RealAddress="00000000"/>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>71</ID>
+          <Description>"always full health"</Description>
+          <LastState Activated="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(INJECT,prog.dll,F3 0F 11 86 8C 03 00 00 FF) // should be unique
+alloc(newmem,$1000)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  movss xmm0,[esi+00000390]
+  movss [esi+0000038C],xmm0
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db F3 0F 11 86 8C 03 00 00 FF
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "prog.dll"+14DDB3
+
+"prog.dll"+14DD78: EB 08                    -  jmp prog.dll+14DD82
+"prog.dll"+14DD7A: F3 0F 59 0D 54 3E EF 65  -  mulss xmm1,[prog.dll+2F3E54]
+"prog.dll"+14DD82: F3 0F 10 86 78 03 00 00  -  movss xmm0,[esi+00000378]
+"prog.dll"+14DD8A: 8B CE                    -  mov ecx,esi
+"prog.dll"+14DD8C: 8B 45 10                 -  mov eax,[ebp+10]
+"prog.dll"+14DD8F: F3 0F 59 C1              -  mulss xmm0,xmm1
+"prog.dll"+14DD93: F3 0F 11 8E C8 03 00 00  -  movss [esi+000003C8],xmm1
+"prog.dll"+14DD9B: F3 0F 11 86 74 03 00 00  -  movss [esi+00000374],xmm0
+"prog.dll"+14DDA3: F3 0F 10 86 90 03 00 00  -  movss xmm0,[esi+00000390]
+"prog.dll"+14DDAB: F3 0F 5D 86 8C 03 00 00  -  minss xmm0,[esi+0000038C]
+// ---------- INJECTING HERE ----------
+"prog.dll"+14DDB3: F3 0F 11 86 8C 03 00 00  -  movss [esi+0000038C],xmm0
+// ---------- DONE INJECTING  ----------
+"prog.dll"+14DDBB: FF B6 04 04 00 00        -  push [esi+00000404]
+"prog.dll"+14DDC1: F3 0F 10 08              -  movss xmm1,[eax]
+"prog.dll"+14DDC5: FF B6 00 04 00 00        -  push [esi+00000400]
+"prog.dll"+14DDCB: E8 80 00 FF FF           -  call prog.dll+13DE50
+"prog.dll"+14DDD0: 8B 7C 24 1C              -  mov edi,[esp+1C]
+"prog.dll"+14DDD4: 83 C4 08                 -  add esp,08
+"prog.dll"+14DDD7: 8B CF                    -  mov ecx,edi
+"prog.dll"+14DDD9: 56                       -  push esi
+"prog.dll"+14DDDA: E8 91 14 00 00           -  call prog.dll+14F270
+"prog.dll"+14DDDF: 8B 45 10                 -  mov eax,[ebp+10]
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>78</ID>
+          <Description>"Mana Pointer"</Description>
+          <Options moHideChildren="1"/>
+          <LastState Activated="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(mana,prog.dll,F3 0F 11 9E 68 02 00 00) // should be unique
+alloc(newmem,$1000)
+
+label(code)
+label(return)
+label(pMana)
+
+newmem:
+
+code:
+  mov [pMana],esi
+  movss [esi+00000268],xmm3
+  jmp return
+
+pMana:
+  dq 0
+
+mana:
+  jmp newmem
+  nop 3
+return:
+registersymbol(mana)
+registersymbol(pMana)
+
+[DISABLE]
+
+mana:
+  db F3 0F 11 9E 68 02 00 00
+
+unregistersymbol(mana)
+unregistersymbol(pMana)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "prog.dll"+FC8ED
+
+"prog.dll"+FC8C2: F3 0F 59 C7              -  mulss xmm0,xmm7
+"prog.dll"+FC8C6: F3 0F 58 86 A4 01 00 00  -  addss xmm0,[esi+000001A4]
+"prog.dll"+FC8CE: F3 0F 58 C4              -  addss xmm0,xmm4
+"prog.dll"+FC8D2: F3 0F 2C C0              -  cvttss2si eax,xmm0
+"prog.dll"+FC8D6: F3 0F 2A D0              -  cvtsi2ss xmm2,eax
+"prog.dll"+FC8DA: F3 0F 5C D3              -  subss xmm2,xmm3
+"prog.dll"+FC8DE: F3 0F 11 55 FC           -  movss [ebp-04],xmm2
+"prog.dll"+FC8E3: F3 0F 58 DA              -  addss xmm3,xmm2
+"prog.dll"+FC8E7: 0F 28 CA                 -  movaps xmm1,xmm2
+"prog.dll"+FC8EA: 8D 4E 68                 -  lea ecx,[esi+68]
+// ---------- INJECTING HERE ----------
+"prog.dll"+FC8ED: F3 0F 11 9E 68 02 00 00  -  movss [esi+00000268],xmm3
+// ---------- DONE INJECTING  ----------
+"prog.dll"+FC8F5: E8 26 E6 FC FF           -  call prog.dll+CAF20
+"prog.dll"+FC8FA: F3 0F 10 4D FC           -  movss xmm1,[ebp-04]
+"prog.dll"+FC8FF: 0F 57 C0                 -  xorps xmm0,xmm0
+"prog.dll"+FC902: 0F 2F C8                 -  comiss xmm1,xmm0
+"prog.dll"+FC905: 76 3D                    -  jna prog.dll+FC944
+"prog.dll"+FC907: 80 7D 08 00              -  cmp byte ptr [ebp+08],00
+"prog.dll"+FC90B: 74 37                    -  je prog.dll+FC944
+"prog.dll"+FC90D: 6A 00                    -  push 00
+"prog.dll"+FC90F: B9 80 13 BF 56           -  mov ecx,prog.dll+341380
+"prog.dll"+FC914: E8 47 83 FF FF           -  call prog.dll+F4C60
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>44</ID>
+              <Description>"Mana"</Description>
+              <LastState Value="177.1259308" RealAddress="18B2CAF8"/>
+              <VariableType>Float</VariableType>
+              <Address>[pMana]+268</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>72</ID>
+          <Description>"Infinite Commando Points"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : UndeadHorde.exe
+  Version: 
+  Date   : 2019-08-26
+  Author : cfe
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,prog.dll,FF 43 40 8B 7D 08) // should be unique
+alloc(newmem,$1000)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  //inc [ebx+40]
+  mov edi,[ebp+08]
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db FF 43 40 8B 7D 08
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "prog.dll"+F45CD
+
+"prog.dll"+F45AD: 8B 53 40                       -  mov edx,[ebx+40]
+"prog.dll"+F45B0: 8D 4B 3C                       -  lea ecx,[ebx+3C]
+"prog.dll"+F45B3: EB 02                          -  jmp prog.dll+F45B7
+"prog.dll"+F45B5: 33 C0                          -  xor eax,eax
+"prog.dll"+F45B7: 8B 09                          -  mov ecx,[ecx]
+"prog.dll"+F45B9: 8D 14 52                       -  lea edx,[edx+edx*2]
+"prog.dll"+F45BC: F3 0F 7E 45 E8                 -  movq xmm0,[ebp-18]
+"prog.dll"+F45C1: 8B 7D 0C                       -  mov edi,[ebp+0C]
+"prog.dll"+F45C4: 66 0F D6 04 91                 -  movq [ecx+edx*4],xmm0
+"prog.dll"+F45C9: 89 7C 91 08                    -  mov [ecx+edx*4+08],edi
+// ---------- INJECTING HERE ----------
+"prog.dll"+F45CD: FF 43 40                       -  inc [ebx+40]
+"prog.dll"+F45D0: 8B 7D 08                       -  mov edi,[ebp+08]
+// ---------- DONE INJECTING  ----------
+"prog.dll"+F45D3: 85 C0                          -  test eax,eax
+"prog.dll"+F45D5: 74 09                          -  je prog.dll+F45E0
+"prog.dll"+F45D7: 50                             -  push eax
+"prog.dll"+F45D8: E8 85 2C 18 00                 -  call prog.dll+277262
+"prog.dll"+F45DD: 83 C4 04                       -  add esp,04
+"prog.dll"+F45E0: 0F B6 43 20                    -  movzx eax,byte ptr [ebx+20]
+"prog.dll"+F45E4: 50                             -  push eax
+"prog.dll"+F45E5: 51                             -  push ecx
+"prog.dll"+F45E6: 89 65 0C                       -  mov [ebp+0C],esp
+"prog.dll"+F45E9: 6A 0D                          -  push 0D
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>68</ID>
+          <Description>"EXP Pointer"</Description>
+          <Options moHideChildren="1"/>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(experience,prog.dll,F2 0F 10 0E F2 0F 5C C8) // should be unique
+alloc(newmem,$1000)
+
+label(code)
+label(return)
+label(pEXP)
+
+newmem:
+  mov [pEXP],esi
+code:
+  movsd xmm1,[esi]
+  subsd xmm1,xmm0
+  jmp return
+
+pEXP:
+dq 0
+
+experience:
+  jmp newmem
+  nop 3
+return:
+registersymbol(experience)
+registersymbol(pEXP)
+
+[DISABLE]
+
+experience:
+  db F2 0F 10 0E F2 0F 5C C8
+
+unregistersymbol(experience)
+unregistersymbol(pEXP)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "prog.dll"+10272C
+
+"prog.dll"+102707: 84 C9                          -  test cl,cl
+"prog.dll"+102709: 0F 45 F8                       -  cmovne edi,eax
+"prog.dll"+10270C: 81 FA B3 00 00 00              -  cmp edx,000000B3
+"prog.dll"+102712: 7C 0A                          -  jl prog.dll+10271E
+"prog.dll"+102714: F3 0F 10 0D 2C 41 BB 56        -  movss xmm1,[prog.dll+30412C]
+"prog.dll"+10271C: EB 2D                          -  jmp prog.dll+10274B
+"prog.dll"+10271E: 66 0F 6E EA                    -  movd xmm5,edx
+"prog.dll"+102722: 52                             -  push edx
+"prog.dll"+102723: F3 0F E6 ED                    -  cvtdq2pd xmm5,xmm5,xmm5
+"prog.dll"+102727: E8 84 9F FF FF                 -  call prog.dll+FC6B0
+// ---------- INJECTING HERE ----------
+"prog.dll"+10272C: F2 0F 10 0E                    -  movsd xmm1,[esi]
+"prog.dll"+102730: F2 0F 5C C8                    -  subsd xmm1,xmm0
+// ---------- DONE INJECTING  ----------
+"prog.dll"+102734: 0F 28 C5                       -  movaps xmm0,xmm5
+"prog.dll"+102737: F2 0F 59 05 70 44 BB 56        -  mulsd xmm0,[prog.dll+304470]
+"prog.dll"+10273F: F2 0F 59 C5                    -  mulsd xmm0,xmm5
+"prog.dll"+102743: F2 0F 5E C8                    -  divsd xmm1,xmm0
+"prog.dll"+102747: 66 0F 5A C9                    -  cvtpd2ps xmm1,xmm1
+"prog.dll"+10274B: F3 0F 10 96 84 02 00 00        -  movss xmm2,[esi+00000284]
+"prog.dll"+102753: 0F 2F CA                       -  comiss xmm1,xmm2
+"prog.dll"+102756: 76 26                          -  jna prog.dll+10277E
+"prog.dll"+102758: 0F 28 C6                       -  movaps xmm0,xmm6
+"prog.dll"+10275B: F3 0F 59 05 E8 3F BB 56        -  mulss xmm0,[prog.dll+303FE8]
+}
+
+
+
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>69</ID>
+              <Description>"Pointer"</Description>
+              <LastState Value="319886" RealAddress="18B2C890"/>
+              <VariableType>Double</VariableType>
+              <Address>[pEXP]</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>75</ID>
+          <Description>"Gold Pointer "</Description>
+          <Options moHideChildren="1"/>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(gold,prog.dll,FF B7 C4 02 00 00) // should be unique
+alloc(newmem,$1000)
+
+label(code)
+label(return)
+label(pGold)
+registersymbol(pGold)
+
+newmem:
+
+code:
+  push [edi+000002C4]
+  mov [pGold],edi
+  jmp return
+
+pGold:
+  dq 0
+
+gold:
+  jmp newmem
+  nop
+return:
+registersymbol(gold)
+
+[DISABLE]
+
+gold:
+  db FF B7 C4 02 00 00
+
+unregistersymbol(pGold)
+unregistersymbol(gold)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "prog.dll"+100927
+
+"prog.dll"+100902: 8D 4D E8                 -  lea ecx,[ebp-18]
+"prog.dll"+100905: 51                       -  push ecx
+"prog.dll"+100906: 8D 4D E4                 -  lea ecx,[ebp-1C]
+"prog.dll"+100909: 51                       -  push ecx
+"prog.dll"+10090A: FF 35 90 16 BF 56        -  push [prog.dll+341690]
+"prog.dll"+100910: FF D0                    -  call eax
+"prog.dll"+100912: F3 0F 10 45 E8           -  movss xmm0,[ebp-18]
+"prog.dll"+100917: 83 C4 14                 -  add esp,14
+"prog.dll"+10091A: F3 0F 5C 05 58 43 BB 56  -  subss xmm0,[prog.dll+304358]
+"prog.dll"+100922: A1 8C E9 BE 56           -  mov eax,[prog.dll+33E98C]
+// ---------- INJECTING HERE ----------
+"prog.dll"+100927: FF B7 C4 02 00 00        -  push [edi+000002C4]
+// ---------- DONE INJECTING  ----------
+"prog.dll"+10092D: F3 0F 11 45 EC           -  movss [ebp-14],xmm0
+"prog.dll"+100932: F3 0F 10 45 E4           -  movss xmm0,[ebp-1C]
+"prog.dll"+100937: F3 0F 58 05 50 45 BB 56  -  addss xmm0,[prog.dll+304550]
+"prog.dll"+10093F: F3 0F 11 45 F0           -  movss [ebp-10],xmm0
+"prog.dll"+100944: 8B B0 B8 00 00 00        -  mov esi,[eax+000000B8]
+"prog.dll"+10094A: E8 91 C3 F4 FF           -  call prog.dll+4CCE0
+"prog.dll"+10094F: 50                       -  push eax
+"prog.dll"+100950: 68 C0 A2 B7 56           -  push prog.dll+2CA2C0
+"prog.dll"+100955: 8D 45 EC                 -  lea eax,[ebp-14]
+"prog.dll"+100958: 50                       -  push eax
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>76</ID>
+              <Description>"Gold"</Description>
+              <LastState Value="695" RealAddress="18B2CB54"/>
+              <VariableType>4 Bytes</VariableType>
+              <Address>[pGold]+2c4</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>80</ID>
+          <Description>"Zero Cooldown for Rezzing"</Description>
+          <LastState Activated="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(cooldown,prog.dll,F3 0F 11 87 90 02 00 00) // should be unique
+alloc(newmem,$1000)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  mov [edi+00000290],0
+  jmp return
+
+cooldown:
+  jmp newmem
+  nop 3
+return:
+registersymbol(cooldown)
+
+[DISABLE]
+
+cooldown:
+  db F3 0F 11 87 90 02 00 00
+
+unregistersymbol(cooldown)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "prog.dll"+10263F
+
+"prog.dll"+102614: 0F 28 C1                       -  movaps xmm0,xmm1
+"prog.dll"+102617: F3 0F 58 C1                    -  addss xmm0,xmm1
+"prog.dll"+10261B: F3 0F 5C D8                    -  subss xmm3,xmm0
+"prog.dll"+10261F: 0F 2F D3                       -  comiss xmm2,xmm3
+"prog.dll"+102622: F3 0F 11 5F 30                 -  movss [edi+30],xmm3
+"prog.dll"+102627: 76 07                          -  jna prog.dll+102630
+"prog.dll"+102629: C7 47 30 00 00 00 00           -  mov [edi+30],00000000
+"prog.dll"+102630: F3 0F 10 87 90 02 00 00        -  movss xmm0,[edi+00000290]
+"prog.dll"+102638: F3 0F 5C C1                    -  subss xmm0,xmm1
+"prog.dll"+10263C: 0F 2F D0                       -  comiss xmm2,xmm0
+// ---------- INJECTING HERE ----------
+"prog.dll"+10263F: F3 0F 11 87 90 02 00 00        -  movss [edi+00000290],xmm0
+// ---------- DONE INJECTING  ----------
+"prog.dll"+102647: 76 0A                          -  jna prog.dll+102653
+"prog.dll"+102649: C7 87 90 02 00 00 00 00 00 00  -  mov [edi+00000290],00000000
+"prog.dll"+102653: 83 7F 10 00                    -  cmp dword ptr [edi+10],00
+"prog.dll"+102657: F3 0F 10 47 2C                 -  movss xmm0,[edi+2C]
+"prog.dll"+10265C: F3 0F 58 C1                    -  addss xmm0,xmm1
+"prog.dll"+102660: F3 0F 11 47 2C                 -  movss [edi+2C],xmm0
+"prog.dll"+102665: 7E 2A                          -  jle prog.dll+102691
+"prog.dll"+102667: F3 0F 10 47 38                 -  movss xmm0,[edi+38]
+"prog.dll"+10266C: F3 0F 58 C1                    -  addss xmm0,xmm1
+"prog.dll"+102670: 0F 2F 05 24 45 BB 56           -  comiss xmm0,[prog.dll+304524]
+}
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

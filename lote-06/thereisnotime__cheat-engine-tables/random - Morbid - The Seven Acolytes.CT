@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="34">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>17</ID>
+      <Description>"Inf Health"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{
+	Game	: Morbid - The Seven Acolytes.exe
+	Version	: 1.0.0.3
+	Date	: 2020-12-04
+	Author	: aSwedishMagyar
+}
+[ENABLE]
+aobscanmodule(infHealth,Morbid - The Seven Acolytes.exe,50 e8 ? ? ? ? 8b 4d ? c7 46 ? ? ? ? ? 8b 41 ? 85 c0 74 ? 05 ? ? ? ? 8b 48 ? 49 f7 c1 ? ? ? ? 75 ? eb ? 8b 01 68 ? ? ? ? ff 50 ? 8b 48 ? 49 f7 c1 ? ? ? ? 75 ? 50 89 46 ? e8 ? ? ? ? 8b 46 ? 83 c4 ? c7 40 ? ? ? ? ? c7 40 ? ? ? ? ? c7 00 ? ? ? ? 8b 4d ? c7 46 ? ? ? ? ? 8b 41 ? 85 c0 74 ? 05 ? ? ? ? c7 86 ? ? ? ? ? ? ? ? eb)
+registersymbol(infHealth)
+registersymbol(originfHealth)
+alloc(originfHealth,6)
+originfHealth:
+  readmem(infHealth,6)
+infHealth:
+  nop
+  nop 5
+
+[DISABLE]
+infHealth:
+  readmem(originfHealth,6)
+
+unregistersymbol(infHealth)
+unregistersymbol(originfHealth)
+dealloc(originfHealth)
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>31</ID>
+      <Description>"One Hit Kills"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{
+  Game   : Morbid - The Seven Acolytes.exe
+  Version: 
+  Date   : 2020-12-04
+  Author : aSwedishMagyar
+}
+
+[ENABLE]
+
+aobscanmodule(oneHitKills,Morbid - The Seven Acolytes.exe,89 D1 89 46 08) // should be unique
+alloc(newoneHitKills,$1000)
+registersymbol(oneHitKills)
+label(codeoneHitKills)
+label(returnoneHitKills)
+
+newoneHitKills:
+  xorpd xmm1,xmm1
+  movsd [edx],xmm1
+codeoneHitKills:
+  mov ecx,edx
+  mov [esi+08],eax
+  jmp returnoneHitKills
+
+oneHitKills:
+  jmp newoneHitKills
+returnoneHitKills:
+
+
+[DISABLE]
+
+oneHitKills:
+  db 89 D1 89 46 08
+
+unregistersymbol(oneHitKills)
+dealloc(newoneHitKills)
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>16</ID>
+      <Description>"Inf Stamina"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{
+	Game	: Morbid - The Seven Acolytes.exe
+	Version	: 1.0.0.3
+	Date	: 2020-12-04
+	Author	: aSwedishMagyar
+}
+[ENABLE]
+aobscanmodule(infStamMelee,Morbid - The Seven Acolytes.exe,50 E8 ?? ?? ?? ?? F2 0F 10 05 ?? ?? ?? ?? C7 46 2C 00 00 00 00)
+aobscanmodule(infStamSprint,Morbid - The Seven Acolytes.exe,50 e8 ? ? ? ? 8b 46 ? 48 a9 ? ? ? ? 75 ? 8d 46 ? c7 86 ? ? ? ? ? ? ? ? 50 e8 ? ? ? ? 83 c4 ? 8b 86 ? ? ? ? 48 a9 ? ? ? ? 0f 85 ? ? ? ? 8d 86 ? ? ? ? c7 86 ? ? ? ? ? ? ? ? 50 e8 ? ? ? ? 83 c4 ? e9 ? ? ? ? 8b 01)
+aobscanmodule(infStamRoll,Morbid - The Seven Acolytes.exe,50 e8 ? ? ? ? 8b 46 ? 48 a9 ? ? ? ? 75 ? 8d 46 ? c7 86 ? ? ? ? ? ? ? ? 50 e8 ? ? ? ? 83 c4 ? 8b 4d ? c7 46 ? ? ? ? ? 8b 41 ? 85 c0 74 ? 8d 90 ? ? ? ? eb ? 8b 01 8b 40 ? c7 86 ? ? ? ? ? ? ? ? 68 ? ? ? ? ff d0 8b 4d ? 89 c2 8b 41 ? 85 c0 0f 84 ? ? ? ? 05 ? ? ? ? c7 86 ? ? ? ? ? ? ? ? 89 46 ? 8d 86)
+aobscanmodule(infStamBlock,Morbid - The Seven Acolytes.exe,50 e8 ? ? ? ? 8b 46 ? 48 a9 ? ? ? ? 75 ? 8d 46 ? c7 86 ? ? ? ? ? ? ? ? 50 e8 ? ? ? ? 83 c4 ? 8b 4d ? c7 46 ? ? ? ? ? 8b 41 ? 85 c0 74 ? 05 ? ? ? ? 8b 48 ? 49 f7 c1 ? ? ? ? 75 ? eb ? 8b 01 8b 40 ? c7 86 ? ? ? ? ? ? ? ? 6a ? ff d0 8b 48 ? 49 f7 c1 ? ? ? ? 75 ? c7 86 ? ? ? ? ? ? ? ? 50 89 86)
+aobscanmodule(infStamPowerAttack,Morbid - The Seven Acolytes.exe,50 E8 ? ? ? ? 8B 4E 04 F2 0F 10 05 ? ? ? ? C7 46 2C 0A 00 00 00)
+alloc(origStamMelee,6)
+alloc(origStamSprint,6)
+alloc(origStamRoll,6)
+alloc(origStamBlock,6)
+alloc(origStamPowerAttack,6)
+registersymbol(infStamMelee)
+registersymbol(infStamSprint)
+registersymbol(infStamRoll)
+registersymbol(infStamBlock)
+registersymbol(infStamPowerAttack)
+registersymbol(origStamMelee)
+registersymbol(origStamSprint)
+registersymbol(origStamRoll)
+registersymbol(origStamBlock)
+registersymbol(origStamPowerAttack)
+origStamMelee:
+  readmem(infStamMelee,6)
+
+origStamSprint:
+  readmem(infStamSprint,6)
+
+origStamRoll:
+  readmem(infStamRoll,6)
+
+origStamBlock:
+  readmem(infStamBlock,6)
+
+origStamPowerAttack:
+  readmem(infStamPowerAttack,6)
+
+infStamMelee:
+  nop
+  nop 5
+
+infStamSprint:
+  nop
+  nop 5
+
+infStamRoll:
+  nop
+  nop 5
+
+infStamBlock:
+  nop
+  nop 5
+
+infStamPowerAttack:
+  nop
+  nop 5
+
+[DISABLE]
+infStamMelee:
+  readmem(origStamMelee,6)
+
+infStamSprint:
+  readmem(origStamSprint,6)
+
+infStamRoll:
+  readmem(origStamRoll,6)
+
+infStamBlock:
+  readmem(origStamBlock,6)
+
+infStamPowerAttack:
+  readmem(origStamPowerAttack,6)
+
+unregistersymbol(infStamMelee)
+unregistersymbol(infStamSprint)
+unregistersymbol(infStamRoll)
+unregistersymbol(infStamBlock)
+unregistersymbol(infStamPowerAttack)
+unregistersymbol(origStamMelee)
+unregistersymbol(origStamSprint)
+unregistersymbol(origStamRoll)
+unregistersymbol(origStamBlock)
+unregistersymbol(origStamPowerAttack)
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>19</ID>
+      <Description>"Enable EXP Script"</Description>
+      <Options moHideChildren="1"/>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{
+	Game	: Morbid - The Seven Acolytes.exe
+	Version	: 1.0.0.3
+	Date	: 2020-12-04
+	Author	: aSwedishMagyar
+}
+[ENABLE]
+aobscanmodule(getEXP,Morbid - The Seven Acolytes.exe,F2 0F 10 07 B0 01 5F 5E)
+registersymbol(getEXP)
+registersymbol(expBase1)
+registersymbol(expBase2)
+alloc(newgetEXP,100,getEXP)
+label(codegetEXP)
+label(returngetEXP)
+label(expBase1)
+label(expBase2)
+newgetEXP:
+  cmp esi,15
+  jne codegetEXP
+  cmp [edi+1C],0
+  jne codegetEXP
+  cmp [edi+18],78787878
+  je @f
+  mov [expBase1],edi
+  jmp codegetEXP
+@@:
+  mov [expBase2],edi
+codegetEXP:
+  movsd xmm0,[edi]
+  mov al,01
+  jmp returngetEXP
+expBase1:
+  dd 0
+expBase2:
+  dd 0
+getEXP:
+  jmp newgetEXP
+  nop
+returngetEXP:
+
+[DISABLE]
+getEXP:
+  db F2 0F 10 07 B0 01
+
+unregistersymbol(getEXP)
+unregistersymbol(expBase1)
+unregistersymbol(expBase2)
+dealloc(newgetEXP)
+
+{
+// ORIGINAL CODE - INJECTION POINT: 018B2D43
+
+018B2CEB: E8 30 FC FE FF        - call 018A2920
+018B2CF0: C7 43 08 00 00 00 00  - mov [ebx+08],00000000
+018B2CF7: C7 43 0C 05 00 00 00  - mov [ebx+0C],00000005
+018B2CFE: C7 03 00 00 00 00     - mov [ebx],00000000
+018B2D04: EB 0C                 - jmp 018B2D12
+018B2D06: FF 33                 - push [ebx]
+018B2D08: E8 73 6D FE FF        - call 01899A80
+018B2D0D: 83 C4 04              - add esp,04
+018B2D10: 89 03                 - mov [ebx],eax
+018B2D12: C7 03 00 00 00 00     - mov [ebx],00000000
+018B2D18: 8B 47 0C              - mov eax,[edi+0C]
+018B2D1B: 89 43 0C              - mov [ebx+0C],eax
+018B2D1E: 8B 47 08              - mov eax,[edi+08]
+018B2D21: 89 43 08              - mov [ebx+08],eax
+018B2D24: 8B 47 0C              - mov eax,[edi+0C]
+018B2D27: 25 FF FF FF 00        - and eax,00FFFFFF
+018B2D2C: 83 F8 0E              - cmp eax,0E
+018B2D2F: 0F 87 FD 01 00 00     - ja 018B2F32
+018B2D35: 0F B6 80 38 32 8B 01  - movzx eax,byte ptr [eax+018B3238]
+018B2D3C: FF 24 85 1C 32 8B 01  - jmp dword ptr [eax*4+018B321C]
+// ---------- INJECTING HERE ----------
+018B2D43: F2 0F 10 07           - movsd xmm0,[edi]
+// ---------- DONE INJECTING  ----------
+018B2D47: B0 01                 - mov al,01
+018B2D49: 5F                    - pop edi
+018B2D4A: 5E                    - pop esi
+018B2D4B: 5D                    - pop ebp
+018B2D4C: F2 0F 11 03           - movsd [ebx],xmm0
+018B2D50: 5B                    - pop ebx
+018B2D51: 83 C4 08              - add esp,08
+018B2D54: C3                    - ret 
+018B2D55: 8B 44 24 24           - mov eax,[esp+24]
+018B2D59: 3D 00 00 00 80        - cmp eax,80000000
+018B2D5E: 0F 85 D8 01 00 00     - jne 018B2F3C
+018B2D64: 8B 07                 - mov eax,[edi]
+018B2D66: 83 78 08 00           - cmp dword ptr [eax+08],00
+018B2D6A: 75 03                 - jne 018B2D6F
+018B2D6C: 89 78 08              - mov [eax+08],edi
+018B2D6F: 8B 5C 24 1C           - mov ebx,[esp+1C]
+018B2D73: 8B 4B 0C              - mov ecx,[ebx+0C]
+018B2D76: 8B C1                 - mov eax,ecx
+018B2D78: 25 FF FF FF 00        - and eax,00FFFFFF
+018B2D7D: 83 E8 01              - sub eax,01
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>22</ID>
+          <Description>"Level UP"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{$lua}
+[ENABLE]
+if syntaxcheck then return end
+local expBase1_lua = readInteger(getAddressSafe('expBase1'))
+local expBase2_lua = readInteger(getAddressSafe('expBase2'))
+if ((expBase1_lua ~= nil) and (expBase2_lua ~= nil)) then writeDouble(expBase1_lua,readDouble(expBase2_lua)) end
+{$asm}
+nop
+{$lua}
+[DISABLE]
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>38</ID>
+      <Description>"Inf Ammo"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{
+	Game	: Morbid - The Seven Acolytes.exe
+	Version	: 1.0.0.3
+	Date	: 2020-12-04
+	Author	: aSwedishMagyar
+}
+[ENABLE]
+aobscanmodule(infAmmo,Morbid - The Seven Acolytes.exe,F2 0F 58 05 ?? ?? ?? ?? F2 0F 11 02 E9 ?? ?? ?? ?? 8B 46 2C C7 46 1C ?? ?? ?? ?? C7 86)
+alloc(origAmmo,8)
+registersymbol(infAmmo)
+registersymbol(origAmmo)
+origAmmo:
+  readmem(infAmmo,8)
+infAmmo:
+  nop 8
+
+[DISABLE]
+infAmmo:
+  readmem(origAmmo,8)
+
+unregistersymbol(infAmmo)
+unregistersymbol(origAmmo)
+dealloc(origAmmo)
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>28</ID>
+      <Description>"Inf Items"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{
+	Game	: Morbid - The Seven Acolytes.exe
+	Version	: 1.0.0.3
+	Date	: 2020-12-04
+	Author	: aSwedishMagyar
+}
+[ENABLE]
+aobscanmodule(infItems,Morbid - The Seven Acolytes.exe,F2 0F 11 03 5B 83 C4 10)
+registersymbol(infItems)
+alloc(newinfItems,100,infItems)
+label(codeinfItems)
+label(returninfItems)
+
+newinfItems:
+  comisd xmm0,[ebx]
+  jb codeinfItems
+  movsd [ebx],xmm0
+codeinfItems:
+  pop ebx
+  jmp returninfItems
+
+infItems:
+  jmp newinfItems
+returninfItems:
+
+[DISABLE]
+infItems:
+  db F2 0F 11 03 5B
+
+unregistersymbol(infItems)
+dealloc(newinfItems)
+</AssemblerScript>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

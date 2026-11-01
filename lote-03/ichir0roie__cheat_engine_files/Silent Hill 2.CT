@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>8</ID>
+      <Description>"Auto Assemble script"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : Silent Hill 2  
+  Version: 
+  Date   : 2024-10-24
+  Author : ichir
+
+  This script does blah blah blah
+}
+
+define(address,"SHProto-Win64-Shipping.exe"+2AF4F88)
+define(bytes,89 91 B4 0B 00 00)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,"SHProto-Win64-Shipping.exe"+2AF4F88)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  add edx,1
+  mov [rcx+00000BB4],edx
+  jmp return
+
+address:
+  jmp newmem
+  nop
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+  // mov [rcx+00000BB4],edx
+
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: SHProto-Win64-Shipping.exe+2AF4F88
+
+SHProto-Win64-Shipping.exe+2AF4F5F: CC                    - int 3 
+SHProto-Win64-Shipping.exe+2AF4F60: 85 D2                 - test edx,edx
+SHProto-Win64-Shipping.exe+2AF4F62: 0F 88 FC 00 00 00     - js SHProto-Win64-Shipping.exe+2AF5064
+SHProto-Win64-Shipping.exe+2AF4F68: 57                    - push rdi
+SHProto-Win64-Shipping.exe+2AF4F69: 48 83 EC 20           - sub rsp,20
+SHProto-Win64-Shipping.exe+2AF4F6D: 48 8B F9              - mov rdi,rcx
+SHProto-Win64-Shipping.exe+2AF4F70: 3B 91 A8 06 00 00     - cmp edx,[rcx+000006A8]
+SHProto-Win64-Shipping.exe+2AF4F76: 0F 8F E3 00 00 00     - jg SHProto-Win64-Shipping.exe+2AF505F
+SHProto-Win64-Shipping.exe+2AF4F7C: 48 89 5C 24 30        - mov [rsp+30],rbx
+SHProto-Win64-Shipping.exe+2AF4F81: 48 8B 99 20 03 00 00  - mov rbx,[rcx+00000320]
+// ---------- INJECTING HERE ----------
+SHProto-Win64-Shipping.exe+2AF4F88: 89 91 B4 0B 00 00     - mov [rcx+00000BB4],edx
+// ---------- DONE INJECTING  ----------
+SHProto-Win64-Shipping.exe+2AF4F8E: 48 85 DB              - test rbx,rbx
+SHProto-Win64-Shipping.exe+2AF4F91: 74 45                 - je SHProto-Win64-Shipping.exe+2AF4FD8
+SHProto-Win64-Shipping.exe+2AF4F93: E8 18 69 DE FF        - call SHProto-Win64-Shipping.exe+28DB8B0
+SHProto-Win64-Shipping.exe+2AF4F98: 48 8B 4B 10           - mov rcx,[rbx+10]
+SHProto-Win64-Shipping.exe+2AF4F9C: 4C 8D 40 30           - lea r8,[rax+30]
+SHProto-Win64-Shipping.exe+2AF4FA0: 48 63 40 38           - movsxd  rax,dword ptr [rax+38]
+SHProto-Win64-Shipping.exe+2AF4FA4: 3B 41 38              - cmp eax,[rcx+38]
+SHProto-Win64-Shipping.exe+2AF4FA7: 7F 2F                 - jg SHProto-Win64-Shipping.exe+2AF4FD8
+SHProto-Win64-Shipping.exe+2AF4FA9: 48 8B D0              - mov rdx,rax
+SHProto-Win64-Shipping.exe+2AF4FAC: 48 8B 41 30           - mov rax,[rcx+30]
+}
+</AssemblerScript>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

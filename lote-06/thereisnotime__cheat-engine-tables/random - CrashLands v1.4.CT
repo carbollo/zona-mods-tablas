@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="29">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>985</ID>
+      <Description>"▴▾▴▾▴▾▴▾▴▾▴▾▴▾▴▾"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+{$lua}
+controlMainForm = getMainForm()
+control_setVisible(wincontrol_getControl(controlMainForm,0), false)
+control_setVisible(wincontrol_getControl(controlMainForm,2), false)
+control_setVisible(wincontrol_getControl(controlMainForm,3), false)
+
+[DISABLE]
+
+{$lua}
+controlMainForm = getMainForm()
+control_setVisible(wincontrol_getControl(controlMainForm,0), true)
+control_setVisible(wincontrol_getControl(controlMainForm,2), true)
+control_setVisible(wincontrol_getControl(controlMainForm,3), true)
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>1132</ID>
+      <Description>"     Activate Crashlands Table"</Description>
+      <Options moHideChildren="1"/>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+{$lua}
+getMainForm().Caption = 'Crashlands 1.4.49 - By Betcha '
+{$asm}
+
+// "Crashlands.exe"+823B58
+aobscanmodule(HealthStomach,Crashlands.exe,F2 0F 10 00 C7 86 20 02 00 00 1E 00 00 00)
+alloc(newmem,$100,Crashlands.exe)
+globalalloc(HealthValues,8)
+alloc(DamageCollision,8)
+alloc(MoveSpeedValue,8)
+alloc(FlyingTrigger,8)
+label(NoDamageTrigger)
+label(MoveSpeedTrigger)
+label(FlyingAroundTrigger)
+newmem:
+
+
+
+TakeNoDamage:
+  cmp [NoDamageTrigger],1
+  jne FlyingAround
+  push ebx
+  mov ebx,[DamageCollision]
+  mov dword ptr [eax-30],ebx
+  mov ebx,[DamageCollision+4]
+  mov dword ptr [eax-2C],ebx
+  pop ebx
+
+FlyingAround:
+  cmp [FlyingAroundTrigger],1
+  jne ChangeMoveSpeed
+  push ebx
+  mov ebx,[FlyingTrigger]
+  mov dword ptr [eax+F0],ebx
+  mov ebx,[FlyingTrigger+4]
+  mov dword ptr [eax+F4],ebx
+  pop ebx
+
+ChangeMoveSpeed:
+  cmp [MoveSpeedTrigger],1
+  jne Default
+  push ebx
+  mov ebx,[MoveSpeedValue]
+  mov dword ptr [eax+570],ebx
+  mov ebx,[MoveSpeedValue+4]
+  mov dword ptr [eax+574],ebx
+  pop ebx
+
+Default:
+  mov [HealthValues],eax
+  movsd xmm0,[eax]
+  mov [esi+00000220],0000001E
+  jmp return
+
+NoDamageTrigger:
+  dd 0
+MoveSpeedTrigger:
+  dd 0
+FlyingAroundTrigger:
+  dd 0
+
+HealthStomach:
+  jmp newmem
+  nop 9
+return:
+registersymbol(HealthStomach)
+registersymbol(NoDamageTrigger)
+registersymbol(MoveSpeedTrigger)
+registersymbol(FlyingAroundTrigger)
+
+DamageCollision:
+  dq (double)0
+
+MoveSpeedValue:
+  dq (double)400.0
+
+FlyingTrigger:
+  dq (double)1
+
+[DISABLE]
+
+HealthStomach:
+  db F2 0F 10 00 C7 86 20 02 00 00 1E 00 00 00
+unregistersymbol(HealthStomach)
+unregistersymbol(NoDamageTrigger)
+unregistersymbol(MoveSpeedTrigger)
+unregistersymbol(FlyingAroundTrigger)
+dealloc(DamageCollision)
+dealloc(MoveSpeedValue)
+dealloc(TurnFlying)
+dealloc(newmem)
+
+{"Crashlands.exe"+823B2A: FF D0                          -  call eax
+"Crashlands.exe"+823B2C: F7 40 0C FF FF FF 00           -  test [eax+0C],Crashlands.exe+4FFFFF
+"Crashlands.exe"+823B33: 74 23                          -  je Crashlands.exe+823B58
+"Crashlands.exe"+823B35: C7 86 20 02 00 00 1E 00 00 00  -  mov [esi+00000220],0000001E
+"Crashlands.exe"+823B3F: 50                             -  push eax
+"Crashlands.exe"+823B40: E8 2B 7F 57 01                 -  call Crashlands.exe+1D9BA70
+"Crashlands.exe"+823B45: 83 C4 04                       -  add esp,04
+"Crashlands.exe"+823B48: DD 9E 08 02 00 00              -  fstp qword ptr [esi+00000208]
+"Crashlands.exe"+823B4E: F2 0F 10 86 08 02 00 00        -  movsd xmm0,[esi+00000208]
+"Crashlands.exe"+823B56: EB 0E                          -  jmp Crashlands.exe+823B66
+// ---------- INJECTING HERE ----------
+"Crashlands.exe"+823B58: F2 0F 10 00                    -  movsd xmm0,[eax]
+"Crashlands.exe"+823B5C: C7 86 20 02 00 00 1E 00 00 00  -  mov [esi+00000220],0000001E
+// ---------- DONE INJECTING  ----------
+"Crashlands.exe"+823B66: F2 0F 2C C0                    -  cvttsd2si eax,xmm0
+"Crashlands.exe"+823B6A: 50                             -  push eax
+"Crashlands.exe"+823B6B: FF 75 0C                       -  push [ebp+0C]
+"Crashlands.exe"+823B6E: FF 75 08                       -  push [ebp+08]
+"Crashlands.exe"+823B71: E8 4A 6D 5A 01                 -  call Crashlands.exe+1DCA8C0
+"Crashlands.exe"+823B76: 83 C4 0C                       -  add esp,0C
+"Crashlands.exe"+823B79: 84 C0                          -  test al,al
+"Crashlands.exe"+823B7B: C7 46 24 02 00 00 00           -  mov [esi+24],00000002
+"Crashlands.exe"+823B82: 0F 84 B7 00 00 00              -  je Crashlands.exe+823C3F
+"Crashlands.exe"+823B88: 8B 46 34                       -  mov eax,[esi+34]}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>1029</ID>
+          <Description>"▴▾▴▾▴▾▴▾▴▾▴▾▴▾"</Description>
+          <Options moHideChildren="1"/>
+          <LastState Value="" RealAddress="00000000"/>
+          <Color>000000</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>1162</ID>
+          <Description>"     Instant Construction"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+// "Crashlands.exe"+141830B
+aobscanmodule(CraftingTimer,Crashlands.exe,0D 01 00 00 F2 0F 10 00 F3 0F 7E 48 08)
+globalalloc(CraftingTimerValues,8)
+alloc(newmem,$100,Crashlands.exe)
+alloc(CraftTimerValue,8)
+newmem:
+
+
+
+ChangeCraftTimer:
+  push ebx
+  mov ebx,[CraftTimerValue]
+  mov dword ptr [eax],ebx
+  mov ebx,[CraftTimerValue+4]
+  mov dword ptr [eax+4],ebx
+  pop ebx
+
+Default:
+  mov [CraftingTimerValues],eax
+  movsd xmm0,[eax]
+  movq xmm1,[eax+08]
+  jmp return
+
+CraftingTimer+04:
+  jmp newmem
+  nop 4
+return:
+registersymbol(CraftingTimer)
+
+CraftTimerValue:
+  dq (double)0
+
+[DISABLE]
+
+CraftingTimer+04:
+  db F2 0F 10 00 F3 0F 7E 48 08
+unregistersymbol(CraftingTimer)
+dealloc(CraftTimerValue)
+dealloc(newmem)
+
+{"Crashlands.exe"+14182E0: F2 0F 10 00                    -  movsd xmm0,[eax]
+"Crashlands.exe"+14182E4: F2 0F 2C C0                    -  cvttsd2si eax,xmm0
+"Crashlands.exe"+14182E8: 8B 8E 6C 02 00 00              -  mov ecx,[esi+0000026C]
+"Crashlands.exe"+14182EE: 69 C0 00 7D 00 00              -  imul eax,eax,00007D00
+"Crashlands.exe"+14182F4: 83 C8 01                       -  or eax,01
+"Crashlands.exe"+14182F7: 50                             -  push eax
+"Crashlands.exe"+14182F8: E8 73 26 C2 FE                 -  call Crashlands.exe+3A970
+"Crashlands.exe"+14182FD: 8D 8E 68 05 00 00              -  lea ecx,[esi+00000568]
+"Crashlands.exe"+1418303: 39 C8                          -  cmp eax,ecx
+"Crashlands.exe"+1418305: 0F 84 0D 01 00 00              -  je Crashlands.exe+1418418
+// ---------- INJECTING HERE ----------
+"Crashlands.exe"+141830B: F2 0F 10 00                    -  movsd xmm0,[eax]
+"Crashlands.exe"+141830F: F3 0F 7E 48 08                 -  movq xmm1,[eax+08]
+// ---------- DONE INJECTING  ----------
+"Crashlands.exe"+1418314: B9 FF FF FF 00                 -  mov ecx,00FFFFFF
+"Crashlands.exe"+1418319: 66 0F D6 4E 18                 -  movq [esi+18],xmm1
+"Crashlands.exe"+141831E: F2 0F 11 46 10                 -  movsd [esi+10],xmm0
+"Crashlands.exe"+1418323: 8B 46 1C                       -  mov eax,[esi+1C]
+"Crashlands.exe"+1418326: 21 C8                          -  and eax,ecx
+"Crashlands.exe"+1418328: 83 F8 02                       -  cmp eax,02
+"Crashlands.exe"+141832B: 75 29                          -  jne Crashlands.exe+1418356
+"Crashlands.exe"+141832D: 8B 46 10                       -  mov eax,[esi+10]
+"Crashlands.exe"+1418330: FF 00                          -  inc [eax]
+"Crashlands.exe"+1418332: 8B 86 74 05 00 00              -  mov eax,[esi+00000574]}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>1150</ID>
+          <Description>"     Increase Melee Damage"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+// "Crashlands.exe"+7F2A07
+aobscanmodule(DamageStomach,Crashlands.exe,90 01 00 00 39 C8 0F 84 19 01 00 00 F2 0F 10 00 F2 0F 10 48 08)
+globalalloc(DamageStomachValues,8)
+alloc(newmem,$100,Crashlands.exe)
+alloc(DamagePerHitValue,8)
+alloc(ChancePerHitValue,8)
+newmem:
+
+
+
+ChangeDamage:
+  push ebx
+  mov ebx,[DamagePerHitValue]
+  mov dword ptr [eax],ebx
+  mov ebx,[DamagePerHitValue+4]
+  mov dword ptr [eax+4],ebx
+  pop ebx
+
+ChangeChance:
+  push ebx
+  mov ebx,[ChancePerHitValue]
+  mov dword ptr [eax-10],ebx
+  mov ebx,[ChancePerHitValue+4]
+  mov dword ptr [eax-C],ebx
+  pop ebx
+
+Default:
+  mov [DamageStomachValues],eax
+  movsd xmm0,[eax]
+  movsd xmm1,[eax+08]
+  jmp return
+
+DamageStomach+0C:
+  jmp newmem
+  nop 4
+return:
+registersymbol(DamageStomach)
+
+DamagePerHitValue:
+  dq (double)10000
+
+ChancePerHitValue:
+  dq (double)0.1
+
+[DISABLE]
+
+DamageStomach+0C:
+  db F2 0F 10 00 F2 0F 10 48 08
+unregistersymbol(DamageStomach)
+dealloc(DamagePerHitValue)
+dealloc(ChancePerHitValue)
+dealloc(newmem)
+
+{"Crashlands.exe"+7F29DB: 85 C9                          -  test ecx,ecx
+"Crashlands.exe"+7F29DD: 74 6E                          -  je Crashlands.exe+7F2A4D
+"Crashlands.exe"+7F29DF: 81 C1 00 96 00 00              -  add ecx,00009600
+"Crashlands.exe"+7F29E5: C7 86 10 03 00 00 52 00 00 00  -  mov [esi+00000310],00000052
+"Crashlands.exe"+7F29EF: 89 4E 4C                       -  mov [esi+4C],ecx
+"Crashlands.exe"+7F29F2: 6A 04                          -  push 04
+"Crashlands.exe"+7F29F4: E8 77 7F 84 FF                 -  call Crashlands.exe+3A970
+"Crashlands.exe"+7F29F9: 8D 8E 90 01 00 00              -  lea ecx,[esi+00000190]
+"Crashlands.exe"+7F29FF: 39 C8                          -  cmp eax,ecx
+"Crashlands.exe"+7F2A01: 0F 84 19 01 00 00              -  je Crashlands.exe+7F2B20
+// ---------- INJECTING HERE ----------
+"Crashlands.exe"+7F2A07: F2 0F 10 00                    -  movsd xmm0,[eax]
+"Crashlands.exe"+7F2A0B: F2 0F 10 48 08                 -  movsd xmm1,[eax+08]
+// ---------- DONE INJECTING  ----------
+"Crashlands.exe"+7F2A10: B8 FF FF FF 00                 -  mov eax,Crashlands.exe+7FFFF
+"Crashlands.exe"+7F2A15: F2 0F 11 4E 08                 -  movsd [esi+08],xmm1
+"Crashlands.exe"+7F2A1A: F2 0F 11 06                    -  movsd [esi],xmm0
+"Crashlands.exe"+7F2A1E: 23 46 0C                       -  and eax,[esi+0C]
+"Crashlands.exe"+7F2A21: 83 F8 02                       -  cmp eax,02
+"Crashlands.exe"+7F2A24: 75 4D                          -  jne Crashlands.exe+7F2A73
+"Crashlands.exe"+7F2A26: 8B 06                          -  mov eax,[esi]
+"Crashlands.exe"+7F2A28: FF 00                          -  inc [eax]
+"Crashlands.exe"+7F2A2A: 8B 86 9C 01 00 00              -  mov eax,[esi+0000019C]
+"Crashlands.exe"+7F2A30: 48                             -  dec eax
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>1176</ID>
+          <Description>"     Increase Movement Speed"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+MoveSpeedTrigger:
+  dd 1
+
+[DISABLE]
+MoveSpeedTrigger:
+  dd 0
+
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>1175</ID>
+          <Description>"     Character Takes No Damage"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+NoDamageTrigger:
+  dd 1
+
+[DISABLE]
+NoDamageTrigger:
+  dd 0
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>1177</ID>
+          <Description>"     Fly Around Instead Of Walking"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+FlyingAroundTrigger:
+  dd 1
+
+[DISABLE]
+FlyingAroundTrigger:
+  dd 0
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>980</ID>
+          <Description>"▾▴▾▴▾▴▾▴▾▴▾▴▾▴▾▴▾▴"</Description>
+          <Options moHideChildren="1"/>
+          <LastState Value="" RealAddress="00000000"/>
+          <Color>000000</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols>
+    <SymbolEntry>
+      <Name>HealthValues</Name>
+      <Address>002C0000</Address>
+    </SymbolEntry>
+  </UserdefinedSymbols>
+</CheatTable>

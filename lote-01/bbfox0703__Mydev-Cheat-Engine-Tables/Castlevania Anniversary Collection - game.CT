@@ -1,0 +1,907 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>20</ID>
+      <Description>"Disable when stage clear!!"</Description>
+      <Color>8000FF</Color>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>21</ID>
+      <Description>"Save game often!"</Description>
+      <Color>8000FF</Color>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>6</ID>
+      <Description>"Castlevania (1987 - NES) / 悪魔城ドラキュラ (1993 - FC)"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : game.exe
+  Version: 
+  Date   : 2023-06-04
+  Author : bbfox@https://opencheattables.com
+}
+
+define(address,"game.exe"+43327)
+define(bytes,88 1C 02 66 83 46 14 03)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000)
+
+label(code)
+label(return)
+label(i_is_invis)
+label(i_is_inf_p)
+label(i_is_inf_HP)
+label(i_is_inf_heart)
+label(i_is_inf_time)
+
+
+newmem:
+  cmp dword ptr [i_is_inf_time], 1
+  jne next1
+  cmp edx, 42
+  jne next1
+  mov bl, 99
+next1:
+  push edx
+  push ebx
+  // heart
+  cmp dword ptr [i_is_inf_heart], 1
+  jne next2
+  mov edx, 71
+  mov bl, 5A
+  mov [edx+eax],bl
+
+  // HP
+next2:
+  cmp dword ptr [i_is_inf_HP], 1
+  jne next3
+  mov edx, 45
+  mov bl, #64
+  mov [edx+eax],bl
+
+  // no. of player
+next3:
+  cmp dword ptr [i_is_inf_p], 1
+  jne next4
+  mov edx, 2A
+  mov bl, 5
+  mov byte ptr [edx+eax],bl
+
+  // invis
+next4:
+  cmp dword ptr [i_is_invis], 1
+  jne next5
+  mov edx, 5B
+  mov bl, 24
+  mov byte ptr [edx+eax],bl
+  //mov edx, 4D
+  //mov bl, D0
+  //mov byte ptr [edx+eax],bl
+
+next5:
+
+  pop ebx
+  pop edx
+
+
+endp:
+
+code:
+  mov [edx+eax],bl
+  add word ptr [esi+14],03
+  jmp return
+align 10 cc
+  i_is_invis:
+  dd 1
+  i_is_inf_p:
+  dd 0
+  i_is_inf_HP:
+  dd 1
+  i_is_inf_heart:
+  dd 1
+  i_is_inf_time:
+  dd 1
+
+
+address:
+  jmp newmem
+  nop 3
+return:
+  registersymbol(i_is_invis)
+  registersymbol(i_is_inf_p)
+  registersymbol(i_is_inf_HP)
+  registersymbol(i_is_inf_heart)
+  registersymbol(i_is_inf_time)
+
+[DISABLE]
+
+address:
+  db bytes
+  // mov [edx+eax],bl
+  // add word ptr [esi+14],03
+  unregistersymbol(i_is_invis)
+  unregistersymbol(i_is_inf_p)
+  unregistersymbol(i_is_inf_HP)
+  unregistersymbol(i_is_inf_heart)
+  unregistersymbol(i_is_inf_time)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: game.exe+43327
+
+game.exe+43302: 0F B6 4E 18           - movzx ecx,byte ptr [esi+18]
+game.exe+43306: 0F B6 5E 16           - movzx ebx,byte ptr [esi+16]
+game.exe+4330A: 66 03 C1              - add ax,cx
+game.exe+4330D: 0F B7 D0              - movzx edx,ax
+game.exe+43310: 8B C2                 - mov eax,edx
+game.exe+43312: C1 E8 0B              - shr eax,0B
+game.exe+43315: 8B 84 86 AC 00 00 00  - mov eax,[esi+eax*4+000000AC]
+game.exe+4331C: 3B 46 28              - cmp eax,[esi+28]
+game.exe+4331F: 74 15                 - je game.exe+43336
+game.exe+43321: 81 E2 FF 07 00 00     - and edx,000007FF
+// ---------- INJECTING HERE ----------
+game.exe+43327: 88 1C 02              - mov [edx+eax],bl
+// ---------- DONE INJECTING  ----------
+game.exe+4332A: 66 83 46 14 03        - add word ptr [esi+14],03
+game.exe+4332F: 83 46 20 05           - add dword ptr [esi+20],05
+game.exe+43333: 5E                    - pop esi
+game.exe+43334: 5B                    - pop ebx
+game.exe+43335: C3                    - ret 
+game.exe+43336: 8B 4E 04              - mov ecx,[esi+04]
+game.exe+43339: 53                    - push ebx
+game.exe+4333A: 52                    - push edx
+game.exe+4333B: FF 71 1C              - push [ecx+1C]
+game.exe+4333E: 8B 41 04              - mov eax,[ecx+04]
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>7</ID>
+          <Description>"invisible?"</Description>
+          <DropDownList DisplayValueAsItem="1">0:No
+1:Yes
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_is_invis</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>8</ID>
+          <Description>"inf. player #?"</Description>
+          <DropDownListLink>invisible?</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_is_inf_p</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>9</ID>
+          <Description>"inf. HP?"</Description>
+          <DropDownListLink>invisible?</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_is_inf_HP</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>10</ID>
+          <Description>"inf. heart?"</Description>
+          <DropDownListLink>invisible?</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_is_inf_heart</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>11</ID>
+          <Description>"inf. time?"</Description>
+          <DropDownListLink>invisible?</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_is_inf_time</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>28</ID>
+      <Description>"Castlevania III Dracula's Curse (1990 - NES)"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : game.exe
+  Version: 
+  Date   : 2023-06-05
+  Author : bbfox@https://opemcheattables.com
+}
+
+define(address,"game.exe"+42AD8)
+define(bytes,88 14 08 66 83 46 14 02)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000)
+
+label(code)
+label(return)
+label(is_inf_time_3)
+label(is_inf_heart_3)
+label(is_inf_HP_3)
+label(is_invis_3)
+
+newmem:
+  cmp eax, 7E
+  jne endp
+  cmp dword ptr [is_inf_time_3], 1
+  jne @F
+  mov dl, 99
+
+chk_heart:
+  push eax
+  push edx
+  cmp dword ptr [is_inf_heart_3], 1
+  jne @F
+  mov eax, 84
+  mov dl, 90
+  mov [eax+ecx],dl
+
+chk_HP:
+  cmp dword ptr [is_inf_HP_3],1
+  jne @F
+  mov eax, 3C
+  mov dl, 40
+  mov [eax+ecx],dl
+
+chk_inv:
+  cmp dword ptr [is_invis_3],1
+  jne @F
+  mov eax, 80
+  mov dl, 80
+  mov [eax+ecx],dl
+
+@@:
+
+  pop edx
+  pop eax
+
+
+endp:
+code:
+  mov [eax+ecx],dl
+  add word ptr [esi+14],02
+  jmp return
+align 10 cc
+  is_inf_time_3:
+  dd 1
+  is_inf_heart_3:
+  dd 1
+  is_inf_HP_3:
+  dd 1
+  is_invis_3:
+  dd 1
+
+address:
+  jmp newmem
+  nop 3
+return:
+registersymbol(is_inf_time_3)
+registersymbol(is_inf_heart_3)
+registersymbol(is_inf_HP_3)
+registersymbol(is_invis_3)
+
+[DISABLE]
+
+address:
+  db bytes
+  // mov [eax+ecx],dl
+  // add word ptr [esi+14],02
+unregistersymbol(is_inf_time_3)
+unregistersymbol(is_inf_heart_3)
+unregistersymbol(is_inf_HP_3)
+unregistersymbol(is_invis_3)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: game.exe+42AD8
+
+game.exe+42AB6: FF D0                 - call eax
+game.exe+42AB8: 83 C4 08              - add esp,08
+game.exe+42ABB: 0F B6 56 16           - movzx edx,byte ptr [esi+16]
+game.exe+42ABF: 8B C8                 - mov ecx,eax
+game.exe+42AC1: C1 E9 0B              - shr ecx,0B
+game.exe+42AC4: 83 E1 1F              - and ecx,1F
+game.exe+42AC7: 8B 8C 8E AC 00 00 00  - mov ecx,[esi+ecx*4+000000AC]
+game.exe+42ACE: 3B 4E 28              - cmp ecx,[esi+28]
+game.exe+42AD1: 74 13                 - je game.exe+42AE6
+game.exe+42AD3: 25 FF 07 00 00        - and eax,000007FF
+// ---------- INJECTING HERE ----------
+game.exe+42AD8: 88 14 08              - mov [eax+ecx],dl
+// ---------- DONE INJECTING  ----------
+game.exe+42ADB: 66 83 46 14 02        - add word ptr [esi+14],02
+game.exe+42AE0: 83 46 20 03           - add dword ptr [esi+20],03
+game.exe+42AE4: 5E                    - pop esi
+game.exe+42AE5: C3                    - ret 
+game.exe+42AE6: 8B 4E 04              - mov ecx,[esi+04]
+game.exe+42AE9: 52                    - push edx
+game.exe+42AEA: 0F B7 C0              - movzx eax,ax
+game.exe+42AED: 50                    - push eax
+game.exe+42AEE: FF 71 1C              - push [ecx+1C]
+game.exe+42AF1: 8B 41 04              - mov eax,[ecx+04]
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>29</ID>
+          <Description>"inf. time?"</Description>
+          <DropDownListLink>invisible?</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>is_inf_time_3</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>30</ID>
+          <Description>"inf. heart?"</Description>
+          <DropDownListLink>invisible?</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>is_inf_heart_3</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>31</ID>
+          <Description>"inf. HP?"</Description>
+          <DropDownListLink>invisible?</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>is_inf_HP_3</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>34</ID>
+          <Description>"is invisible?"</Description>
+          <DropDownListLink>invisible?</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>is_invis_3</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>17</ID>
+      <Description>"Super Castlevania IV (1991 - SNES) / 悪魔城ドラキュラ (1991 - SFC)"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : game.exe
+  Version: 
+  Date   : 2023-06-04
+  Author : bbfox@https://opencheattables.com
+}
+
+define(address,"game.exe"+B2213)
+define(bytes,2B 42 04 88 0C 38)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000)
+
+label(code)
+label(return)
+
+label(i_base_timer_addr_4)
+label(i_data_base_addr_4)
+label(is_inf_time_4)
+label(is_inf_HP_4)
+label(is_inf_heart_4)
+label(is_invis_4)
+
+
+newmem:
+
+code:
+  sub eax,[edx+04]
+
+  // script start
+  cmp dword ptr [is_inf_time_4], 1
+  jne chk_hp
+
+  cmp edi, 113F0 // time
+  jne chk_hp
+
+
+  push ebx
+  lea ebx, [eax+edi]
+  mov [i_base_timer_addr_4], ebx
+  mov [i_data_base_addr_4], eax
+  pop ebx
+  mov cl, 99
+  //mov [eax+edi],cl
+chk_hp:
+  cmp dword ptr [is_inf_HP_4], 1
+  jne next1
+
+  cmp edi, 113F4 // HP
+  jne next1
+  mov cl, #16
+
+next1:
+  push ecx
+  push edi
+  // heart
+  cmp dword ptr [is_inf_heart_4], 1
+  jne @F
+  mov ecx, 90
+  mov edi, 113F2
+  mov [eax+edi],cl
+
+@@:
+  // invis.
+  cmp dword ptr [is_invis_4], 1
+  jne @F
+
+  mov ecx, 4F
+  mov edi, 100BC
+  mov [eax+edi],cl
+
+@@:
+  //
+  pop edi
+  pop ecx
+
+endp:
+
+  // script end
+
+
+  mov [eax+edi],cl
+  jmp return
+align 10 cc
+  i_base_timer_addr_4:
+  dd 0
+  i_data_base_addr_4:
+  dd 0
+  is_inf_time_4:
+  dd 1
+  is_inf_HP_4:
+  dd 1
+  is_inf_heart_4:
+  dd 1
+  is_invis_4:
+  dd 1
+
+
+address:
+  jmp newmem
+  nop
+return:
+  registersymbol(i_base_timer_addr_4)
+  registersymbol(i_data_base_addr_4)
+  registersymbol(is_inf_time_4)
+  registersymbol(is_inf_HP_4)
+  registersymbol(is_inf_heart_4)
+  registersymbol(is_invis_4)
+
+[DISABLE]
+
+address:
+  db bytes
+  // sub eax,[edx+04]
+  // mov [eax+edi],cl
+  unregistersymbol(i_base_timer_addr_4)
+  unregistersymbol(i_data_base_addr_4)
+  unregistersymbol(is_inf_time_4)
+  unregistersymbol(is_inf_HP_4)
+  unregistersymbol(is_inf_heart_4)
+  unregistersymbol(is_invis_4)
+
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: game.exe+B2213
+
+game.exe+B21F9: 8B 56 0C     - mov edx,[esi+0C]
+game.exe+B21FC: 23 D7        - and edx,edi
+game.exe+B21FE: C1 E2 04     - shl edx,04
+game.exe+B2201: 03 D0        - add edx,eax
+game.exe+B2203: 8B 02        - mov eax,[edx]
+game.exe+B2205: 8B 4C 24 10  - mov ecx,[esp+10]
+game.exe+B2209: 85 C0        - test eax,eax
+game.exe+B220B: 74 0C        - je game.exe+B2219
+game.exe+B220D: 03 C0        - add eax,eax
+game.exe+B220F: 8B 44 C6 28  - mov eax,[esi+eax*8+28]
+// ---------- INJECTING HERE ----------
+game.exe+B2213: 2B 42 04     - sub eax,[edx+04]
+// ---------- DONE INJECTING  ----------
+game.exe+B2216: 88 0C 38     - mov [eax+edi],cl
+game.exe+B2219: 8B 42 08     - mov eax,[edx+08]
+game.exe+B221C: 85 C0        - test eax,eax
+game.exe+B221E: 74 07        - je game.exe+B2227
+game.exe+B2220: 51           - push ecx
+game.exe+B2221: 8B 0E        - mov ecx,[esi]
+game.exe+B2223: 8B D3        - mov edx,ebx
+game.exe+B2225: FF D0        - call eax
+game.exe+B2227: 8B 75 34     - mov esi,[ebp+34]
+game.exe+B222A: 43           - inc ebx
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>19</ID>
+          <Description>"Base"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>808080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_data_base_addr_4</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>18</ID>
+          <Description>"Timer"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_base_timer_addr_4</Address>
+          <Offsets>
+            <Offset>0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>23</ID>
+          <Description>"inf. time?"</Description>
+          <DropDownListLink>invisible?</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>is_inf_time_4</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>24</ID>
+          <Description>"inf. HP?"</Description>
+          <DropDownListLink>invisible?</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>is_inf_HP_4</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>25</ID>
+          <Description>"inf. heart?"</Description>
+          <DropDownListLink>invisible?</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>is_inf_heart_4</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>26</ID>
+          <Description>"is invisible?"</Description>
+          <DropDownListLink>invisible?</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>is_invis_4</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>44</ID>
+      <Description>"CastleVania BLOODLINES (1994 - GEN/MD)"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>40</ID>
+          <Description>"Get crystal (enable after enter zone)"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : game.exe
+  Version: 
+  Date   : 2023-06-23
+  Author : bbfox@https://opencheattables.com
+}
+
+define(address,"game.exe"+38554)
+define(bytes,0F B6 40 01 5E)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000)
+
+label(code)
+label(return)
+label(i_base_crystal_addr)
+label(i_base_esi_1)
+label(i_base_esi_2)
+
+newmem:
+  pushf
+  cmp ecx, FB0E // crystal / heart
+  jne next1
+
+  cmp esi, [i_base_esi_1]
+  je start
+
+  cmp dword ptr [i_base_esi_1], 0
+  jne chk2
+  mov [i_base_esi_1], esi
+  jmp start
+
+chk2:
+  cmp esi, [i_base_esi_2]
+  je start
+  mov [i_base_esi_2], esi
+  jmp start
+
+
+start:
+  push ebx
+  lea ebx, [eax+1]
+  cmp dword ptr [i_base_crystal_addr], 0
+  jne chk3
+  mov [i_base_crystal_addr], ebx
+  jmp next0p
+
+chk3:
+  cmp dword ptr [i_calc_cnt], 1
+  je next0p
+  cmp dword ptr [i_base_crystal_addr], ebx
+  jae next0p
+  mov dword ptr [i_calc_cnt], 1
+  mov [i_base_crystal_addr], ebx
+next0p:
+
+  pop ebx
+
+
+next1:
+  popf
+
+code:
+  movzx eax,byte ptr [eax+01]
+  pop esi
+  jmp return
+align 10 cc
+  i_base_crystal_addr:
+  dd 0
+  i_base_esi_1:
+  dd 0
+  i_base_esi_2:
+  dd 0
+  i_calc_cnt:
+  dd 0
+
+address:
+  jmp newmem
+return:
+registersymbol(i_base_crystal_addr)
+registersymbol(i_base_esi_1)
+registersymbol(i_base_esi_2)
+
+
+[DISABLE]
+
+address:
+  db bytes
+  // movzx eax,byte ptr [eax+01]
+  // pop esi
+unregistersymbol(i_base_crystal_addr)
+unregistersymbol(i_base_esi_1)
+unregistersymbol(i_base_esi_2)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: game.exe+38554
+
+game.exe+3853E: 74 1A              - je game.exe+3855A
+game.exe+38540: 0F B7 C9           - movzx ecx,cx
+game.exe+38543: 8B C1              - mov eax,ecx
+game.exe+38545: D1 E8              - shr eax,1
+game.exe+38547: 8D 04 46           - lea eax,[esi+eax*2]
+game.exe+3854A: F6 C1 01           - test cl,01
+game.exe+3854D: 74 05              - je game.exe+38554
+game.exe+3854F: 0F B6 00           - movzx eax,byte ptr [eax]
+game.exe+38552: 5E                 - pop esi
+game.exe+38553: C3                 - ret 
+// ---------- INJECTING HERE ----------
+game.exe+38554: 0F B6 40 01        - movzx eax,byte ptr [eax+01]
+// ---------- DONE INJECTING  ----------
+game.exe+38558: 5E                 - pop esi
+game.exe+38559: C3                 - ret 
+game.exe+3855A: 8B 42 04           - mov eax,[edx+04]
+game.exe+3855D: 81 E1 FF FF FF 00  - and ecx,game.exe+DCFFFF
+game.exe+38563: 51                 - push ecx
+game.exe+38564: FF 70 1C           - push [eax+1C]
+game.exe+38567: 8B 00              - mov eax,[eax]
+game.exe+38569: FF D0              - call eax
+game.exe+3856B: 83 C4 08           - add esp,08
+game.exe+3856E: 5E                 - pop esi
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>62</ID>
+              <Description>"Disable invisibility locking when something wrong!"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>51</ID>
+              <Description>"Crystal / heart"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>Byte</VariableType>
+              <Address>i_base_crystal_addr</Address>
+              <Offsets>
+                <Offset>0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>56</ID>
+              <Description>"invisibility counter"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>Byte</VariableType>
+              <Address>i_base_crystal_addr</Address>
+              <Offsets>
+                <Offset>-5E47</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>59</ID>
+                  <Description>"Set non-zero and lock it, then get hit once"</Description>
+                  <Color>8000FF</Color>
+                  <GroupHeader>1</GroupHeader>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>61</ID>
+                  <Description>"Cannot get item when this value locked!"</Description>
+                  <Color>8000FF</Color>
+                  <GroupHeader>1</GroupHeader>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>43</ID>
+          <Description>"inf. HP"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : game.exe
+  Version: 
+  Date   : 2023-06-23
+  Author : bbfox@https://opencheattables.com
+}
+
+define(address,"game.exe"+38597)
+define(bytes,0F B7 04 48 C3)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000)
+
+label(code)
+label(return)
+label(i_base_hp_addr)
+label(i_base_data_addr)
+
+newmem:
+  cmp ecx, 4E08
+  jne next1
+  push ebx
+  movzx ebx,word ptr [eax+ecx*2]
+  cmp ebx, 80
+  jae next0p
+  mov bx, 88
+  mov word ptr [eax+ecx*2], bx
+  lea ebx, [eax+ecx*2]
+  mov [i_base_hp_addr], ebx
+  mov [i_base_data_addr], eax
+
+next0p:
+  pop ebx
+
+next1:
+
+code:
+  movzx eax,word ptr [eax+ecx*2]
+  ret 
+  jmp return
+align 10 cc
+  i_base_hp_addr:
+  dd 0
+  i_base_data_addr:
+  dd 0
+
+
+address:
+  jmp newmem
+return:
+registersymbol(i_base_hp_addr)
+registersymbol(i_base_data_addr)
+
+[DISABLE]
+
+address:
+  db bytes
+  // movzx eax,word ptr [eax+ecx*2]
+  // ret 
+unregistersymbol(i_base_hp_addr)
+unregistersymbol(i_base_data_addr)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: game.exe+38597
+
+game.exe+38570: 8B 4C 24 08           - mov ecx,[esp+08]
+game.exe+38574: 8B C1                 - mov eax,ecx
+game.exe+38576: 8B 54 24 04           - mov edx,[esp+04]
+game.exe+3857A: C1 E8 10              - shr eax,10
+game.exe+3857D: 0F B6 C0              - movzx eax,al
+game.exe+38580: 8B 84 82 C4 01 00 00  - mov eax,[edx+eax*4+000001C4]
+game.exe+38587: 3B 82 C0 01 00 00     - cmp eax,[edx+000001C0]
+game.exe+3858D: 74 0D                 - je game.exe+3859C
+game.exe+3858F: D1 E9                 - shr ecx,1
+game.exe+38591: 81 E1 FF 7F 00 00     - and ecx,00007FFF
+// ---------- INJECTING HERE ----------
+game.exe+38597: 0F B7 04 48           - movzx eax,word ptr [eax+ecx*2]
+// ---------- DONE INJECTING  ----------
+game.exe+3859B: C3                    - ret 
+game.exe+3859C: 8B 42 04              - mov eax,[edx+04]
+game.exe+3859F: 81 E1 FF FF FF 00     - and ecx,game.exe+DCFFFF
+game.exe+385A5: 51                    - push ecx
+game.exe+385A6: FF 70 1C              - push [eax+1C]
+game.exe+385A9: 8B 40 08              - mov eax,[eax+08]
+game.exe+385AC: FF D0                 - call eax
+game.exe+385AE: 83 C4 08              - add esp,08
+game.exe+385B1: C3                    - ret 
+game.exe+385B2: CC                    - int 3 
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>45</ID>
+              <Description>"HP addr."</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>808080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_hp_addr</Address>
+              <Offsets>
+                <Offset>0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>46</ID>
+              <Description>"Base"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>808080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_data_addr</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>22</ID>
+      <Description>"Castlevania Anniversary Collection 1.1.0 &lt;partial&gt;  /  https://opencheattables.com  /  CE 7.5+"</Description>
+      <Color>00B95C</Color>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

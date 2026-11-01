@@ -1,0 +1,572 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>1</ID>
+      <Description>"wing energy"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : EarthDefenceForce 6 for PC
+  Version: 
+  Date   : 2024-08-04
+  Author : ichir
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,EDF.dll,F3 0F 11 81 08 03 00 00) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  movss [rcx+00000308],xmm0
+  mov [rcx+00000308],42C80000
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db F3 0F 11 81 08 03 00 00
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: EDF.dll+54A037
+
+EDF.dll+54A00E: CC                             - int 3 
+EDF.dll+54A00F: CC                             - int 3 
+EDF.dll+54A010: F3 0F 10 81 08 03 00 00        - movss xmm0,[rcx+00000308]
+EDF.dll+54A018: 0F 2F C8                       - comiss xmm1,xmm0
+EDF.dll+54A01B: 72 0B                          - jb EDF.dll+54A028
+EDF.dll+54A01D: C7 81 08 03 00 00 00 00 00 00  - mov [rcx+00000308],00000000
+EDF.dll+54A027: C3                             - ret 
+EDF.dll+54A028: F3 0F 10 91 04 03 00 00        - movss xmm2,[rcx+00000304]
+EDF.dll+54A030: F3 0F 5C C1                    - subss xmm0,xmm1
+EDF.dll+54A034: 0F 2F C2                       - comiss xmm0,xmm2
+// ---------- INJECTING HERE ----------
+EDF.dll+54A037: F3 0F 11 81 08 03 00 00        - movss [rcx+00000308],xmm0
+// ---------- DONE INJECTING  ----------
+EDF.dll+54A03F: 76 08                          - jna EDF.dll+54A049
+EDF.dll+54A041: F3 0F 11 91 08 03 00 00        - movss [rcx+00000308],xmm2
+EDF.dll+54A049: 0F 28 C1                       - movaps xmm0,xmm1
+EDF.dll+54A04C: C3                             - ret 
+EDF.dll+54A04D: CC                             - int 3 
+EDF.dll+54A04E: CC                             - int 3 
+EDF.dll+54A04F: CC                             - int 3 
+EDF.dll+54A050: C2 00 00                       - ret 0000
+EDF.dll+54A053: CC                             - int 3 
+EDF.dll+54A054: CC                             - int 3 
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>7</ID>
+      <Description>"armer box"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : EarthDefenceForce 6 for PC
+  Version: 
+  Date   : 2024-08-04
+  Author : ichir
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,EDF.dll,FF 87 0C 0E 00 00) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  //inc [rdi+00000E0C]
+  mov [rdi+00000E0C],fff
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db FF 87 0C 0E 00 00
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: EDF.dll+2C7382
+
+EDF.dll+2C735C: 83 7C 10 68 00        - cmp dword ptr [rax+rdx+68],00
+EDF.dll+2C7361: 74 10                 - je EDF.dll+2C7373
+EDF.dll+2C7363: 48 8B 0D DE 64 DE 01  - mov rcx,[EDF.dll+20AD848]
+EDF.dll+2C736A: E8 71 A5 4B 00        - call EDF.dll+7818E0
+EDF.dll+2C736F: 84 C0                 - test al,al
+EDF.dll+2C7371: 74 68                 - je EDF.dll+2C73DB
+EDF.dll+2C7373: 8B 87 04 0E 00 00     - mov eax,[rdi+00000E04]
+EDF.dll+2C7379: 3D 00 04 00 00        - cmp eax,00000400
+EDF.dll+2C737E: 73 5B                 - jae EDF.dll+2C73DB
+EDF.dll+2C7380: FF C0                 - inc eax
+// ---------- INJECTING HERE ----------
+EDF.dll+2C7382: FF 87 0C 0E 00 00     - inc [rdi+00000E0C]
+// ---------- DONE INJECTING  ----------
+EDF.dll+2C7388: EB 4B                 - jmp EDF.dll+2C73D5
+EDF.dll+2C738A: 48 8B 05 7F 62 DE 01  - mov rax,[EDF.dll+20AD610]
+EDF.dll+2C7391: 8B 48 38              - mov ecx,[rax+38]
+EDF.dll+2C7394: 83 F9 FF              - cmp ecx,-01
+EDF.dll+2C7397: 74 27                 - je EDF.dll+2C73C0
+EDF.dll+2C7399: 48 8B 40 20           - mov rax,[rax+20]
+EDF.dll+2C739D: 48 8B 0C C8           - mov rcx,[rax+rcx*8]
+EDF.dll+2C73A1: 48 8B 51 10           - mov rdx,[rcx+10]
+EDF.dll+2C73A5: 48 63 42 08           - movsxd  rax,dword ptr [rdx+08]
+EDF.dll+2C73A9: 83 7C 10 68 00        - cmp dword ptr [rax+rdx+68],00
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>10</ID>
+      <Description>"weapon box"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : EarthDefenceForce 6 for PC
+  Version: 
+  Date   : 2024-08-04
+  Author : ichir
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,EDF.dll,FF 87 08 0E 00 00) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  //inc [rdi+00000E08]
+  mov [rdi+00000E08],fff
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db FF 87 08 0E 00 00
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: EDF.dll+2C73CF
+
+EDF.dll+2C73A9: 83 7C 10 68 00        - cmp dword ptr [rax+rdx+68],00
+EDF.dll+2C73AE: 74 10                 - je EDF.dll+2C73C0
+EDF.dll+2C73B0: 48 8B 0D 91 64 DE 01  - mov rcx,[EDF.dll+20AD848]
+EDF.dll+2C73B7: E8 24 A5 4B 00        - call EDF.dll+7818E0
+EDF.dll+2C73BC: 84 C0                 - test al,al
+EDF.dll+2C73BE: 74 1B                 - je EDF.dll+2C73DB
+EDF.dll+2C73C0: 8B 87 04 0E 00 00     - mov eax,[rdi+00000E04]
+EDF.dll+2C73C6: 3D 00 04 00 00        - cmp eax,00000400
+EDF.dll+2C73CB: 73 0E                 - jae EDF.dll+2C73DB
+EDF.dll+2C73CD: FF C0                 - inc eax
+// ---------- INJECTING HERE ----------
+EDF.dll+2C73CF: FF 87 08 0E 00 00     - inc [rdi+00000E08]
+// ---------- DONE INJECTING  ----------
+EDF.dll+2C73D5: 89 87 04 0E 00 00     - mov [rdi+00000E04],eax
+EDF.dll+2C73DB: 48 8B 5C 24 40        - mov rbx,[rsp+40]
+EDF.dll+2C73E0: 48 8B 74 24 48        - mov rsi,[rsp+48]
+EDF.dll+2C73E5: 0F 28 74 24 20        - movaps xmm6,[rsp+20]
+EDF.dll+2C73EA: 48 83 C4 30           - add rsp,30
+EDF.dll+2C73EE: 5F                    - pop rdi
+EDF.dll+2C73EF: C3                    - ret 
+EDF.dll+2C73F0: 4C 8B DC              - mov r11,rsp
+EDF.dll+2C73F3: 48 83 EC 78           - sub rsp,78
+EDF.dll+2C73F7: 48 8B 05 3A 2C D2 01  - mov rax,[EDF.dll+1FEA038]
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>12</ID>
+      <Description>"jump"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : EarthDefenceForce 6 for PC
+  Version: 
+  Date   : 2024-08-04
+  Author : ichir
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,EDF.dll,FF 8B 68 20 00 00) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  //dec [rbx+00002068]
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db FF 8B 68 20 00 00
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: EDF.dll+566992
+
+EDF.dll+566963: 0F 85 D7 01 00 00              - jne EDF.dll+566B40
+EDF.dll+566969: 39 AB 68 20 00 00              - cmp [rbx+00002068],ebp
+EDF.dll+56696F: 0F 8E CB 01 00 00              - jng EDF.dll+566B40
+EDF.dll+566975: 33 D2                          - xor edx,edx
+EDF.dll+566977: 44 8D 45 02                    - lea r8d,[rbp+02]
+EDF.dll+56697B: 48 8B CB                       - mov rcx,rbx
+EDF.dll+56697E: E8 BD 9D 02 00                 - call EDF.dll+590740
+EDF.dll+566983: 84 C0                          - test al,al
+EDF.dll+566985: 0F 84 B5 01 00 00              - je EDF.dll+566B40
+EDF.dll+56698B: 0F 10 83 E0 11 00 00           - movups xmm0,[rbx+000011E0]
+// ---------- INJECTING HERE ----------
+EDF.dll+566992: FF 8B 68 20 00 00              - dec [rbx+00002068]
+// ---------- DONE INJECTING  ----------
+EDF.dll+566998: C7 83 60 20 00 00 F0 00 00 00  - mov [rbx+00002060],000000F0
+EDF.dll+5669A2: 0F 11 83 50 20 00 00           - movups [rbx+00002050],xmm0
+EDF.dll+5669A9: 48 89 B4 24 90 00 00 00        - mov [rsp+00000090],rsi
+EDF.dll+5669B1: 0F 59 C0                       - mulps xmm0,xmm0
+EDF.dll+5669B4: 0F 28 C8                       - movaps xmm1,xmm0
+EDF.dll+5669B7: 0F C6 C8 55                    - shufps xmm1,xmm0,55
+EDF.dll+5669BB: F3 0F 58 C8                    - addss xmm1,xmm0
+EDF.dll+5669BF: 0F C6 C0 AA                    - shufps xmm0,xmm0,-56
+EDF.dll+5669C3: F3 0F 58 C8                    - addss xmm1,xmm0
+EDF.dll+5669C7: F3 0F 10 05 79 C1 24 01        - movss xmm0,[EDF.dll+17B2B48]
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>14</ID>
+      <Description>"boost"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : EarthDefenceForce 6 for PC
+  Version: 
+  Date   : 2024-08-04
+  Author : ichir
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,EDF.dll,89 83 7C 20 00 00 83) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+ // mov [rbx+0000207C],eax
+  mov [rbx+0000207C],2
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db 89 83 7C 20 00 00
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: EDF.dll+569CA5
+
+EDF.dll+569C72: 8B 93 20 14 00 00              - mov edx,[rbx+00001420]
+EDF.dll+569C78: E8 03 07 C0 00                 - call EDF.dll+116A380
+EDF.dll+569C7D: F3 0F 10 45 EB                 - movss xmm0,[rbp-15]
+EDF.dll+569C82: 8B 83 7C 20 00 00              - mov eax,[rbx+0000207C]
+EDF.dll+569C88: F3 0F 11 83 D8 12 00 00        - movss [rbx+000012D8],xmm0
+EDF.dll+569C90: F3 0F 11 83 DC 12 00 00        - movss [rbx+000012DC],xmm0
+EDF.dll+569C98: 40 88 BB 80 20 00 00           - mov [rbx+00002080],dil
+EDF.dll+569C9F: 85 C0                          - test eax,eax
+EDF.dll+569CA1: 7E 08                          - jle EDF.dll+569CAB
+EDF.dll+569CA3: FF C8                          - dec eax
+// ---------- INJECTING HERE ----------
+EDF.dll+569CA5: 89 83 7C 20 00 00              - mov [rbx+0000207C],eax
+// ---------- DONE INJECTING  ----------
+EDF.dll+569CAB: 83 8B 88 15 00 00 40           - or dword ptr [rbx+00001588],40
+EDF.dll+569CB2: C7 83 2C 20 00 00 00 00 34 43  - mov [rbx+0000202C],43340000
+EDF.dll+569CBC: C7 83 48 1B 00 00 00 00 80 40  - mov [rbx+00001B48],40800000
+EDF.dll+569CC6: C7 83 70 20 00 00 5A 00 00 00  - mov [rbx+00002070],0000005A
+EDF.dll+569CD0: E9 EE 00 00 00                 - jmp EDF.dll+569DC3
+EDF.dll+569CD5: 83 FA 01                       - cmp edx,01
+EDF.dll+569CD8: 0F 85 B8 00 00 00              - jne EDF.dll+569D96
+EDF.dll+569CDE: 48 8B 81 F8 1E 00 00           - mov rax,[rcx+00001EF8]
+EDF.dll+569CE5: F3 0F 10 00                    - movss xmm0,[rax]
+EDF.dll+569CE9: 0F 2F 05 78 C6 1F 01           - comiss xmm0,[EDF.dll+1766368]
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>17</ID>
+      <Description>"ammo"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : EarthDefenceForce 6 for PC
+  Version: 
+  Date   : 2024-08-04
+  Author : ichir
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,EDF.dll,41 FF 8F E8 0B 00 00) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  //dec [r15+00000BE8]
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop 2
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db 41 FF 8F E8 0B 00 00
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: EDF.dll+697F2E
+
+EDF.dll+697EF6: 41 83 BF 18 0E 00 00 00     - cmp dword ptr [r15+00000E18],00
+EDF.dll+697EFE: 7F 09                       - jg EDF.dll+697F09
+EDF.dll+697F00: 41 8B 87 6C 03 00 00        - mov eax,[r15+0000036C]
+EDF.dll+697F07: EB 07                       - jmp EDF.dll+697F10
+EDF.dll+697F09: 41 8B 87 74 03 00 00        - mov eax,[r15+00000374]
+EDF.dll+697F10: 66 0F 6E C0                 - movd xmm0,eax
+EDF.dll+697F14: 0F 5B C0                    - cvtdq2ps xmm0,xmm0
+EDF.dll+697F17: F3 41 0F 11 87 0C 0E 00 00  - movss [r15+00000E0C],xmm0
+EDF.dll+697F20: 41 80 BF E4 0B 00 00 00     - cmp byte ptr [r15+00000BE4],00
+EDF.dll+697F28: 0F 84 97 00 00 00           - je EDF.dll+697FC5
+// ---------- INJECTING HERE ----------
+EDF.dll+697F2E: 41 FF 8F E8 0B 00 00        - dec [r15+00000BE8]
+// ---------- DONE INJECTING  ----------
+EDF.dll+697F35: 41 8B 97 E8 0B 00 00        - mov edx,[r15+00000BE8]
+EDF.dll+697F3C: 85 D2                       - test edx,edx
+EDF.dll+697F3E: 7F 6B                       - jg EDF.dll+697FAB
+EDF.dll+697F40: 49 8B 87 20 01 00 00        - mov rax,[r15+00000120]
+EDF.dll+697F47: 48 63 88 14 03 00 00        - movsxd  rcx,dword ptr [rax+00000314]
+EDF.dll+697F4E: 83 F9 FF                    - cmp ecx,-01
+EDF.dll+697F51: 74 1A                       - je EDF.dll+697F6D
+EDF.dll+697F53: 83 F9 07                    - cmp ecx,07
+EDF.dll+697F56: 7D 15                       - jnl EDF.dll+697F6D
+EDF.dll+697F58: 48 6B D1 38                 - imul rdx,rcx,38
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>20</ID>
+      <Description>"shield"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : EarthDefenceForce 6 for PC
+  Version: 
+  Date   : 2024-08-08
+  Author : ichir
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,EDF.dll,01 91 E8 0B 00 00) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  //add [rcx+00000BE8],edx
+  add [rcx+00000BE8],f
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db 01 91 E8 0B 00 00
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: EDF.dll+68F970
+
+EDF.dll+68F966: CC                    - int 3 
+EDF.dll+68F967: CC                    - int 3 
+EDF.dll+68F968: CC                    - int 3 
+EDF.dll+68F969: CC                    - int 3 
+EDF.dll+68F96A: CC                    - int 3 
+EDF.dll+68F96B: CC                    - int 3 
+EDF.dll+68F96C: CC                    - int 3 
+EDF.dll+68F96D: CC                    - int 3 
+EDF.dll+68F96E: CC                    - int 3 
+EDF.dll+68F96F: CC                    - int 3 
+// ---------- INJECTING HERE ----------
+EDF.dll+68F970: 01 91 E8 0B 00 00     - add [rcx+00000BE8],edx
+// ---------- DONE INJECTING  ----------
+EDF.dll+68F976: 4C 8B C1              - mov r8,rcx
+EDF.dll+68F979: 8B 91 E8 0B 00 00     - mov edx,[rcx+00000BE8]
+EDF.dll+68F97F: 85 D2                 - test edx,edx
+EDF.dll+68F981: 7F 74                 - jg EDF.dll+68F9F7
+EDF.dll+68F983: 48 8B 81 20 01 00 00  - mov rax,[rcx+00000120]
+EDF.dll+68F98A: 48 63 88 14 03 00 00  - movsxd  rcx,dword ptr [rax+00000314]
+EDF.dll+68F991: 83 F9 FF              - cmp ecx,-01
+EDF.dll+68F994: 75 05                 - jne EDF.dll+68F99B
+EDF.dll+68F996: 0F 57 C0              - xorps xmm0,xmm0
+EDF.dll+68F999: EB 1F                 - jmp EDF.dll+68F9BA
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>22</ID>
+      <Description>"ammo fire rate"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : EarthDefenceForce 6 for PC
+  Version: 
+  Date   : 2024-08-10
+  Author : ichir
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,EDF.dll,F3 41 0F 11 87 0C 0E 00 00) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  //movss [r15+00000E0C],xmm0
+  mov [r15+00000E0C],0
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop 4
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db F3 41 0F 11 87 0C 0E 00 00
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: EDF.dll+697F17
+
+EDF.dll+697EEC: 90                          - nop 
+EDF.dll+697EED: 48 8D 4D E0                 - lea rcx,[rbp-20]
+EDF.dll+697EF1: E8 0A DF 10 00              - call EDF.dll+7A5E00
+EDF.dll+697EF6: 41 83 BF 18 0E 00 00 00     - cmp dword ptr [r15+00000E18],00
+EDF.dll+697EFE: 7F 09                       - jg EDF.dll+697F09
+EDF.dll+697F00: 41 8B 87 6C 03 00 00        - mov eax,[r15+0000036C]
+EDF.dll+697F07: EB 07                       - jmp EDF.dll+697F10
+EDF.dll+697F09: 41 8B 87 74 03 00 00        - mov eax,[r15+00000374]
+EDF.dll+697F10: 66 0F 6E C0                 - movd xmm0,eax
+EDF.dll+697F14: 0F 5B C0                    - cvtdq2ps xmm0,xmm0
+// ---------- INJECTING HERE ----------
+EDF.dll+697F17: F3 41 0F 11 87 0C 0E 00 00  - movss [r15+00000E0C],xmm0
+// ---------- DONE INJECTING  ----------
+EDF.dll+697F20: 41 80 BF E4 0B 00 00 00     - cmp byte ptr [r15+00000BE4],00
+EDF.dll+697F28: 0F 84 97 00 00 00           - je EDF.dll+697FC5
+INJECT: E9 CD 80 C4 01              - jmp 7FFDF29C0000
+EDF.dll+697F33: 66 90                       - nop 2
+EDF.dll+697F35: 41 8B 97 E8 0B 00 00        - mov edx,[r15+00000BE8]
+EDF.dll+697F3C: 85 D2                       - test edx,edx
+EDF.dll+697F3E: 7F 6B                       - jg EDF.dll+697FAB
+EDF.dll+697F40: 49 8B 87 20 01 00 00        - mov rax,[r15+00000120]
+EDF.dll+697F47: 48 63 88 14 03 00 00        - movsxd  rcx,dword ptr [rax+00000314]
+EDF.dll+697F4E: 83 F9 FF                    - cmp ecx,-01
+}
+</AssemblerScript>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

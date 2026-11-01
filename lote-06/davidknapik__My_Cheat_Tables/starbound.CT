@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="26">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>13</ID>
+      <Description>"Infinate Items"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+// Search for item "4 byte"
+//code from here to '[DISABLE]' will be used to enable the cheat
+aobscan(invqty, 72 0A 48 2B C2 48 89 41 60 B0 01 C3)
+label(_invqty)
+registersymbol(_invqty)
+
+invqty+5:
+_invqty:
+db 90 90 90 90
+
+/*
+7FF742139987 - 72 0A - jb starbound.Star::Item::consume+13
+7FF742139989 - 48 2B C2  - sub rax,rdx
+7FF74213998C - 48 89 41 60  - mov [rcx+60],rax &lt;&lt;
+7FF742139990 - B0 01 - mov al,01
+7FF742139992 - C3 - ret
+*/
+
+
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+_invqty:
+db 48 89 41 60
+
+unregistersymbol(_invqty)
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>15</ID>
+      <Description>"No Cost"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+// Search for health "float"
+//code from here to '[DISABLE]' will be used to enable the cheat
+aobscan(mySearch, 48 8B CE E8 ?? ?? FF FF 48 29 18  B0 01 48 8B 5C 24 30)
+label(_mySearch)
+registersymbol(_mySearch)
+
+mySearch+8:
+_mySearch:
+db 90 90 90
+
+
+/*
+
+7FF6037B4B2C - 48 8B CE  - mov rcx,rsi
+7FF6037B4B2F - E8 BCA0FFFF - call "starbound.Star::FlatHashMap&lt;Star::String,unsigned __int64,Star::hash&lt;Star::String,void&gt;,std::equal_to&lt;Star::String&gt;,std::allocator&lt;std::pair&lt;Star::String const ,unsigned __int64&gt; &gt; &gt;::operator[]"
+7FF6037B4B34 - 48 29 18  - sub [rax],rbx &lt;&lt;
+7FF6037B4B37 - B0 01 - mov al,01
+7FF6037B4B39 - 48 8B 5C 24 30  - mov rbx,[rsp+30]
+
+7FF7422E5D7C - 48 8B CE  - mov rcx,rsi
+7FF7422E5D7F - E8 5CA1FFFF - call "starbound.Star::FlatHashMap&lt;Star::String,unsigned __int64,Star::hash&lt;Star::String,void&gt;,std::equal_to&lt;Star::String&gt;,std::allocator&lt;std::pair&lt;Star::String const ,unsigned __int64&gt; &gt; &gt;::operator[]"
+7FF7422E5D84 - 48 29 18  - sub [rax],rbx &lt;&lt;
+7FF7422E5D87 - B0 01 - mov al,01
+7FF7422E5D89 - 48 8B 5C 24 30  - mov rbx,[rsp+30]
+*/
+
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+_mySearch:
+db 48 29 18
+
+unregistersymbol(_mySearch)
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>16</ID>
+      <Description>"Duplicate Item"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+// Search for health "float"
+//code from here to '[DISABLE]' will be used to enable the cheat
+aobscan(mySearch, 74 46 48 8B 94 24 A0 00 00 00 48 29 17)
+label(_mySearch)
+registersymbol(_mySearch)
+
+mySearch+a:
+_mySearch:
+db 90 90 90
+
+
+/*
+7FF74213B010 - 74 46 - je starbound.Star::Item::take+A8
+7FF74213B012 - 48 8B 94 24 A0000000  - mov rdx,[rsp+000000A0]
+7FF74213B01A - 48 29 17  - sub [rdi],rdx &lt;&lt;
+7FF74213B01D - 48 89 94 24 B8000000  - mov [rsp+000000B8],rdx
+7FF74213B025 - 49 8D 80 80000000  - lea rax,[r8+00000080]
+*/
+
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+_mySearch:
+db 48 29 17
+
+unregistersymbol(_mySearch)
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>3</ID>
+      <Description>"Monster Damage"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+// Search for health "float"
+//code from here to '[DISABLE]' will be used to enable the cheat
+aobscan(_health, 0F 85 97 08 00 00 D9 85 34 FE FF FF D9 C0 D8 2E D9 16 )
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode)
+label(exit)
+
+_health:
+jne starbound.exe+19FDFD
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+
+returnhere:
+
+newmem:
+
+
+originalcode:
+//starbound.exe+19F560 - 0F85 97080000         - jne starbound.exe+19FDFD
+//starbound.exe+19F566 - D9 85 34FEFFFF        - fld dword ptr [ebp-000001CC]
+//starbound.exe+19F56C - D9C0                  - fld st(0)
+//starbound.exe+19F56E - D8 2E                 - fsubr dword ptr [esi]
+//starbound.exe+19F570 - D9 16                 - fst dword ptr [esi]
+
+exit:
+jmp returnhere
+ 
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+aobscan(_health, 0F 85 97 08 00 00 90 90 90 90 90 90 90 90 90 90 90 90 )
+dealloc(newmem)
+_health:
+jne starbound.exe+19FDFD
+fld dword ptr [ebp-000001CC]
+fld st(0)
+fsubr dword ptr [esi]
+fst dword ptr [esi]
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>11</ID>
+      <Description>"Infiniate Bandage"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+// Search for health "float"
+//code from here to '[DISABLE]' will be used to enable the cheat
+aobscan(_health, 5D 29 D0 89 51 1C C2 08 00 66 90 )
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode)
+label(exit)
+
+_health:
+pop ebp
+sub eax,edx
+nop
+nop
+nop
+ret 0008
+nop
+
+returnhere:
+
+newmem:
+
+
+originalcode:
+/*
+005DA105 - 5D - pop ebp
+005DA106 - 29 D0  - sub eax,edx
+005DA108 - 89 51 1C  - mov [ecx+1C],edx &lt;&lt;
+005DA10B - C2 0800 - ret 0008
+005DA10E - 66 90 - nop
+*/
+
+exit:
+jmp returnhere
+ 
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+aobscan(_health, 5D 29 D0 90 90 90 C2 08 00 66 90 )
+dealloc(newmem)
+_health:
+pop ebp
+sub eax,edx
+mov [ecx+1C],edx
+ret 0008
+nop
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>9</ID>
+      <Description>"Infiniate Food"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+// Search for health "float"
+//code from here to '[DISABLE]' will be used to enable the cheat
+aobscan(_health, 29 D3 B8 01 00 00 00 89 59 18 5B 5D)
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode)
+label(exit)
+
+_health:
+cmovbe edx,[ecx+2C]
+sub eax,edx
+mov [ecx+18],edx
+ret 0008
+
+
+returnhere:
+
+newmem:
+
+
+originalcode:
+//00561752 - 0F46 51 2C  - cmovbe edx,[ecx+2C]
+//00561756 - 29 D0  - sub eax,edx
+//00561758 - 89 51 18  - mov [ecx+18],edx &lt;&lt;
+//0056175B - C2 0800 - ret 0008
+//0056175E - 66 90 - nop
+
+exit:
+jmp returnhere
+ 
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+aobscan(_health, 90 90 B8 01 00 00 00 89 59 18 5B 5D)
+dealloc(newmem)
+_health:
+sub ebx,edx
+mov eax,00000001
+mov [ecx+18],ebx
+pop ebx
+pop ebp
+</AssemblerScript>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

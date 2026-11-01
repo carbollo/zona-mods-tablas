@@ -1,0 +1,1014 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="29">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>5</ID>
+      <Description>"cheats"</Description>
+      <Options moHideChildren="1"/>
+      <LastState Activated="1"/>
+      <Color>FF0000</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+OpenProcess("SGWContracts.exe")
+showMessage("Created by GamerCare, enjoy.")
+{$asm}
+
+[DISABLE]
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>32</ID>
+          <Description>"inf health"</Description>
+          <LastState Activated="1"/>
+          <Color>FF8000</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(aobHealth,SGWContracts.exe,48 89 86 A4 00 00 00 8B 86) // should be unique
+alloc(newmem,$1000,"SGWContracts.exe"+131EE06)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+cmp rbx,1
+jne return
+  mov [rsi+000000A4],rax
+  jmp return
+
+aobHealth:
+  jmp newmem
+  nop 2
+return:
+registersymbol(aobHealth)
+
+[DISABLE]
+
+aobHealth:
+  db 48 89 86 A4 00 00 00
+
+unregistersymbol(aobHealth)
+dealloc(newmem)
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>34</ID>
+          <Description>"invisible"</Description>
+          <LastState Activated="1"/>
+          <Color>FF8000</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>// Game Executable   : Sniper Ghost Warrior Contracts
+// Author            : GamerCare
+// Tables Archive    : wwww.pastelink.net/133ki
+// Patreon           : www.patreon.com/gamercare
+
+[ENABLE]
+
+aobscanmodule(invisible,SGWContracts.exe,89 77 3C 48 8B 74 24 50) // should be unique
+
+invisible:
+  db 90 90 90
+
+registersymbol(invisible)
+
+[DISABLE]
+
+invisible:
+  db 89 77 3C
+
+unregistersymbol(invisible)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "SGWContracts.exe"+8F8698
+
+"SGWContracts.exe"+8F8675: EB 21                    -  jmp SGWContracts.exe+8F8698
+"SGWContracts.exe"+8F8677: 40 84 ED                 -  test bpl,bpl
+"SGWContracts.exe"+8F867A: 0F 84 2F FE FF FF        -  je SGWContracts.exe+8F84AF
+"SGWContracts.exe"+8F8680: 33 C0                    -  xor eax,eax
+"SGWContracts.exe"+8F8682: BE 07 00 00 00           -  mov esi,00000007
+"SGWContracts.exe"+8F8687: 89 87 8C 00 00 00        -  mov [rdi+0000008C],eax
+"SGWContracts.exe"+8F868D: EB 09                    -  jmp SGWContracts.exe+8F8698
+"SGWContracts.exe"+8F868F: 83 FE 09                 -  cmp esi,09
+"SGWContracts.exe"+8F8692: 75 04                    -  jne SGWContracts.exe+8F8698
+"SGWContracts.exe"+8F8694: 83 67 40 DF              -  and dword ptr [rdi+40],-21
+// ---------- INJECTING HERE ----------
+"SGWContracts.exe"+8F8698: 89 77 3C                 -  mov [rdi+3C],esi
+"SGWContracts.exe"+8F869B: 48 8B 74 24 50           -  mov rsi,[rsp+50]
+// ---------- DONE INJECTING  ----------
+"SGWContracts.exe"+8F86A0: 48 8B 5C 24 58           -  mov rbx,[rsp+58]
+"SGWContracts.exe"+8F86A5: 48 8B 6C 24 60           -  mov rbp,[rsp+60]
+"SGWContracts.exe"+8F86AA: 0F 28 74 24 30           -  movaps xmm6,[rsp+30]
+"SGWContracts.exe"+8F86AF: 0F 28 7C 24 20           -  movaps xmm7,[rsp+20]
+"SGWContracts.exe"+8F86B4: 48 83 C4 40              -  add rsp,40
+"SGWContracts.exe"+8F86B8: 5F                       -  pop rdi
+"SGWContracts.exe"+8F86B9: C3                       -  ret 
+"SGWContracts.exe"+8F86BA: 66 90                    -  nop 
+"SGWContracts.exe"+8F86BC: 34 84                    -  xor al,-7C
+"SGWContracts.exe"+8F86BE: 8F 00                    -  pop [rax]
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>1</ID>
+          <Description>"no reload / inf ammo"</Description>
+          <LastState Activated="1"/>
+          <Color>FF8000</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>// Game Executable   : Sniper Ghost Warrior Contracts
+// Author            : GamerCare
+// Tables Archive    : wwww.pastelink.net/133ki
+// Patreon           : www.patreon.com/gamercare
+
+[ENABLE]
+
+aobscanmodule(noreload,SGWContracts.exe,89 58 ? b0 ? 48 83 c4) // should be unique
+
+noreload:
+  db 90 90 90
+
+registersymbol(noreload)
+
+[DISABLE]
+
+noreload:
+  db 89 58 08
+
+unregistersymbol(noreload)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "SGWContracts.exe"+148D7B5
+
+"SGWContracts.exe"+148D798: 41 0F 11 03           -  movups [r11],xmm0
+"SGWContracts.exe"+148D79C: 49 83 42 08 10        -  add qword ptr [r10+08],10
+"SGWContracts.exe"+148D7A1: 32 C0                 -  xor al,al
+"SGWContracts.exe"+148D7A3: 48 83 C4 30           -  add rsp,30
+"SGWContracts.exe"+148D7A7: 5B                    -  pop rbx
+"SGWContracts.exe"+148D7A8: C3                    -  ret 
+"SGWContracts.exe"+148D7A9: 49 63 C1              -  movsxd  rax,r9d
+"SGWContracts.exe"+148D7AC: 48 C1 E0 04           -  shl rax,04
+"SGWContracts.exe"+148D7B0: 49 03 02              -  add rax,[r10]
+"SGWContracts.exe"+148D7B3: 74 CF                 -  je SGWContracts.exe+148D784
+// ---------- INJECTING HERE ----------
+"SGWContracts.exe"+148D7B5: 89 58 08              -  mov [rax+08],ebx
+"SGWContracts.exe"+148D7B8: B0 01                 -  mov al,01
+// ---------- DONE INJECTING  ----------
+"SGWContracts.exe"+148D7BA: 48 83 C4 30           -  add rsp,30
+"SGWContracts.exe"+148D7BE: 5B                    -  pop rbx
+"SGWContracts.exe"+148D7BF: C3                    -  ret 
+"SGWContracts.exe"+148D7C0: 4C 8D 44 24 20        -  lea r8,[rsp+20]
+"SGWContracts.exe"+148D7C5: 49 8B D3              -  mov rdx,r11
+"SGWContracts.exe"+148D7C8: 49 8B CA              -  mov rcx,r10
+"SGWContracts.exe"+148D7CB: E8 A0 3A CC FE        -  call SGWContracts.exe+151270
+"SGWContracts.exe"+148D7D0: 32 C0                 -  xor al,al
+"SGWContracts.exe"+148D7D2: 48 83 C4 30           -  add rsp,30
+"SGWContracts.exe"+148D7D6: 5B                    -  pop rbx
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>11</ID>
+          <Description>"unlimited stamina / steady breath"</Description>
+          <LastState Activated="1"/>
+          <Color>FF8000</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>// Game Executable   : Sniper Ghost Warrior Contracts
+// Author            : GamerCare
+// Tables Archive    : wwww.pastelink.net/133ki
+// Patreon           : www.patreon.com/gamercare
+
+[ENABLE]
+
+aobscanmodule(steady,SGWContracts.exe,f3 0f 11 43 0c 73 ? 48 8b 0d) // should be unique
+
+steady:
+  db 90 90 90 90 90
+
+registersymbol(steady)
+
+[DISABLE]
+
+steady:
+  db F3 0F 11 43 0C
+
+unregistersymbol(steady)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "SGWContracts.exe"+1AFCE8D
+
+"SGWContracts.exe"+1AFCE52: 48 8B 05 37 03 73 04     -  mov rax,[SGWContracts.exe+622D190]
+"SGWContracts.exe"+1AFCE59: F3 0F 10 80 F8 0B 00 00  -  movss xmm0,[rax+00000BF8]
+"SGWContracts.exe"+1AFCE61: F3 0F 59 43 18           -  mulss xmm0,[rbx+18]
+"SGWContracts.exe"+1AFCE66: F3 0F 11 43 18           -  movss [rbx+18],xmm0
+"SGWContracts.exe"+1AFCE6B: F3 0F 10 43 0C           -  movss xmm0,[rbx+0C]
+"SGWContracts.exe"+1AFCE70: F3 0F 5C 43 18           -  subss xmm0,[rbx+18]
+"SGWContracts.exe"+1AFCE75: F3 0F 5F C6              -  maxss xmm0,xmm6
+"SGWContracts.exe"+1AFCE79: 0F 28 74 24 20           -  movaps xmm6,[rsp+20]
+"SGWContracts.exe"+1AFCE7E: F3 0F 5D 05 3A D6 39 00  -  minss xmm0,[SGWContracts.exe+1E9A4C0]
+"SGWContracts.exe"+1AFCE86: 0F 2F 05 F3 42 3B 00     -  comiss xmm0,[SGWContracts.exe+1EB1180]
+// ---------- INJECTING HERE ----------
+"SGWContracts.exe"+1AFCE8D: F3 0F 11 43 0C           -  movss [rbx+0C],xmm0
+// ---------- DONE INJECTING  ----------
+"SGWContracts.exe"+1AFCE92: 73 6C                    -  jae SGWContracts.exe+1AFCF00
+"SGWContracts.exe"+1AFCE94: 48 8B 0D ED 02 73 04     -  mov rcx,[SGWContracts.exe+622D188]
+"SGWContracts.exe"+1AFCE9B: 48 8B 01                 -  mov rax,[rcx]
+"SGWContracts.exe"+1AFCE9E: FF 90 40 02 00 00        -  call qword ptr [rax+00000240]
+"SGWContracts.exe"+1AFCEA4: 48 8B F8                 -  mov rdi,rax
+"SGWContracts.exe"+1AFCEA7: 48 85 C0                 -  test rax,rax
+"SGWContracts.exe"+1AFCEAA: 74 47                    -  je SGWContracts.exe+1AFCEF3
+"SGWContracts.exe"+1AFCEAC: 48 8B 0D D5 02 73 04     -  mov rcx,[SGWContracts.exe+622D188]
+"SGWContracts.exe"+1AFCEB3: 48 8B 89 40 03 00 00     -  mov rcx,[rcx+00000340]
+"SGWContracts.exe"+1AFCEBA: 48 85 C9                 -  test rcx,rcx
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>35</ID>
+          <Description>"unlimited medic"</Description>
+          <LastState Activated="1"/>
+          <Color>FF8000</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>// Credits : cfemen
+
+[ENABLE]
+
+aobscanmodule(aobMeds,SGWContracts.exe,89 41 10 33 F6 48 8B) // should be unique
+
+aobMeds:
+  db 90 90 90 90 90
+
+registersymbol(aobMeds)
+
+[DISABLE]
+
+aobMeds:
+  db 89 41 10 33 F6
+
+unregistersymbol(aobMeds)
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>21</ID>
+          <Description>"resources"</Description>
+          <LastState Activated="1"/>
+          <Color>FF8000</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>// Game Executable   : Sniper Ghost Warrior Contracts
+// Author            : GamerCare
+// Tables Archive    : wwww.pastelink.net/133ki
+// Patreon           : www.patreon.com/gamercare
+
+[ENABLE]
+
+aobscanmodule(resources,SGWContracts.exe,C3 F3 0F 10 81 78 02 00 00) // should be unique
+alloc(newmem,$1000,resources)
+
+label(code)
+label(return)
+label(show_resources)
+
+newmem:
+  mov [show_resources],rcx
+
+code:
+  movss xmm0,[rcx+00000278]
+  jmp return
+
+show_resources:
+dq 0
+
+resources+01:
+  jmp newmem
+  nop 3
+return:
+registersymbol(show_resources)
+registersymbol(resources)
+
+[DISABLE]
+
+resources+01:
+  db F3 0F 10 81 78 02 00 00
+
+unregistersymbol(show_resources)
+unregistersymbol(resources)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "SGWContracts.exe"+651C52
+
+"SGWContracts.exe"+651C2E: 83 FA 01                    -  cmp edx,01
+"SGWContracts.exe"+651C31: 74 04                       -  je SGWContracts.exe+651C37
+"SGWContracts.exe"+651C33: 0F 57 C0                    -  xorps xmm0,xmm0
+"SGWContracts.exe"+651C36: C3                          -  ret 
+"SGWContracts.exe"+651C37: F3 0F 10 81 84 02 00 00     -  movss xmm0,[rcx+00000284]
+"SGWContracts.exe"+651C3F: C3                          -  ret 
+"SGWContracts.exe"+651C40: F3 0F 10 81 80 02 00 00     -  movss xmm0,[rcx+00000280]
+"SGWContracts.exe"+651C48: C3                          -  ret 
+"SGWContracts.exe"+651C49: F3 0F 10 81 7C 02 00 00     -  movss xmm0,[rcx+0000027C]
+"SGWContracts.exe"+651C51: C3                          -  ret 
+// ---------- INJECTING HERE ----------
+"SGWContracts.exe"+651C52: F3 0F 10 81 78 02 00 00     -  movss xmm0,[rcx+00000278]
+// ---------- DONE INJECTING  ----------
+"SGWContracts.exe"+651C5A: C3                          -  ret 
+"SGWContracts.exe"+651C5B: CC                          -  int 3 
+"SGWContracts.exe"+651C5C: CC                          -  int 3 
+"SGWContracts.exe"+651C5D: CC                          -  int 3 
+"SGWContracts.exe"+651C5E: CC                          -  int 3 
+"SGWContracts.exe"+651C5F: CC                          -  int 3 
+"SGWContracts.exe"+651C60: 48 89 5C 24 08              -  mov [rsp+08],rbx
+"SGWContracts.exe"+651C65: 48 89 6C 24 10              -  mov [rsp+10],rbp
+"SGWContracts.exe"+651C6A: 48 89 74 24 18              -  mov [rsp+18],rsi
+"SGWContracts.exe"+651C6F: 57                          -  push rdi
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>22</ID>
+              <Description>"money"</Description>
+              <Color>FF8000</Color>
+              <VariableType>Float</VariableType>
+              <Address>show_resources</Address>
+              <Offsets>
+                <Offset>278</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>25</ID>
+              <Description>"contract tokens"</Description>
+              <Color>FF8000</Color>
+              <VariableType>Float</VariableType>
+              <Address>show_resources</Address>
+              <Offsets>
+                <Offset>27C</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>24</ID>
+              <Description>"intel tokens"</Description>
+              <Color>FF8000</Color>
+              <VariableType>Float</VariableType>
+              <Address>show_resources</Address>
+              <Offsets>
+                <Offset>280</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>23</ID>
+              <Description>"challenge tokens"</Description>
+              <Color>FF8000</Color>
+              <VariableType>Float</VariableType>
+              <Address>show_resources</Address>
+              <Offsets>
+                <Offset>284</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>37</ID>
+          <Description>"credit: ctl3d32"</Description>
+          <LastState Activated="1"/>
+          <Color>FF0000</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>// Game Executable   : Sniper Ghost Warrior Contracts
+// Author            : GamerCare
+// Tables Archive    : wwww.pastelink.net/133ki
+// Patreon           : www.patreon.com/gamercare
+
+[ENABLE]
+
+aobscanmodule(pBase,SGWContracts.exe,48 8B 8B B0 03 00 00 48 85 C9 74 25) // should be unique
+alloc(newmem,$1000,pBase)
+
+label(code)
+label(return)
+label(physical)
+
+newmem:
+  push rax
+  mov rax,physical
+  mov [rax],rbx
+  pop rax
+
+code:
+  mov rcx,[rbx+000003B0]
+  jmp return
+
+physical:
+dq 0
+
+pBase:
+  jmp newmem
+  nop 2
+return:
+registersymbol(physical)
+registersymbol(pBase)
+
+[DISABLE]
+
+pBase:
+  db 48 8B 8B B0 03 00 00
+
+unregistersymbol(physical)
+unregistersymbol(pBase)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "SGWContracts.exe"+12F7552
+
+"SGWContracts.exe"+12F7530: FF 90 38 04 00 00     -  call qword ptr [rax+00000438]
+"SGWContracts.exe"+12F7536: 48 85 C0              -  test rax,rax
+"SGWContracts.exe"+12F7539: 74 17                 -  je SGWContracts.exe+12F7552
+"SGWContracts.exe"+12F753B: 4C 8B 08              -  mov r9,[rax]
+"SGWContracts.exe"+12F753E: 45 33 C0              -  xor r8d,r8d
+"SGWContracts.exe"+12F7541: 8B 53 30              -  mov edx,[rbx+30]
+"SGWContracts.exe"+12F7544: 48 8B C8              -  mov rcx,rax
+"SGWContracts.exe"+12F7547: 41 FF 91 E8 02 00 00  -  call qword ptr [r9+000002E8]
+"SGWContracts.exe"+12F754E: 85 C0                 -  test eax,eax
+"SGWContracts.exe"+12F7550: 75 19                 -  jne SGWContracts.exe+12F756B
+// ---------- INJECTING HERE ----------
+"SGWContracts.exe"+12F7552: 48 8B 8B B0 03 00 00  -  mov rcx,[rbx+000003B0]
+// ---------- DONE INJECTING  ----------
+"SGWContracts.exe"+12F7559: 48 85 C9              -  test rcx,rcx
+"SGWContracts.exe"+12F755C: 74 25                 -  je SGWContracts.exe+12F7583
+"SGWContracts.exe"+12F755E: 48 8B 01              -  mov rax,[rcx]
+"SGWContracts.exe"+12F7561: FF 90 50 02 00 00     -  call qword ptr [rax+00000250]
+"SGWContracts.exe"+12F7567: 85 C0                 -  test eax,eax
+"SGWContracts.exe"+12F7569: 74 18                 -  je SGWContracts.exe+12F7583
+"SGWContracts.exe"+12F756B: 48 8B 0D C6 45 F3 04  -  mov rcx,[SGWContracts.exe+622BB38]
+"SGWContracts.exe"+12F7572: 8B D0                 -  mov edx,eax
+"SGWContracts.exe"+12F7574: 4C 8B 01              -  mov r8,[rcx]
+"SGWContracts.exe"+12F7577: 48 83 C4 20           -  add rsp,20
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>40</ID>
+              <Description>"easy climb"</Description>
+              <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">1.100000024:Off
+99999.0:On
+</DropDownList>
+              <LastState Value="1.100000024" RealAddress="20DC8C892A8"/>
+              <Color>FF8000</Color>
+              <VariableType>Float</VariableType>
+              <Address>physical</Address>
+              <Offsets>
+                <Offset>3C8</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>41</ID>
+              <Description>"hover (spam jump key)"</Description>
+              <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">0.05000000075:Off
+99999.0:On
+</DropDownList>
+              <LastState Value="0.05000000075" RealAddress="20DC8C892B0"/>
+              <Color>FF8000</Color>
+              <VariableType>Float</VariableType>
+              <Address>physical</Address>
+              <Offsets>
+                <Offset>3D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>47</ID>
+              <Description>"movement speed"</Description>
+              <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">2.599999905:Normal
+5.0:Speed x2
+7.5:Speed x3
+12.0:Speed x5
+</DropDownList>
+              <LastState Value="2.599999905" RealAddress="20DC8C8937C"/>
+              <Color>FF8000</Color>
+              <VariableType>Float</VariableType>
+              <Address>physical</Address>
+              <Offsets>
+                <Offset>49C</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>48</ID>
+          <Description>"credit: xorps"</Description>
+          <LastState Value="" RealAddress="00000000"/>
+          <Color>FF0000</Color>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>112</ID>
+              <Description>"no recoil"</Description>
+              <LastState Activated="1"/>
+              <Color>FF8000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{ Game   : SGWContracts.exe
+  Version: 
+  Date   : 2019-11-24
+  Author : LIRW
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(_recoil_1_,SGWContracts.exe,F3 0F 10 40 5C F3 * * * * * * * F3 * * * * * F3 * * * * * E8 * * * * F3)
+_recoil_1_:
+  db 0F 57 C0 90 90
+registersymbol(_recoil_1_)
+aobscanmodule(_recoil_2_,SGWContracts.exe,F3 0F 10 40 38 F3 * * * * * EB * 48 * * * * * * * F3 * * * * F3)
+_recoil_2_:
+  db 0F 57 C0 90 90
+registersymbol(_recoil_2_)
+[DISABLE]
+_recoil_1_:
+  db F3 0F 10 40 5C
+unregistersymbol(_recoil_1_)
+_recoil_2_:
+  db F3 0F 10 40 38
+unregistersymbol(_recoil_2_)
+
+
+
+{
+// ORIGINAL CODE - INJECTION POINT: "SGWContracts.exe"+18AF976
+
+"SGWContracts.exe"+18AF942: 0F 2F 05 BF AA 5E 00        -  comiss xmm0,[SGWContracts.exe+1E9A408]
+"SGWContracts.exe"+18AF949: 73 0E                       -  jae SGWContracts.exe+18AF959
+"SGWContracts.exe"+18AF94B: F3 0F 10 44 24 58           -  movss xmm0,[rsp+58]
+"SGWContracts.exe"+18AF951: F3 0F 11 44 24 44           -  movss [rsp+44],xmm0
+"SGWContracts.exe"+18AF957: EB 09                       -  jmp SGWContracts.exe+18AF962
+"SGWContracts.exe"+18AF959: 0F 57 C0                    -  xorps xmm0,xmm0
+"SGWContracts.exe"+18AF95C: F3 0F 11 44 24 44           -  movss [rsp+44],xmm0
+"SGWContracts.exe"+18AF962: F3 0F 10 44 24 44           -  movss xmm0,[rsp+44]
+"SGWContracts.exe"+18AF968: F3 0F 11 44 24 24           -  movss [rsp+24],xmm0
+"SGWContracts.exe"+18AF96E: 48 8B 84 24 B0 01 00 00     -  mov rax,[rsp+000001B0]
+// ---------- INJECTING HERE ----------
+"SGWContracts.exe"+18AF976: F3 0F 10 40 5C              -  movss xmm0,[rax+5C]
+// ---------- DONE INJECTING  ----------
+"SGWContracts.exe"+18AF97B: F3 0F 59 05 E5 AA 5E 00     -  mulss xmm0,[SGWContracts.exe+1E9A468]
+"SGWContracts.exe"+18AF983: F3 0F 11 44 24 60           -  movss [rsp+60],xmm0
+"SGWContracts.exe"+18AF989: F3 0F 10 44 24 60           -  movss xmm0,[rsp+60]
+"SGWContracts.exe"+18AF98F: E8 D2 BB 57 00              -  call SGWContracts.exe+1E2B566
+"SGWContracts.exe"+18AF994: F3 0F 11 44 24 70           -  movss [rsp+70],xmm0
+"SGWContracts.exe"+18AF99A: 48 8B 84 24 B0 01 00 00     -  mov rax,[rsp+000001B0]
+"SGWContracts.exe"+18AF9A2: F3 0F 10 40 58              -  movss xmm0,[rax+58]
+"SGWContracts.exe"+18AF9A7: F3 0F 59 05 B9 AA 5E 00     -  mulss xmm0,[SGWContracts.exe+1E9A468]
+"SGWContracts.exe"+18AF9AF: F3 0F 11 44 24 68           -  movss [rsp+68],xmm0
+"SGWContracts.exe"+18AF9B5: F3 0F 10 44 24 68           -  movss xmm0,[rsp+68]
+}
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>279</ID>
+              <Description>"no spread sniper weapon"</Description>
+              <LastState Activated="1"/>
+              <Color>FF8000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+aobscanmodule(_spread_weapon_sniper_2_,SGWContracts.exe,F3 0F 10 80 B8 00 00 00 F3 * * * F3 * * * F3 * * * 0F 28 * F3 * * * * * 8B)
+aobscanmodule(_spread_weapon_sniper_1_,SGWContracts.exe,F3 * * * * F3 * * * * * F3 * * * * * * E8 * * * * F3 * * * * 48 * * * F3 * * * * F3 * * * * F3 * * * * F3 * * * * * E8 * * * * F3)
+_spread_weapon_sniper_1_:
+  db 0F 57 C0 90 90
+registersymbol(_spread_weapon_sniper_1_)
+alloc(_spread_weapon_sniper_2_mem,$1000,_spread_weapon_sniper_2_)
+label(_spread_weapon_sniper_2_back_)
+label(_max_distance_)
+  _spread_weapon_sniper_2_mem:
+  movss xmm0,[rax+000000B8]
+  mulss xmm0,[_max_distance_]
+  jmp _spread_weapon_sniper_2_back_
+  _max_distance_:
+  dd (float)20
+  _spread_weapon_sniper_2_:
+  jmp _spread_weapon_sniper_2_mem
+  db 90 90 90
+ _spread_weapon_sniper_2_back_:
+registersymbol(_spread_weapon_sniper_2_)
+registersymbol(_max_distance_)
+
+[DISABLE]
+_spread_weapon_sniper_1_:
+  db F3 0F 10 40 4C
+unregistersymbol(_spread_weapon_sniper_1_)
+_spread_weapon_sniper_2_:
+  db F3 0F 10 80 B8 00 00 00
+unregistersymbol(_spread_weapon_sniper_2_)
+unregistersymbol(_max_distance_)
+
+dealloc(_spread_weapon_sniper_2_mem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "SGWContracts.exe"+148FF61
+
+"SGWContracts.exe"+148FF2F: 48 8B 0D 12 59 EA 00        -  mov rcx,[SGWContracts.exe+2335848]
+"SGWContracts.exe"+148FF36: 0F 28 D6                    -  movaps xmm2,xmm6
+"SGWContracts.exe"+148FF39: F3 0F 59 16                 -  mulss xmm2,[rsi]
+"SGWContracts.exe"+148FF3D: 0F 28 CE                    -  movaps xmm1,xmm6
+"SGWContracts.exe"+148FF40: 45 33 C9                    -  xor r9d,r9d
+"SGWContracts.exe"+148FF43: 89 84 24 08 01 00 00        -  mov [rsp+00000108],eax
+"SGWContracts.exe"+148FF4A: F3 0F 59 4E 04              -  mulss xmm1,[rsi+04]
+"SGWContracts.exe"+148FF4F: 48 8B 43 58                 -  mov rax,[rbx+58]
+"SGWContracts.exe"+148FF53: F3 0F 59 76 08              -  mulss xmm6,[rsi+08]
+"SGWContracts.exe"+148FF58: F2 0F 11 84 24 00 01 00 00  -  movsd [rsp+00000100],xmm0
+// ---------- INJECTING HERE ----------
+"SGWContracts.exe"+148FF61: F3 0F 10 80 B8 00 00 00     -  movss xmm0,[rax+000000B8]
+// ---------- DONE INJECTING  ----------
+"SGWContracts.exe"+148FF69: F3 0F 59 F0                 -  mulss xmm6,xmm0
+"SGWContracts.exe"+148FF6D: F3 0F 59 D0                 -  mulss xmm2,xmm0
+"SGWContracts.exe"+148FF71: F3 0F 59 C8                 -  mulss xmm1,xmm0
+"SGWContracts.exe"+148FF75: 0F 28 C2                    -  movaps xmm0,xmm2
+"SGWContracts.exe"+148FF78: F3 0F 11 74 24 28           -  movss [rsp+28],xmm6
+"SGWContracts.exe"+148FF7E: 8B 44 24 28                 -  mov eax,[rsp+28]
+"SGWContracts.exe"+148FF82: 0F 14 C1                    -  unpcklps xmm0,xmm1
+"SGWContracts.exe"+148FF85: F2 0F 11 84 24 0C 01 00 00  -  movsd [rsp+0000010C],xmm0
+"SGWContracts.exe"+148FF8E: F2 0F 10 07                 -  movsd xmm0,[rdi]
+"SGWContracts.exe"+148FF92: 89 84 24 14 01 00 00        -  mov [rsp+00000114],eax
+}
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>181</ID>
+              <Description>"fix optic"</Description>
+              <LastState Activated="1"/>
+              <Color>FF8000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{ Game   : SGWContracts.exe
+  Version: 
+  Date   : 2019-11-24
+  Author : LIRW
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(_fix_optic_,SGWContracts.exe,F3 44 0F 59 80 68 01 00 00) // should be unique
+_fix_optic_:
+  db 45 0F 57 C0 90 90 90 90 90 0F 57 FF 90 90 90 90 90
+registersymbol(_fix_optic_)
+[DISABLE]
+_fix_optic_:
+  db F3 44 0F 59 80 68 01 00 00 F3 0F 59 B8 6C 01 00 00
+unregistersymbol(_fix_optic_)
+
+
+{
+// ORIGINAL CODE - INJECTION POINT: "SGWContracts.exe"+17F94AC
+
+"SGWContracts.exe"+17F9475: E8 36 D2 1C 00                       -  call SGWContracts.exe+19C66B0
+"SGWContracts.exe"+17F947A: 0F 28 CF                             -  movaps xmm1,xmm7
+"SGWContracts.exe"+17F947D: 48 8D 8E A0 00 00 00                 -  lea rcx,[rsi+000000A0]
+"SGWContracts.exe"+17F9484: 44 0F 28 C0                          -  movaps xmm8,xmm0
+"SGWContracts.exe"+17F9488: E8 23 D2 1C 00                       -  call SGWContracts.exe+19C66B0
+"SGWContracts.exe"+17F948D: 48 8B 46 18                          -  mov rax,[rsi+18]
+"SGWContracts.exe"+17F9491: 0F 28 F8                             -  movaps xmm7,xmm0
+"SGWContracts.exe"+17F9494: 44 38 AE F5 00 00 00                 -  cmp [rsi+000000F5],r13l
+"SGWContracts.exe"+17F949B: 44 0F 28 8C 24 C0 00 00 00           -  movaps xmm9,[rsp+000000C0]
+"SGWContracts.exe"+17F94A4: 48 8B B4 24 30 01 00 00              -  mov rsi,[rsp+00000130]
+// ---------- INJECTING HERE ----------
+"SGWContracts.exe"+17F94AC: F3 44 0F 59 80 68 01 00 00           -  mulss xmm8,[rax+00000168]
+// ---------- DONE INJECTING  ----------
+"SGWContracts.exe"+17F94B5: F3 0F 59 B8 6C 01 00 00              -  mulss xmm7,[rax+0000016C]
+"SGWContracts.exe"+17F94BD: 74 09                                -  je SGWContracts.exe+17F94C8
+"SGWContracts.exe"+17F94BF: 41 0F 28 F3                          -  movaps xmm6,xmm11
+"SGWContracts.exe"+17F94C3: F3 41 0F 5C F5                       -  subss xmm6,xmm13
+"SGWContracts.exe"+17F94C8: 41 C7 84 24 88 02 00 00 00 00 80 3F  -  mov [r12+00000288],3F800000
+"SGWContracts.exe"+17F94D4: 48 8B 0D 1D C4 B3 00                 -  mov rcx,[SGWContracts.exe+23358F8]
+"SGWContracts.exe"+17F94DB: 48 8B 01                             -  mov rax,[rcx]
+"SGWContracts.exe"+17F94DE: FF 90 90 00 00 00                    -  call qword ptr [rax+00000090]
+"SGWContracts.exe"+17F94E4: 44 0F 28 AC 24 80 00 00 00           -  movaps xmm13,[rsp+00000080]
+"SGWContracts.exe"+17F94ED: 48 8B F8                             -  mov rdi,rax
+}
+</AssemblerScript>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>8</ID>
+      <Description>"www.pastelink.net/133ki"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+shellExecute('www.pastelink.net/133ki')
+{$asm}
+
+[DISABLE]
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>9</ID>
+      <Description>"www.patreon.com/gamercare"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+shellExecute('www.patreon.com/gamercare')
+{$asm}
+
+[DISABLE]
+</AssemblerScript>
+    </CheatEntry>
+  </CheatEntries>
+  <CheatCodes>
+    <CodeEntry>
+      <Description>Change of mov [rax+08],rcx</Description>
+      <AddressString>SGWContracts.exe+B96B3D</AddressString>
+      <Before>
+        <Byte>08</Byte>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>4F</Byte>
+        <Byte>08</Byte>
+      </Before>
+      <Actual>
+        <Byte>48</Byte>
+        <Byte>89</Byte>
+        <Byte>48</Byte>
+        <Byte>08</Byte>
+      </Actual>
+      <After>
+        <Byte>48</Byte>
+        <Byte>89</Byte>
+        <Byte>03</Byte>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Change of mov [rdi+000000A4],rsi</Description>
+      <AddressString>SGWContracts.exe+135FB23</AddressString>
+      <Before>
+        <Byte>9C</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>01</Byte>
+      </Before>
+      <Actual>
+        <Byte>48</Byte>
+        <Byte>89</Byte>
+        <Byte>B7</Byte>
+        <Byte>A4</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>89</Byte>
+        <Byte>B7</Byte>
+        <Byte>AC</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Change of movss [rdi+000000A0],xmm6</Description>
+      <AddressString>SGWContracts.exe+135FD9D</AddressString>
+      <Before>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>33</Byte>
+        <Byte>F6</Byte>
+      </Before>
+      <Actual>
+        <Byte>F3</Byte>
+        <Byte>0F</Byte>
+        <Byte>11</Byte>
+        <Byte>B7</Byte>
+        <Byte>A0</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>89</Byte>
+        <Byte>87</Byte>
+        <Byte>A4</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Change of mov [rdi+000001CC],40400000</Description>
+      <AddressString>SGWContracts.exe+135FD8B</AddressString>
+      <Before>
+        <Byte>9F</Byte>
+        <Byte>A0</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>C7</Byte>
+        <Byte>87</Byte>
+        <Byte>CC</Byte>
+        <Byte>01</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>40</Byte>
+        <Byte>40</Byte>
+      </Actual>
+      <After>
+        <Byte>8B</Byte>
+        <Byte>87</Byte>
+        <Byte>A8</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Change of movss [rdi+000000A0],xmm6</Description>
+      <AddressString>SGWContracts.exe+135FCB8</AddressString>
+      <Before>
+        <Byte>5E</Byte>
+        <Byte>70</Byte>
+        <Byte>20</Byte>
+        <Byte>75</Byte>
+        <Byte>0D</Byte>
+      </Before>
+      <Actual>
+        <Byte>F3</Byte>
+        <Byte>0F</Byte>
+        <Byte>11</Byte>
+        <Byte>B7</Byte>
+        <Byte>A0</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>E9</Byte>
+        <Byte>3E</Byte>
+        <Byte>01</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Change of addss xmm1,xmm0</Description>
+      <AddressString>SGWContracts.exe+138690D</AddressString>
+      <Before>
+        <Byte>8B</Byte>
+        <Byte>AC</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>F3</Byte>
+        <Byte>0F</Byte>
+        <Byte>58</Byte>
+        <Byte>C8</Byte>
+      </Actual>
+      <After>
+        <Byte>F3</Byte>
+        <Byte>0F</Byte>
+        <Byte>11</Byte>
+        <Byte>8B</Byte>
+        <Byte>B0</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Change of movss xmm0,[rbx+000000B4]</Description>
+      <AddressString>SGWContracts.exe+13868C4</AddressString>
+      <Before>
+        <Byte>90</Byte>
+        <Byte>F0</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>F3</Byte>
+        <Byte>0F</Byte>
+        <Byte>10</Byte>
+        <Byte>83</Byte>
+        <Byte>B4</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>0F</Byte>
+        <Byte>2F</Byte>
+        <Byte>C6</Byte>
+        <Byte>77</Byte>
+        <Byte>48</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Change of subss xmm0,[rsi+68]</Description>
+      <AddressString>SGWContracts.exe+1B62015</AddressString>
+      <Before>
+        <Byte>90</Byte>
+        <Byte>F8</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>F3</Byte>
+        <Byte>0F</Byte>
+        <Byte>5C</Byte>
+        <Byte>46</Byte>
+        <Byte>68</Byte>
+      </Actual>
+      <After>
+        <Byte>0F</Byte>
+        <Byte>54</Byte>
+        <Byte>05</Byte>
+        <Byte>CF</Byte>
+        <Byte>85</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Change of movss [rsi+68],xmm0</Description>
+      <AddressString>SGWContracts.exe+1B6203E</AddressString>
+      <Before>
+        <Byte>00</Byte>
+        <Byte>2A</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>F3</Byte>
+        <Byte>0F</Byte>
+        <Byte>11</Byte>
+        <Byte>46</Byte>
+        <Byte>68</Byte>
+      </Actual>
+      <After>
+        <Byte>74</Byte>
+        <Byte>3C</Byte>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>86</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Change of mov [rsi+000000A4],rax</Description>
+      <AddressString>SGWContracts.exe+131EE06</AddressString>
+      <Before>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>44</Byte>
+        <Byte>24</Byte>
+        <Byte>68</Byte>
+      </Before>
+      <Actual>
+        <Byte>48</Byte>
+        <Byte>89</Byte>
+        <Byte>86</Byte>
+        <Byte>A4</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>8B</Byte>
+        <Byte>86</Byte>
+        <Byte>A8</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Change of mov [rdi+3C],esi</Description>
+      <AddressString>SGWContracts.exe+8F8698</AddressString>
+      <Before>
+        <Byte>04</Byte>
+        <Byte>83</Byte>
+        <Byte>67</Byte>
+        <Byte>40</Byte>
+        <Byte>DF</Byte>
+      </Before>
+      <Actual>
+        <Byte>89</Byte>
+        <Byte>77</Byte>
+        <Byte>3C</Byte>
+      </Actual>
+      <After>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>74</Byte>
+        <Byte>24</Byte>
+        <Byte>50</Byte>
+      </After>
+    </CodeEntry>
+  </CheatCodes>
+  <UserdefinedSymbols/>
+  <Signature>
+    <SignedHash HashSize="132">0qfRWk42oG!)zhUXysj;l-WudFm(LG-_Q#tD*zir:v)9rziD$]:Nh9UbPJ!L$O(/q6/:xM/d%,?K4;*RB[jZ7C[Gmec:L;F:G%f:=i/IGXkNxo9V$vMK2MNWapfY-Z^]i^u-XY;MYJoDGC9Rv)197;Ai:LTUSYP?PU:Rw</SignedHash>
+    <PublicKey Size="42273">00000i}s?vMMG0HLI3}(0m+1.ACX]E#;llul11}2S7T]uazz8v@9V]@gSSI(Ma3m@SX8JIK4%v?yl59^OzLsy4ZkXmI-]KIA2RygCPo2C@H6cWXJ:KXB]fj-e-#)VO0DX=7-)myZtP8mE5K8NT7kFpO{fWMLLbX0,4)9-63](ki_^n(4+3j3au:(61@{c00RPzk.Sb/Ncxh$.08LE+DgXcg2ml8G5(#1L000310RR928UO[V00031003eE8vq3W00031003$MC.$Th000310ssI3F#rMp0012T0043UG5]Vq000yK0057NX#fNO00031005*[007Vc3jBZo04ERt3jBZo04ESZWN%[,AW(#.bZ;KLZ+U,)Lm))uX;Me1cXKHKGB7bYIx#RhF*/*8IXW@mIx^c.000A@0RRI400061^^R4;0ssU600031009o50^^d700031002Y*00000000I70^^a6000311@?s78UO[V0003100ABW8vq3W0003100AZeC.$Th000310ssI40RRL50003100Axn0ssU60003101m1E00000002k.00031002k.00061+#GSS3[*aXVr5?LO#lM[=f=!!WN%[,0Azpw00061,W;=B3/wAa2=z]c2?DYn3JVbx4-5/s6(Mo{6%!K{5ey6r3:9kr3:9km3:9km3:9km3:9km3:9km3:9km3:9km0SyZa4Gs,u4h_3$4h^_!6b:p!4ipg#3:9km5fKaw3:9km5ey6r3:9km3:9km3:9km3:9km3:9km3:9km4FA9Y5eNV%0G_T@A@-vr0Rs@M_J=ut01E%a0Y3l$0R.g80RaI40000000003009C71qKHQ2=]4V009L70RaI40RR91000000RRF61O*}M2nh-c5C8!L0RsXA0tE+K2n7QSGXVes5d#Dv5-_lqQDGAzae+:h6p@8@LL)#/Qo(+}G.*H]LkA[2Q{E(OV^/hYqOyY}M3YoxMZ%,WHW$*W.$]x*gu}Ny/MT!+l%$2UmBiHK@rf{M*#de8W[E@[rnbh]:Jq#7S7(#Jm#4SK+XQ;U00II50t5sD1O*}M2L:T-0RRFK10gXI1VK=?aUv51GJ%m4p_L[E!BWxiGbCc,a*OdWQx#*#H1Q/^7NW9*2PQSb)nOO}qZedFRW?^G.[_bE![#%,@G1{Ug_wB#*a3M}wZ,xt@.TwfhL*zb#?6QcCpSk_XLpB{r=/!d,5ij#0RRFK0{%i{0Kuuk$G,dq4*m,?+J/1T02ybsS/9qiMOjW2/d]m@T3p8d=eKk/zy9O;I..MF^Te6LdY?*Z]AsdXbgW}L+SZ^O6Z)Am;UXmIswiedas6M;S8dhV^ta#a0E+tRk/[ovZd:*FMB9klNw,4Z2Q^wsGM]]RD!JDCe?XoPH}xmEC/HH7%)C$Ga(WpYSkK$]OiLWs:-VC+b@icc*Ubax-[Nm*fBEZUKcfE4;DBaVc4YM*uWK20Q*Qr6QEk?I;De!+7ahjGR?VOjIdAj7r]b}PuXWyqrjfqj)rRJh(jZ-ke/yPDtbg(Jhfh[04@+oX${R@T]PdG7,gR1RUhAr;+T-Yr=_v*2AMmt#sEBs@Rve[!:sGw.)$Lq_OKoGfw*PU($T}TWX%4UX8(;{SMEcVF3X3yZ]_.=ZwBxdtv91I@,UuV8H-7(BQ*{:40KolEQ-3t,WjjwHq-n2%RLLHs9wI)u=]QoglK}-_fL#9ou9.aKORA2ib6U?_Gh:ID)SomIYxN/nx!##$pJV=3?H*LZ*(_wT+4gSZhQT^r?(NM.^^YCWqd@=$/T,ZrsWQU=d]H/QH/+x*Sx3w94Ej$*;YZyZ=0qvF/X@PBv:GqNj$dQ!EoE*}x-VM#v*1_x;t_KPIOgC?Pu$nF)e#6Csn2Hi^@!$O?A#Z%%#N(fne@y@-/+Z1m4_J.JL;IyThQv:DYn/;)}C]xy28wB-H,.Sy4GD,vvyDD;u35.)E5tZXv$I3)g+Kx(x#Yt::}4S^V)y=LLyKHyW?{#nr%F1$S-f_KUexyxR^wa9Xk?6;gsg0ji$QC:wFiB8BR-U,^d{twtkwg@ojb04?PAlSP$%,1N$wlw.plYB)^cSx7OLU(u@;yo{cLbiARQ8S:Wb3^rF?3=@pBCPqpIshs.NkXc0OA.:RTH09HP*zw5h6z^m9K;HeUkR=%6o,G-a%kUb_?,Wns9f7Br3@q.G[Jy*Y%,-xgyET-D;#yunK[K^eBty@7Rru}.U@j3X6mLv;FzgNlbZM1l2lm7rwtJ+#MUnA*K3##=ZlZ):@(P}m3:V{[)xA(iAg_*N%/X+M*Yprw{E3c}K8V$gjj@?3NkEOQCoc3.S:P]Qk*r[v4e[8s.kAa5HpH;g2jQ.;k0qQ-E(NgIit+qO-cGfrd7[un8FQ^VuUB(DD4d1h:ZEnSLEM](3dvVCe--%w@Dyhu/YTsY/Ue8YSKqgX,3V?B-^b#Qk%jxxSe@-TE0.:]y]8J,Ea)Esf550SCe=jR@Z%fL%r)#u+-lS=Rs.a_HFMah[P3;m-=02E*]k)0X5L=r{u4jFFe?Q)j9:7znXJk3SjM.6M3{#ophO:)mddv22^^RU808tJo)K@(*IT9:Uk;UOC)nq!8[]qm9N5rMKzdmcxzs3#,Mg50_n}h#8I,HRD7e57=DSHUNcMWST@xsQA?I{CED3RcL=ki*$$CJ?2FaOXV*CMynsORF=!2D{53v!I;vchQeHva([dY-5J7uo+,.TL1_OX]+n*y8DI8XWw$4bJx%uDSGUn_[nM[BzM?kNh9^HG{nQqxCv4urjI0s:T+Q;#?B]^^Tn!d(^kFOwYNmWv].@7}H(TtE$K0U-qv?*{eGiSH8G)Zn.%$t;Y6kfx8Ol0R6.!y$5K[y1$oK^dTHUTHgNvMoF9L@;uoNH]?AsRwm/F$*d[b,o5T)j/0h]^O0anF7K!xSuwhxuMZ3D2Dh{.;sPsvKF[pzjCK;7^,IN(QDXMoht*,cw.{DOrpD[maBD:JzURD#u4{6G]aLs:)w%-*w?5bPQ*Quzf=WEq,4fgoXY,J@m)r+DP2R7g[Is6)bW{DW@Xx8^pKA@dGY*0AEsNbuM#]RA;liF7eV.+[D]*Ay.FC1A-(1KHNC4sD16/O!DC/@q;c%}NEuA.1+I1z1TI#/=r:gK/HLdk;ayK+9s^1V2;wl#EBEiIPY[xGM[}.w]$%URI[1mL7rh1^QhZzOMjnwvTpVZue[9nO(*;.]P0@f1d^-gVTlCgc3*cUe1cGuQO4)FfVADqX11$w-k9EP@bG5+hC8s9^NBlny1U.U;40M{K^S2(J75/noGC,QzdpQHX0nehx6PEI),Qi(SN5E(%]KYItJQ-{5OanJozFRMLQJL:YB?}EM:Q/BY;Q*^+thLUQsyBgazxsP-I0Kr=mi)CGDWS]mN7o@usT^6:8o9mL#OVYO()A=?q$2PmSdfxv4:KlbhSs3{*Ey=;nc%9l.lGuVjH]QaeH}#:3^J+BP8.jDe)YKOEJBEYf@meP+:L}=50Y5CP]nHs6Tr%L7rgQZ/Ir.u.lOrBTo*S2rkVMWBf(Jgo^^RCg21V{r?b{O$sOb%=eXW[tZbO_fZOzTF9r+tM.jC-D-[6)ljSDO5wf9xk+m]hj;kZkZ]?J{(xS#hQZQn:K]c/NS$.GfkG8pmMfNcc%=c9d]ivIx3eL#3H;mCyCcl^,SblL-Z-g4K9GyVSn-@T[q?#$/x9(zDkclf}1^kvCKXHR88xaSt@XWU#})+FQmwlc:j(ql@O^UtUiGwbF;SzSKLdShw8;9sn#aemNTTwLEtwmT+DJNc?.tgq7l0IndrqFmh;TW9x,fj]-A^$hgujgch!TixBya6j{zzv]TbhLyq7gY@DNlz4aky#D}M$UZbr;Bs)S4vqD%H;LHSrPON0Zbcnd$JvvJ:WPOAWwq=c+ze{OYZ(d-ewAB*[]u6:Q0e#M.8ji,Os(/]gxehA.N{W-$}F6aCO7n7pnvlJ0FfS-([-8P#;LHRhBcm^d253w*2.V4jdOQ.JNAB(S.,do)oaXr(Bw;OjDwL}IJIV4;g-@$s(4%i9[Hs++SgnK%eH#8Z}Z6e6Sx63W9pFc]Dew4[rJgD]S:@$zI@#]oY9..vBXLK?65vQ?rAysDzBu9n}#:rU{P6:bF8x;#^1}?]j%Yp]^injKDuU8@^)%%lwvi%X^oebhU+J}V=zhGAXeSBZl$mOWolLRU#ImZbn38{=w?^T2PW4([T[+Y[G0:;rOu)P[u1:Nf2sOE[)g9Q;K,A[boX5OX2v)D)APd{vHrb(wmwGY]ZfC0^^S,@e;8-KI0/n99V8=V6r@}i;mM{!dE.lUXx6c/2qVSjKC%60v#j7[bj+A/.9z4s,$!{Qd!1qRJ.v*9TbjoD*[WH^:(q,T;cyDYIC*:bru)xR%MKeLTU}aw+3oXZZn;LV;DvDQMvv0{0Hjp@0Au8j?JH{Z[K!hg(fG@^FITEwsd{1R(oL{^ICBvh*$Tr5_IxYiB7s+zzVKM?wB/UnS+-79t^raMp6!.=W47C{y1z#IZm.R?S:ik.biT2jkLl1bZ7r*F%%=G,2S!ahZoAuEZ1:M)^3X7Zr(99tlt-gHerbLlf1;-{Lg}FWpd8GMZ0Bov@vex)TH=k#)yFIhw^2]=Y[s^#:RZiVbxyF^0YhC_t#)zd$ES0H7.JEJ,gqIBlVd%#yY!E+)qB6ykCH^^$G=xu^^S]gudI+j7}OXMqnkrpUUhz!EstZYskD^}[EEdi,m)([NB.nB%!.f1BEfkrvwc3(-9QJBWd8tTouB#I/kC$wYL3rmUR]f#ZKG]HbkqAy^KT{!KH/8Tog6s[/haC;bm[AFdhYiG7c/yJt#^?.%UnON]KT_+4Xv(P=rVLfw_-(%Tz{QIaj7dDmmj)}eqYo6?BR1gwEiXR]#-JU^GEK/f7Sm0yL)1.5fE)ve)h*SzyAPMBeSVn]Hn4{2=k030In[)C9k8-(,h+K?4fSLu8=:1$WQi;24%A^W?HZEG5O2SQcfRM8GAktqtl/2P1WR4bE;,zEqn)6TpY+yEEYBFb#6zqs]V=]b1cXXuImN1HT2Yd.f:.,l%G#@4yu}jU4Do2Ys@woN9lFfhl[@*0ImIh]Rv%f?$DaHkJ_NL5A%Q5eL^_;*iK2b8z8gMtW^G?bvhaz,rwe=zjx]GzNgvxWnsN^uYkfch(7$TqMAfT:-hoTfAg;Qer1cv)nRonm$(1]=Qwt3WgqD)96s%IeLdM7M%-GlZpd?-?rd.6Eod@/nycMqY-N]EHM=UyOAv!ECIg*y8SH:aCFZFqJO2RO^^YVUT71XeIR5{(e0Ba*:HY,.,5hbq;]-WLbZ;KLZ+U,pE-)N%LP/;oB;)@b000mG0000000000000000000uLP/;oIsgCw0089x000mG00031000003vhC2Zgfv_bZ}Wa0000500000P.,!sVsCG30RR9107-6iWo2%4Z2$lO07-6iWdHyG07GnYZ2$lO4^(m6Zgf+:cywiDZbE5vVsCG3000003vhC2ZggdGPGN0jR7F?,000010000001t3-X;N2-a(K;DQ*P5?a8F]tV+mgE3./97asY1tZvbWhAOKSUWdL+lbpUVx000003UG37Z*Q[vbaik5000310000(Y./mAZgp)^000bPb!lvLX;L$+Z+OJ+000Saa(K;DLrqyr060QPO$0jt00002EdT%j5C8xG0RR91000tja%paKPjz%}b#zZ}bZKvHa^vGU7XSbN07GzeZenk5YybcN002X5Vsc[^Z*@Yn0000_XLC)rZ+Ob;00000Lvn6IVsCG30000007GtcLt/{lYybcN002y4Y.$67Z*@Yn0000@XLNRAZ+Ob;00000MQv/EVsCG30000007-6ia$._9YybcN002T]YiCblYGVKZ0096100000Qb$5V0000300000Qe,==WN(q1KyTmx0000000000M^.f.WN(q1KyTmx0000000000LTn%*WN(q1KyTmx0000000000LULqORc;?fBT^U1000000000000000LTqFpRc;?fBT^U1000000000000000Qgdu^Rc;?fBT#s3KvDnz000000000Ac4cF9Z+oLobYWs_Z*@bo0000]XHauxZgp)^0000]XHath0000]XHY]]0000=WoC3$ZgfT=Qfzbp00000000000000}Z+U-0ZgfT=Qfzbp00000000000000{V^9N+ZgfT=P.z5HSpWb400000000nUa(K?}Xk}6ta%paKX;Mm=Z+Ob;0000EV^(hBQe_UwLT[_+Z+6REZf5]h0000001RVtZ+Wp(V^{YqW@]/CZf5]h0000001abuZ+Wp(V^{q!XJ}Y6Z+FG+00000000YPa(K?[Wn+,yZ+XjHZf5]h0000uLP/;n=EnA)000mGNB^r.0RRC2NB^r.0RRCwLP/;oCIA2c000gE000000000006%}L060QPO#{?9000001ONa4S}x.UO#}SL000001ONa49ymftO#_{*000002;/^9000000096vLP/=05C8xG000UA0RR91000000XRZQO#{4,00000NB{QpW(i.IY-VNv1@?s600031FJ?*^0RW,yng9j;000000RS:p00031S@xk51@?s600031H2=qr0RSxk000I6000000XRZQO#{D/00000Z}y?R_NsC0_NsC0_NsC0_NsC0_NsC0^^!d%00030_NsC0_NsC0_NsC0_NsC0_NsC0^^!d%00030_NsC0_NsC0_NsC0_NsC0_NsC0^^!d%00030_NsC0_NsC0_NsC0_NsC0_NsC0^^!d%060QPO#{b^000000ssOyLP/;o0ssI2000O8000000000uLP/;oFaQ7m000C50RaIxLP/;oEdT%j000I60RR911UN!TO#{!4000005C8xG0RR93KmY((KmY($060QPO#}hQ000001ONa4060QPO#}VM00003NdN!/1@?s60000000000L.wH+4gdfE3IJ6AZUA%uX#jKpYyf2dWB?GyF#rGn0RR91000000000000000000000RR9100000000014gdfEL.wH*000000000000000009610000000000000000000001yBG0096100000Zgp(I0000200006VsCYBWOGkqYGVKZ0096100000Qe$+60000400000RBvz}Y.SI70000000000Ol4,tY.SI70000000000LUeC!Y.SI70000*00000QfFv%Y.SI70003F00006b8Km2Wph=,OmhGL00B;8YGVKZ0096100005b8Km2WdHyG5(!?I2Xky]V]WK1Y.SI70000000007XL4[Ka7jdLZ+FG+00000000JWa%pF2Ze=zDZ2$lO3]J9HX:7zia%pF2ZU6uP4PkY3Z%1WrWpZJ3Wn:(V002}ZaAjp}b!]9u018D?Y-wX/RC#b@00000No^8!00006VsCYBWOGkqYGVKZ0096100000Qe$+60000400000RBvz}Y.SI70000000000Ol4,tY.SI70000000000LUeC!Y.SI70000*00000QfFv%Y.SI70003F00003b#iP{MOah-00031000000B([]Y+a.9Q}(=}0RR910000?b7y5#MOah-000310000024QS.RAFaSMOah-00031000004r66)Y+b{/bV,kaR834]Z+Ob=00008V]Xe=RAqQ^R7F?,0000100000010Ssa)Y2+X:iR[Zgp)^000j}Q+3EtWk[#wdO;VyXKnxh00)4cW=@,}bN}PV33g=2bU_!sXKrO}b!]9u01rh_Y-wX/R%LQ?L2PMfZU6uP2V]YtVRdYD0000BVrN5dY.ST?d2nTAZgp)^000q1Q+3EtWkN=oZ*_UJRC#b@00000PH%2y00009bZ;A@b#!xObZl;KX8-@I000003T$O(bWe43b7gdFZ+FG+00000000bPZ+,8TZBKP^b7gdFZ+FG+00000000YeX:iA3Pjz(2Wpr$BZf5]h0000uLP/;oC.$Ke000aC0006%?Bjb,0000uLP/;o5dZ*H00032060QPO#}DG000001ONa42slDXO#{:80000E#sB}S0RR91p8x.:C.$Kf-}a$i0000EssI:O0sq,l=EnlxWN%[,Uqej+0^]v,4nbsZVr2kifB+mh0sq=oga8Z)2nY!X3/)Jg5eo[n5fu+%3:b6.6B88@6BrQ.3:9km3:s=r3:9km3:9km3:9km3:9km3:9km3:9km3:9Dc3kwYn4G/0v5EKp$4ipp*4h^_!5ey6r3:9zw3:9km3:9zr3:9km3:9km3:9km3:9km3:9km3:9km3:9nazyJ^l04M.T0_6oc0uccN5dr[+00aOE_HJ]5000360RaI40RaF20000000RI40t5vH2M7rY3jqKD1pxs80RaI300000000310s^mE1[uZU3JVYb0R#a90t5mD2L:cQ0{L_)00I#M1R*YJ1wm0@6C!beG6ocpp_L[EBo$J?Vly.yg3([/C6ZI^.qha0H5Q[;gC/0iRAfcMqjWYG)pBPR@0S1*)^/zXMkkb^g_wB#*a3M}wZ,xt@.TwfhL*zb#?6QcH%C]zcZZj!x5wA#[YnXB0s#U91Oo(G1[uWQ1vLQx0ucitF%kqpQDJc,69qDXkrbh@LL/Ra)eN]QV(QUvl0#D!V^/g_B=cCvvV#XEHNw)FlT?P?WJOgrbY/f5vxLLbb;s6!l%$2UmBiHK@rf{M*#de8W[E@[rnbh]:JqEyM@_TehnJ[f$N$.?3/CiG0ucid06zf1slvy.-@}v6tMk]s,y4L:XSG=(q,(%]P8H.sE{}jo#^TW[eV4!f/NZ3T^)t:%C*IkNW:.7]Ev$5]W02Rn9BC8!eERBlvizzjW/zoPU)r];*!F[HZT_p?-m#I=ugz^-+:t1Gh{%iGCZ-29uJtmXU,F5j+86],^QWonhNdV4FILR5?bq$Ux-VGI,xARL9M_aE9u0N;09)_se;UIGv5kNE;tjEn^;_yt@lElw@(YQl8Fo].pjT0C+3s$NFQ+qB#:ln9^^T5{@S]IrQtz+I-i4--zTnboVd2jM+w:q2a]UWz?t:oJReldts{jmC2Oas=4tv^J*w@Ens.k$;W8Ck4E4=4@w0fwBcKcQwq_xX*I6}6U+VapIW4E@U64%H(IgV*#ulXBR^^Te#)*/dGGg_xc:%KXZvX-%}1V7sAp7%F=^^T}K?BaY6^ZCVWH0fnKPa(jfuY++^9.6.3K4kA[^VJ0IA*J6+^^XI.SshENj.C^4($KgRYhclWuVZWVA,EXJnPZ:0^^Zkhy+kzg*xXx,;N1AGJ6!Sr@9:t0$gHD59O;jaTD,,.!vcIq+)W!ckd9eL%kd2QPebaRYcK45GaTe!w7j$s)AJJ$W9%)uZT]A1TKcor]U}r4RmC^w.7w25+R_2}gKVkKX7;K*)[QcQoMz09tah37:z-syg^hT=ZM^3^=R^I(;fI?{+XYxWO@(,4%xm3];TbH$U01VqPw4As]cKgMip+%rQPa]}=^UwH6UpfP577ND?z,8kPzSr=kPn)_JZH!,Z_Xl,]c:4=nK;Oh5{WGkbhVA9y2t2WlG,)gOKaT6x!AUTny;VU]i2iiWgl1%=3?GpEv;g6aoQxdhGn/b+_pDatNWgx:;3UDhFe,Jhf4kUWBu/{@UzPV.]oQmN0Mj{IsxLn#s2[SKCi#*yGg+u@y{(VprlsOS,Lq[7dntVCs@A3p5{klAmj9)tGPW[qh8!;D^=HR,VaLdBkcB)SbwcsU0/gCmpAlQeLa;W3]oCM$=k2mcxRLU08y+jJ@WuI::{=-@}^rt)y]7;(2Hyv8rHY;pJj!$v.5;/we?SQbQ;$Ls@c0Bz=zQcy@fEiw#uCLZg1x=dhgYYuAP5b]pJ*hhR(Z;52uX)089buJ();dWNodi,q-twH{?E[D8DbLV+Opk;-]Piv#D*v#d9oXQOSF8$j9G[UfU_E%;8QLU-VwjPV[)}QjH3LjoJNYuNlkf@;BYzg/Jxv[3rsLo/DMU9v}0Bdv1S0:{vD.%DbmxRgm7KYAvd(!%Z*J@.b;pX8P:Rq3HUb:/+O-*4r{{eS3dNJtrQv@t?,eIl,wCZI:vYSH6a]Zrpmy[HX_H2;$=44k+z(*MGgkEBuk,^qNF8wc[{_Xgo+6rMJI6Ytg@P4hKd3hliVuUMo72G7T3$1*C^+2*{m=Yc2HOOF!@Mz-%ay.Ck+WW5UOi)JC,h(;z$WGb5/y.?H6aYcUIQjO)))X!JJ!0K/Bor}DV$^^Z0@WA#hwmJij(WV.$1^I=Cx[ZY6Z@lO]blfCvj$NrD{ANn/e@:qT]Ixw(?smQ9lw?}Y]y-NQ8NA]Qmt#3?vxvyofqU#vkylbnf$KhZ0uSeFQbU#/VxO8s0Rc*:}6EuOl3g-a+#CyF5Xw165mskCEs#IFu^^Tiwo9Xp,dWJXJ]hHd;/5_g}%0t[sX_ay4b4mQ;=p]kMs2@D_x{dKQ3,*ECwAJfZxsg84w0ewo6Px}+@tMrA[S{cnMJ}4==WU(2;nw0/M4i6pyoRo8s]dIkGl_ljepR/fHsVudp@buE]mfpcS6@rIbbgo8r{_CaucP+Rm5[8*HX-xuE_.Hc4h{O8Ww/Si-AqQxo=7b_EG(JWL7OXQ;A(EUG]8PUX(+:c.o/^a)zYn.R(=sdJ$*@mH;uZHpxRpMzelH]k#04u@;T7IGuEp6EZOUSr2Qhn#Bgl1aW44i8}w=Jo,S0#qdca1p^$1*1.vfj[HLil,:2EcxEI!186+PVant@z],kzKeU^YvvMF{g*/[QLpWYvw$9*BQyqp_^w#za8(tV$hM1v#uoAh7)rvCufRnAv9jy?7VAe_?aA55R4^u7z.3;i+NIL1/m8p^wFB=3Qt2c{bp[3=4f^ZlWiJy$#G*=?Ohp_=_#(6iVawikwyYO:c.,cvq6bN;LrTfK^0^)NMg,2a=a+G+kA)*ye0lFv*hw-=ad;PE+lySIAY^^ZIy0GU{B]PePV]#yM],E/d.f/HIaW4AZ_03rOprnMW3)yr0Bl1Dp,gX8petJvoZfRF)^EUfyrlxkcu.FqRz@+K5D^%eyX9!Q:NIH8b4(JuzB-[rj811APW=*vce(?rg#4Xk}wna6HJoiA/8(9EK#^^Z2vYrWsi+Zz$QE9/rQRn@#faB1re+]?ovIHkCs[aANFN7VXNqJGK6utPE!?!5cF1o]dUhW=8G0L@[scrfc867P5YB]kE;1AE=b+NQX!^^Y^_1}KvJY*Bq*.b)XFz_Z{:S6F9HWkI.-7VKx-Twc:u0A02,#=sG5#ykBbHYhXe:0#auKFWGyX}5}VI:XRw(_F,x-${MRCG_V]s:chQ)+FRiAiJVm-5FbF[lto*+;C:0g8q$;B;G$3-Oq48@h3YuoQQ@%!PA5E^z^a1cmBNp0ItYBG+9Wr^%a16@^,Rj@]52FYQ:6v9ahKLlZfYS0$pXb=8w.f:Dlke=bUvjTYvb#%WqKW[v7GIP8UqA*zyUC9OB@S3U$gg],X*i@k1NV@8Wyl9,%KYS5=Nv(1.4:o{qbbgD2Ci[ce]kcX}Vaevw)o]oGdoN6XE{$GVJzkzF^oW=Jg)V6v*i^S[YO:UCUe+Hp^4dbMx.C,HKn0XAdmkn#Cv#fSI5zv{t.8^EEp]EZ:koISC]N(fH5!te2gzN#v)q;7u5mUCca7jAQ]vm)a)::S:ST/]nkYKuO*W;fX9?2r$!HNR:8v_Wbl3xQ*p2e%,r-L]I{ul^9fRrOz_@)J*cu$b/jeq^$H+FE.-fExB/]b=$Hp^?7X;sf!P]ak$ZZx]ww1)tO8T:^0kH;l9pK5Vi6y=)YnM(_l8]qcjbGRA+2goZc=aRD79Bo7p%c%_zfH2!)xXRc]0v8?Or#pXV-^b#eR.A3;md@X?/V=5j^@(NYiVf8*6;ls@]#]?NK7d[}%r!)rsnAkXZUumZMvl]0_8z5U/cD2@gZnkc?n[KDH^^Tjh)+FRYRQ}^D/d5*2?K5%SL1NC[M[w.is$Qvjnq1E?EO_I^5gFC*K3D)Ix%DD{S3/t/SnssuI/Z--=]W/aZrh(imeXUl,p?a9M+D8B;F-)C-8gi/v7L_U(?gQ,s}+g!F]x%VO+=M8,g*t.vn%^1zL%#]@7NEPqdb0Tejb0K]]/$8y+8j6%#3X3YkBm]4Ru:L#yirgr)3seY-Mb-]OoJ,NUwEHu-pMdU0bboRjtRTbAuRcaC6(RoZ+vWJ,-@@kFU}SJ0y;iMd]:CkIVl6HT18nkLwuScK*NALt9;TewHndW2}vPmJ0S!yVBd0jrvFb0B,2RtNkLuc]dVjKGNMl2asg^0Arn;]P$@tO+Lwc(u3m.Z*t6#Z0K}.]%V1Bw8uW-x_f_CIS1sp#FKRCvi+AQ[XHO,+hQ@)/},,;Kd/=yFUSq8t[ALEeWtg5Vg6iy*wOY^D.$;{x.TDc*Bf-M[wKa+CG7h?t;65eeB6K4^^XvtMs+PoZ2+4lXY#-Q09GTjsayGuEu9GlN(f)?E*gZKqt4In^^Zj3@K-6^cb}^l[K@l/vodC64(O2P%g/6yA66NAJ]bbQpOsD3/WX}}y16ZU2LN0g$NMZ6HSBe6N3+K,E7?{[$PTXS1-3Qx*P3QN#${YBPjwEen%P{]hx2R9Qc[3hb:QZBhW]Mq^eSuF+uL?YA7[u,@/NM3f7g9Nj.GZz#RD54v)c/oQ%!X]8XnujVfDXv;6yN#,4@N,y=3vG!ZV09ox!4-L]LY]eJ[9Wul9ari@/YN?P3!K/HzlBf6iqe:[)vP=R0%T+(RmQTCr{)bMf)r@y?8XGS-?[-DPZLmijfjV=9d^gD*lnogf,PfAb}gsVO]E0Nnoo(iPt:$KE+q0AGA^^!]{RfB*GyLP/;oApigX002[{000320000F06[p]0B-/d0A(Cm08jvE0B-/v0B-/u0B8Vj0B]@R01@N{0Av7f0Ac]T03ZNR0B8Vj0CWIv0CNCn0B-/r03ZNE07C!)0096vLP/;o1@?s6000L72mt^A0RaI2.SXMDbaZe!FE4I$E?5PEVr4F4Z+4DlVQ=:oE-*[uJU?7FVPk7$bRc47XK8LdBJaDuA_PpGJt9^%O*yPxLuF]bNP2Q+Q,iHRV_r[2Ib/R}J_H{JI)ThxZDn+{Ab4$TZgV/#JtARbZ)=OSZgV/qWprULA_QA:cx]ZWYds:CWN%[,AXrUMAVY6+Wgs.!HZ5Z?G%[GJIW93aFgY=bEFdy4F+h$TH!m=WEif?UFg7_fIUpb*ARr)hAR.};JaS{aI#NVNAb4$TZgV/vWM){gXmoUNIxjDGcXuv#GcIp)XD:}1IXN#dGA{YREplXLEpvHpbYXZcZgV3dJ_H{DWM):/WpiV4X;fFDZ+CxRWM);HVsCYHJt86=cx]NMb2?l!a6KYubaZe!FE4I$E?5PEVr4F4Z+4DlVQ=:oE-*]5Ab4$TZgV/#ZE#IZJtAmybZ_N@FK%-#VPtP(WiDfHZ7,CXa4#[}FfVOwFCrj#ZES9HI(+YIc62::XmoUNIxjD7b1q=IZ)=OGV^dIQcwulaF*lDKb5wb7WiL]=b8mHWV]W8lWo}pMA_QBeY.JQpaA/FIZ+ypGa6KYubaZe!FE4I$E?5PEVr4F4Z+4DdXm50Hb7+gHFEK7KFCrj#ZES9HI%H!#B4}7Ua5@t9aCLHQE@l(YFJxmcWo%[[Wo}qHFEK7LFCrj#ZE!k6a%Ew3Z+o+]Z*]mxL1b?YWgt+!Z++@SXm4.JLqi{aS7}l!Z,CMkA_QBea5[VBWnpw;L{7GgJt8tNF+z,UFfB1LR4[R?GBr9gFe?-PIxsLIAb4$XI!$GCVPs*,VMJkcWj!J=FflnTF*%GLF.p-*Ix.mnGcYSKI65#eA_QBea5[zIWNBu3L{7GgJt8tNF+z,UFfB1LR4[R?GBr9gFe?-PIxsLIAb4$XO-)vUZgX@DZewLhL[H#SZE!AWX:FNMFf{wVVP#{3GdW?}En.IdFfC#+H#sdeIW:WrVq-NmWH?FbAb4$XO-)vPZ*0[BWo}pyL[H#5WN%[,I%IESX:FNZXm50Hb7+gHIx^(rV;U5iVJ$H,WHv2fHZ)UaI5A@kEn#IdHZV72WMpDuWg.MWZE#IZI!_)GXK8L;Y)#Hkb!{yCbV*:#B6w_ZE?WwBIyf,4FkxdhI4w6fHf1egH#9UYIA$=pEiqv?W?0rtFkv)[V/I4MXm50Hb7+gHIzw-4Z+om/WMw?fGa=^lV;*JUa(2LBJtApsVP_D8YH)#_B0eBIcx]Y@O+%,vb98TVc_IUKa%5(YQ*O^JAUtwpW.$$XAais?c62(nV^}b6ZapGna%Ew3Wn;}Cb96.@bUJBnb97.DV]WK1JtBB+a4u/SWI8x7VK8B1HaIOeH#TK0VK,21EjVT_V:XaZIA(rsIWS:}G-Dzlb96.@bUJrvWo_tpGB7bYEio]HF*;syIXW@mIx^dUFgQ9eFd]sxbVYV[I(+Jkba!ELWkF_UZgf2(L1b?YWgt+!Z++@SXm4.JLqi{aS7}l!Z,CMkA{;B5JaS{aI(5hmb96.@bUI.UbZKvHJtA^qc4cHDAais?c62(vZgX@DZewLhL[H#SZE!AWX:FNMFf{wVVP#{3GdW?}En.IdFfC#+H#sdeIW:WrVq-NmWH?FbAais?c62(-Xk}6aA}G.BIV}_TEio{vFgZFhH99jeD:.]ZFfbw?b96.@bUJfyW@^L9a%DkhWo}pmB0+$tVr3vuXm50Hb7+gHAVWhSC_7B2WN(wKDIy=qbVYV[I%8.IZf9j:Jt8k6FFqhVFLGpNI#XqFJ_H_Vcx]Y@O+%,vb98TVc_IUKaA/FIZ+ypGa5[_Fcyvr+d1Z2QJ_H{DWM):-VP]%dJaS{aI(5hmaA/FIZ+ypGa5[w3d1Z1:VQpnSB1d6uWpYDda%CVOARr)hARr)hARr)hARr)hARr)hARr)hARr)hAVWnURAFLlWg.MOXm50Hb7+gHI!s{CWpY$ycyv7=M]3McazkNqWgs9RARr)hARr)hARr)hARr)hARr)hARr)hARr)hLq#A_VPb4$A{;B5JTG!(W.#M*XFec2FK{pYbZ;KLZ+V$PWq5Q/VR;b8b3PzEaA/FIZ+ypGa5[Y9V_8t1ZgfFzV]X!6Z+p?!AUtwpW.#M*XFec2a%5(YY-v6=Gek5sH#apzH#0FcL?[WzIYUG;Ff;F%Lo-A-IWtB*FLGpNI(5h@AUtwpW.$$XJ}%ixGD0+sF,oK!G)kBuFfueYF+h,bIX5#jMK)4#H#^$LWM);SX,9u4FLGpNIznM+J_H_VaA/FIZ+ypGa5[Y9V_8t1ZgfFzV]X!6Z+p?!AUrQ{WM):/WpiV4X;fFDZ+D#yJTG!(W.#,tMm]]sFL+k5ZE$U6bYVUqARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hARr)hJU?7FVPk7$bRcDJWIZBxB0oO:=f?Y^WN%[,0AxS[0003401yKL0_o#900000000000095n0E7Sm0RaI40RaI40RaI40RaI40RaI40RaI40RaI40RaI40RaI40RaI40RaL60s.a80s.a80s^jB0_NsC0_NsA0RaI40RaI40RaL60RjR80_NsC0_NsC0_NsC0_NsC0_NsC0_NsC0_NsC0_NsC0_NsC0_NsC0_NsC0_NsC_H1$f2mnL?4g(!Z00I#K0{%oL!}p}V000I80_5X400000000001qKHQ2=[!O00avG0RRC60_5a6000000000000jaA1O?;I2nhfR5C8xM0s#a90RaUF0_5X400IL91qKHJ2nhfY6BH5@778(VBo]PVGBh/dH#iw0GbcF[000I70tEsC1q25J2=,oI0RjUA1qKHZ5(#nv6$l_QA_n/-Q8FYKVR1qUfl?O:G$k03a#Qf3!D4enw_IH,f?6a/CblQI5(!{L0t5pE1p+5N0{2NK009C65d.7s5)P0620;9[A[sASkunsaBk-{o)cwa3a*K2IQZqwiB:M3^bAz*qbhNd07k8rK!zDF!7XR7,3/CiH0ucid0001p9T)FIP[v]oAiC@r;]akj]u[l}/hD2l/mIgNJ1mfq5L.fIK*(YX^61DsV-.t4Ke)ji]hH^Vq-R?s+y3=+Tyq(=8)(r[XN[ljtzzDGI-iZ;V*23%IleykjG:uQRANJce!VCYDzXAbrCQLtsvARG1OAF_TDosyx{LE4*Dbxw/s!kBJ(kbvPkNwNM9]APSR@wX:^^L8*FguiEE0(B/9zo=9:p#w,UbM4;8vQ2ba@mLG8QV?,xWml%IHiQRId3E-g5(srh2sN%jpDyM}yz64c)Tk.sWU#q(4QYVWS*{)3_U?m1UDKIv9TQ.W^d2Pwa,@dCbysAXcNaq]4h?#,BwiH$.g{:8@5UXAq7Z(a$Mq%[Ct+vbPe(Z5tKlCA3#N,-54Zy#ZhI,{RxSt)8k;lfH$_QmO5;d}5tgqbDhQ#nA4?Gta6]:9k}SHLs%9PfX8]FIGHoEM2Jpk+8c{KV8_,P.K@cx#vh1I{2:@Vt8bwZbH$!Z@z+7s1;Fu[t-RxoACv.qisnt8PDU{X49Qk9.;HYpNg$?/:+vbCm-Y--1,!/2kHL,qpdDF^b/*NIL(mk23MY{P2_qb*:U).)v6f7MjRAM5H9xejC+/U-Ug{ab+_j]6VQoCP_938ISx_v%2,EzTOo=-=k;%;d5uEUDP_F}W4[N@eRX?]ESpTpiaWVo(6[)-ZeS?KaZ/bEXRmhsgIt/)wB7GR4H!uUsBJh}Fd=tYYA{(tVL?)cJW?%gRQbmGdMnIwUa0BCzoC4=JKMA_UOCk5HqeO$No%l^rW@(5L/()d,or;8c3D6X-w36#BG6fl(6%s5xGja-VWu_!06%Q5Rr?X](K?Ltinz6w?ge(TORF9SPiqRW!;bnfKO9lM!B]vZuR+L$(e2(]r(O1H-NNnDQ{vXh]eXTZahKj%P-N5wW)?)5SD]X-5$jP{d5{T]k!]2a7UAF?)*3z(2CvXBpX7@2cH4y3!qA/9MUCw}WPu*_^QQSKBxCct]oFP4D_JyFw/j64CdzzO^D20U$:WZEWK=tPmQ01fQ8j!=#AxMxR_tDo${H^/a0B$O#j^{:NsVC657%(7MWl}0OAa,Geg-BxDZPd9[X+@,Qjd,mWcevQt^{K:YJp7UfTd4+^t@D7:L#UWAQQXf)$(mTwAREt3*)f-9aRTCN}_z#lp7-?wqU7)%Q$f6o0XEZ;{q$0;Sm.#]X9lm+GzIzrMlvd@+Hw=tYv%:j!.2*BMef64$2yEmI!]ufybZ.PKG?!7]yR8Cdwbc-}ZYG2mt}B0R.d]M]F$pjy$q^LN?}!K[FtwV^m,n2akYqFdBvA/k)2G4o1]NNRikdx31aiAFv[Fgj-VFm5ib%AuU=6f(@+u0W4Gx3SxRF*kcd6$Sa@I7tbj05r,l=2BtqF@Cc(tlC=%YNXpKA@?R37pEwfLMf(OSm4fjjEwJ#EYE:Ok8WbKB%^Wdj#e[.o(Hza8XGRAY:(TGmLf}Utk_E(oN,]pH;43b,W@J[nbgN.uHKBp6l_6=VCJ0Nytiw@YoUXkP@5s{4kGdj*$)+[-zaeQxM-nIMQqI;)L)@.y(Zvgh%1geXgNimMHC:GEok+bI0Se#)L{T1ZTwt?4ty_ZDyB(JJC2^erR[@khHbM.c3Zt?FOkpk453TAEB{NQnCj%Hv59_oBfsK#VEtq0lut5S,akS;)RVy5.Sd^CPhaWOkt5+}XF#=2bOTxJoWw15.ZWSKccsm;(,kKxLGV=fmg}cYjz}*:7(0e)O@lq%^O/.A.s(AA.]is{O#ah)=qU:_duewF0@?]=XkXHy*h5rChUl+:R?xjJ.huuan5TI6A1f?]hR(m;].}2tK1ttmjPQ5r2nvF?I7E15fMg$-oeC$hv6-X7S9z;9ywp0q/DQTqAzjxOMx%AQ-qci3z/+KaMzxHEmztMY-^yTk.D8!Q8wcF$C[mwjAdojBt^l$38V#AT?O:R(ktu)EBO?2BGS@oeB@@n8P+F9lh3Sge:WrZu6j_GDn5n.d$GqI^woFkB6^DZ%Km8l6KM+3Nz1CUD(MkggoQ/xKu762jkI2Cl6L@c%9C63Ai/_w=h$ka8ZN+W!xDtCx@u[XxT6I$HQtfeiFiYiGmDGAl2[-mzX=?g=QR+?$e8Va(%:b7]lkD]fDUUid%=rr49:x^VDBBWIsO1Y[p6PtBOFkWkuYDQlO]U-qx3J*-[eJ}DEN@FN84}I,BU[lWIa%v;zr_19)IxOrOp,,(2Ff0Q!*vk(Vq4JZjrzzYfw#6;C5hG*/8+/d)0h+CeM}vhm5oQmpe0%:z)3DUyp63[/6jm[8*Uol%iw281/Jp3rV9R8,y:dx9K]nGDD.^f_%}^)RWRvH5[C(y58=oQ)Lx3)4oB:48ctUXUJP1Z*#W@[45-!Ig%8V;dAoSD]WJ-zn0MKALLy*W]44zL5aYM5Y%Ny9^LXFGdmQgcSAikH5fas8Y1jd6pDLj05]q:RB1_{_n9b[H}j4%tTjz1ntKc+#;d^)Ec+kw.!gSE-Rkyha;PG#G1^GFyrr4lx]O.m+mf:]H3SIh9mKFy#oN4OlL%z3^PF]WESrYsm3!.FP.a*xdN@E0@$hE5MDOGthnyhvco%Yg;?Q.feEqpPe^RlDm@tuF0[p+a4qfF$4r9iD/oox*O[2q01N2eFQt,,5pMA!?8p$:0ydj(i3!M(%_+Vzlh#/:PQOzPTn%0ZR27k5{+#^^W82as]/aNB39!z6w4,WIwL*oBj1*F37w-Q$0?}=z_-YyaV_3f2Z?$o7q,CdjA0U]N^3#*X#J9GrjMKJACos:pFlmw@.FZ2X4Xrq5Y-(K3MJ0yYyefu@(GkJU(wU[x;N._Jncu0RsR51pruXKzT*!NoObsIwZh)FmN-{npRpeV{U%BMGz1H)k7L1a#?XLWU((iQ4aHCtQ)HJzuSTL$cOR9Mqsm)OD^MP!s_HzGxHd,pBOQdaxSy,(OF]ml8qKT.0]b$53C,oI]SAUyrq@eFvZuDvh)bVq?N;_E_#^CKe:rg3a5/dOn07].skg(OBvpplqfV:07x*q48azq8R$UffYZEYWo7@$d[w9h+iKNGB[6BPX,g=_3w0:zF.^hX%rV?Y84ZvXgiKCKj#)6YPFiSdk;s@SRUr[4p(??]HDO/bya/HRcXQ5F4{2pDq0Z,N;dxxcEGjI%y[2)n9%fL!l7S*v^K3EloOIoc9@mrc-rQs-BnCz!1XvP[K0sr{GBe{DqoKKU!/u4x1F5EU5.MyWMy5J8g-F7!xy30d2zcxyPKgOjL))Eq8zCT,rmPxL*XBsH9ux$GtmGY!q*Zh7LahK%w/[!=.};%@F)/5PugS[)!R[QY[c7cggu,:H?;7JND^5lL?xam,BhET33:^(@Fgbwms7jAH@;PgQ+f#_wu=_qlKTRq@Km#IFZ(f=eM.L.G)hZ!$%[20Yq-CUc^^Sz1^^RUk^^Y]57!5spwg=ob:ZBO_fj#]SDT2g_)IsISX,Es}0QA!3#3XiOH8Bfj(tlA54j{6e7_4h.MG[SM028DNGNopJw/!zqDr=E$A/fOKLNM}$TH4*]I5iSqnGo[{U0!j5=0ZUB-#V;M#I+BzuJ#o8f}5P5?H^Hr1/Bk}ZUdqHe@]enF*rIbsyJI[q/{YUq?1?GO]%jY:yrL]NK*Ev:-*]%1t%m*c{fEC4U.#qTO#5iN$r+LHO.#W.+lh[+L9Wj7ml+/FOrnWe#Oyo:msM[ff@hHZ3D=[NODRvhyaww1DxJfg]o,Eo7;c5+HB(tM)AqF]?N/yy=ZN3J-1X@m%EIY@IeOp58{RKM-b0:$NWj]vAAKn+l#BYX3l4po[f.QX%pvlVkTVH)jsP#it](%DHGaFSvTt;TFzv3k^7Q=/k5LWJ33;LJnNjT3p9scWX(.]:IK.y0F(TZ^Jl4gN/pc4PK[2^U18-3QOplSD/UZ)$kW4IMTWLg8!,CWK4(FBFodSycqDl,m8Jc0lG?U=w3r:u)txu^EDBYQ.j1/eK}dAwXDw1#pl%w]C2J[E:FM%%jTcH3t,E=QCJvq2;B;nyv0L$rGJWyY%VJKp?@4b!oi?k4Dv#ItKPqyRQnGv%hqc2Q;X8}_3EJ?^W}0S$%Cdj,f;rUDn3T5m=BN$piB}/I;n3AoR/-C#(m{%w3=;x*l96@2G*clXjNwU1lRS)hi^h.wLMG#r1tPM{0Ei9$07*?jvB=w$K-B8v2x;?TnBw*lD6N]J!kCI(mzaxJ!8AE4WU3+kmf?cUv@pKS[COFmZlt}5Ib3Yi!lrLUy_b[/SI7+s3QXTyBt{}sZzi(sL{PHs8HjRZ[xs?Z]ti=q?zHz!NUza(O7VAf]:3HN[ny%_4(S]:@V]NpzvEHj@#SdBBlvig[/fzJ^BQF:^#V]0?UM!]$Now[m%6W{[=zkUf7kSHrP%*fTe7dJ[ZR)VmB-ilkJ0Hr[%$96v?h86^^RX1pa0qb2mt^A0R.e[E+p!QatlgA2;ZjELSl=0vkeJ2/D+R4cB.qalE#h9w.:+3$fMfFx.7OVW9Y]+o3[tCsDEs$N%p9E+}eKUzh1a_di^NJuGl1k]pR;T4}T.L#tt[b0U,qSnrB_P0gwn.7E?.#31SafNOp686ka[u%?2h,eR_3d2dtPKV1*.V)I+)K0BoL5r8:N*([!*MVA=x,Q%;,rxzmwTycAGS+IT^x:.b;z)c3dvwS4j97*EFD;n0A!VGXV2EK=wll,7T,V9hfvAS*aIaTN#T;hyK{Kl}h8j^J{D*iKe^/e2fDzmQ06E2A54v5h$6M{8Edj[9V[ODg*;j/#-jRmGtjd9KWrha8+Zb-^SC.hx+xJ+h8(-U.Iqu64MJj]5kZB:LdBIkAdgPPSiTU2HuY,ggboO}:mb-=7Q/Uo*yCf/mcBUXomOmp2!/+DR,YqIFaBi)4Cn-8)-R0PL5C80}MeJlb,Utz)ySC$1c+ajLN4VIw*-!?EG!ibh%DOl.kSAyZRW993jd@knt:H[^YKG_IH)al4QWb9!m5]E{JRw#2)G9xdwlWjnCiHF.0%;DL}Y9LD5}?DHvvU0oWgtNT9SrFdF[p^^t[/BOAu+OES2]H$or-ZeQc+Irn4f0RB/slAbs-P?b4wRA4F:5w3/=x}bnw+,=BuHav+vV+VOwP*,^X#TT3Q{E=.%X9TeSM}/e;L:,-*r.hNhHuN_a8H]5ijQr!KJVQ-%U5gJv{rIM5/IlQ4:r+_;VpSTU^6UthqWS;I6xhhoNPh0H)#WFPSnFLsH#iKFTb%3f2A$HYUwGZ]6bys2;$=/,-3g(yPQvdlJIdfk37KjYgwOX47?Wru*Xo!]dw!ccsC_f4Slp.IY]-9Ub@hRGz[wf#GT%)fBlW.VouEn:WmgAYj$x-eyAE_nWgmKEcxh6p}e^:/dMg:N=8DP](.$Swbz*6j@0UYGc:,n$xj7y*bo08@yh6%,+I97G[c;Ux+Flr?=$vwqjBOw(zAJ5*20LgzEzyS8[2^hqUNIKl3reUO=Prdx{1wF+f4V!%8MkHx#a7VD+97g?^7pD8oHn5JCo^z6:uxs7QEbd+C}9SZ6$v{a-YcFrBn/blf]5O@H/AbJYFfXI{u+qMst/RL9+05#ByB6bnOnvYzF1p6fZBlnCpxiWVSD2Htv0x[Hoc-q}scZUe/S/H.nE;/NH)tP#Qr3?0]1oB=z1w,!_N%*w7P@t{0DF)@i=cFPk4--IDt8XavXtvVLegb*LIeEoY.j*2)EjQ%d0Ui+=LNI.Ss6rbn!D-#VIHhOs*)uP5}BT)G4vT{;u@B}4QrX99{*MItEr)Sft47{{QR@+jl0T8heJ#BIf2;TacQ;2(T+O:#AQb-jhK9Cup!.jLEh9G1-$sKmw6EXbg[$6w2pm;)CG[N;LU7n]_kLHk9x-sk4$Zggqn:R[RRTHCWkRl}A(gOC_3d+;S+g4:ODk:FUHmt2/d1}*Uoo@Y^xbz^l1xXG,8[0,t7Ol7Glc8_48t!jE/S#kp=lr@+OV?e;jZk#pgN{GC/eZf!q.N.-/5TsURC0RnMHPWf4-G[:@r}%ha4FqYf[U5nI3pZx;HPW3A4{3Gk,v0G)DH(Cz*4fpf#p-7(,P.(/xs7#.Y(9SKJ3s*N]gellTpd(QeDiO1.sTp*5%J_[+jnwi5iNGSw}sUxV2Ti9%gZbsx=9MGzQ$GU^l92WH.VrNzhwI^Epf^9D(m(.3Q]$^$rC@lF0SM#F(L5{R8*new(iSd5oTE0z@S6ok-8R:V$#^tOSV9mP4,^HYB6I!/kgmP/=B(dE1HDp/(_kizI)^*NVo5v[$H*j9fa6gC7!e7AAjj6WH+pbNFtEuZLHh)h+jgX8,*{x7M.Ykg)q;sZ[{0dfAt8L-tTjMFZnHR^^VWwORoO[*F0rBew+W_-:2S39Myl.:kk%4(G!xe06$#MTkWF1lzoJo;Ax6)^$:*/]1Z2AKb%}?UH7MdH}dWBnE4R/p9Efh$UNU5]aP0)dnfh#CH4EH[CBGL:i,1f={(UqCErE%NWQ:65By*l^0HJ,_Jncu0RjRBKLA[FBsxb0;=hlaWdkC3cVSt)4hU2f#Wi]muuR7iTcYU_IsS{mMk2Xl2yWY+X(V9+no?=mbNpDm)18%{(a{[iD},z!.^HYEM/S=GMR%YfBorZ(BJ=FjwMMN#2P_,n8DfgHI1?^5VubK#450f33peno?gQe]%SM(QYgJTt]4sDK3cC1%fOYA$2O?OG5cXuMPqM6gtBl.t^lci95.eEEW3Tp)8Y@?QZ]v2gpTxv}eX:q5/L[oNKlWqEeeS{e,Ni,y.KN}VQlo,csE@ug+n#3g[zoDQ*yO8b)H$Juwyp9ni3N^[1bciMWIPBO/v,wmU%.z@+OvfHdn=S4pW30IKfcOG+?SB=y?q*,uC[Jq%RoQE$GNf1,$QC{=UH0a!J7^aT2yvZ6oTJdb}KbCz6d/N/{ZYn[E3?b83_EN%=K+Qe(T5yD}d-MnY-W0g#O=*BlnnBwR/ob,fAt8O)TqZ2bE8NK,JoN1zD$%6Oi(J$LDW=4.(bvP]16HMu]6ajFJKNxg[[T7_rUL(RGMXe*F8pSpWe8Ec-EOYNPLUAH,D}GO7!)sRsc/P{4kf1CiNJz,g!.v2NZUn+@!D%,)%m%Y#[g9s;(]a/U%b!xmeDg70r{9HTlD%XNJ/p]}d])9.(T4m]3Vv8RgHD+hD4h!LHS00l]N.n}]F4%}mLokx159ljuh74dRMb#lhr+0%jS73Wm$w@Cc#i:VuLE:nuSaN$Zbn8c9=.zdPgeNr*0)JxB%[f%NzcYOoA-Cf0Kvu*dIL2%YD2i3wJ)kO4xL)hsmZ!#7RN._qUCrWkiMr?pm4c69KB{QQ*,D(fqMR0_jBx?9J6F8DZCz4UfQgI!g-_9z9-+0T%7S.^c%Hr)3Y0FD!t^!6Ayt*,u2P#*AEw?p1Ce5@7GL{KQUs}B00O;6hbIlg84n;KOS0bS0jiMR-Lh0Uh;[SUu,jFpAs8=!6[K}dhnHXfR3NT[RpBxUJ-gnKa9/OaWY$v[9x4V5}QgZDcVRa[4n)0N/K2Sz4e!RtFvRfa%nrDvM*+4qgd0r?h$k$uy%DM2w?@tT2Y]griE}z8icMDs-TKB*x%Pf?d?+w?ZTv,ctf73fX]UU1%U2b,ZcK_vEkC[zrG0b)w%Iajuqbn#X!o6SD9a?)Amh-gVMYoFxrHqL88-/nNhV-NJAXJVCrjj6wEQu2$G8Qr;;+^vb4%Zi@mRp/[6KLCZo:RNL3)Fm}Wr[DD5:Rre$g.3PLYZSP8koAjZR!62qv_[b?o9Snsx!qTjDkq!w,[U^vMUf^l1U258*i_KpGjxx7fVIDhSDH=-+0Q.#AK#3ajj$]heUCq90f*Kb:OjDyB4[[1MW9*TXPvjN};H:5_#rp3x*$aQyX;0!?O-9fxebRwU!IpTfeAy6ujwfu^+}j!hpPiIgJv6(S^/$b*Q]9J1yfaM0:LyX:ytG165)TnmH,?l![:6Wg^XnZFMD[cUDsQqqx,v!5}(DOlBrAvg%T#;ukXWgb^[F.0W!]YpCczKg($XAGodX#+So!pYaHyFNjK*YVfILpf%7*104B/Q}@v{6gn+.rE/=c/Jp,)?9x6fX#4IS)Z?dXo([=+j2BZ6(4MP;l78-A8s,dfmD}n@a3k^g.hVOYj$hYqI26N!jhvFw%57oqRR::w^ddp*OnXKp5tT4k%uoc2hZ4jfKgMbg3SyH:)!D-Z6k7PZElBUuhxfa2^XYofM2y_/*eGJeW}E6ak}JDsnpY{t$Dv(j^Xj,6g8IsR@7[%bd3K(zj]sXp$hQx/KBDT_cqp.P6e_+4i*l_!I#;Ej:=:Z!]WF8HsCPHIN$isEa=xxd).e6Hc.ty}o?rU+Lq)C_4B*g(PedWNw35rz].E78JN:x]BHdcuL%UtWYPVLhw:(9Bvq-56MG0utCMw24=foKk2IVQ2cDm?fxze[8E5W(3,X+CYEbNf3rZp@T%t/8U]gPs58,lUis5%PIaJ=?qvY9T.-RuR_nCv4#1TaLAMiMkwhLx#eeHyyh,T]8u-ktRR@LZrG$vl!?-]g}oGKZ0wm06S)Ky.?CpvxYJblAC(ZLiRqPU$M@C1t,9NleqS/TdDx5lPfkYaoFm40JD1]W=B.16k{[EYnE8R2n[$EMWd:PpSdPH@O4UD^8?,AO[z]/E.1FTST@7(9_rSL{*0nnfiBWn5u$FqO,P+lip7pZrwAx@^CzYyKwajYPr7(6D*T33AAsEEF$5jm9IYWs=*S@;R=D#6l2%@oTlq7gmZPpt/jw:zNoL$+aQj6Hx_Rq(nH)mEk7x)N2%VQdR:$EbuU*,Hu1M3t)MU_cX3*omnPv-I48ZBq}CWOvL:C^j7)W(BON),*!QB3(,CkxTYCk=jp({+@ldA+SWRm*=e[(9C^4[hh@^#c(n*T8aS(DX7JbTQn)oi5x0?u9vwx=C,R_8K*N=BrJ(@%ER0?O2ss*$zEx7fBLG},6[C2#{Xd2[5Q*#_QB$if^64n@+Zp5gI4Z*p}U1AVX-;;)7ShsoPxVh;5-fLOh-AN=7+_w4P=QH.OJlnkr%^48,YR+JpoO-L#7Z,shQS9H$p,+6OR{fuWTQkI16B_gEetjBs@3b)PDGu_;/.dgn5[;9347[Sc=#B/e@kOChGCw9I)!oev]zmTb4_WV%hHaS3kGJF7frelOPahlzkwSry$O]zM!]YS_*;YK4ksk@lx3fMto+8}XNCOd{]9Z/}z}OvB$4YKu0VML,L8,TGSpo%csJT(C5$7(Q90hac(myhA;XY_rPx8]$fm-B:LTkr79SGAmdjhHMP/5Ys3iozn)hbrZW.R:9;AArxD$,E2+sP=5O(3TmET$r,r$ccyr:ndQwxliUR?1ugM*_(-mSnP=NG7sIx?eVUiKKg$jue)oONm,1Gb*$#Z**j1^[{6L-a4m#OV,oMp=RaX7Htd/Bzk1!F]idw@#qWjmsZfaeGS}YS9OZxt}V:9)rxJk.zzfYHwU,{h2mfOx_;K:WJVmxIn60!8@o+q8-L^6-}4L)AJPZ?+jaz#8-[oopZ%QaKl[{R@apwh4(8C-p2rF{%yVs^m1c.VQ)6fkc2G=gSjo*LdQH:QjO/,vbz/EUunVA[G1D8I(%4QG7].jEF7{)Nm%KC3PLC?%n6PCM7ROpy=y+N6:=;M=$uh:}M.gkVH=%B?k-]:j)OfW8iB;cKDgdAidXZ.g3({3q*wY,?5uTWNch-f-QRP7./ZDt$@9.s1/I=M!/^fu:+7g[hL({hbvx;(zDW(IW/gST%Xk%v+v5@WRAd!;Rj/*H0];nHa-nzeSu#V}%F-}mbwYz);1d0TxjWLD=mNs2gk]UD9sj{,l-qwFuuR6-,8R2]4QzqFJgfgV(3hSlC/.0:xB-PA#RU.{:U4D-L0O$Sp^@PdeX4-9-o150)V2uH$xn[x?jeJRF09Ul+tgrn.x7og**1-ITwoTgJ)(pd!oOUubii;OLrGjgpsZ_id?jE:8K#WOK;V=,-0JL:dzQ:8[@7+?ePi#9)hUR/AR+EON,P2#%-5MxvAL-skg[#ycLh)k,kisyPNh2?:d3,5:6X8+wXBu4jd28/P#If7T%EaYEh?,B5FG}31+[IBO4!-O)7fGj1TB{cue={x_9G0M[e^Fv!.AWjqmbio#];jJR(NwW12Eww8@$+9MHXYe4%$,qVl)-P7l1oXWcS9luC4[eoh}7XL;7AIP!xP66J=7uNK^RBVgl%$*b^Oi,4Jq?GJ9V^dkMy=TjX1xVzlAbEUl8PW99]^u#ih0O$#*rBi,iQ!M:Bh@F*$z$]J.HklyDgtTmm/14ZF}dwV{U(MKeutxJt!VMV7EMx3WuU]q6(!,E]tb7{%KDp@MYGeLb@2nMH8-31;XlQY2Rr0vcFnY2NK5aLl@lm?:yoPzlE0vd!pagq9YMGsmXybA@M=%jOv-OW_^HKI$-n.#LrVL[q[%ZkpNpkJ7kq[6=5F=W]kf=Zzavf:Qlsj7XQ!w1CSay:Hk_Js^8lj-IsZA57D8wb^1Su-lMcZc#@VZ5*pxz$8o9o/NNwuxSL2by1#[17v:y@rjucU9V{j,boH[,?coNHfmDV-mzastRX?]l49}TeDX1-BI+9H;DxWyrQt,KZ6#A6fJTBO/y@A}p;;T!W;[RLGUU!dIJMsWIP^Be,j?x?7@mmnUd/D(X)U4S:IiO=TGUG#M(l,^$WwCaZ(E!xhjr@awTMe_@{CA5,=Zpxi(S;@)OWKvVvQ.klcuZ-YOdkDMQIzo:B1iBP*.UEDjqozl+c4*306TJ8A%QZCj*TYeGuB;-NhKv:Wx)i009/J-X+F7Owr/0Co(k5iMnfX;1!$aDdAYYf#X%SSfgOkq*/d7iUAt^$YTMKfMsym.$4LL8DMs*E?QZ1@=RQ/%Nj]/^^X4[?2ObAO8*=GCJ-{[=HP4f8*re;dR(uq9hLOgmiBFXxgd[[.UkV_d5eF}CDJ5aEi*j}RZvML!*EAxkNHl,Ydg(p3pDctl0plxlHysV@AIvFK/onzx@=%Yn_1c^A!8-Xa@Bgzj6(7sTML@{GqF%hy1SMv#MRiCI%lN1X47ZssMxTA-6@fl[;*M+rJh/+d9%qRnnJFvDxiFra;kMZC?EU@*Ygkksm8oA#k[)rRSBu@rdW;l+w!{^BfIlgKW]iwsi=}:QkXJORk0!ks*O.yrgNW)!3d#i,$o2Js7mLFg#_FR]D#BN8+Azqnr?c6pl{H-3lU9fE1Hp$sHUMqnF9.do{6[fZTIr2Ws)Ob2Pe%(R4Vb3bdm*KpsH68,xmgF4a29*)JqjJSOUi;C[Kl?/#44Gij72I=!7a*rNnATc,Zw)Y@oVrhM9sIq*?MYFcmD;YIvV9[;70c-,_AK*C%zglkn^JoDC;-ceZ}3GQeq@fIIm6hj+{GQaX/sh4(}wmkJ$?fxvK4;])ys3ZEQR*U@g)gWpX4G^-KwVIwsHihZ:rz4gUh7Ju2ud(#fj#h%e)x+B(10%UWi7AI3=e@^RZh.{LWefTSG3u1ReWDe3Ntpa@V*EkW.d9t.yFYhU%(5o/_qiE?[ti0._k8,yI]r.cHW!tS/3x;9N:eUaT/cimtq%6]vm8kN9bmGTl;u!=kNiOc)C6(dd-2_35?@avJj=QWCZOzldZefaai5a4qf*P?sw#}-Jq[.auTclUyUR$-j*EfT*!=:K!/jTAqH614@/J1pMI!_rg8;^,V+*RFAM6lIo]gSlhcM=e8N(f(6D6--K%N:v,KF79hjn_z!Zt}rUVu?^tNnnM!FCD_m(934*2ZAv]*u8_smv-AEg$T%%AYfLw*5/!JZguukh8:BzI+$QTDh6CD!l(YJ1@6MxNGL?_ZeH4DOjb)Q1)f6l8XncfbmLBR^MZgFi=BfioH.x??UmARaT{5/4LISidTVu[,F3Gf40N![]Ij_32M{]b#M=Jp@yRMSwM=aC0CLMMJ6AN-T+CmYr!Z..Bi[0)rn9(cmqacAXmvFbS]J$s3^:%f%#bl[y4oW1^#j!jQN}OSPs(KDnvh0Xi3b^3)YwDn!t0D][}3}xV/*#EUw(1/q$)P^l?$AU.AZvg@HcHGnAC3Dj^!sRBz=JH1GqZ-!OPqQKHO*yzMpsI$4y*f%(:R9$bn8Hj##_5@.6Mf+0bGpsz,?I-S0M+wwPI^c;]IawEWUlG*MxeT8zoZ@[Moo+2iku=RU-2O}Tw,!+l$]-0u?8w(zO0=DWZ_UUVUx;Ci?!as3_K$9U4ly,@qbQZlW[Pvw]h=8mPiU$Au!?459B+VZuGoyKqUU(;id:(QC@qF-G{cMtk=RJ;@H%qGBufmZ7u*W1;RO*GBe*Ryvx5:euYHPy,H+%gFt*vl82#yXQ3QpUg5KT,,Q(CEOe-3PZT,$4.%FudOSQVXicq(MF}G_3@anPgycCl}u_-;5qggLmlLTj[QyKj%[U4;k*4t=%Y+%MrFM%cF/6/nB@vd#NF{g)A{oAhzPv=)%,ofB6:#wJ^=@*F1:*/6NYYtSRrr%:uLQL4_e^2Zj/.5i:e,XW^l;;N/Q5RQBMO8i$5;6;9$gw-rAlWnRyZ3[7wC5gFjLY%}wm=ZDD;jv3^IiE=z$,gz_!;w(C(:Vg1aO}]4we)yrgib/sjqlL^$TAs}R.D1%EH)j#zZ!D*k$WtUB^=YSPaPm-88k2]hRMM)EzzQh,[Ux}F94_4:do(ua]@4!#!)0%pmxmvT(jU/@A0NV*9(:0+Bp]cm4;X*x-rCCRG.9bp=!,B,Yw14Py:?*HxEDI7F@R)m6D@sT+)]zl;dR}jxYo2]TwQvFb=L-@]iVB:,k?YIZsJ,58e:/7U@kylQ!y?6lgsSUrz}^T^bkb(xlglPNj-x![b}lDva}Gj1-$UAnwr]JNkob=000cZxBjN/4?qqAx^q_Z]iq.7slSEfnCd1/TiwK^WGq?/TA-Dv)g$D(-Zx$2)c3$X.^M:IG[7}ImT6RzRsR531Zu@OxZ=;NfB?;jR1UK08(6E@M(Z.{EoZogdx.@rwr7Gv57Nmq,d]]*v:14A7?8*D3]}S$b5Bk;9?{NRy?+FVi#656(mC2Qb1vt(ks}gu%#pIAGOI8pK@e}V2iaf6mK2$ZBQf4Ro.3U@i.X_t:?j[=0JrSNpXb(qh]IIT;GxK,hgO^w%k:*A#Y]SghYw*KpXaW4etxYr%A7wB!-g81C}$e7Ei$iu8}znD^5]nx?WJPC^J4,lHB!BtDTL=g:TO)b2bIQ^Z;s,4nRnM4zw?nMPxZg*KBJqXM:dq!rd,z_)f%EE[}JjS)e)8,tu%iIk1zYV^^U,_9z][!:{#ZikJZ:NrnIele?AW)zFjHXTK/2I4K)TT.rX$an*}VY.eJoI3#UihflU=n.8RAd;,@8J;d^YqKFltTS2MHO,g^pZK3@QGtB!m.JF#y}I.v}O=XPEbG5VFDtu/?ooqtzP4/0y@Un]H6mEq$}-*.[]UcEWix?k/QT/cysefa.^00.pC0tP/-iqa)nvyxkdG981C6=ivk?5X[hM.vM[Ylraf%Mw}]?2;Hyt2$@Sv(Zq]3ya#b+I(K7#C@EA+4o6G)2f,)8-((X!MRJQnFeKn8K4/Z9u+$iV^Wy)ndF?xR/p.4%SxQT3S#!,J9K!XbY;){s?8;(*KRKJ*K_+PDMCo([T!1iZYVMGF;hh}d[LSRVF!k1.(LAYifa4M49WaG+vJK69M8jm[=(8USMkjIhvpcniVxcS-:upm8b_o;[YN4UDW]eJdxsPDV@ppP1HOad,wUg;l)ik5i_*)u3:/$}cmfCK#,b!?l(8ms/Hwou9fR{n[*]Q#DttdF.qf;JSW)/FKOO[z54RamzlLq@^02CL9}1e9,kjn$zZ{oFer#7k*Asw9@PhGuFC6^Y1KG#N0bZs]k)UfD#FtT}TpNxINfDWbdY9$*chq+]SZrVsgWI03esshyIV7=3G4Jg@hi*HfjoFeol-IVj6(:+}U{,V@u#f/u%yAgGNj%0i9DE2ElWZ-bJE*oxK(:FdS5+lWBDJMOaV(JrSd9D*GsRti9@9,pfMZfuyyQLyGw]R54)WKJR)C3jMG#PVi501)MFFThPYM[$n$8nq=8=7(7z_TMVO3Ds23qDg/ZFv{,Ttb_fh9#iS])[R$1XfTp%ukpYj//^sUj99x]C:s#NmU/93XZ)1V0xdzThy(nFUV?NQIbq650H4.)ZZHKTxvsGt7BOs3*=3.zWuNBvV3NsZVKcA7H[FnkNH{hglE7N(9inX/:96NgYFbm58QY!xvXu(9Kn{gws*8Vbwt38mRIyBO-K;mk{iEYY*(Psvo/EfXo:E(2/]tV[wQ.MMYw_,APP@7ShT-TAl._38BuTyjHX^0!eNy+^PayP/w+v*$zoZ,:Yphk?ti}wf40EKFZ?.G.bbY2,ELY$1ud2cH;axL{_gD5dQ%25(2F6-ma8x1v3Y-q4Nhm;{W%(]*Qd!ym$_J7[O0+Wph6N0F-.aIG!7K3KA)FKJYTHg=lkzA+8prFe_oo0rTwa2aP.2LVTcb;:{]e;;PYD%Nmz2XAE0IEdn^r[h2QK.I^;GbOwb[b!kKG%LUUWkWqsg*5G-QtH!.#.@qGUSYl+fmO-E6%i*M!eq=1M,.O:@7$OPeAKGebBiKINN3H2892%[t/rO}w1[po-9tE;L/p)d}KJ0Ar7A1[cekiyO1Ko:YJ=viVj!9j40xD8X3UwI]Y7BjYw}4M,?pR;[/krnRgoZ%!c}vQ1P#]X6,DCxK+q^{=F,Vv@%#O22pfa4$:vDHN4,Gndo_c_:v@72DXPE($/pbS}mPmosHK2B;ty]NaW!yBPig.qhVJ-Kza7xuR@GO)H[f,INF{B47dP7.mBYxA!nwh/^Aa=NMoiPNPYY;7MNj[_*5vMoi(-:_;JipoU)-O-ZN^aAXww2(DTg1c**Y7NC/8iPTLQB:XhnN7#8DqEv2C3DXaiAGxQJyX:+(K.3/8LCDK2(k=f/L$RV^qGSt!I0wq;nCFpGt:(ilxm7D@dtF$mB?GA5#-Wy8T3o::E0-h}Z:/4GMx.:t%QtLzXtF2;ZcxI?h.INEi:sWAVg$h0V)SMwyl/it5xvEt@z.0A@AJ8(L,KMG2hWN/x@VAm(MsBN*b6]JRB2kgZNw-O[KCID}]R8CT##8jc2nyf6f6C[6Z1iqj1OgUpyZaXE?,IO68s]OO0:s6C3Ifd2q+9P]9R1NZLYhNSsVWeLdFww26b*kOd[#8E5gtASr]G^m{=:c[VJdygI,y{h}NF5y!_[t(tD]+QqPvUK9;Q{C]XrLW#l:kCWkzHm7FKRyJknvP!,!yR9/%]-)DH{i!;%0nKqQJKzUvJl@P5DM]iW0P!Irav.F618e,%#aebKeqlIl+J@KVqWDT-];P(9@@g@,lVZpxD9u2GnZ1?oNEdJIg;)AfOup.#?hk]@}p5F%]=!#E=rugit^KcbeftCS=%i#g,#Ygho*5uuoVRHrC6G9BmzO8rr7rK;bZE[${3$gBy}_v(mya5Q_2bLAP$:U0I_RQ:6rP5^e%AiuRb:P^^UNS^^TX],T?MHFVH{yos5VSgX5KZaw8T^=a/kng^(3-08MV@naW.eS;k3buDYsDb.P1jqEQ8}U.:.]TSZU.)Le@E1pp2JQypoy8C1x)fxs2^M:?$i/MR#x3_-l=f2)V#okb7G5;Upx1qocMQ(B*bG}6eOO(2m.M1X?v)V_l(J3uEuBvQ50z;$cj64!8RhYYph7)@:6^ibIGl53/:lr]Hw=YAHFcG(6El(EP8sw;^YgW@slmgq*RZRab?Rb{RKpO?uuRGoTg2szU%ZszbniOT=Jh8T%r!h:+%qY+$(2[q]fpkwC41CoQsEb])r[h,6t[47xVJ.dcvgx)A;O7uQQ6%St89yG%_meGU61;l,R9oQuCIJ6F2L;i_?6P[meOQCriexr;K2;#D7k)lqrw%[zxu3ADI?ina{U*J^a?$Jb;tL9ZSJ*/tnPA%l5sD!mRnhNKLO1S]z9f#YEEg:8]K:B,t,.xvh-ET2kb@W+!+^##9ygQY()8nUe(Y?!G,Dg+J33UQXSkOq97ZJ?ow%acI)c6WU!p6Ep)EUBObp*i@7B(QisJBTCK@he0gZ$HQC?GpmO2[Y)rbh8KiGO5b:I5m)]inPmqBz8D3kArtN?#.qR-xR.rD[ypO7nIbB(eZO*a2$5[l^}a98njvYASOP#ROLlcv-_%pCSVjRsl4r*Jw;.UmUUiqo%ClfN*)+??GowaO$A(%kLJv2)A[l!on$7EhC6)X%rG$%N%D{8i[Tgky=?}j#T=Kw/Q+VWRkMRji_1e.%WfTT5EspWJsm}-R*tLMnIA4Cs,z7s*(RZ015yVxOU:uwYFBWl,;+C6#dADm{T0^8KzY1#EEZZ1+58p$V(m3Bxq,O6OqYSl^Bt(z:QcZ,,5HPsGD43l%kNe+7.-sKn+f#V(kd}:6USen{l%:]ih#?w[C98#+1#BhI?mTH[nlYe$jHR^^S{_1L20/uP;3+igHwGh%a[@V?{Ey9kjq!+e$eHq+d!sJN4?A%mN1kN^k^.wZrs+iwJ].Rb}JZ8(bAmRA:3bYqbIa392fbm$!^c[=(X?wy19BQ9wy5$Hb7z4}aZ_xJYIz6[T8hG9J@}Pl,Vs:fZ*S:TlLac2v%{[T[@VmoB;2nnCjApAW!ipJgQxol727Inuf1-R{3^rfiEE.*8]SjoDmD8:gNf;@_Hr+aJjog$6*)evCfZy,xs{s;pjlT+VJ%K/w/p-EzXmB9WF@5#ftO=IxdQCdg[CO=]s6+{B*$(B/,jR?!4G5a1ZEBT]$FEmeq-SnGmX5^xv0s=Cr6I^u[RBwnWJTQ)8AJB)sG:#@WR%;kWfise-UtY!2pl@^wNj@lmkFImmgoqm=+pR=X9sFAZQVy$RN1}eu?B#g=k$OuMMMy01kdaKfRJ8Z2Q^WaWleY$vnqC9fK9YYYUst#VHWRXKKQuva6$EuRy0,ta+(2EiO!VjIn.pUN-^Jz48w)d_)HlLO@Na2k3Duy5-)rD(2F63$]J1cX(g?@kPHi1vto{xqTkCWmsEp^jb%o$5@#Sn@,.LXFC#-c-0TI!{2JDt}*+m-)dcO8M{D5^]VfJX=Y5hY1DXrg@r%zVK$OFJLia!UYvIj+Z+g+ahEN_w,GbiGcwlmX?:QW$v9QF,5ML*B?B(CTOWxE;85X_5ahRYNcxfFddm(?osPTSZFhmX9H=Xo)J$?Gl]Fwm!pavsugad)+ms(LoA?MqyQXX.E5eLTf/Bw-FP,ELZGmR4EawHe=nZwK/v{ZZ}[(o%jC$xLBi@MtT84K@lccOL/o,F)3n.EqA,{[Ebxt.xia0HS*6Ss=mTT]E=c4t(t-V=G[tk[cn.)44@sg/5jMq!K/BXgudHY-0lbz%Myky9.yRTPt^?,[Y.ricDF4i;ljv,6$G,[KvaUKDv,(A!9G+lgqwTXX19(A1%U)Y7z$,-[T%b5m=zTktyfO1T4{3_b$KaTYQY!gmet9*4-r$B,lcL}$u^TaJVEZE.CpdRuHuuo2+0+[!0qnK2G)7#McAfU?H^Krd(V]JC8[bD[,T}F.f{miROvn0cVTYfQg=(@DWRbQfg@?@X1prKnH-4y7;ua{E7)Oo%(;[/D}=q;F)Q;ENaIXf=Vg{=m7eKs8/L#Z!E_DzRb(*($e*#ldGVpek6ijQ*[a#ub)O4wTX]Nsa/RB-]5BpHjxs#27N$uSsNky,iTybBmv6G)M7wZ=X@bU:cSRFa[Qji;6)(TPG_I2!P_j(wZo3ZiJFSvFyK9$a5ziCmhe_5OWB{:8)5,EjBA^Tt-M7i}-_/.YdaJ.!MDq/e*]{Y^QwB=2#z7D=kh@k}2X3m7Kynn*+[]Mqac;@qy;1HyKnzTRA;gKkS#tS,*8a7lPrXgZT-#VxP?^:wpfsjrmI[B4uq_M/hH%6kCJ,#q$ZbG+W7MREE^a;[Vt5:N,(1)]%K:0VgpzU%Cap;d%AlrwwIdFe^VQz^W+V{Rt;3AM*L8eiW9]Jtb/?$bEa1=yC_t!95v0;lsMJX)Dv@-%[6@?/i7X[*K,jhodDm5Y1r2!i/%tFM+YzyYuAjVU@nebb/;RiPRQ$Bdjy,-BEi78+M2[Hcfu@En?^-gf1Z@%r9(I^J0Vf-DyN#*U!=^crJw/_s5ge/SsTkg#2[$w}wgs4J(}-S[pgU;.ln;:JUzApu,-H?Em8C3Cc]Qjd;RAMbm}57(xt(*w!L#uMgWp[rHuBKJb$Jv}vO;D]p/:#b(Z?bo%ts;^pOgS{t4FZXAP6f]bytDaN^u}$WNV*RjbHx(JiqTYEiLaufb76ivmwNL?o6QzuF.D8-JCdnTv@8wODa5n-KkaPY0QBy(lv,U%0Q,P-dlkr;Y,%4JrED?+[$}Xcr=5pu.qyEt!9STX=5}W(NVk/RY_C$R1WYfhK{6dZc/l0E=_w1dOkp{aTu2BU8dd](^Xp-rt(Wlt+cCiMDRRD8Vhm,ouiIln-{)_%g#sC0OOZv9B}{Lmea%xQS!j5;Z$C@],b.d:M!OBD5vq?h,eUNupRzB;[f.9!PYx(x3-nlYC^34EoO]ZkTMOVo.1nU]*AyCpXGO!?_2U91d/jVyrD;x9x7yJBoM[rF%^PEg5vA-B$VrtzvV/SQ}v-UfSL=4+:?+=8rANB4@H*k4;11#(op]Q9nbvM13R9^0]e:BG^T?kKtQITTz[ccqMF2Vh@1qyns^l[!{v,Ws__#DT)dS;s=9?I4P5F0r3PabaL$U.rAxA=RguU#izy63l1ouYq2Z9GA#3_cQb;q(/;#TORkasg5(^ldqN0PtTC0cL=CgT;7MEZl)qaWXtQ^Da4=syIX^iKhQ.U6^Zi+Q/7$ZE#)m9PqT;#2dq*tNz8iuz3l^p(j^XMx?r#fqS5@1DWtdTl0$n_Q56f7i=f^YDXyd}LsYix,?[cfHtLbPy_0E#G5$[f%y^IS$1I+9.CFRX3uW[H#kDgzWIqPd,[u5XoVS[6Y%HYgu*c,8n1(.UppnV2Bd-cgy*HUV=OgtNDbH$lvzrC91#/,6n.R1g{Wsi^[jfd^2]MYp!MatT.}V%4gnvKq1DooO9wQU*9SBeSD]bb%W(RuwC#peT5p@s-b6/P0h-p:bdlv87kA6/sBbK[Hr]11!O(Htu*Hsj2Ov?%LgKA0}rO%Z-:$MxW-}$+EpCIV/+7xRdMu0P9-YSAWcLZS}szvp/^rub9%6%Y]fBTo0hp(Hn%_hq_4f%x-l0ojQ+/RcWTCntUntU{;lEcYm]D%cs.,%{)q}r-$jmugy[{/ovbl=)xF=R-IpNBKmDyy.+l*@C?21clh_;exAJCy[nkmn}{]:FZH}RPd^HV@jB7TwAWsry^3v}iNBT8]HejKIh@YM0GrM8)!6zL-H+NJb2{,Y^ki-wd0$b/^^S.ZX,y+R0GqRp57P6!,BEy=m%{[SH)x+YX/v0Sr=*OR@K($K:,+XRN[,ACEo:KY(zbgqTt{yy$1WJP+Ub9/Q_YH26(kBgE{dL8cGjJ@wEEAgr!.B+0Ee!lM;3glr!Q7ous*Mt@F2MBty)qbt5:)oU!P8O]FzyEe_:7SXy.PA(owl2Gw.!-Efvw[#?nOnIQi,OoEuiYZ:Xi0^GNSUY2=JZdB0cm$@F$i]gxz=ey:CHSD+XMK3!OwUo%HD=+31ff_d8zk7tHFzftwPfvZ-HI([@py=N?Td7O[ntsLLf$N$.?2mt^B20s9Wq):ctyyB?lniL8N7[n^4Alb5lKmp}rD_4K_:mkX$zsIKtw^Aj{BvUFxDL?KPDFZ[200KVWw0N-Cnz94IRZ)Vn$tB!$Op/XTuq77.,3Ap3Hx[Brfr]bE3T0N/WlgcVYOJ2,gsQx9ZffQ)rYM_4LZp{uf)?CILJ(vPblg6oJSwAw6GbG8y.amW6+3SDy,uxQ2{)i]Jw!+*1B%syG]g[kKN=YxZ0Id;m8*HT12xJb^EVAWsu=BJDJYTYNyz,%D:i_MkW5UAQYh@};6MP5!!;V?a8)i)jYF+0,7yfsjfF_%vSeh?Eu:-O*)x7x,#pda7099e16{}}axM#Rc*X+/R7iP_:W=;WSQWtpfFM@20*,z!wI}671VlLT;Sp_DtoMd_YqHuV:-xlvXBn2OS9NcPlVI,[NbBOCwv4w_i#*rCb*SQz81t7!0c:IL6Ud8bR2k43^d}r9yG3N9SFT_z?-@tjDjG%W1e;ywlaP5F51u,jA_!R+oS}:[c.5V5#HdiR-Tpp*zi-Gk6R}4xj;GYFw}ko5Mww$qMIy%LX,]A.7?$Xy?^OQhNVIfRf#]}Uqzyk^2!BZXdhzH^0R5Z4[Hpf=^=OC/b/@LEPmBHEQU3sDyaCRc(]bL2l+9q])@7zdoc^pO1IM8bx(HvHU:-8WP{kru#$f(8AG=4ND3u?**9_8,e]oNJNB01a8jkgi[Xea*KY7GChYwG/ya]h#)g*%M$_/M!YN5n@fA?=$d]A?r;=$BTe)zOG0vdn11MTm=k-B=+G%z9t-KX]AsOo)]qzn5v)Nln%U%-g)A8%tE1XCdY07/]h8(F6^I[arODlC7q]#{v#BmV$Y3(!Qt5+SC,fIQ^IN8AihHiR}x*-Z4!hNjo-QB:(S[4[vbJhG4UYx^WK/ovyK+O,4(QS_fxNCZv,]{7VzT6?R)%ltv0^mB/n7uW9-a8s.pgwx;[j3g*r^^Rgj[;Jl9w4:wun67aCB_uY52iwsyj]M#;gZFR)AOuHurlM3E2dD6WXh9#]0z7+ebNYL3NgaP[gauQEzjodP6Hj76[[/)IQ4jk:h=EVd-eU.yvzk#jho+o$qK:w}9aCwpx?Z6ZA,Ot{yjn6N.S#pztkM+V4:Amf88RFeIGn(l%!DURxJ*[[%bW,*IJV{i3GJ_,J/{xLK)n8%FhxrqTC,ha0Xqwi)vcK8Xeiahtd@Kqq.9L??:^SgQj3x%nS@^{u_Q)[]a$$QH-xoT/][b)?T#_WcE3L+nd5iY;k/MW;ETpzQlef$D.T]R6iMbvk.hnK9dJZeQfg;!7PS*t7@0h6wN%{=04YivO6E/l2BD}k=$RPlEy,n[ScnHmy[aD:u@YC(NwYXA$(^2[QihGKPzb)/bj;rmla}S(72KfPoP)Kcbk3=vO%0V^%o5n+uT,SJn#@sJU?aP9jCn[lNt{IeAI(aeAw4_pHmxJ!g.diqOmjLz$loG-g;M?nl5/o]$XZuO^lv[6J%[bUvuQO)X7Sdp964nUt7IdjOrnKe8Lvi)%tq!{+$tov(P,rD,(3yj^XKoQoOR-1FT?F}$j00n;CB61p;,F*X1aa6WEL/sYb-39F[f7V8]tb{aVf}LJhD]!qMx@oc-bfIoR(o.(Wf9gew3SlbPg4Q;IlKK@Eqm(i{DJxOxszbUf0gIN)Vq35uizPK_RIZBmmqR=g[Yp8C4OAn39buif9WclNYNsDbJvC!9x]-M=e7Ajff[p#7E%+l+cd;eT2YL^odoi@$L*t5AIO[Szk{E#wdbBHotj/e]goB8ESe}y?RksEpo$rVOw1@E+D8#RFsoioklWE%Li:WqGS?U$SoxJq!)$T,@Dx8DC4SYl^_2zVfmV-WyTdcL.KXlPcCN%H.PM4ofl+,63QQ5+:,dIP4vLlo.*f9j)CbHHXts7Nh,FZ/ew0sODmCAhn_8iH:1Dzva:VO/=1prZj7T=HhoAdIO*8=OkB5Y3xAoSvPo[LF0vUO]Qh*A@!gk]S+E3Kmb=j-.A,uu/ZNe$lzlxZQ+9E.H8zD6MP)HtAee65r;[$exCh2.@P3@7)j/tSoW;Y}AY;=bX:NLc.!$#MDbO/P/Kz].p.ZJIR1]8s18owB4.HBu^5_q^So#aMvG/pSz=n}:rO3vo(X8ecRT^C9uexH}K/gyz5m7Swm.gO@lg+Vc8Z**G5JI6Q:36RP?g?3S8b%:qq0yOe^[Pn6:DOVol}XZXnOA9+0}A2{L@x,d#rXc@f3--Q;BrS+wP_ZS;+JF@5.1}.XzoGjigTA.iJU]T8)A}AjJf,0!M$9qnakwNKajEHGnXPIC@te/+/Fin/zYF1HV{7u?ePu32Z#Pl/cxJ:2mb)1-Ermy%6966?nU5kK{z/EHF}ch5iQ$h/6N[G%5bkG)^*ll*d+sSE5#X38u@9sRkoKmnIy0CG@xn1s[[j%P6^e%^wRMv7;pgFLQ-nR!ZioP7cuNqcn%Z:]9Rfrzlu[rN:?!^wc^(3MSwhpTJjg]IcimMZG.TX!ATfPQw([q,,3^dWD#nkL:NDkG04=oq}PVNRxxd!dfSEb9btQ;Iq%?n(BnYj?}4NgQ_I0=LOq1K)Jn.:,dm[A.Ja6ereyi3s(j=XKf,Hd2B0iYB%Po/cgt:f4IE9^$ak:)jA2?nXzHm91OX4l#OzKC!I@tAOI8}.ePxfu7}1EOq}KY-Syt=xO+5xM%qtSr.@;?-DCd,#4pAvYL/Bgvy}y4$:b8([c+46ee2}3jJN0qB9v/5*,5*X9ZZzd;i,aNgMDx?c$1d/uP2.sliY7XTC/t9J[lsUb/yx84Q6ky#-WSPt$TKRFhb/IDl9g*Qs^v6rOqNJX%ncMs/?YIoB(qoZmt([{Ayi2jiuKYKPQ5o8vdz)Uf;IDNh%$c2;ojnhr7Fb%I%+Wa8W.zTYWq,]brK5NqKQC9U8tq%V{O0cDDktHp?iP,ie?Tg*7Q{u*nk-()?[u+0oOs_3ZDWhHEi(A9TJAYoUzTiP+{HiU=]X)qgQm2TQt$agw*[/$@^W,m+^g!.LjbbFkT/^x8k}Uwi?0e$T[yTR#IBso@tVEm8=)Xw3]c8vZ%5#)rQH(OsZ^B:(ozE8s]Nle,aWXEUJ7/F7fkkrYXKaVzsHZo24ThN16M%SSZ.VP0Olx9C9MTZkVnciPuTcn]nR:.V6KcQ87S6Pyi4R0Mm:Tjv.pF%D]48/;Suy-.xLMvF.x.;O-Y]Zk/KaDG#,3ln@lNA(wv%H?^[H5UUlOX)YLhM@-.0;XdtpkrvAa/+L.?jRNvMUOg2E1{j$4ikNf*3Ce9uInExO/=VYm)3)=cF1W7N-aVDV6(BZ,D8Hy#BEe/itTpu)c9?n+G^QuVVx-_F:P@iS6*:/xFPkDk(.(M(f,[k2zWQta(Ml=@4T)y{w+dgqK/Gh7rf}lNcbl%9O(P)zCiRQxfZRKXWvi+Nk!{O%I+80[a^K(Afc@Y8bWsp9Wzlp4rqKg8P@*S[^;CS--@IB=l{C#Wrg:;O1qQ?0%Q]ox:w{LnNA=guqlJMo6wQi%nyX=JyndtcZc$@E5@5U%0C,pK4@BQanbLvkDK]0N^@Pk,peFwS/(Z:Ew.q3{4U$DdE8?yz5*_8tMSs+]*FF.z80Xw5lTi]-15P}7%zh2L?RZg2d?qf-)*h#5/,HJ-5SYg{#cNDcx^GW:#Eg:SbjvB6jt:q4s-09y1W6+0POp,Vulca#uL3cbk}D7_Fl-)mo2uj_@jv1%BH.4l-DIdg;Ly_.!0PhK9swrOPMdBsHqXT+j6_KP2lExv+,}0.j(L}x61VYhAV4ySbxFEW;:,]8VY?k_UEvybyp0Cd^^8Ox6rRWxCrc^O6d[xcB7Zf=9zTGLtJN6!mkl!.0{R-VqN5FN!{RNO:CSP3DG,4MISIviXr?x6i8LV!1ONc?+0FYb9PTd%d9i*PnC%GYSa=!I)c95,-H_BAAri%z/*0}IpOJdI:Z0P5g]S(wn?U2L%Q*MTb/*M+Z#.ad?#]POSF2GKxVWrcj4kaWDln=YL$,$o,m=+pC^;*CoYw,7loK0KA3O48R.viY+/_y;$P8qRvv]);NJC;;Zz}R3y(.3{1G!EOq;QVlLW+LNM@NeRAc]b68OIoTvr;k%M(2[20Fkvw,SI#xJcM0]#]%noXG.zs?wGI_#gIc8IABD?-r1zgi4:Mu[!K]FXBjqB(ts[9(nsx=uCNn)*_J05v(/1!SQ1GD[qs]+/82]WQx1g;ZY*EJF+D3?k9;IWgEdg8QZiF4-8i[wNN4^58%-NFl}J8]A-w=;=Blse$C1;4l=4C:M8pLk?q??;VdLh}z3}quW7E[Ld/:8R]j05HeiH+=H8%25:)]w]r_5(5(DWS,x+Nvqr^!iZ#J)z0^7u8zp2/+ooAd2rYL#Hg*.X,v%B/-bTcs{*z@7xbq1C.QXmY)!Tp$k.+sDSqFVT3m/ygwz8=y0x8](z@CmpX]xZ{k$yPUI;pf0cxxlXQ07{:?xsxa{UeG)FCjA.:=UY#R3G1T,H@*_m3UL2X=[l[AJ)3DG5+]XtCl)yfX/_dbJiAab?OZ[}W=vyA1uHffX]lzAIHGkzEz8^mCnDXx3._u):mD@aF*_yqK9cTP#]Yp3KX3#QHcbS/w-ab+1tEl:Uk!dQ{$sN#/L^h/2^^RwdFmVwztlxm@HtMWHdQ2oGcgBXd2*N9!NQPEJvyW/o4FDEZ1S3FYPs#![A)jvUz#d4Fxfb6j+E4%.IrU.F5gAwX,nomca[sUd5C9}b#!O=/D$G@]nV7h62#Ep0z.hXMs3IjWfx_[PC*45G%rQr9zT;F:=mo_NeLmekcecD?DkMYF#mL)-MNSSS?5m]rlu{i=u(4:}AmIdx^z/w]cNm5O@YsAK07Ln3XG{;+vs,nMZ5Qdwy=UP!Ct]UUaLKrep:t+X+v6ve!55BgjV2i!!cy!rAs}E0A.rJQ42?j1*iG])?tEytY-SAkjBKU9FiA(KEAz(!yLzxk+j^7G41tBh(6[*M5Q]({4ADmBI0:uuM1;td06oK9Jv7%(GLBQ5k4^!67}@{cMSm8y-du{%MQ(Eos{l+6PzqOp5)*0wVNZ784MU6fk)ut{Cw9N(Nw;1:F7ex!5w+CroGN(lZApsC85jzkVTsDoizeVi)=uW:0XUe)$i6^V@F_:X%3.iGmPA@QeZQ,vw(zN#jDXUEY^i)=8FoO?]D,HsjDwhtc_;E1RmdWtG$ldP1Mg*%oJ7-O0EY9ibc!-aDxiKXd2Y%k[4E*QyNPKr*Tzo)NIu=S0Q^/sR2I4j2!IrfwrTeOe)oF1Hv:f}B.47IPyhuLNz2uxU8GWpM^$(5vC0MX*Y/=JoE:8O3X#KOownUf3v/%{ZLobrz@RljgZAsM6XuI(+CcsIDg:Y(3gr:9ML#+CbTn*WBJ;q1rBF_=Vi:nXw]dE8qKj6crzLkOD.UdY5WBm4anME3kiNnQx6?x:w[ZM5Wn]E3:C}:@Gy^F*Y;}yvrTwQ,pR}Vc9%@IB2W=r.,-mqb-Cc]05@AiRHa)Qe5f*cbh=L2K:tH^5?r7[CA?(Qjw-}#FcbGX_!nCR$K4jcy/Dxj#nXQdo!9K^9h;JuPMUibvZ!qD,EZaE9+mNAoIbzgbw;xCgRdTjDQS!q3lqeND/+O5T!Q%O]xh=T6XWG^s,ur0NSS(G7GG%cVoZ1Q38K8@NK,c,]x]jnV!DT@DGN3YDYC.DNP.A(/z2mHk*y3jtZLpF!qCVA.tSl!Sl+YBVO7{jrdxg/IO4Jx8+rY1yI69xrlm7rV80-H4:R9Y{@Hcu-*Mp_80O4jR/N1XD0P4TzSN^N=MDgd1EtBMrWu/;H^^SZ4((3Le3#PHwxkzU/]A$k{D6v;co-OJr9YUrjS)4:d5GLXBdmwphbMqp+GTY1#Db{VdA=A0PxN5r{fZ{o-n%Lp;a.Zknbc%#!1q#@:c-Jl2CfxDmA)J[g1jI26%}_W(D#X4=@2ScNBPAy/H6s26^^Wa7;C^8l@EL,#:cS(yk5x0O/=@b$T_*]hIg}MkZBR1uO]}7sPaLvk7P3d}TcUZp6Kj4p$YzR/OyW+sv4EjJa0DowLnhqgrhq)QZzdSPwNnn$ygSPHu6oXSn1tOjzF0D4PI3_jI0L+1[dU*THx3HvCdX!xS_},UO.aG6-Y8-WsRc@O=^GhfIkPXGjbvzq^9IMO$#{:n6xFOyZd6t#LDCSdpGdW4@#y=.A]ba]x@,u2i./]{hVe$L.%!R9S,FsxnU#7(GtK223;:,hJ1]}C9mQ84*tH@UOHNR/LO_-SQ/Y{iuPcA?L+pm?CT0#ice;f6NflVAA;w[W#Uin]Hem_@ketfOzHmN*%4Wf.iVmZo0Y^8Y34$NxfO{^1kH%(/2]m=Eywq(w!xI?Q9llF:t/M:uLD@ub:BGJW?-NVQ+)U8ZSj!L!2Mi_zTf1ioJMGKJsOd:h:2r6C$[)Wm:A}A}xfP_7W-@VNa{GkRGkF@@Xox@%o3cs!Vmvc*ED1VYH3L!)n*]=RgM]cnDTL*PnK0f4NI:2;Q/%w:rZIpu4WeN6@(NPt+eR}kkGR9yYm!vS2O1T-D}n0k@)u{X7^Q?gr#?Ev=R]00fPFZK?uu5ivn+K3jD2F.ZmS)Sw7jLCc[poOI[s2Mxg-(#El!:Rhao?9kx*$_00B,F*p3eeHVkBJ77LY=@?hnIWS[fQ=J38jCu6tHN^X,iBvES=gLZ/Uz;OOsL^TXdC:?g)0YC},([7@$^^Xj)HB!MG%3c!F12I^gi/C%LjFf_(jCB[,82J+JBdX2(7m6gQK..t/!T:yXydid}RF94%m5qh0zh4nzTP^t([qUKO)S)ATu0UcKd90y_Z8MQ:,xH0h2p6o}ya8D@o6d1k:aTZ1NBHZ.Y+mdcnI[YcZ(ZtJF_yufYmicsXyYtvj4}T242JRCv+swbQgQry2-fYEGNtCKLZEzO/MtqqEuQ?}2+Vyw8a$9_7:x*c?duAZ/cy:mO3Ep!LM}Qa!lne0NrBWkfPuIrG3IumJ.!%e6vJAhqn4I{ut!c.--GDLX^!B;u[rSDH6F9b/q$cWxH+ztBauRs!KW3]DT:Cnh9grB)F1[Tw-W)=x]w+=7(Q0cyLCWJ!WGw6$wfY4NfR0dl_]C^+In$:Yz?i-[;w6N;N}iDnq=g6IJeCceJc69Yk8?d]2s5I;d9uvqGTL_B$bILYbcT:Ny^XPE.lYN6+[V?MW;@mM:JHeo:z##iv,rx+Ho;:;}Ohq[BCe(0+YjoS)4(Y6h}ck5C_xg,$cH$UQ87ykIW/R;Wp5%j(3]L(@Eg/L/2+QzZGnqMZQ=@21:=boUCQWI$}xP)8/EO7-Le5Ze@E_j#aP9T?IXMA2wLXugpxxAk@g5@5WvV$};cqh(L!;j4fA:S=h=WkgE+,a/]7zMckN]gY_Ycof#(^tYWTIO1TPhyYmR%L_7];jr}S8i#L?1kfPVC@3;S1Na]B7IYxt^p-Hqx[XdgVO-MIlqk/IX9mN9$irE_G#fnbBXk!5xFuTl6gAZCsonyNULU0vXOkVmf3u*)F8Op3$#.W,oDcy67nqo{1kn#7BhOf[N]*qyRD%l,3JP5R9j?1!ejj6DbFxc@v$Y?ixfQWA2ri},H(I#]nj-Z)1mMoa[$w;)5tlyF3@0q}M%L=G;2y0$Tl8uIjmzgumW-oo)%rNln2rS}7wPH=LM5z;1G0l:2VeI.=ZN5.-[pIZQ0W3X(rdrBn44C}1JFTh1%T[a(P6*G4ks@Z4x})HyX]%:uQ4kx3eZ?KQ.Y-W6]I)vP*U6C-8@l_rr^($xN+3D*v{n,0Bh^LGtCZOqE#nsJ2pJM5w7N-RoTucis;MOHHh9K%txu_BS@=+xmE_V-F3z=rrc?;6Al.CF3buM-X1Zc;i3}#:2Bm@9+OJN6F=A4U!mUVSi7-vw;]AQFX^)g!R/YZ0wEU8$dt_V?a6MFulcFnf$U;w-CRmFN1.njh*e9ufS@}+me/Ir57cjwcI$/RZGah!(Vx)C*OsXQQFhyj{03_k_uL*G(d52)+k4b]zjn=C:DLHplHI8+msjSQ6HEs:?k1#-sx_B]IU.qU.6bb,yOVV:2MUT)?*/R^+W0bQ#p1w+ymu9qly0Y;T$9jabc{VvMZsiB1c9Q5AQ$FH,JTts0/(=nBu(zl{8yEDS1eOGl@3ri}?5I#-V(JH(F00s9,hmT!)kY?rK#P=X6d_qtK+RYSs##j@N33IeExBAZfrQeux?=rZ#cmwc*v:SRyl{=JPrFm7Y_%Gsb9Sn!%2E]j%-%;_O[4G_.9[egv4vipQ2}U4;U(cVhoaYO5JA%QihRIp(OYyq:Fl^T#rU[%,jK1s1*FHdD2ru79OYE()QH9{f,]W-O^HAr.@JA6aY,]fmQA]Sl^CsgO)e:yvS+R]R@65ECvFUyKe9X[Si)mXK;ez)T#atRvr;pM,N??AjM[CbgPl/zsG-hpz.C;L1O9z?P^uKcsYIN#c;-Wm2XH81R15]3Q[wU40o__Jrx_YqWV$oj#Py^K3nmHj*+cFJ65;qn1zTQT0}6$%pD9W=F{6%:5/^}{Ov$.4k^}RJ$[^laZy(seizXEFmWL88t?!SA20jBf#:.O8ILw_s(bc_F?-/3mi51*Skxm^d4!WXU%C.1o9VYEu3JMSiJkp_*p]lOlBw^K9xit!3uu5RpP!QwSU41=MN7K,g)e?4nBA3)vKnG9^.u8pn]u,NFXREp8rezKDOT0]8YEtr1Ni9yX(N:}8APAUr@!}N$#.TNysF]K4?vfP_O%e.C!]Nnd$iXm;w{Vq1LC6[t;yF*CuMke};/-}m2InOf*ej^6D##5lRqQQeSvymFyLy?od2gmPX%}%wiJm:$hJNzQ@}{7rmO(Q{TCqWkw(ZqZ$(P]I:)vt]h0h.g]cv#{]i(Hl$-(%gGxKk4w#4bmI9X+})5q+QX39Oln8b3ZI8]MTL^eEuIOAwVlc-i50wN**PMb4E$Opf}WSp:r.rAW-]+5Rh@cO9jv=yz*s:i_7iXc9N:qkA:59{Tu+Di7Exu.myN2!vJ7iiDa/Vt495?CYz;$iOBHNs8GoA%?rC/(AnK(DWKMZy,+cac]3+/=sA5IkuSvQ.EXbc;.6ItMVTM!*C!8O(/wyG4D,Sn8j7206u(8X3%buhHnOmDS@(l0j4s?xyje[M*,F?iz[u0XmJHw]m{%X:{U+?r/3Kp//7,wman)lZJi/Z,K,:)agGtI%6c@u(6.Yni1).sNKi8HyEcWP-[oGULjL1L]@Lsi*$m}K+s/TkzF#21_pe9)[;N]2m9Z+g.bh]m5gdr9H8bwlc]CmB7uqmvy-,($}]YRGZ[N7P@h3(Y${2QxOs8abFA{S2;Qg)9xJ#t*1])fdtxTn*C#ygA8iMLcW-zxpeQU;rI9{_.wA*:RiGgdP!$Ors44J@Vi+gwLuhcJm[Q7Io3_!uF0Hg1V{U?XJ4i(_xpucRU;Hp0.lSExDFA2yMIR6w#V7G1qs}l3A@.nMR!ovj7U}%:D2Rh)6jMMQKz.ZzoE6.LwHb9xHYL)RE@^lfBvdLc0(8y497I(.(Hw-co]wP8aA[RgIuxb:S-g5E!B+Pn8VI@?vZ:K=o]NDS7FA(p9Rzq0a:O!QOP}vAl9]lY4kM:3rJkYGI0A[J?+4q1[+MIO2TL@UP%D,uL=F@dHJtS1F-*5796A^nWl2,zssih5,F:rakEa8X*@(oGwFWmXObiI=C(}W31ywe^DUk3EDg}#c/sc_G0vdRz5x^i)z+ISWQM_^z:N{R3nCm9u+et1!DON0^Y:X-dcD5RuOPqBor(+fDk=?v0h%nC!x.2!l/;nOIRWSp2n:.{rAUrLPj*ZRZQu#![Wvg3UkBVd2Pun4+pJl40Zx;ry)qrun:]W.X6nf}XzKJh9q5ujNJFN](oNJJcQl62A]ri^,*3#$/NVHHxyix3;XB/hY;#-eME)jzCC$U419XzYP+_A*XIP!UfM2/d,s=FM7,?jH%suJSRmgwn/R1[Npi4/,822wHw1%N.V#rXKao?)6e7?A*a]41?%0Y]y;p18Tc#Xhmtt)Iu[c38*;+edHpTQH{(-[uLJ4sp@h!.r??1RI=-gf-L(poo9Z:sXC5A@-vICH4:u+VsKc=c*yMWK1CFzbVi.D=n.zA^]*nCPdBtcJVIYAZxCiRxuSrFk]Cck)XTiRhP*:L*av-[GqMEO;Uf,tJ}{muUDB=ej;e0f/i71#Sq!U35HISh.,oO5WuBjTP%*Av1gn}oN-.73uX%rIJD!N@(pai,bplEx5ky*bI3Ji,cR0pY9N}es3mK,a*:@sDp(^09D987RY=[@K-9A4CV,1?o@(Zhpj,)=p]*4Pq!{WZ9cgIevy}!5GL8@/U@2WlcOm3.W_7sV+x=/MVeZ*8NwB,g3:v83E%m6j(6YHQfe-BrPG[JPc#nxq(EF[o:H0esU(fejp)T096UJT98!aHl6)Ej93hYso6)7nwaNa$dL:jbDj)^qk$6pEX%@_}:Dx{86/%f^+NXs;5D5Q4t3+)F{335bLG0tL)CG2S@Qxik^A_Mu6eAVQx8G)=y/hQv-%?0baNZ2B7nK8/a,9i-O4TP=%*^ASnC/n$uHKX=jj*G;H8%Lm#HkX6:-Inil%lhiUC6Zw+H92W;R@Kwnk0u)C*q:MyizKTSS1,q2719KhA:?aCfpe4##Z8mOE}3=T?aI^B:8jmqB2TN%A0%{fyh#?(BCW?IXA/agh!}/J9wCtxQfTyHJ7J7FwxvA@/x.3sh+1M7*=u2UsF%:maspih06=ZuE{haxA(iRKPEavNc_=Z%4v[.FP%%UVL*?hwKw0W2n6UD$Rb7(RQ.0WmB4t.NRNjD?)cif,^[!CJFX1o*aYAfiWm:q#9vLTXP(?LoDZ6]zEnO8;GG$E?d.sMoh=s$Z05u+SR@(_]F/O#k)L0Q4RM_0-MKR[T#M*]2B9!Z^dSy[80MrvX3StRFpkP+Zmg3B]3@a+XVB^R7B/Ld+Dr/^LW}]N2?sI=URk^8Z)or),I045{u}sF54-C3RN(H#{ICUWy=F7g#nkyi6*o;]6npH{uDYQ@gGnlFF5(*wyF3,znn#ML:88JaZ]WY7zsFSxMV-BI^Wko$bKzIb-!=r5oP+ymtT7/i(3,@dMM!:F^RZc,;F@+HGv.cGg9SSbjny+w(?Tr.0hRLNIthtN*W=d2{g6X-],Uzijnth(wp%86akLs2XNdw3A50+OW6LLgq+oHYwupD#%Dn=MI+Kgm#uO7XB5?dkDb/(qvSIMU$n5JguP)j3qAhKi/f?[=q^vrSe#2hSG$!CriO)j/qWK=GDG+U;qsB}jN5Jh!L8VC@Oai^=3Uw#UAm#N3VnG]AoF^6mxxq!wg3e}tF$VCmhYE.OUnrZ2$4U},vJZ_j-RZEzPEnO/)c@2m]sxAS[e8Fz0l-meG0SW]O2U88D@ktRevMnNo!VOnVl1eO95iy)WE}QygoT3670CXtoKAc29?uSPo?dc%8#Aovt8ximpKF,Of6_-O7EXE{5vIL6.wQ?tIf^TlWraG#XO^M=;fbsmSYMDzE68$xJ!dPw)7}Kz$EOh=;)Ytwket}j)!C*Z{RzD#fSi(gKBP5QKLi2gLiOK:T@I;elO!DCC2jSILc%mtybDb*Gl/5=vDq/znqyP;*EX7w!7Awaz43FZSlG:[Xuk!LSGs9/y.a8Fwqa^d4V;):A7Q}=1RaMP;H(znJme5gI;CYRWe:j-:J6Pmu(TtK.4OR^!VxKM%HQHr8D7Foxp0Zv{J+h{ig2{g8B02(T76kx:0^.Lh=0.maS0+UYersj7QPoLErcW#FT.u-$8}o)6QUxftNhruZoUqpzIc8mg2]/$m7eOd-7BV/XF-EV8ytcSwm:7y53LZ8]+W}+pk1AK}c+3(MlakiVu4!!}W6XqCaHuotn=W}r]O=m{x@%G:vz,b?WK4@YDr5u-P)L+:Kok@{1?!@c-lW@/=mP}b*y:d3Od#F3fdGCG,#r91qG8if]$vgO^w%0b=9@OwTZMqlqkOfiRBam?lw}F;]1V!:%vn8@keG#-V/7D0ZV0Rm3UtV,PN[J_6bz}WL)I#br67brpqoY$bUsoLP9v3g-RqWs#%%/gDyS$fR51)ysS05rNTkBQ3{=@lSFA6SCFg63+we:Ga=b*Xa=Z+.i=u1HSV;ool4,RYR{D/R!eB0)8ynIE#a9hUk-NJ!;iqpxWv,BM3j]m0M!j8bK(aGXY/*s3njq1mhy0fcFV0M*D6f(xnXQ!h9#/z;QJpL?2@wBPApvCKxXNb1$zA*X:,,JjlLp9[r+7DV5ZH5^hZ8orIu/#JYGZXztSYsTdeEX!5C.Pyv)mR%eFJICh=w7J+{@c8*7f[?$S!lD+qFZ.L=sOMat5YNrGm:l3IWdHF3spURWgsMgbV69-z.SqUeS[U/+4c8:,;?_U8E(mvS](Y#c_OYsMbDOxRriAvIbGAr9sBkgo/t,VA)T1Myyvsgxs7%g1{Q9DvHvy;_rY$wZ@_zv0T}MF7-L(qU/6a)Zgj[aFc=N#dLxqQ6%(s9UT-]D$XO4Td8*d0Uyh)!O:,A9Lq*]MD}}npHxC@+g?r#8.t0S:1UZ!jQbMvJ_Asfw.(Z$88HnGU.t2p0tWyeKv..X(Ow9yq6-LvmZma71{;mcB7!9m[S^8CKBN,y0Kk*wZoBA+oa9_FIm*_)wM?Ll6:rh}sLAv_JH!eA.WBH=PiXTDjHFs/86@s05zKg:J::4KprWyusM(NJA_s%bM[:9p;Z7P/0b?-v;S%eD5@W@1WDi7RED4aLGT/8QP2x%v/Dhd%?5Iv8[1.BFIBeXOn)4!}O9YH,;x6TOXu)vh-n)Vhxgu,7cI%NrOjRj[iz2Lii@Z)Z,KEbbO{dzNh:]D=CI?]_1g6#jOyFTnBoPn}K].-p%qyo;4VV4xgj!/8FblK]^(6aEb6h8(]iz3cAZj]YaGH_S4qUha0V]Ung*=1r4FP$VMLcnIAAXFEKm%O[IM%-9IJAmG5FA7{aued2iX:BtIN.{-F@mQsz=q1EhwuP!S1qNEE0p4XM41tCnbZ*[K}Qj2TDTuk9Th2l^^Vg*9n6!@Gjx$b5h{),z_jB[l[Zr%XbD9l7]uQ)c9=y5kzE6wHm;%f#RpDSa@fwbCQGIw4ih[Ktl//A1cgNkZR8QuHxA%)j6^p}Xg*/_k[M3iw:34%@p/JJO@V%gYKW,wr^%jas2}6%%Q4dy2soWMvXp{tO9wczY9^!-QYU2Px,$[V5nXf(1tEa@vK$U3IB==z++u]Wh9H!#Ax;z*Ry3fWR.(rF9QrNQ$-RBHSf7SgITNy6qcWmmiMcBQlRnUk?y/KQ10MyS9HoVrW2P9t4hfpj5P:GNT94FeW01MFa5eH36kK.9k]idBEzJ3xW%#T@m*%hZF_dWIWUA:YD0YcE%xrT?Y-DmFC4H={7m7S[=oZNCvC21isa[dF8(p#/XxPgac[)73)J[s1X[Y#:,BPS%vxkgCt/X,9U0LzutN8;X!HE-Mo7J5if(}/iITJC!*p(Zxm9mw{RT?0hy8Lr(bB6@sv96mlMD3PpmN#/pVR,[fkwjiS1zfh(.?x7XbAhoP5%-cd/za9Q@]:3=;P6Qn)37;BOBl.UNi62R#n*qRbIzWyx5,ki,F9G:U$:g#T?@qbyjD}43o:;qomQ75d8lY+;$FNF18IUVRVVL]+B#YrF.C@wj(!/B+KnJMsJ2_=Oh68BF=UF[O+ajeP?=Hkl4^+0,Ndd^s34Q2Nce(}38@:xuG1JxpqL$.C8Uv1O5Hx0AUTnEnT%ylM?yB$WK0oN5+URsR4L9H^31^h@3S;Vf3H8(5,6bA=+9Nyb-z{-:l71A^F}}2:g?X8v-2ADeILcm.a:(:?BLf9srfrMeOuHi@)Rxy@zI$!ozK[f:4-pxk1qcJKt7oLK;bIs[pYm;=H^PRw)niXXRlMge!Wl2)]L[=%.OsUHU5D/p8YqF=4PFH@Q]=c=:?cQ%:%mN9mBhH]#WFxw=C:neC.?}^.(Rx^bApm[n-9N@-s]UkLhanWZCt^^^XN%k4;,2=jIL):WFqA.V$pmdTyXJ=.RH[pR^;?/Gne(-MVe}wAW8wKbfD[pReCYezjBj?2*#/X!-}1TQ6$.IqE/AZ.^dV=$O*,Pt$y@Z@z8y3%7ov^^XAL)vRrB*BgZO[iowEYurCoH2l{.4@OvmH{idOFSY#6qlCLxBfavQZshVgyLo2,02$8sx-M4l=Y/6H?3USUa)P]BQon2E=(WsgcjWeSem,Md]yJo,eVY34/FRk/9PsZvjlG,w)3+EXXUp$9KNn5.t-5o59lR6h^(!o:ORnGl0MT{Rz3Z9sIbU_4nbYv[:j!d9A0ZxhN7VCsrk_4R9Ix^p=bYeg@8R-Hx[WEEKTY#^m(M,=t)}]]:bxALA0zU.$EMq[P4V.ha^dkrufHstwD#s]8{?7Kw_BSO[wf/+w;#=(onCKh/n=]D%kBDa]F#GLe[77[uSfmA?bM4K,x53-4(l(u52X8#JbJEgPx7[yolp3mPG;Wl;9;Zx^^X!9kB7JQeVejv*OGEBuku@A^^X]E^/p5YeqWo))7U/Zjhp]fi,/0Ow_BPw3)x-m7wNaR;(o4?HQ(48-Twe)[V8Zg(eKBw0By6a*6=+B^)t,s^vHj{[1z{m^^R!yay_b5zTf$M]upkedvIP}SI[m_%G:X;eVpH!%-8PtboS%dtJ}?S00.JKuiL/D*oZAK!T$iG[HaA8t#vNC@7Qujb@ADdv#ISJV?_7gMYF5ew?t_A^%4uU-?lXmACJ;cB^}jX^*qiX^,GD*TNUd2e;;*Kc^^p_p1iNw$N86C+tade^BKFzIw9qBy+K5%$1D3DZ[EC[!LJJJ-M6.4;$@Wq$=cm@+RSn:Cw9Ae^Lfx}-Twd_6MWvA?P1dFw_2YG/a9l,?=BR=?6P!.Zr$?ZOMgGMcQ?Rw=bCff*%L?Gf!Fh0-]]!ID[(Obi%uEz^YN+Y^Pz7n#dDVY8?*8-a^mAiroXpdK4#9;,;O*p]gMJ0P*;Jq:*PAY,otQiH0E@w0N)Nc+?OT900DY3Yumb_L:p%.e6VTV]yshIs]Ye-HJCl;RE8cm.p1fS+n3k{L,=t]qq.S)/k??v5$,m:wtP=Am/1L0KKf,/bPV7%j3jYn=EkE+F2Zdm/5azOA1_w?$Yup,W.AsVV6mrzrFK5zGA}XB/KER=i8x3)HFNmGs[,RPsya%GRR</PublicKey>
+  </Signature>
+</CheatTable>

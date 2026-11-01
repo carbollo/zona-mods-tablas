@@ -1,0 +1,1603 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="46">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>54</ID>
+      <Description>"Compact Mode"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+if syntaxcheck then return end
+
+if not toggleCompactView then
+    function toggleCompactView(sender, forceEnable)
+        local isCompactMode = not (compactViewMenuItem.Caption == 'Compact View Mode')
+        if forceEnable ~= nil then
+            isCompactMode = not forceEnable
+        end
+
+    synchronize(function()
+        compactViewMenuItem.Caption = isCompactMode and 'Compact View Mode' or 'Full View Mode'
+        getMainForm().Splitter1.Visible = isCompactMode
+        getMainForm().Panel4.Visible    = isCompactMode
+        getMainForm().Panel5.Visible    = isCompactMode
+    end)
+end
+end
+
+if not createCompactViewMenu then
+    function createCompactViewMenu()
+        if isCompactMenuCreated then return end
+
+    synchronize(function()
+        local mainMenu = getMainForm().Menu.Items
+        compactViewMenuItem = createMenuItem(mainMenu)
+        mainMenu.add(compactViewMenuItem)
+        compactViewMenuItem.Caption = 'Compact View Mode'
+        compactViewMenuItem.OnClick = toggleCompactView
+    end)
+
+    isCompactMenuCreated = true
+end
+end
+
+createCompactViewMenu()
+toggleCompactView(nil, true)
+
+[DISABLE]
+{$lua}
+if toggleCompactView then
+    toggleCompactView(nil, false)
+end
+
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>2</ID>
+      <Description>"Enable"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+if syntaxcheck then return end
+if memrec then print(memrec.Description) end
+
+closeLuaEngine2()
+
+local _dbg = true
+if (_dbg) then
+  AOBs = {
+    {["name"]="cole", ["aob"]="89 05 ?? ?? ?? ?? 48 8D 4C 24 30", ["pos"]= 2,  ["aoblen"]= 6 , ["symbol"]="cole_base"},
+    {["name"]="exhaustion", ["aob"]="66 03 05 ?? ?? ?? ?? 66 3B C1 66 0F 4F C1", ["pos"]= 3,  ["aoblen"]= 7 , ["symbol"]="exhaustion_base"},
+    {["name"]="cur_mp", ["aob"]="0F BF 05 ?? ?? ?? ?? 2B 44 24 50", ["pos"]= 3,  ["aoblen"]= 7 , ["symbol"]="cur_mp_base"},
+  }
+
+  local a1 = 'n/a'
+  local a2 = 'n/a'
+  local a3 = 0
+  local a4 = 0
+  local a5 = 'n/a'
+
+  for k,v in pairs(AOBs) do
+    -- k = array seq.
+    for k1,v1 in pairs(v) do
+      if (k1 == 'name') then
+        a1 = v1
+      end
+      if (k1 == 'aob') then
+        a2 = v1
+      end
+      if (k1 == 'pos') then
+        a3 = v1
+      end
+      if (k1 == 'aoblen') then
+        a4 = v1
+      end
+      if (k1 == 'symbol') then
+        a5 = v1
+      end
+      --print(k1,v1)
+    end
+    local aob_addr_str = AOBScanModule('Atelier_Marie_Remake.exe', a2, '+X-C-W')
+    local name_addr_str = getAddressSafe(aob_addr_str)+a3
+    local name_addr_val = readInteger(name_addr_str)
+    local aob_addr_val = tonumber(aob_addr_str, 16)
+    local final_addr_val = name_addr_val + aob_addr_val + a4
+    --print(a1 .. " addr: " .. string.format("%08X", final_addr_val))
+    registerSymbol(a5, final_addr_val)
+    --print('-------')
+  end
+end
+
+{$asm}
+[DISABLE]
+{$lua}
+
+if syntaxcheck then return end
+local disable_array = {"exhaustion_base", "cole_base", "cur_mp_base", }
+local a_len = #(disable_array)
+local i = 0
+for i = 1, a_len do
+  --print(disable_array[i])
+  unregisterSymbol(disable_array[i])
+end
+
+closeLuaEngine()
+
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>55</ID>
+          <Description>"Toggle Scripts"</Description>
+          <Color>4080FF</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript Async="1">[ENABLE]
+{$lua}
+if (syntaxcheck) then return end
+synchronize(function()
+  getLuaEngine().menuItem5.doClick()
+  getLuaEngine().Close()
+end)
+
+local enableBattleScripts = {
+  54, -- "Compact Mode"
+  21, -- "Set existing items count"
+  25, -- "Lock / slow day progress"
+  27, -- "Battle: inf MP"
+  3, -- "Static values"
+  30, -- "Battle: inf items"
+  31, -- "Battle: damage control"
+  36, -- "EXP multiplier"
+  42, -- "Synthesis: no exhaustion"
+  47, -- "Synthesis: inf. MP"
+  48, -- "Refill HP/MP after battle"
+  50, -- "Mini game: inf. timer"
+  53, -- "Faster friendship increasement after battle"
+}
+local addressList = getAddressList()
+synchronize(function()
+  for _, id in ipairs(enableBattleScripts) do
+    local memRec = addressList.getMemoryRecordByID(id)
+    if memRec and not memRec.Active then
+      memRec.Active = true
+      sleep(30)
+    end
+    addressList.refresh()
+  end
+end)
+synchronize(function() getLuaEngine().Close() end)
+[DISABLE]
+{$lua}
+if (syntaxcheck) then return end
+synchronize(function()
+  getLuaEngine().menuItem5.doClick()
+  getLuaEngine().Close()
+end)
+
+local disableBattleScripts = {
+  43, -- "_unknown"
+  53, -- "Faster friendship increasement after battle"
+  50, -- "Mini game: inf. timer"
+  48, -- "Refill HP/MP after battle"
+  47, -- "Synthesis: inf. MP"
+  42, -- "Synthesis: no exhaustion"
+  36, -- "EXP multiplier"
+  31, -- "Battle: damage control"
+  30, -- "Battle: inf items"
+  3, -- "Static values"
+  27, -- "Battle: inf MP"
+  25, -- "Lock / slow day progress"
+  21, -- "Set existing items count"
+  18, -- "!!Set all items to 50"
+  54, -- "Compact Mode"
+}
+local addressList = getAddressList()
+synchronize(function()
+  for _, id in ipairs(disableBattleScripts) do
+    local memRec = addressList.getMemoryRecordByID(id)
+    if memRec and memRec.Active then
+      memRec.Active = false
+      sleep(30)
+    end
+    addressList.refresh()
+  end
+end)
+synchronize(function() getLuaEngine().Close() end)
+-- Comments:
+-- ID: 54, Description: "Compact Mode", Depth: 0
+-- ID: 2, Description: "Enable", Depth: 0
+--   ID: 3, Description: "Static values", Depth: 1
+--     ID: 43, Description: "_unknown", Depth: 2
+--   ID: 21, Description: "Set existing items count", Depth: 1
+--   ID: 25, Description: "Lock / slow day progress", Depth: 1
+--   ID: 27, Description: "Battle: inf MP", Depth: 1
+--   ID: 30, Description: "Battle: inf items", Depth: 1
+--   ID: 31, Description: "Battle: damage control", Depth: 1
+--   ID: 48, Description: "Refill HP/MP after battle", Depth: 1
+--   ID: 53, Description: "Faster friendship increasement after battle", Depth: 1
+--   ID: 36, Description: "EXP multiplier", Depth: 1
+--   ID: 42, Description: "Synthesis: no exhaustion", Depth: 1
+--   ID: 47, Description: "Synthesis: inf. MP", Depth: 1
+--   ID: 50, Description: "Mini game: inf. timer", Depth: 1
+--   ID: 18, Description: "!!Set all items to 50", Depth: 1
+
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>3</ID>
+          <Description>"Static values"</Description>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>4</ID>
+              <Description>"Cole"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>cole_base</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>5</ID>
+              <Description>"Knowledge"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>cole_base+4</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>13</ID>
+              <Description>"Reputation"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>cole_base+6</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>12</ID>
+              <Description>"Days past (from Year 1/Sep/1)"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>cole_base+8</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>41</ID>
+              <Description>"Exhaustion / 疲勞"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>exhaustion_base</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>46</ID>
+              <Description>"Marie cur. HP"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>cur_mp_base-4</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>44</ID>
+              <Description>"Marie cur. MP"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>cur_mp_base</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>43</ID>
+              <Description>"_unknown"</Description>
+              <Options moHideChildren="1"/>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>14</ID>
+                  <Description>"??"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>cole_base+A</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>7</ID>
+                  <Description>"??"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>cole_base+C</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>8</ID>
+                  <Description>"??"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>cole_base+E</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>9</ID>
+                  <Description>"??"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>cole_base+10</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>10</ID>
+                  <Description>"??"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>cole_base+12</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>11</ID>
+                  <Description>"??"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>cole_base+14</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>21</ID>
+          <Description>"Set existing items count"</Description>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : Atelier_Marie_Remake.exe
+  Version: 
+  Date   : 2023-07-13
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_FILL_ITEMS,Atelier_Marie_Remake.exe,41 0F BF 16 48 8D 4D 97) // should be unique
+alloc(newmem,$1000,INJECT_FILL_ITEMS)
+
+label(code)
+label(return)
+label(i_item_chk_threshold)
+label(i_item_target_cnt)
+
+newmem:
+  mov dx, [i_item_chk_threshold]
+  cmp word ptr [r14], dx
+  jb endp
+  mov dx, [i_item_target_cnt]
+  cmp word ptr [r14], dx
+  jae endp
+  mov word ptr [r14], dx
+
+endp:
+
+code:
+  movsx edx,word ptr [r14]
+  lea rcx,[rbp-69]
+  jmp return
+align 10 cc
+  i_item_chk_threshold:
+  dw 2
+  i_item_target_cnt:
+  dw 32
+
+INJECT_FILL_ITEMS:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_FILL_ITEMS)
+registersymbol(i_item_chk_threshold)
+registersymbol(i_item_target_cnt)
+
+[DISABLE]
+
+INJECT_FILL_ITEMS:
+  db 41 0F BF 16 48 8D 4D 97
+
+unregistersymbol(INJECT_FILL_ITEMS)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: Atelier_Marie_Remake.exe+16B3FE
+
+Atelier_Marie_Remake.exe+16B3D5: 33 FF                 - xor edi,edi
+Atelier_Marie_Remake.exe+16B3D7: 4C 8D 35 12 5F A5 01  - lea r14,[Atelier_Marie_Remake.exe+1BC12F0]
+Atelier_Marie_Remake.exe+16B3DE: 8B DF                 - mov ebx,edi
+Atelier_Marie_Remake.exe+16B3E0: 66 41 39 3E           - cmp [r14],di
+Atelier_Marie_Remake.exe+16B3E4: 0F 8E 89 00 00 00     - jng Atelier_Marie_Remake.exe+16B473
+Atelier_Marie_Remake.exe+16B3EA: 48 8D 4D 97           - lea rcx,[rbp-69]
+Atelier_Marie_Remake.exe+16B3EE: E8 AD FD 37 00        - call Atelier_Marie_Remake.exe+4EB1A0
+Atelier_Marie_Remake.exe+16B3F3: 8B D3                 - mov edx,ebx
+Atelier_Marie_Remake.exe+16B3F5: 48 8D 4D 97           - lea rcx,[rbp-69]
+Atelier_Marie_Remake.exe+16B3F9: E8 22 07 38 00        - call Atelier_Marie_Remake.exe+4EBB20
+// ---------- INJECTING HERE ----------
+Atelier_Marie_Remake.exe+16B3FE: 41 0F BF 16           - movsx edx,word ptr [r14]
+// ---------- DONE INJECTING  ----------
+Atelier_Marie_Remake.exe+16B402: 48 8D 4D 97           - lea rcx,[rbp-69]
+Atelier_Marie_Remake.exe+16B406: E8 45 0A 38 00        - call Atelier_Marie_Remake.exe+4EBE50
+Atelier_Marie_Remake.exe+16B40B: 45 33 C0              - xor r8d,r8d
+Atelier_Marie_Remake.exe+16B40E: 48 8D 4D 07           - lea rcx,[rbp+07]
+Atelier_Marie_Remake.exe+16B412: 8B D3                 - mov edx,ebx
+Atelier_Marie_Remake.exe+16B414: E8 C7 24 F2 FF        - call Atelier_Marie_Remake.exe+8D8E0
+Atelier_Marie_Remake.exe+16B419: 45 33 C9              - xor r9d,r9d
+Atelier_Marie_Remake.exe+16B41C: 48 8D 4D 97           - lea rcx,[rbp-69]
+Atelier_Marie_Remake.exe+16B420: 45 33 C0              - xor r8d,r8d
+Atelier_Marie_Remake.exe+16B423: 0F 10 40 10           - movups xmm0,[rax+10]
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>24</ID>
+              <Description>"Usage: browse container in town area"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>22</ID>
+              <Description>"item count must &gt;="</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_item_chk_threshold</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>23</ID>
+              <Description>"Set item count to"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_item_target_cnt</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>25</ID>
+          <Description>"Lock / slow day progress"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : Atelier_Marie_Remake.exe
+  Version: 
+  Date   : 2023-07-13
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_DAYS_NO_CHG,Atelier_Marie_Remake.exe,89 0D ?? ?? ?? ?? 03 D1 C1 FA 08) // should be unique
+alloc(newmem,$1000,INJECT_DAYS_NO_CHG)
+
+alloc(INJECT_DAYS_NO_CHGo, 6)
+
+
+label(code)
+label(return)
+label(i_day_lock_option)
+
+INJECT_DAYS_NO_CHGo:
+  readmem(INJECT_DAYS_NO_CHG, 6)
+
+newmem:
+  cmp dword ptr [i_day_lock_option], 0
+  je code
+  cmp dword ptr [i_day_lock_option], 1
+  je lock_day
+  cmp dword ptr [i_day_lock_option], 2
+  je slow_day
+  cmp dword ptr [i_day_lock_option], 3
+  je slower_day
+  cmp dword ptr [i_day_lock_option], 4
+  je slowest_day
+
+  jmp code
+lock_day:
+  mov cx, [cole_base+8]
+  jmp code
+
+slow_day:
+  cmp dword ptr [i_slow_day_counter], 2
+  jae inc_1
+  inc dword ptr [i_slow_day_counter]
+  jmp code
+
+slower_day:
+  cmp dword ptr [i_slow_day_counter], 3
+  jae inc_1
+  inc dword ptr [i_slow_day_counter]
+  jmp code
+
+slowest_day:
+  cmp dword ptr [i_slow_day_counter], 5
+  jae inc_1
+  inc dword ptr [i_slow_day_counter]
+  jmp code
+
+
+inc_1:
+  inc word ptr [cole_base+8]
+  mov cx, [cole_base+8]
+  mov dword ptr [i_slow_day_counter], 0
+
+code:
+  //mov [Atelier_Marie_Remake.exe+1BFF950],ecx
+  jmp return
+align 10 cc
+  i_day_lock_option:
+  dd 1
+  i_slow_day_counter:
+  dd 0
+
+INJECT_DAYS_NO_CHG:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT_DAYS_NO_CHG)
+registersymbol(INJECT_DAYS_NO_CHGo)
+registersymbol(i_day_lock_option)
+
+[DISABLE]
+
+INJECT_DAYS_NO_CHG:
+  //db 89 0D FB 55 BE 01
+  readmem(INJECT_DAYS_NO_CHGo, 6)
+
+unregistersymbol(INJECT_DAYS_NO_CHG)
+dealloc(newmem)
+
+unregistersymbol(INJECT_DAYS_NO_CHGo)
+dealloc(INJECT_DAYS_NO_CHGo)
+
+unregistersymbol(*)
+{
+// ORIGINAL CODE - INJECTION POINT: Atelier_Marie_Remake.exe+1A34F
+
+Atelier_Marie_Remake.exe+1A326: 48 89 70 E8           - mov [rax-18],rsi
+Atelier_Marie_Remake.exe+1A32A: 4C 8D 3D CF 5C FE FF  - lea r15,[Atelier_Marie_Remake.exe]
+Atelier_Marie_Remake.exe+1A331: 48 89 78 E0           - mov [rax-20],rdi
+Atelier_Marie_Remake.exe+1A335: 4C 89 68 D0           - mov [rax-30],r13
+Atelier_Marie_Remake.exe+1A339: 0F B7 E9              - movzx ebp,cx
+Atelier_Marie_Remake.exe+1A33C: 0F 1F 40 00           - nop dword ptr [rax+00]
+Atelier_Marie_Remake.exe+1A340: 8B 0D 0A 56 BE 01     - mov ecx,[Atelier_Marie_Remake.exe+1BFF950]
+Atelier_Marie_Remake.exe+1A346: B8 B7 60 0B B6        - mov eax,B60B60B7
+Atelier_Marie_Remake.exe+1A34B: FF C1                 - inc ecx
+Atelier_Marie_Remake.exe+1A34D: F7 E9                 - imul ecx
+// ---------- INJECTING HERE ----------
+Atelier_Marie_Remake.exe+1A34F: 89 0D FB 55 BE 01     - mov [Atelier_Marie_Remake.exe+1BFF950],ecx
+// ---------- DONE INJECTING  ----------
+Atelier_Marie_Remake.exe+1A355: 03 D1                 - add edx,ecx
+Atelier_Marie_Remake.exe+1A357: C1 FA 08              - sar edx,08
+Atelier_Marie_Remake.exe+1A35A: 8B CA                 - mov ecx,edx
+Atelier_Marie_Remake.exe+1A35C: FF C2                 - inc edx
+Atelier_Marie_Remake.exe+1A35E: C1 E9 1F              - shr ecx,1F
+Atelier_Marie_Remake.exe+1A361: 03 CA                 - add ecx,edx
+Atelier_Marie_Remake.exe+1A363: E8 28 71 09 00        - call Atelier_Marie_Remake.exe+B1490
+Atelier_Marie_Remake.exe+1A368: 66 89 05 E5 55 BE 01  - mov [Atelier_Marie_Remake.exe+1BFF954],ax
+Atelier_Marie_Remake.exe+1A36F: B8 89 88 88 88        - mov eax,88888889
+Atelier_Marie_Remake.exe+1A374: F7 2D D6 55 BE 01     - imul [Atelier_Marie_Remake.exe+1BFF950]
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>39</ID>
+              <Description>"Day progress option"</Description>
+              <DropDownList DescriptionOnly="1" DisplayValueAsItem="1">0:None
+1:Lock
+2:Slow
+3:Slower
+4:Slowest
+</DropDownList>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_day_lock_option</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>27</ID>
+          <Description>"Battle: inf MP"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : Atelier_Marie_Remake.exe
+  Version: 
+  Date   : 2023-07-13
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_BATTLE_INF_MP,Atelier_Marie_Remake.exe,66 29 58 0A 48 8B 8F 30 07 00 00) // should be unique
+alloc(newmem,$1000,INJECT_BATTLE_INF_MP)
+
+label(code)
+label(return)
+
+newmem:
+  cmp bx, 0
+  jle code
+  mov bx, [rax+08]
+  mov [rax+0A], bx
+  xor bx, bx
+
+
+
+code:
+  sub [rax+0A],bx
+  mov rcx,[rdi+00000730]
+  jmp return
+
+INJECT_BATTLE_INF_MP:
+  jmp newmem
+  nop 6
+return:
+registersymbol(INJECT_BATTLE_INF_MP)
+
+[DISABLE]
+
+INJECT_BATTLE_INF_MP:
+  db 66 29 58 0A 48 8B 8F 30 07 00 00
+
+unregistersymbol(INJECT_BATTLE_INF_MP)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: Atelier_Marie_Remake.exe+58AD3B
+
+Atelier_Marie_Remake.exe+58AD1D: CC                    - int 3 
+Atelier_Marie_Remake.exe+58AD1E: CC                    - int 3 
+Atelier_Marie_Remake.exe+58AD1F: CC                    - int 3 
+Atelier_Marie_Remake.exe+58AD20: 48 89 5C 24 08        - mov [rsp+08],rbx
+Atelier_Marie_Remake.exe+58AD25: 57                    - push rdi
+Atelier_Marie_Remake.exe+58AD26: 48 83 EC 20           - sub rsp,20
+Atelier_Marie_Remake.exe+58AD2A: 48 8B F9              - mov rdi,rcx
+Atelier_Marie_Remake.exe+58AD2D: 8B DA                 - mov ebx,edx
+Atelier_Marie_Remake.exe+58AD2F: 48 8B 89 30 07 00 00  - mov rcx,[rcx+00000730]
+Atelier_Marie_Remake.exe+58AD36: E8 C5 A5 B3 FF        - call Atelier_Marie_Remake.exe+C5300
+// ---------- INJECTING HERE ----------
+Atelier_Marie_Remake.exe+58AD3B: 66 29 58 0A           - sub [rax+0A],bx
+// ---------- DONE INJECTING  ----------
+Atelier_Marie_Remake.exe+58AD3F: 48 8B 8F 30 07 00 00  - mov rcx,[rdi+00000730]
+Atelier_Marie_Remake.exe+58AD46: E8 B5 A5 B3 FF        - call Atelier_Marie_Remake.exe+C5300
+Atelier_Marie_Remake.exe+58AD4B: 66 83 78 0A 00        - cmp word ptr [rax+0A],00
+Atelier_Marie_Remake.exe+58AD50: 7D 06                 - jnl Atelier_Marie_Remake.exe+58AD58
+Atelier_Marie_Remake.exe+58AD52: 33 C9                 - xor ecx,ecx
+Atelier_Marie_Remake.exe+58AD54: 66 89 48 0A           - mov [rax+0A],cx
+Atelier_Marie_Remake.exe+58AD58: 48 8B 5C 24 30        - mov rbx,[rsp+30]
+Atelier_Marie_Remake.exe+58AD5D: 48 83 C4 20           - add rsp,20
+Atelier_Marie_Remake.exe+58AD61: 5F                    - pop rdi
+Atelier_Marie_Remake.exe+58AD62: C3                    - ret 
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>30</ID>
+          <Description>"Battle: inf items"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : Atelier_Marie_Remake.exe
+  Version: 
+  Date   : 2023-07-13
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_BATTLE_ITEM_NO_DEC,Atelier_Marie_Remake.exe,66 FF 8C 43 ?? ?? ?? ?? 8B 15 ?? ?? ?? ?? 85 D2 78 ?? 48 8B 4E 08 48 8B 01 FF 90 00 02 00 00 48 8B 5E 08) // should be unique
+alloc(newmem,$1000,INJECT_BATTLE_ITEM_NO_DEC)
+
+alloc(INJECT_BATTLE_ITEM_NO_DECo, 8)
+
+label(code)
+label(return)
+
+INJECT_BATTLE_ITEM_NO_DECo:
+  readmem(INJECT_BATTLE_ITEM_NO_DEC, 8)
+
+newmem:
+
+code:
+  //dec word ptr [rbx+rax*2+01BC12F0]
+  jmp return
+
+INJECT_BATTLE_ITEM_NO_DEC:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_BATTLE_ITEM_NO_DEC)
+registersymbol(INJECT_BATTLE_ITEM_NO_DECo)
+[DISABLE]
+
+INJECT_BATTLE_ITEM_NO_DEC:
+  //db 66 FF 8C 43 F0 12 BC 01
+  readmem(INJECT_BATTLE_ITEM_NO_DECo, 8)
+
+unregistersymbol(INJECT_BATTLE_ITEM_NO_DEC)
+dealloc(newmem)
+
+unregistersymbol(INJECT_BATTLE_ITEM_NO_DECo)
+dealloc(INJECT_BATTLE_ITEM_NO_DECo)
+{
+// ORIGINAL CODE - INJECTION POINT: Atelier_Marie_Remake.exe+8671AA
+
+Atelier_Marie_Remake.exe+867182: 7E 17                    - jle Atelier_Marie_Remake.exe+86719B
+Atelier_Marie_Remake.exe+867184: 48 8B CD                 - mov rcx,rbp
+Atelier_Marie_Remake.exe+867187: E8 64 3B C8 FF           - call Atelier_Marie_Remake.exe+4EACF0
+Atelier_Marie_Remake.exe+86718C: 48 63 C8                 - movsxd  rcx,eax
+Atelier_Marie_Remake.exe+86718F: 48 8D 04 49              - lea rax,[rcx+rcx*2]
+Atelier_Marie_Remake.exe+867193: 66 FF 8C 43 50 15 BC 01  - dec word ptr [rbx+rax*2+01BC1550]
+Atelier_Marie_Remake.exe+86719B: 48 8B CD                 - mov rcx,rbp
+Atelier_Marie_Remake.exe+86719E: E8 4D 3B C8 FF           - call Atelier_Marie_Remake.exe+4EACF0
+Atelier_Marie_Remake.exe+8671A3: 48 63 C8                 - movsxd  rcx,eax
+Atelier_Marie_Remake.exe+8671A6: 48 8D 04 49              - lea rax,[rcx+rcx*2]
+// ---------- INJECTING HERE ----------
+Atelier_Marie_Remake.exe+8671AA: 66 FF 8C 43 F0 12 BC 01  - dec word ptr [rbx+rax*2+01BC12F0]
+// ---------- DONE INJECTING  ----------
+Atelier_Marie_Remake.exe+8671B2: 8B 15 58 1B 3A 01        - mov edx,[Atelier_Marie_Remake.exe+1C08D10]
+Atelier_Marie_Remake.exe+8671B8: 85 D2                    - test edx,edx
+Atelier_Marie_Remake.exe+8671BA: 78 0D                    - js Atelier_Marie_Remake.exe+8671C9
+Atelier_Marie_Remake.exe+8671BC: 48 8B 4E 08              - mov rcx,[rsi+08]
+Atelier_Marie_Remake.exe+8671C0: 48 8B 01                 - mov rax,[rcx]
+Atelier_Marie_Remake.exe+8671C3: FF 90 00 02 00 00        - call qword ptr [rax+00000200]
+Atelier_Marie_Remake.exe+8671C9: 48 8B 5E 08              - mov rbx,[rsi+08]
+Atelier_Marie_Remake.exe+8671CD: 48 8B CD                 - mov rcx,rbp
+Atelier_Marie_Remake.exe+8671D0: 48 8B 3B                 - mov rdi,[rbx]
+Atelier_Marie_Remake.exe+8671D3: E8 18 3B C8 FF           - call Atelier_Marie_Remake.exe+4EACF0
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>31</ID>
+          <Description>"Battle: damage control"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : Atelier_Marie_Remake.exe
+  Version: 
+  Date   : 2023-07-13
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_BATTLE_DAMAGE_MULTI,Atelier_Marie_Remake.exe,66 29 48 06 8B 06) // should be unique
+alloc(newmem,$1000,INJECT_BATTLE_DAMAGE_MULTI)
+
+label(code)
+label(return)
+label(vf_damage_to_player)
+label(vf_damage_to_enemy)
+
+
+newmem:
+  push rbx
+  mov bx, [rax+08]
+  test bx, bx
+  jz to_enemy
+  db EB 3B 54
+  db 68 69 73 20 74 61 62 6C 65
+  db 20 63 6F 6D
+  db 65 73 20 66 72 6F 6D 20
+  db 68 74 74 70
+  db 73 3A 2F 2F 6F 70 65 6E 63 68 65 61
+  db 74 74 61 62
+  db 6C 65 73 2E
+  db 63 6F 6D 20
+  db 2F 20 43 45 20 37 2E 34 2B
+
+  vmovss xmm14, [vf_damage_to_player]
+  cvtsi2ss xmm15, ecx
+  vmulss xmm13, xmm14, xmm15
+  vcvtss2si ecx, xmm13
+  jmp endp
+
+to_enemy:
+  vmovss xmm14, [vf_damage_to_enemy]
+  cvtsi2ss xmm15, ecx
+  vmulss xmm13, xmm14, xmm15
+  vcvtss2si ecx, xmm13
+
+  cmp ecx, #32000
+  jbe endp
+  mov ecx, #32000
+
+endp:
+  pop rbx
+
+code:
+  sub [rax+06],cx
+  mov eax,[rsi]
+  jmp return
+align 10 cc
+  vf_damage_to_player:
+  dd (float)0.75
+  vf_damage_to_enemy:
+  dd (float)1.00
+  vf_60000:
+  dd (float)60000
+
+INJECT_BATTLE_DAMAGE_MULTI:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT_BATTLE_DAMAGE_MULTI)
+registersymbol(vf_damage_to_player)
+registersymbol(vf_damage_to_enemy)
+
+[DISABLE]
+
+INJECT_BATTLE_DAMAGE_MULTI:
+  db 66 29 48 06 8B 06
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: Atelier_Marie_Remake.exe+58AB7C
+
+Atelier_Marie_Remake.exe+58AB57: 7D 05                 - jnl Atelier_Marie_Remake.exe+58AB5E
+Atelier_Marie_Remake.exe+58AB59: B9 01 00 00 00        - mov ecx,00000001
+Atelier_Marie_Remake.exe+58AB5E: 0F BF C1              - movsx eax,cx
+Atelier_Marie_Remake.exe+58AB61: 0F BF CD              - movsx ecx,bp
+Atelier_Marie_Remake.exe+58AB64: 48 8B 6C 24 30        - mov rbp,[rsp+30]
+Atelier_Marie_Remake.exe+58AB69: 2B C8                 - sub ecx,eax
+Atelier_Marie_Remake.exe+58AB6B: 89 0E                 - mov [rsi],ecx
+Atelier_Marie_Remake.exe+58AB6D: 48 8B 8B 30 07 00 00  - mov rcx,[rbx+00000730]
+Atelier_Marie_Remake.exe+58AB74: E8 87 A7 B3 FF        - call Atelier_Marie_Remake.exe+C5300
+Atelier_Marie_Remake.exe+58AB79: 0F B7 0E              - movzx ecx,word ptr [rsi]
+// ---------- INJECTING HERE ----------
+Atelier_Marie_Remake.exe+58AB7C: 66 29 48 06           - sub [rax+06],cx
+// ---------- DONE INJECTING  ----------
+Atelier_Marie_Remake.exe+58AB80: 8B 06                 - mov eax,[rsi]
+Atelier_Marie_Remake.exe+58AB82: 01 83 68 04 00 00     - add [rbx+00000468],eax
+Atelier_Marie_Remake.exe+58AB88: 80 7C 24 50 00        - cmp byte ptr [rsp+50],00
+Atelier_Marie_Remake.exe+58AB8D: 74 14                 - je Atelier_Marie_Remake.exe+58ABA3
+Atelier_Marie_Remake.exe+58AB8F: 83 FF FF              - cmp edi,-01
+Atelier_Marie_Remake.exe+58AB92: 74 0F                 - je Atelier_Marie_Remake.exe+58ABA3
+Atelier_Marie_Remake.exe+58AB94: 81 FF 34 75 00 00     - cmp edi,00007534
+Atelier_Marie_Remake.exe+58AB9A: 77 07                 - ja Atelier_Marie_Remake.exe+58ABA3
+Atelier_Marie_Remake.exe+58AB9C: 8B CF                 - mov ecx,edi
+Atelier_Marie_Remake.exe+58AB9E: E8 4D 33 FC FF        - call Atelier_Marie_Remake.exe+54DEF0
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>32</ID>
+              <Description>"Damage multiplier to player"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>Float</VariableType>
+              <Address>vf_damage_to_player</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>33</ID>
+              <Description>"Damage multiplier to enemy (max 32000)"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>Float</VariableType>
+              <Address>vf_damage_to_enemy</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>48</ID>
+          <Description>"Refill HP/MP after battle"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : Atelier_Marie_Remake.exe
+  Version: 
+  Date   : 2023-07-14
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_AF_BATTLE_FILLHPMP,Atelier_Marie_Remake.exe,66 89 58 06 48 8B BE 30 07 00 00) // should be unique
+alloc(newmem,$1000,INJECT_AF_BATTLE_FILLHPMP)
+
+label(code)
+label(return)
+
+newmem:
+  mov bx, [rax+08]
+  mov [rax+0A],bx
+  mov bx, [rax+04]
+
+code:
+  mov [rax+06],bx
+  mov rdi,[rsi+00000730]
+  jmp return
+
+INJECT_AF_BATTLE_FILLHPMP:
+  jmp newmem
+  nop 6
+return:
+registersymbol(INJECT_AF_BATTLE_FILLHPMP)
+
+[DISABLE]
+
+INJECT_AF_BATTLE_FILLHPMP:
+  db 66 89 58 06 48 8B BE 30 07 00 00
+
+unregistersymbol(INJECT_AF_BATTLE_FILLHPMP)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: Atelier_Marie_Remake.exe+59EF1D
+
+Atelier_Marie_Remake.exe+59EEF5: 48 89 74 24 10        - mov [rsp+10],rsi
+Atelier_Marie_Remake.exe+59EEFA: 57                    - push rdi
+Atelier_Marie_Remake.exe+59EEFB: 48 83 EC 20           - sub rsp,20
+Atelier_Marie_Remake.exe+59EEFF: 48 8B B9 30 07 00 00  - mov rdi,[rcx+00000730]
+Atelier_Marie_Remake.exe+59EF06: 48 8B F1              - mov rsi,rcx
+Atelier_Marie_Remake.exe+59EF09: 48 8B CF              - mov rcx,rdi
+Atelier_Marie_Remake.exe+59EF0C: E8 EF 63 B2 FF        - call Atelier_Marie_Remake.exe+C5300
+Atelier_Marie_Remake.exe+59EF11: 48 8B CF              - mov rcx,rdi
+Atelier_Marie_Remake.exe+59EF14: 0F B7 58 06           - movzx ebx,word ptr [rax+06]
+Atelier_Marie_Remake.exe+59EF18: E8 F3 63 B2 FF        - call Atelier_Marie_Remake.exe+C5310
+// ---------- INJECTING HERE ----------
+Atelier_Marie_Remake.exe+59EF1D: 66 89 58 06           - mov [rax+06],bx
+// ---------- DONE INJECTING  ----------
+Atelier_Marie_Remake.exe+59EF21: 48 8B BE 30 07 00 00  - mov rdi,[rsi+00000730]
+Atelier_Marie_Remake.exe+59EF28: 48 8B CF              - mov rcx,rdi
+Atelier_Marie_Remake.exe+59EF2B: E8 D0 63 B2 FF        - call Atelier_Marie_Remake.exe+C5300
+Atelier_Marie_Remake.exe+59EF30: 48 8B CF              - mov rcx,rdi
+Atelier_Marie_Remake.exe+59EF33: 0F B7 58 0A           - movzx ebx,word ptr [rax+0A]
+Atelier_Marie_Remake.exe+59EF37: E8 D4 63 B2 FF        - call Atelier_Marie_Remake.exe+C5310
+Atelier_Marie_Remake.exe+59EF3C: 48 8B 74 24 38        - mov rsi,[rsp+38]
+Atelier_Marie_Remake.exe+59EF41: 66 89 58 0A           - mov [rax+0A],bx
+Atelier_Marie_Remake.exe+59EF45: 48 8B 5C 24 30        - mov rbx,[rsp+30]
+Atelier_Marie_Remake.exe+59EF4A: 48 83 C4 20           - add rsp,20
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>53</ID>
+          <Description>"Faster friendship increasement after battle"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : Atelier_Marie_Remake.exe
+  Version: 
+  Date   : 2023-07-14
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_INC_FR,Atelier_Marie_Remake.exe,FF 74 ?? 48 6B C1 2C 66 42 FF 84 38 ?? ?? ?? ?? 48 6B C1 1C ) // should be unique
+alloc(newmem,$1000,INJECT_INC_FR)
+
+alloc(INJECT_INC_FRo, 9)
+
+label(code)
+label(return)
+
+INJECT_INC_FRo:
+  readmem(INJECT_INC_FR+7, 9)
+
+newmem:
+
+code:
+  //inc word ptr [rax+r15+01B1EF62]
+  push rcx
+  xor rcx, rcx
+  mov cl, 14
+
+loop1:
+  readmem(INJECT_INC_FR+7, 9)
+  loop loop1
+
+  pop rcx
+  jmp return
+
+INJECT_INC_FR+07:
+  jmp newmem
+  nop 4
+return:
+registersymbol(INJECT_INC_FR)
+registersymbol(INJECT_INC_FRo)
+[DISABLE]
+
+INJECT_INC_FR+07:
+  //db 66 42 FF 84 38 62 EF B1 01
+  readmem(INJECT_INC_FRo, 9)
+
+unregistersymbol(INJECT_INC_FR)
+dealloc(newmem)
+
+unregistersymbol(INJECT_INC_FRo)
+dealloc(INJECT_INC_FRo)
+
+{
+
+FF 74 ?? 48 6B C1 2C 66 42 FF 84 38 ?? ?? ?? ?? 48 6B C1 1C 66 46 01 B4 38 ?? ?? ?? ?? E8
+// ORIGINAL CODE - INJECTION POINT: Atelier_Marie_Remake.exe+10C95A
+
+Atelier_Marie_Remake.exe+10C93D: C1 E8 1F                    - shr eax,1F
+Atelier_Marie_Remake.exe+10C940: 03 E8                       - add ebp,eax
+Atelier_Marie_Remake.exe+10C942: 66 FF C5                    - inc bp
+Atelier_Marie_Remake.exe+10C945: 0F B7 06                    - movzx eax,word ptr [rsi]
+Atelier_Marie_Remake.exe+10C948: 66 85 C0                    - test ax,ax
+Atelier_Marie_Remake.exe+10C94B: 78 5A                       - js Atelier_Marie_Remake.exe+10C9A7
+Atelier_Marie_Remake.exe+10C94D: 48 0F BF C8                 - movsx rcx,ax
+Atelier_Marie_Remake.exe+10C951: 66 85 FF                    - test di,di
+Atelier_Marie_Remake.exe+10C954: 74 0D                       - je Atelier_Marie_Remake.exe+10C963
+Atelier_Marie_Remake.exe+10C956: 48 6B C1 2C                 - imul rax,rcx,2C
+// ---------- INJECTING HERE ----------
+Atelier_Marie_Remake.exe+10C95A: 66 42 FF 84 38 62 EF B1 01  - inc word ptr [rax+r15+01B1EF62]
+// ---------- DONE INJECTING  ----------
+Atelier_Marie_Remake.exe+10C963: 48 6B C1 1C                 - imul rax,rcx,1C
+Atelier_Marie_Remake.exe+10C967: 66 46 01 B4 38 66 EB B1 01  - add [rax+r15+01B1EB66],r14w
+Atelier_Marie_Remake.exe+10C970: E8 23 FC F4 00              - call Atelier_Marie_Remake.exe+105C598
+Atelier_Marie_Remake.exe+10C975: 44 8B C0                    - mov r8d,eax
+Atelier_Marie_Remake.exe+10C978: B8 1F 85 EB 51              - mov eax,51EB851F
+Atelier_Marie_Remake.exe+10C97D: 41 F7 E8                    - imul r8d
+Atelier_Marie_Remake.exe+10C980: C1 FA 05                    - sar edx,05
+Atelier_Marie_Remake.exe+10C983: 8B CA                       - mov ecx,edx
+Atelier_Marie_Remake.exe+10C985: C1 E9 1F                    - shr ecx,1F
+Atelier_Marie_Remake.exe+10C988: 03 D1                       - add edx,ecx
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>36</ID>
+          <Description>"EXP multiplier"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : Atelier_Marie_Remake.exe
+  Version: 
+  Date   : 2023-07-13
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_XP_MULTI,Atelier_Marie_Remake.exe,48 6B D1 1C 66 01 04 2A) // should be unique
+alloc(newmem,$1000,INJECT_XP_MULTI)
+
+label(code)
+label(return)
+label(vf_xp_multi)
+
+newmem:
+  cmp eax, #1000
+  jge code
+
+  vmovss xmm14, [vf_xp_multi]
+  cvtsi2ss xmm15, eax
+  vmulss xmm13, xmm14, xmm15
+  cvtss2si eax, xmm13
+  cmp eax, #1000
+  jle code
+  mov eax, #1000
+
+
+code:
+  imul rdx,rcx,1C
+  add [rdx+rbp],ax
+  jmp return
+align 10 cc
+  vf_xp_multi:
+  dd (float)1.15
+
+INJECT_XP_MULTI:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_XP_MULTI)
+registersymbol(vf_xp_multi)
+
+[DISABLE]
+
+INJECT_XP_MULTI:
+  db 48 6B D1 1C 66 01 04 2A
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: Atelier_Marie_Remake.exe+91BED2
+
+Atelier_Marie_Remake.exe+91BEA6: 66 66 0F 1F 84 00 00 00 00 00  - nop word ptr [rax+rax+00000000]
+Atelier_Marie_Remake.exe+91BEB0: 48 8B 43 08                    - mov rax,[rbx+08]
+Atelier_Marie_Remake.exe+91BEB4: 8B D7                          - mov edx,edi
+Atelier_Marie_Remake.exe+91BEB6: 48 8B 48 30                    - mov rcx,[rax+30]
+Atelier_Marie_Remake.exe+91BEBA: E8 F1 DF C7 FF                 - call Atelier_Marie_Remake.exe+599EB0
+Atelier_Marie_Remake.exe+91BEBF: 48 85 C0                       - test rax,rax
+Atelier_Marie_Remake.exe+91BEC2: 74 16                          - je Atelier_Marie_Remake.exe+91BEDA
+Atelier_Marie_Remake.exe+91BEC4: 48 8B 40 10                    - mov rax,[rax+10]
+Atelier_Marie_Remake.exe+91BEC8: 48 63 88 50 04 00 00           - movsxd  rcx,dword ptr [rax+00000450]
+Atelier_Marie_Remake.exe+91BECF: 0F B7 06                       - movzx eax,word ptr [rsi]
+// ---------- INJECTING HERE ----------
+Atelier_Marie_Remake.exe+91BED2: 48 6B D1 1C                    - imul rdx,rcx,1C
+// ---------- DONE INJECTING  ----------
+Atelier_Marie_Remake.exe+91BED6: 66 01 04 2A                    - add [rdx+rbp],ax
+Atelier_Marie_Remake.exe+91BEDA: FF C7                          - inc edi
+Atelier_Marie_Remake.exe+91BEDC: 48 83 C6 04                    - add rsi,04
+Atelier_Marie_Remake.exe+91BEE0: 83 FF 03                       - cmp edi,03
+Atelier_Marie_Remake.exe+91BEE3: 7C CB                          - jl Atelier_Marie_Remake.exe+91BEB0
+Atelier_Marie_Remake.exe+91BEE5: 8B 43 5C                       - mov eax,[rbx+5C]
+Atelier_Marie_Remake.exe+91BEE8: 48 8B 7C 24 70                 - mov rdi,[rsp+70]
+Atelier_Marie_Remake.exe+91BEED: 48 8B 74 24 68                 - mov rsi,[rsp+68]
+Atelier_Marie_Remake.exe+91BEF2: 48 8B 6C 24 60                 - mov rbp,[rsp+60]
+Atelier_Marie_Remake.exe+91BEF7: 85 C0                          - test eax,eax
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>37</ID>
+              <Description>"Multiplier (max XP = 1000)"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>Float</VariableType>
+              <Address>vf_xp_multi</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>42</ID>
+          <Description>"Synthesis: no exhaustion"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : Atelier_Marie_Remake.exe
+  Version: 
+  Date   : 2023-07-14
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_inf_exhaustion,Atelier_Marie_Remake.exe,66 03 05 ?? ?? ?? ?? 66 3B C1 66 0F 4F C1) // should be unique
+alloc(newmem,$1000,INJECT_inf_exhaustion)
+
+alloc(INJECT_inf_exhaustiono, 7)
+
+label(code)
+label(return)
+
+INJECT_inf_exhaustiono:
+  readmem(INJECT_inf_exhaustion, 7)
+
+newmem:
+  xor ax, ax
+  mov [exhaustion_base], ax
+
+
+code:
+  //add ax,[Atelier_Marie_Remake.exe+1B1EF62]
+  jmp return
+
+INJECT_inf_exhaustion:
+  jmp newmem
+  nop 2
+return:
+registersymbol(INJECT_inf_exhaustion)
+registersymbol(INJECT_inf_exhaustiono)
+[DISABLE]
+
+INJECT_inf_exhaustion:
+  //db 66 03 05 75 C1 6C 01
+  readmem(INJECT_inf_exhaustiono, 7)
+
+unregistersymbol(INJECT_inf_exhaustion)
+dealloc(newmem)
+
+unregistersymbol(INJECT_inf_exhaustiono)
+dealloc(INJECT_inf_exhaustiono)
+
+{
+// ORIGINAL CODE - INJECTION POINT: Atelier_Marie_Remake.exe+452DE6
+
+Atelier_Marie_Remake.exe+452DB8: 66 3B C1              - cmp ax,cx
+Atelier_Marie_Remake.exe+452DBB: 66 0F 4F C1           - cmovg ax,cx
+Atelier_Marie_Remake.exe+452DBF: 66 89 05 9C C1 6C 01  - mov [Atelier_Marie_Remake.exe+1B1EF62],ax
+Atelier_Marie_Remake.exe+452DC6: 89 B7 38 02 00 00     - mov [rdi+00000238],esi
+Atelier_Marie_Remake.exe+452DCC: 0F B7 05 8F C1 6C 01  - movzx eax,word ptr [Atelier_Marie_Remake.exe+1B1EF62]
+Atelier_Marie_Remake.exe+452DD3: EB 26                 - jmp Atelier_Marie_Remake.exe+452DFB
+Atelier_Marie_Remake.exe+452DD5: FF C8                 - dec eax
+Atelier_Marie_Remake.exe+452DD7: B9 64 00 00 00        - mov ecx,00000064
+Atelier_Marie_Remake.exe+452DDC: 89 47 08              - mov [rdi+08],eax
+Atelier_Marie_Remake.exe+452DDF: 0F B7 87 30 02 00 00  - movzx eax,word ptr [rdi+00000230]
+// ---------- INJECTING HERE ----------
+Atelier_Marie_Remake.exe+452DE6: 66 03 05 75 C1 6C 01  - add ax,[Atelier_Marie_Remake.exe+1B1EF62]
+// ---------- DONE INJECTING  ----------
+Atelier_Marie_Remake.exe+452DED: 66 3B C1              - cmp ax,cx
+Atelier_Marie_Remake.exe+452DF0: 66 0F 4F C1           - cmovg ax,cx
+Atelier_Marie_Remake.exe+452DF4: 66 89 05 67 C1 6C 01  - mov [Atelier_Marie_Remake.exe+1B1EF62],ax
+Atelier_Marie_Remake.exe+452DFB: 48 8B 4F 20           - mov rcx,[rdi+20]
+Atelier_Marie_Remake.exe+452DFF: 0F BF D0              - movsx edx,ax
+Atelier_Marie_Remake.exe+452E02: E8 59 F0 08 00        - call Atelier_Marie_Remake.exe+4E1E60
+Atelier_Marie_Remake.exe+452E07: 0F BF 15 54 C1 6C 01  - movsx edx,word ptr [Atelier_Marie_Remake.exe+1B1EF62]
+Atelier_Marie_Remake.exe+452E0E: 45 33 C0              - xor r8d,r8d
+Atelier_Marie_Remake.exe+452E11: 48 8B 4F 30           - mov rcx,[rdi+30]
+Atelier_Marie_Remake.exe+452E15: E8 06 21 38 00        - call Atelier_Marie_Remake.exe+7D4F20
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>47</ID>
+          <Description>"Synthesis: inf. MP"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : Atelier_Marie_Remake.exe
+  Version: 
+  Date   : 2023-07-14
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_SYN_INF_MP,Atelier_Marie_Remake.exe,0F B7 45 08 33 C9) // should be unique
+alloc(newmem,$1000,INJECT_SYN_INF_MP)
+
+label(code)
+label(return)
+
+newmem:
+  mov ax, [cur_mp_base]
+  mov word ptr [rbp+08], ax
+
+
+code:
+  movzx eax,word ptr [rbp+08]
+  xor ecx,ecx
+  jmp return
+
+INJECT_SYN_INF_MP:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT_SYN_INF_MP)
+
+[DISABLE]
+
+INJECT_SYN_INF_MP:
+  db 0F B7 45 08 33 C9
+
+unregistersymbol(INJECT_SYN_INF_MP)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: Atelier_Marie_Remake.exe+4517D4
+
+Atelier_Marie_Remake.exe+4517B1: 45 33 C0              - xor r8d,r8d
+Atelier_Marie_Remake.exe+4517B4: 48 8B 4F 38           - mov rcx,[rdi+38]
+Atelier_Marie_Remake.exe+4517B8: E8 63 37 38 00        - call Atelier_Marie_Remake.exe+7D4F20
+Atelier_Marie_Remake.exe+4517BD: 48 8B 4F 48           - mov rcx,[rdi+48]
+Atelier_Marie_Remake.exe+4517C1: 41 8B D4              - mov edx,r12d
+Atelier_Marie_Remake.exe+4517C4: F7 DA                 - neg edx
+Atelier_Marie_Remake.exe+4517C6: 41 B0 01              - mov r8b,01
+Atelier_Marie_Remake.exe+4517C9: E8 52 37 38 00        - call Atelier_Marie_Remake.exe+7D4F20
+Atelier_Marie_Remake.exe+4517CE: 44 89 67 0C           - mov [rdi+0C],r12d
+Atelier_Marie_Remake.exe+4517D2: 33 D2                 - xor edx,edx
+// ---------- INJECTING HERE ----------
+Atelier_Marie_Remake.exe+4517D4: 0F B7 45 08           - movzx eax,word ptr [rbp+08]
+// ---------- DONE INJECTING  ----------
+Atelier_Marie_Remake.exe+4517D8: 33 C9                 - xor ecx,ecx
+Atelier_Marie_Remake.exe+4517DA: 66 89 05 79 D3 6C 01  - mov [cur_mp_base],ax
+Atelier_Marie_Remake.exe+4517E1: 0F BF 05 6C D3 6C 01  - movsx eax,word ptr [Atelier_Marie_Remake.exe+1B1EB54]
+Atelier_Marie_Remake.exe+4517E8: 89 87 94 00 00 00     - mov [rdi+00000094],eax
+Atelier_Marie_Remake.exe+4517EE: 0F BF 05 63 D3 6C 01  - movsx eax,word ptr [Atelier_Marie_Remake.exe+1B1EB58]
+Atelier_Marie_Remake.exe+4517F5: 89 87 98 00 00 00     - mov [rdi+00000098],eax
+Atelier_Marie_Remake.exe+4517FB: 0F BF 05 5A D3 6C 01  - movsx eax,word ptr [Atelier_Marie_Remake.exe+1B1EB5C]
+Atelier_Marie_Remake.exe+451802: 89 87 9C 00 00 00     - mov [rdi+0000009C],eax
+Atelier_Marie_Remake.exe+451808: 0F BF 05 4F D3 6C 01  - movsx eax,word ptr [Atelier_Marie_Remake.exe+1B1EB5E]
+Atelier_Marie_Remake.exe+45180F: 89 87 A0 00 00 00     - mov [rdi+000000A0],eax
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>50</ID>
+          <Description>"Mini game: inf. timer"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : Atelier_Marie_Remake.exe (paused)
+  Version: 
+  Date   : 2023-07-14
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_STOP_TIMER,Atelier_Marie_Remake.exe,F3 0F 5C D6 33 D2) // should be unique
+alloc(newmem,$1000,INJECT_STOP_TIMER)
+
+label(code)
+label(return)
+
+newmem:
+  vxorps xmm6, xmm6, xmm6
+
+code:
+  subss xmm2,xmm6
+  xor edx,edx
+  jmp return
+
+INJECT_STOP_TIMER:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT_STOP_TIMER)
+
+[DISABLE]
+
+INJECT_STOP_TIMER:
+  db F3 0F 5C D6 33 D2
+
+unregistersymbol(INJECT_STOP_TIMER)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: Atelier_Marie_Remake.exe+1F3D06
+
+Atelier_Marie_Remake.exe+1F3CDD: 48 8B D9                 - mov rbx,rcx
+Atelier_Marie_Remake.exe+1F3CE0: 0F 29 74 24 30           - movaps [rsp+30],xmm6
+Atelier_Marie_Remake.exe+1F3CE5: 0F 28 F1                 - movaps xmm6,xmm1
+Atelier_Marie_Remake.exe+1F3CE8: 0F 29 7C 24 20           - movaps [rsp+20],xmm7
+Atelier_Marie_Remake.exe+1F3CED: 0F 57 FF                 - xorps xmm7,xmm7
+Atelier_Marie_Remake.exe+1F3CF0: 74 3F                    - je Atelier_Marie_Remake.exe+1F3D31
+Atelier_Marie_Remake.exe+1F3CF2: 80 B9 9D 00 00 00 00     - cmp byte ptr [rcx+0000009D],00
+Atelier_Marie_Remake.exe+1F3CF9: 75 22                    - jne Atelier_Marie_Remake.exe+1F3D1D
+Atelier_Marie_Remake.exe+1F3CFB: F3 0F 10 91 94 00 00 00  - movss xmm2,[rcx+00000094]
+Atelier_Marie_Remake.exe+1F3D03: 0F 57 C0                 - xorps xmm0,xmm0
+// ---------- INJECTING HERE ----------
+Atelier_Marie_Remake.exe+1F3D06: F3 0F 5C D6              - subss xmm2,xmm6
+// ---------- DONE INJECTING  ----------
+Atelier_Marie_Remake.exe+1F3D0A: 33 D2                    - xor edx,edx
+Atelier_Marie_Remake.exe+1F3D0C: F3 0F 5F C2              - maxss xmm0,xmm2
+Atelier_Marie_Remake.exe+1F3D10: F3 0F 11 81 94 00 00 00  - movss [rcx+00000094],xmm0
+Atelier_Marie_Remake.exe+1F3D18: E8 D3 11 00 00           - call Atelier_Marie_Remake.exe+1F4EF0
+Atelier_Marie_Remake.exe+1F3D1D: 48 8B 8B A8 00 00 00     - mov rcx,[rbx+000000A8]
+Atelier_Marie_Remake.exe+1F3D24: 48 85 C9                 - test rcx,rcx
+Atelier_Marie_Remake.exe+1F3D27: 74 08                    - je Atelier_Marie_Remake.exe+1F3D31
+Atelier_Marie_Remake.exe+1F3D29: 0F 28 CE                 - movaps xmm1,xmm6
+Atelier_Marie_Remake.exe+1F3D2C: E8 AF 66 5C 00           - call Atelier_Marie_Remake.exe+7BA3E0
+Atelier_Marie_Remake.exe+1F3D31: 48 8B 4B 10              - mov rcx,[rbx+10]
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>19</ID>
+              <Description>"Not fully tested"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>18</ID>
+          <Description>"!!Set all items to 50"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : Atelier_Marie_Remake.exe
+  Version: 
+  Date   : 2023-07-13
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_FILL_ITEMS_ALL,Atelier_Marie_Remake.exe,66 41 39 3E 0F 8E 89 00 00 00) // should be unique
+alloc(newmem,$1000,INJECT_FILL_ITEMS_ALL)
+
+label(code)
+label(return)
+
+newmem:
+  mov di, 32
+  cmp [r14], di
+  jae endp
+  mov [r14], di
+
+endp:
+  xor di, di
+code:
+  cmp [r14],di
+  jng Atelier_Marie_Remake.exe+16B473
+  jmp return
+
+INJECT_FILL_ITEMS_ALL:
+  jmp newmem
+  nop 5
+return:
+registersymbol(INJECT_FILL_ITEMS_ALL)
+
+[DISABLE]
+
+INJECT_FILL_ITEMS_ALL:
+  db 66 41 39 3E 0F 8E 89 00 00 00
+
+unregistersymbol(INJECT_FILL_ITEMS_ALL)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: Atelier_Marie_Remake.exe+16B3E0
+
+Atelier_Marie_Remake.exe+16B3B9: 48 81 EC E0 00 00 00  - sub rsp,000000E0
+Atelier_Marie_Remake.exe+16B3C0: 48 8B F1              - mov rsi,rcx
+Atelier_Marie_Remake.exe+16B3C3: 48 8D 4D 97           - lea rcx,[rbp-69]
+Atelier_Marie_Remake.exe+16B3C7: E8 F4 DE 37 00        - call Atelier_Marie_Remake.exe+4E92C0
+Atelier_Marie_Remake.exe+16B3CC: 48 8B 06              - mov rax,[rsi]
+Atelier_Marie_Remake.exe+16B3CF: 48 8B CE              - mov rcx,rsi
+Atelier_Marie_Remake.exe+16B3D2: FF 50 08              - call qword ptr [rax+08]
+Atelier_Marie_Remake.exe+16B3D5: 33 FF                 - xor edi,edi
+Atelier_Marie_Remake.exe+16B3D7: 4C 8D 35 12 5F A5 01  - lea r14,[Atelier_Marie_Remake.exe+1BC12F0]
+Atelier_Marie_Remake.exe+16B3DE: 8B DF                 - mov ebx,edi
+// ---------- INJECTING HERE ----------
+Atelier_Marie_Remake.exe+16B3E0: 66 41 39 3E           - cmp [r14],di
+// ---------- DONE INJECTING  ----------
+Atelier_Marie_Remake.exe+16B3E4: 0F 8E 89 00 00 00     - jng Atelier_Marie_Remake.exe+16B473
+Atelier_Marie_Remake.exe+16B3EA: 48 8D 4D 97           - lea rcx,[rbp-69]
+Atelier_Marie_Remake.exe+16B3EE: E8 AD FD 37 00        - call Atelier_Marie_Remake.exe+4EB1A0
+Atelier_Marie_Remake.exe+16B3F3: 8B D3                 - mov edx,ebx
+Atelier_Marie_Remake.exe+16B3F5: 48 8D 4D 97           - lea rcx,[rbp-69]
+Atelier_Marie_Remake.exe+16B3F9: E8 22 07 38 00        - call Atelier_Marie_Remake.exe+4EBB20
+Atelier_Marie_Remake.exe+16B3FE: 41 0F BF 16           - movsx edx,word ptr [r14]
+Atelier_Marie_Remake.exe+16B402: 48 8D 4D 97           - lea rcx,[rbp-69]
+Atelier_Marie_Remake.exe+16B406: E8 45 0A 38 00        - call Atelier_Marie_Remake.exe+4EBE50
+Atelier_Marie_Remake.exe+16B40B: 45 33 C0              - xor r8d,r8d
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>51</ID>
+              <Description>"WARNING: may affect game progress!!"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>20</ID>
+              <Description>"Usage: browse container in town area"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>38</ID>
+      <Description>"Atelier Marie Remake: The Alchemist of Salburg  /  https://opencheattables.com  /  CE 7.6"</Description>
+      <Color>00BB5E</Color>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+  <LuaScript>MaxContainerCount = 9999
+MaxBasketCount = 300
+
+g_containerBaseAddress = nil
+
+--print(MaxBasketCount)
+
+--local dynBasketAddress = getAddressSafe("???.exe")+0x?????
+--MaxBasketCount = readSmallInteger(dynBasketAddress)
+--print(MaxBasketCount)
+
+ItemRecordSize = 128
+
+--lua scripts that table checkbox will not be checked with "NO_ACTIVATE" in comment
+function onMemRecPostExecute(memoryrecord, newState, succeeded )
+    if memoryrecord.Type == vtAutoAssembler and memoryrecord.Script:find("NO_ACTIVATE") and newState and succeeded then
+        memoryrecord.disableWithoutExecute()
+    end
+end
+
+--memory record IDs now allowed to be 'locked'
+IDs = {41, 158, 208,
+       }
+
+--determine event trigger sequence
+
+
+function contains(table, val)
+   local i = 0
+   for i=1, #table do
+      if table[i] == val then
+         return true
+      end
+   end
+   return false
+end
+
+
+function onMemRecPreExecute(memoryrecord, newstate)
+    if contains(IDs, memoryrecord.ID) and newstate then
+	    memoryrecord.OnActivate = function(memoryrecord, before, currentstate)
+		    return false
+	    end
+    end
+end
+
+function AOBScanModule(moduleName, signature, scanOptions)
+    local baseAddr = nil
+    local maxAddr = 0
+    local modList = enumModules()
+
+    for _, mod in ipairs(modList) do
+        if string.lower(mod.Name) == string.lower(moduleName) then
+            baseAddr = mod.Address
+            maxAddr = baseAddr + mod.Size
+            break
+        end
+    end
+
+    if not baseAddr then
+        print("❌ Error: Module " .. moduleName .. " not found!")
+        return nil
+    end
+
+    -- Debug:
+    --print(string.format("✅ %s Base Address: 0x%X", moduleName, baseAddr))
+    --print(string.format("📏 Scanning Range: 0x%X - 0x%X", baseAddr, maxAddr))
+
+    local ms = createMemScan()
+    ms.firstScan(
+        soExactValue,   -- exact scan
+        vtByteArray,    -- AOB scan: Byte Array
+        nil,            -- RoundingType (no used)
+        signature,      -- AOB String
+        nil,            -- no need by this scanoption
+        baseAddr,       -- start addr
+        maxAddr,        -- stop addr
+        scanOptions or "+X+R", -- memory protectionflags
+        fsmNotAligned,  -- no alignment
+        "1",            -- alignment 1 byte
+        true,           -- using Hexadecimal
+        true,           -- isNotABinaryString
+        false,          -- isUnicode
+        false           -- isCaseSensitive
+    )
+
+    ms.waitTillDone()
+
+    local results = createFoundList(ms)
+    results.initialize()
+
+    if results.getCount() &gt; 0 then
+        local addr = results[0]
+        --print("🎯 AOB found at: 0x" .. addr)
+        results.destroy()
+        ms.destroy()
+        return addr
+    else
+        --print("❌ AOB not found in " .. moduleName)
+        results.destroy()
+        ms.destroy()
+        return nil
+    end
+end
+
+-- test AOBScanModule()
+--local aob_addr_str = AOBScanModule("???.exe", "48 8B 05 ?? ?? ?? ?? 33 ED 48 8B 88", "+X+R")
+--if aob_addr_str then
+--    print("✅ Final AOB Address: 0x" .. aob_addr_str)
+--else
+--    print("❌ AOB not found in ???.exe")
+--end
+
+registerLuaFunctionHighlight('AOBScanModule')
+
+function clearLuaLog()
+    synchronize(function()
+      getLuaEngine().MenuItem5.doClick()
+    end)
+end
+registerLuaFunctionHighlight('clearLuaLog')
+
+function closeLuaEngine()
+    synchronize(function()
+      getLuaEngine().Close()
+    end)
+end
+registerLuaFunctionHighlight('closeLuaEngine')
+
+function closeLuaEngine2()
+    synchronize(function()
+      getLuaEngine().MenuItem5.doClick()
+      getLuaEngine().Close()
+    end)
+end
+registerLuaFunctionHighlight('closeLuaEngine2')
+
+synchronize(function() AddressList.Header.OnSectionClick = nil end)
+
+
+</LuaScript>
+</CheatTable>

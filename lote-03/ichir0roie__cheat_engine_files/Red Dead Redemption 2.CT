@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>5</ID>
+      <Description>"item max"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : Red Dead Redemption 2
+  Version: 
+  Date   : 2024-07-15
+  Author : ichir
+
+  This script does blah blah blah
+}
+
+define(address,"RDR2.exe"+79CE6E)
+define(bytes,48 3B D8 48 0F 4F D8)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,"RDR2.exe"+79CE6E)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  add rbx,ff
+  cmp rbx,rax
+  cmovg rbx,rax
+  //sub rbx,1
+  jmp return
+
+address:
+  jmp newmem
+  nop 2
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+  // cmp rbx,rax
+  // cmovg rbx,rax
+
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: RDR2.exe+79CE6E
+
+RDR2.exe+79CE52: 48 8B DA        - mov rbx,rdx
+RDR2.exe+79CE55: 48 8B F9        - mov rdi,rcx
+RDR2.exe+79CE58: 48 85 D2        - test rdx,rdx
+RDR2.exe+79CE5B: 78 1C           - js RDR2.exe+79CE79
+RDR2.exe+79CE5D: 48 8B 01        - mov rax,[rcx]
+RDR2.exe+79CE60: 49 8B D0        - mov rdx,r8
+RDR2.exe+79CE63: FF 50 68        - call qword ptr [rax+68]
+RDR2.exe+79CE66: 48 83 F8 FF     - cmp rax,-01
+RDR2.exe+79CE6A: 7C 0D           - jl RDR2.exe+79CE79
+RDR2.exe+79CE6C: 74 07           - je RDR2.exe+79CE75
+// ---------- INJECTING HERE ----------
+RDR2.exe+79CE6E: 48 3B D8        - cmp rbx,rax
+// ---------- DONE INJECTING  ----------
+RDR2.exe+79CE71: 48 0F 4F D8     - cmovg rbx,rax
+RDR2.exe+79CE75: 48 89 5F 18     - mov [rdi+18],rbx
+RDR2.exe+79CE79: 48 8B 47 18     - mov rax,[rdi+18]
+RDR2.exe+79CE7D: 48 8B 5C 24 30  - mov rbx,[rsp+30]
+RDR2.exe+79CE82: 48 83 C4 20     - add rsp,20
+RDR2.exe+79CE86: 5F              - pop rdi
+RDR2.exe+79CE87: C3              - ret 
+RDR2.exe+79CE88: 48 89 5C 24 08  - mov [rsp+08],rbx
+RDR2.exe+79CE8D: 48 89 74 24 10  - mov [rsp+10],rsi
+RDR2.exe+79CE92: 57              - push rdi
+}
+</AssemblerScript>
+      <Hotkeys>
+        <Hotkey>
+          <Action>Toggle Activation</Action>
+          <Keys>
+            <Key>78</Key>
+          </Keys>
+          <ID>0</ID>
+        </Hotkey>
+      </Hotkeys>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

@@ -1,0 +1,1238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="42">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>1</ID>
+      <Description>"Free Camera (Num 0 Toggle)"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+globalalloc(speedModifier,8)
+speedModifier:
+dd (float)3
+globalalloc(useMouse,8)
+useMouse:
+dd (float)1 // 1 to use mouse, 0 to not use mouse
+globalalloc(mouseSensitivity,8)
+mouseSensitivity:
+dd (float)8
+
+aobscanmodule(cameracoordinates_aob,ed9.exe,48 8B 8F 90 06 00 00 8B 84 3E C8) // should be unique
+aobscanmodule(moveplayer_aob,ed9.exe,FF 94 C3 D8 00 00 00 8B 84 BB 08) // should be unique
+alloc(newmem,$100,cameracoordinates_aob)
+alloc(cameracoordinates,$100,cameracoordinates_aob)
+registersymbol(cameracoordinates_aob)
+registersymbol(moveplayer_aob)
+registersymbol(cameracoordinates)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  mov rcx,[rdi+00000690]
+  mov [cameracoordinates],rcx
+  jmp return
+
+cameracoordinates_aob:
+  jmp newmem
+  nop 2
+return:
+
+cameracoordinates_aob+E:
+  db 90 90 90 8B 84 3E CC 01 00 00 90 90 90 8B 84 3E D0 01 00 00 90 90 90 48 8B 8F 90 06 00 00 8B 84 3E 04 02 00 00 90 90 90 8B 84 3E 08 02 00 00 90 90 90 8B 84 3E 0C 02 00 00 90 90 90 8B 84 3E 40 02 00 00 48 8B 8F 90 06 00 00 90 90 90 8B 84 3E 44 02 00 00 90 90 90 8B 84 3E 48 02 00 00 90 90 90
+
+moveplayer_aob:
+  db 90 90 90 90 90 90 90
+
+{$lua}
+
+function checkKeys()
+  if not (getForegroundProcess() == getOpenedProcessID()) then return end -- Only run if in game
+  if (getAddressSafe("[cameracoordinates]")) then
+    --Read and assign speed modifier value
+    local speed = readFloat("speedModifier")
+    local use_mouse = readFloat("useMouse")
+    local mouse_speed = readFloat("mouseSensitivity")
+
+    --Camera Coordinates
+    local camx = readFloat("[cameracoordinates]+08") -- Camera X
+    local camy = readFloat("[cameracoordinates]+10") -- Camera Y
+    local camz = readFloat("[cameracoordinates]+0C") -- Camera Z
+
+    --Target Coordinates
+    local targetx = readFloat("[cameracoordinates]+18") -- Camera X
+    local targety = readFloat("[cameracoordinates]+20") -- Camera Y
+    local targetz = readFloat("[cameracoordinates]+1C") -- Camera Z
+
+    --Prevent endless error loop if camera status is not initiated
+    if (targetz == nil) or (targetz == camz and targetx == camx and targety == camy) then
+      speed = 0
+      camx = 0
+      camy = 0
+      camz = 0
+      targetx = 0
+      targety = 0
+      targetz = 0
+    else
+
+      local new_mouse_x,new_mouse_y = getMousePos()
+      local mouse_loaded = readInteger("cameracoordinates+38")
+
+      --Initialize mouse coordinates on first run (if using mouse)
+      if not (mouse_loaded == 1) and (use_mouse == 1) then
+        new_mouse_x = getScreenWidth() / 2
+        new_mouse_y = getScreenHeight() / 2
+        setMousePos(getScreenWidth() / 2, getScreenHeight() / 2)
+        writeInteger("cameracoordinates+38",1)
+      end
+
+      --Measure mouse movement from previous cycle
+      local mouse_move_x = new_mouse_x - getScreenWidth() / 2
+      local mouse_move_y = new_mouse_y - getScreenHeight() / 2
+
+      --Mouse Rotation in Radians
+      --Use math.rad() to convert from degrees if game values aren't in radians
+      local camdist = ((targetx - camx)^2 + (targety - camy)^2 + (targetz - camz)^2)^0.5
+      local tilt = math.atan2(camz - targetz, ((targetx - camx)^2 + (targety - camy)^2)^0.5)
+      local pan = math.atan2(targetx - camx, targety - camy) + math.rad(180) -- Horizontal (pan)
+
+      --Sine and Cosine of Rotation Values
+      local siny = math.sin(pan) -- Sine of Horizontal (pan)
+      local cosy = math.cos(pan) -- Cosine of Horizontal (pan)
+      local sinp = math.sin(tilt) -- Sine of Vertical (tilt)
+      local cosp = math.cos(tilt) -- Cosine of Vertical (tilt)
+
+      --Forward
+      if isKeyPressed(VK_W) then
+        camx = camx - (siny * speed * 0.03)
+        camy = camy - (cosy * speed * 0.03)
+        camz = camz - (sinp * speed * 0.03)
+      end
+      --Left
+      if isKeyPressed(VK_A) then
+        camx = camx + (math.sin(pan - math.rad(90)) * speed * 0.03)
+        camy = camy + (math.cos(pan - math.rad(90)) * speed * 0.03)
+      end
+      --Back
+      if isKeyPressed(VK_S) then
+        camx = camx + (siny * speed * 0.03)
+        camy = camy + (cosy * speed * 0.03)
+        camz = camz + (sinp * speed * 0.03)
+      end
+      --Right
+      if isKeyPressed(VK_D) then
+        camx = camx - (math.sin(pan - math.rad(90)) * speed * 0.03)
+        camy = camy - (math.cos(pan - math.rad(90)) * speed * 0.03)
+      end
+      --Forward/Right
+      if isKeyPressed(VK_W) and isKeyPressed(VK_D) then
+        camx = camx - (math.sin(pan - math.rad(45)) * speed * 0.03)
+        camy = camy - (math.cos(pan - math.rad(45)) * speed * 0.03)
+        camz = camz - (sinp * speed * 0.03)
+      end
+      --Forward/Left
+      if isKeyPressed(VK_W) and isKeyPressed(VK_A) then
+        camx = camx - (math.sin(pan + math.rad(45)) * speed * 0.03)
+        camy = camy - (math.cos(pan + math.rad(45)) * speed * 0.03)
+        camz = camz - (sinp * speed * 0.03)
+      end
+      --Back/Left
+      if isKeyPressed(VK_S) and isKeyPressed(VK_A) then
+        camx = camx + (math.sin(pan - math.rad(45)) * speed * 0.03)
+        camy = camy + (math.cos(pan - math.rad(45)) * speed * 0.03)
+        camz = camz + (sinp * speed * 0.03)
+      end
+      --Back/Right
+      if isKeyPressed(VK_S) and isKeyPressed(VK_D) then
+        camx = camx + (math.sin(pan + math.rad(45)) * speed * 0.03)
+        camy = camy + (math.cos(pan + math.rad(45)) * speed * 0.03)
+        camz = camz + (sinp * speed * 0.03)
+      end
+      --Up
+      if isKeyPressed(VK_R) then
+       camz = camz + (speed * 0.02)
+      end
+      --Down
+      if isKeyPressed(VK_F) then
+       camz = camz - (speed * 0.02)
+      end
+      --Pan right
+      if isKeyPressed(VK_L) then
+        pan = pan - speed * 0.01
+      end
+      --Pan left
+      if isKeyPressed(VK_J) then
+        pan = pan + speed * 0.01
+      end
+      --Tilt up
+      if isKeyPressed(VK_I) then
+        tilt = math.max(tilt - speed * 0.01, math.rad(-89.5))
+      end
+      --Tilt down
+      if isKeyPressed(VK_K) then
+        tilt = math.min(tilt + speed * 0.01, math.rad(89.5))
+      end
+
+      if (use_mouse == 1) then
+        --Tilt by mouse
+        if not(mouse_move_y == 0) then
+          tilt = math.min(math.max(tilt + mouse_move_y * mouse_speed * 0.0003, math.rad(-89.5)), math.rad(89.5))
+        end
+        --Tilt by mouse
+        if not(mouse_move_x == 0) then
+          pan = pan - mouse_move_x * mouse_speed * 0.0003
+        end
+
+        setMousePos(getScreenWidth() / 2, getScreenHeight() / 2)
+      end
+
+      --Create a copy of the entire memory block before alterations.  I do not know if +14, +24 or +34 are used, but this preserves them.
+      copyMemory("[cameracoordinates]+08",48,"cameracoordinates+08")
+
+      --Write new values into the temporary buffer
+      writeFloat("cameracoordinates+08", camx)
+      writeFloat("cameracoordinates+10", camy)
+      writeFloat("cameracoordinates+0C", camz)
+      writeFloat("cameracoordinates+18", camx - (camdist * math.cos(tilt) * math.sin(pan)))
+      writeFloat("cameracoordinates+20", camy - (camdist * math.cos(tilt) * math.cos(pan)))
+      writeFloat("cameracoordinates+1C", camz - (camdist * math.sin(tilt)))
+      writeFloat("cameracoordinates+28", 0) --Anti-vomit settings
+      writeFloat("cameracoordinates+2C", 1)
+      writeFloat("cameracoordinates+30", 0)
+
+      --Copy buffer back into memory read by game engine
+      copyMemory("cameracoordinates+08",48,"[cameracoordinates]+08")
+    end
+
+
+    --Speed Modifiers
+    if isKeyPressed(VK_F3) then --If F3 is pressed, quadruple the speed
+      writeFloat("speedModifier", 12)
+    elseif isKeyPressed(VK_F2) then --If F2 is pressed, double the speed
+      writeFloat("speedModifier", 6)
+    elseif isKeyPressed(VK_F1) then --If F1 is pressed, slow way down
+      writeFloat("speedModifier", .5)
+    else --If nothing is pressed, speed is normal
+      writeFloat("speedModifier", 3)
+    end
+
+    --Mouse Support
+    if isKeyPressed(VK_PRIOR) then --If Page Up is pressed, enable mouse
+      writeFloat("useMouse", 1)
+    elseif isKeyPressed(VK_NEXT) then --If Page Down is pressed, disable mouse
+      writeFloat("useMouse", 0)
+    end
+  end
+end
+
+t=createTimer(nil)
+timer_setInterval(t, 10)
+timer_onTimer(t, checkKeys)
+timer_setEnabled(t, true)
+
+{$asm}
+
+[DISABLE]
+{$lua}
+
+timer_setEnabled(t, false)
+
+{$asm}
+cameracoordinates_aob:
+  db 48 8B 8F 90 06 00 00
+
+cameracoordinates_aob+E:
+  db 89 41 08 8B 84 3E CC 01 00 00 89 41 0C 8B 84 3E D0 01 00 00 89 41 10 48 8B 8F 90 06 00 00 8B 84 3E 04 02 00 00 89 41 18 8B 84 3E 08 02 00 00 89 41 1C 8B 84 3E 0C 02 00 00 89 41 20 8B 84 3E 40 02 00 00 48 8B 8F 90 06 00 00 89 41 28 8B 84 3E 44 02 00 00 89 41 2C 8B 84 3E 48 02 00 00 89 41 30
+
+moveplayer_aob:
+  db FF 94 C3 D8 00 00 00
+
+unregistersymbol(cameracoordinates_aob)
+unregistersymbol(moveplayer_aob)
+unregistersymbol(cameracoordinates)
+dealloc(cameracoordinates)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+10D3FD, ed9.exe+10D40B - Camera
+
+ed9.exe+10D3DF: F3 0F 58 78 0C        - addss xmm7,[rax+0C]
+ed9.exe+10D3E4: 48 83 C3 40           - add rbx,40
+ed9.exe+10D3E8: 48 3B DD              - cmp rbx,rbp
+ed9.exe+10D3EB: 75 C3                 - jne ed9.exe+10D3B0
+ed9.exe+10D3ED: 8B 87 34 07 00 00     - mov eax,[rdi+00000734]
+ed9.exe+10D3F3: D1 E8                 - shr eax,1
+ed9.exe+10D3F5: A8 01                 - test al,01
+ed9.exe+10D3F7: 0F 85 DB 00 00 00     - jne ed9.exe+10D4D8
+// ---------- INJECTING HERE ----------
+ed9.exe+10D3FD: 48 8B 8F 90 06 00 00  - mov rcx,[rdi+00000690]
+// ---------- DONE INJECTING  ----------
+ed9.exe+10D404: 8B 84 3E C8 01 00 00  - mov eax,[rsi+rdi+000001C8]
+// ---------- INJECTING HERE ----------
+ed9.exe+10D40B: 89 41 08              - mov [rcx+08],eax
+ed9.exe+10D40E: 8B 84 3E CC 01 00 00  - mov eax,[rsi+rdi+000001CC]
+ed9.exe+10D415: 89 41 0C              - mov [rcx+0C],eax
+ed9.exe+10D418: 8B 84 3E D0 01 00 00  - mov eax,[rsi+rdi+000001D0]
+ed9.exe+10D41F: 89 41 10              - mov [rcx+10],eax
+ed9.exe+10D422: 48 8B 8F 90 06 00 00  - mov rcx,[rdi+00000690]
+ed9.exe+10D429: 8B 84 3E 04 02 00 00  - mov eax,[rsi+rdi+00000204]
+ed9.exe+10D430: 89 41 18              - mov [rcx+18],eax
+ed9.exe+10D433: 8B 84 3E 08 02 00 00  - mov eax,[rsi+rdi+00000208]
+ed9.exe+10D43A: 89 41 1C              - mov [rcx+1C],eax
+ed9.exe+10D43D: 8B 84 3E 0C 02 00 00  - mov eax,[rsi+rdi+0000020C]
+ed9.exe+10D444: 89 41 20              - mov [rcx+20],eax
+ed9.exe+10D447: 8B 84 3E 40020000     - mov eax,[rsi+rdi+00000240]
+ed9.exe+10D44E: 48 8B 8F 90060000     - mov rcx,[rdi+00000690]
+ed9.exe+10D455: 89 41 28              - mov [rcx+28],eax
+ed9.exe+10D458: 8B 84 3E 44020000     - mov eax,[rsi+rdi+00000244]
+ed9.exe+10D45F: 89 41 2C              - mov [rcx+2C],eax
+ed9.exe+10D462: 8B 84 3E 48020000     - mov eax,[rsi+rdi+00000248]
+ed9.exe+10D469: 89 41 30              - mov [rcx+30],eax
+// ---------- DONE INJECTING  ----------
+ed9.exe+10D46C: 45 85 FF              - test r15d,r15d
+ed9.exe+10D46F: 75 2D                 - jne ed9.exe+10D49E
+ed9.exe+10D471: 48 8B 0D F0786900     - mov rcx,[ed9.exe+7A4D68]
+ed9.exe+10D478: F3 0F10 8C 3E 30030000  - movss xmm1,[rsi+rdi+00000330]
+ed9.exe+10D481: 48 81 C1 0C010000     - add rcx,0000010C
+ed9.exe+10D488: E8 03322800           - call ed9.exe+390690
+ed9.exe+10D48D: 48 8B 87 90060000     - mov rax,[rdi+00000690]
+ed9.exe+10D494: F3 0F11 80 58010000   - movss [rax+00000158],xmm0
+ed9.exe+10D49C: EB 14                 - jmp ed9.exe+10D4B2
+ed9.exe+10D49E: 48 8B 8F 90060000     - mov rcx,[rdi+00000690]
+
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+20BF0D - Lock Player Movement
+
+ed9.exe+20BED5: 89 AB 40 02 00 00        - mov [rbx+00000240],ebp
+ed9.exe+20BEDB: 8B 84 BB 04 02 00 00     - mov eax,[rbx+rdi*4+00000204]
+ed9.exe+20BEE2: 89 84 BB 00 02 00 00     - mov [rbx+rdi*4+00000200],eax
+ed9.exe+20BEE9: 89 AC BB 08 02 00 00     - mov [rbx+rdi*4+00000208],ebp
+ed9.exe+20BEF0: 89 83 44 02 00 00        - mov [rbx+00000244],eax
+ed9.exe+20BEF6: 48 63 84 BB 00 02 00 00  - movsxd  rax,dword ptr [rbx+rdi*4+00000200]
+ed9.exe+20BEFE: 83 F8 FF                 - cmp eax,-01
+ed9.exe+20BF01: 74 28                    - je ed9.exe+20BF2B
+ed9.exe+20BF03: 48 8B 8B D0 00 00 00     - mov rcx,[rbx+000000D0]
+ed9.exe+20BF0A: 0F 28 CF                 - movaps xmm1,xmm7
+// ---------- INJECTING HERE ----------
+ed9.exe+20BF0D: FF 94 C3 D8 00 00 00     - call qword ptr [rbx+rax*8+000000D8]
+// ---------- DONE INJECTING  ----------
+ed9.exe+20BF14: 8B 84 BB 08 02 00 00     - mov eax,[rbx+rdi*4+00000208]
+ed9.exe+20BF1B: FF C0                    - inc eax
+ed9.exe+20BF1D: 41 3B C7                 - cmp eax,r15d
+ed9.exe+20BF20: 41 0F 4F C7              - cmovg eax,r15d
+ed9.exe+20BF24: 89 84 BB 08 02 00 00     - mov [rbx+rdi*4+00000208],eax
+ed9.exe+20BF2B: 48 8B 03                 - mov rax,[rbx]
+ed9.exe+20BF2E: 0F 28 C7                 - movaps xmm0,xmm7
+ed9.exe+20BF31: F3 0F 58 83 40 02 00 00  - addss xmm0,[rbx+00000240]
+ed9.exe+20BF39: 48 8B CB                 - mov rcx,rbx
+ed9.exe+20BF3C: F3 0F 11 83 40 02 00 00  - movss [rbx+00000240],xmm0
+}
+</AssemblerScript>
+      <Hotkeys>
+        <Hotkey>
+          <Action>Toggle Activation</Action>
+          <Keys>
+            <Key>96</Key>
+          </Keys>
+          <ID>0</ID>
+          <ActivateSound>Activate</ActivateSound>
+          <DeactivateSound>Deactivate</DeactivateSound>
+        </Hotkey>
+      </Hotkeys>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>10</ID>
+          <Description>"Camera Coordinates"</Description>
+          <Options moHideChildren="1"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>11</ID>
+              <Description>"Camera X"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>cameracoordinates</Address>
+              <Offsets>
+                <Offset>08</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>12</ID>
+              <Description>"Camera Y"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>cameracoordinates</Address>
+              <Offsets>
+                <Offset>10</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>13</ID>
+              <Description>"Camera Z"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>cameracoordinates</Address>
+              <Offsets>
+                <Offset>0C</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>14</ID>
+              <Description>"Camera Target X"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>cameracoordinates</Address>
+              <Offsets>
+                <Offset>18</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>15</ID>
+              <Description>"Camera Target Y"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>cameracoordinates</Address>
+              <Offsets>
+                <Offset>20</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>16</ID>
+              <Description>"Camera Target Z"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>cameracoordinates</Address>
+              <Offsets>
+                <Offset>1C</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>2</ID>
+      <Description>"Set Custom Camera Distance (F4 Toggle)"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+aobscanmodule(fov_aob,ed9.exe,F3 0F 10 97 70 01 00 00) // should be unique
+aobscanmodule(unlockfov1_aob,ed9.exe,F3 0F 11 80 70 01 00 00 4C 89 A0 74 01 00 00 44 89 A0 7C 01 00 00 E9) // should be unique
+aobscanmodule(unlockfov2_aob,ed9.exe,F3 0F 11 43 08 48 83 C4 30) // should be unique
+alloc(newmem,$1000,fov_aob)
+alloc(fov,8)
+registersymbol(fov_aob)
+registersymbol(fov)
+registersymbol(fov_set)
+registersymbol(fov_max)
+registersymbol(unlockfov1_aob)
+registersymbol(unlockfov2_aob)
+
+label(code)
+label(writecode)
+label(dialoguezoomcode)
+label(fov_set)
+label(fov_step)
+label(fov_min)
+label(fov_max)
+label(return)
+label(writereturn)
+label(dialoguezoomcodereturn)
+
+newmem:
+
+toggleon:
+  push rax
+  push rcx
+  push rdx
+  push r8
+  push r9
+  push r10
+  push r11
+  sub rsp,28
+  mov rcx,23 //VK_END
+  call GetAsyncKeyState
+  add rsp,28
+  pop r11
+  pop r10
+  pop r9
+  pop r8
+  pop rdx
+  pop rcx
+  test ax,8001
+  pop rax
+  jz toggleoff
+  movss xmm2,[rdi+00000170]
+  addss xmm2,[fov_step]
+  minss xmm2,[fov_max]
+  movss [fov_set],xmm2
+  movss [rdi+00000170],xmm2
+  jmp code
+
+toggleoff:
+  push rax
+  push rcx
+  push rdx
+  push r8
+  push r9
+  push r10
+  push r11
+  sub rsp,28
+  mov rcx,24 //VK_HOME
+  call GetAsyncKeyState
+  add rsp,28
+  pop r11
+  pop r10
+  pop r9
+  pop r8
+  pop rdx
+  pop rcx
+  test ax,8001
+  pop rax
+  jz code
+  movss xmm2,[rdi+00000170]
+  subss xmm2,[fov_step]
+  maxss xmm2,[fov_min]
+  movss [fov_set],xmm2
+  movss [rdi+00000170],xmm2
+
+code:
+  mov [fov],rdi
+  movss xmm2,[rdi+00000170]
+  jmp return
+
+writecode:
+  cmp [fov_set],(float)0
+  je @f
+  movss xmm0,[fov_set]
+@@:
+  movss [rax+00000170],xmm0
+  jmp writereturn
+
+dialoguezoomcode:
+  cmp [fov_set],(float)0
+  jne @f
+  movss [rax+00000170],xmm0
+@@:
+  jmp dialoguezoomcodereturn
+
+fov_set:
+  dd (float)0
+
+fov_step:
+  dd (float)0.3
+
+fov_min:
+  dd (float)0.1
+
+fov_max:
+  dd (float)15
+
+fov_aob:
+  jmp newmem
+  nop 3
+return:
+
+unlockfov1_aob:
+  jmp writecode
+  nop 3
+writereturn:
+
+unlockfov1_aob+44:
+  jmp dialoguezoomcode
+  nop 3
+dialoguezoomcodereturn:
+
+unlockfov2_aob:
+  db 90 90 90 90 90
+
+[DISABLE]
+
+fov_aob:
+  db F3 0F 10 97 70 01 00 00
+
+unlockfov1_aob:
+  db F3 0F 11 80 70 01 00 00
+
+unlockfov1_aob+44:
+  db F3 0F 11 80 70 01 00 00
+
+unlockfov2_aob:
+  db F3 0F 11 43 08
+
+unregistersymbol(unlockfov1_aob)
+unregistersymbol(unlockfov2_aob)
+unregistersymbol(fov_aob)
+unregistersymbol(fov)
+unregistersymbol(fov_set)
+unregistersymbol(fov_max)
+dealloc(fov)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+10B54A - Read FOV
+
+ed9.exe+10B51B: E8 A0 17 00 00           - call ed9.exe+10CCC0
+ed9.exe+10B520: 48 8B 4B 08              - mov rcx,[rbx+08]
+ed9.exe+10B524: 0F 28 CF                 - movaps xmm1,xmm7
+ed9.exe+10B527: 48 81 C1 2C 01 00 00     - add rcx,0000012C
+ed9.exe+10B52E: E8 8D 17 00 00           - call ed9.exe+10CCC0
+ed9.exe+10B533: 48 8B 4B 08              - mov rcx,[rbx+08]
+ed9.exe+10B537: 0F 28 CF                 - movaps xmm1,xmm7
+ed9.exe+10B53A: 48 81 C1 68 01 00 00     - add rcx,00000168
+ed9.exe+10B541: E8 6A 1B F6 FF           - call ed9.exe+6D0B0
+ed9.exe+10B546: 48 8B 7B 08              - mov rdi,[rbx+08]
+// ---------- INJECTING HERE ----------
+ed9.exe+10B54A: F3 0F 10 97 70 01 00 00  - movss xmm2,[rdi+00000170]
+// ---------- DONE INJECTING  ----------
+ed9.exe+10B552: F2 0F 10 87 78 01 00 00  - movsd xmm0,[rdi+00000178]
+ed9.exe+10B55A: 0F 2E D2                 - ucomiss xmm2,xmm2
+ed9.exe+10B55D: F2 0F 11 45 C7           - movsd [rbp-39],xmm0
+ed9.exe+10B562: 0F 9A C0                 - setp al
+ed9.exe+10B565: 3C 01                    - cmp al,01
+ed9.exe+10B567: 74 18                    - je ed9.exe+10B581
+ed9.exe+10B569: F2 0F 11 45 C7           - movsd [rbp-39],xmm0
+ed9.exe+10B56E: F3 0F 10 87 70 01 00 00  - movss xmm0,[rdi+00000170]
+ed9.exe+10B576: E8 95 85 54 00           - call ed9.exe+653B10
+ed9.exe+10B57B: 66 83 F8 01              - cmp ax,01
+
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+1D205B - Unlock FOV1
+
+ed9.exe+1D2017: 44 0F 28 8C 24 80 01 00 00  - movaps xmm9,[rsp+00000180]
+ed9.exe+1D2020: 0F 28 BC 24 A0 01 00 00     - movaps xmm7,[rsp+000001A0]
+ed9.exe+1D2028: 4C 8B B4 24 C8 01 00 00     - mov r14,[rsp+000001C8]
+ed9.exe+1D2030: 48 8B B4 24 08 02 00 00     - mov rsi,[rsp+00000208]
+ed9.exe+1D2038: 74 0D                       - je ed9.exe+1D2047
+ed9.exe+1D203A: 44 39 A7 44 04 00 00        - cmp [rdi+00000444],r12d
+ed9.exe+1D2041: 0F 84 E8 02 00 00           - je ed9.exe+1D232F
+ed9.exe+1D2047: 48 8B 47 08                 - mov rax,[rdi+08]
+ed9.exe+1D204B: F3 0F 11 80 68 01 00 00     - movss [rax+00000168],xmm0
+ed9.exe+1D2053: F3 0F 11 80 6C 01 00 00     - movss [rax+0000016C],xmm0
+// ---------- INJECTING HERE ----------
+ed9.exe+1D205B: F3 0F 11 80 70 01 00 00     - movss [rax+00000170],xmm0
+// ---------- DONE INJECTING  ----------
+ed9.exe+1D2063: 4C 89 A0 74 01 00 00        - mov [rax+00000174],r12
+ed9.exe+1D206A: 44 89 A0 7C 01 00 00        - mov [rax+0000017C],r12d
+ed9.exe+1D2071: E9 B9 02 00 00              - jmp ed9.exe+1D232F
+ed9.exe+1D2076: F6 82 0A 01 00 00 04        - test byte ptr [rdx+0000010A],04
+ed9.exe+1D207D: 74 36                       - je ed9.exe+1D20B5
+ed9.exe+1D207F: 41 0F 28 CC                 - movaps xmm1,xmm12
+ed9.exe+1D2083: 48 8B CF                    - mov rcx,rdi
+ed9.exe+1D2086: E8 C5 11 00 00              - call ed9.exe+1D3250
+ed9.exe+1D208B: 48 8B 47 08                 - mov rax,[rdi+08]
+ed9.exe+1D208F: F3 0F 11 80 68 01 00 00     - movss [rax+00000168],xmm0
+ed9.exe+1D2097: F3 0F 11 80 6C 01 00 00     - movss [rax+0000016C],xmm0
+// ---------- INJECTING HERE ----------
+ed9.exe+1D209F: F3 0F 11 80 70 01 00 00     - movss [rax+00000170],xmm0
+// ---------- DONE INJECTING  ----------
+ed9.exe+1D20A7: 4C 89 A0 74 01 00 00        - mov [rax+00000174],r12
+ed9.exe+1D20AE: 44 89 A0 7C 01 00 00        - mov [rax+0000017C],r12d
+ed9.exe+1D20B5: 44 39 A7 44 04 00 00        - cmp [rdi+00000444],r12d
+ed9.exe+1D20BC: 0F 84 6D 02 00 00           - je ed9.exe+1D232F
+ed9.exe+1D20C2: 0F 10 97 98 00 00 00        - movups xmm2,[rdi+00000098]
+ed9.exe+1D20C9: 48 8B 47 08                 - mov rax,[rdi+08]
+ed9.exe+1D20CD: 48 05 F0 00 00 00           - add rax,000000F0
+ed9.exe+1D20D3: 0F 10 E2                    - movups xmm4,xmm2
+ed9.exe+1D20D6: 0F 10 DA                    - movups xmm3,xmm2
+ed9.exe+1D20D9: 0F 28 C2                    - movaps xmm0,xmm2
+
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+6D0D1 - Unlock FOV2
+
+ed9.exe+6D0AF: CC                 - int 3
+ed9.exe+6D0B0: 40 53              - push rbx
+ed9.exe+6D0B2: 48 83 EC 30        - sub rsp,30
+ed9.exe+6D0B6: F3 0F 10 51 0C     - movss xmm2,[rcx+0C]
+ed9.exe+6D0BB: 48 8B D9           - mov rbx,rcx
+ed9.exe+6D0BE: 48 83 C1 0C        - add rcx,0C
+ed9.exe+6D0C2: F3 0F 10 43 10     - movss xmm0,[rbx+10]
+ed9.exe+6D0C7: 0F 2F C2           - comiss xmm0,xmm2
+ed9.exe+6D0CA: 72 10              - jb ed9.exe+6D0DC
+ed9.exe+6D0CC: F3 0F 10 43 04     - movss xmm0,[rbx+04]
+// ---------- INJECTING HERE ----------
+ed9.exe+6D0D1: F3 0F 11 43 08     - movss [rbx+08],xmm0
+// ---------- DONE INJECTING  ----------
+ed9.exe+6D0D6: 48 83 C4 30        - add rsp,30
+ed9.exe+6D0DA: 5B                 - pop rbx
+ed9.exe+6D0DB: C3                 - ret
+ed9.exe+6D0DC: F3 0F 58 C1        - addss xmm0,xmm1
+ed9.exe+6D0E0: 0F 29 74 24 20     - movaps [rsp+20],xmm6
+ed9.exe+6D0E5: 48 8D 44 24 40     - lea rax,[rsp+40]
+ed9.exe+6D0EA: 0F 2F C2           - comiss xmm0,xmm2
+ed9.exe+6D0ED: F3 0F 11 44 24 40  - movss [rsp+40],xmm0
+ed9.exe+6D0F3: 48 0F 47 C1        - cmova rax,rcx
+ed9.exe+6D0F7: 8B 4B 14           - mov ecx,[rbx+14]
+}
+</AssemblerScript>
+      <Hotkeys>
+        <Hotkey>
+          <Action>Toggle Activation</Action>
+          <Keys>
+            <Key>115</Key>
+          </Keys>
+          <ID>0</ID>
+        </Hotkey>
+      </Hotkeys>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>21</ID>
+          <Description>"Home Key to Zoom In, End Key to Zoom Out"</Description>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>22</ID>
+          <Description>"Current Camera Distance (read-only)"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>fov</Address>
+          <Offsets>
+            <Offset>170</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>23</ID>
+          <Description>"Custom Camera Distance"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>fov_set</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>24</ID>
+          <Description>"Maximum Camera Distance"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>fov_max</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>3</ID>
+      <Description>"Set Camera Min Z to Floor (Use No Clip)"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+aobscanmodule(cameradistance_aob,ed9.exe,02 00 00 48 8B 46 08 F3 0F 11 80 68 01 00 00) // should be unique
+alloc(newmem,$1000,cameradistance_aob)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  mov [rax+00000168],(float)5
+  movss xmm0,[rax+00000168]
+  movss [rax+00000168],xmm0
+  jmp return
+
+cameradistance_aob+07:
+  jmp newmem
+  nop 3
+return:
+registersymbol(cameradistance_aob)
+
+[DISABLE]
+
+cameradistance_aob+07:
+  db F3 0F 11 80 68 01 00 00
+
+unregistersymbol(cameradistance_aob)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+1D248E
+
+ed9.exe+1D2447: 44 0F 28 AC 24 50 01 00 00  - movaps xmm13,[rsp+00000150]
+ed9.exe+1D2450: 44 0F 28 A4 24 60 01 00 00  - movaps xmm12,[rsp+00000160]
+ed9.exe+1D2459: 44 0F 28 9C 24 70 01 00 00  - movaps xmm11,[rsp+00000170]
+ed9.exe+1D2462: 44 0F 28 8C 24 90 01 00 00  - movaps xmm9,[rsp+00000190]
+ed9.exe+1D246B: 0F 28 BC 24 B0 01 00 00     - movaps xmm7,[rsp+000001B0]
+ed9.exe+1D2473: 4C 8B B4 24 D8 01 00 00     - mov r14,[rsp+000001D8]
+ed9.exe+1D247B: 74 0D                       - je ed9.exe+1D248A
+ed9.exe+1D247D: 44 39 A6 44 04 00 00        - cmp [rsi+00000444],r12d
+ed9.exe+1D2484: 0F 84 E8 02 00 00           - je ed9.exe+1D2772
+ed9.exe+1D248A: 48 8B 46 08                 - mov rax,[rsi+08]
+// ---------- INJECTING HERE ----------
+ed9.exe+1D248E: F3 0F 11 80 68 01 00 00     - movss [rax+00000168],xmm0
+// ---------- DONE INJECTING  ----------
+ed9.exe+1D2496: F3 0F 11 80 6C 01 00 00     - movss [rax+0000016C],xmm0
+ed9.exe+1D249E: F3 0F 11 80 70 01 00 00     - movss [rax+00000170],xmm0
+ed9.exe+1D24A6: 4C 89 A0 74 01 00 00        - mov [rax+00000174],r12
+ed9.exe+1D24AD: 44 89 A0 7C 01 00 00        - mov [rax+0000017C],r12d
+ed9.exe+1D24B4: E9 B9 02 00 00              - jmp ed9.exe+1D2772
+ed9.exe+1D24B9: F6 87 0A 01 00 00 04        - test byte ptr [rdi+0000010A],04
+ed9.exe+1D24C0: 74 36                       - je ed9.exe+1D24F8
+ed9.exe+1D24C2: 41 0F 28 CA                 - movaps xmm1,xmm10
+ed9.exe+1D24C6: 48 8B CE                    - mov rcx,rsi
+ed9.exe+1D24C9: E8 52 12 00 00              - call ed9.exe+1D3720
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>4</ID>
+      <Description>"No Clip"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+aobscanmodule(noclip_aob,ed9.exe,89 83 9C 08 00 00 72) // should be unique
+registersymbol(noclip_aob)
+
+noclip_aob:
+  db 90 90 90 90 90 90 72 5A 90 90 90 90 90 90 90 90 90 90
+
+[DISABLE]
+
+noclip_aob:
+  db 89 83 9C 08 00 00 72 5A C7 83 9C 08 00 00 00 00 00 00
+
+unregistersymbol(noclip_aob)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+1903B1
+
+ed9.exe+190382: 48 8D 44 24 20                 - lea rax,[rsp+20]
+ed9.exe+190387: F3 0F 5C C7                    - subss xmm0,xmm7
+ed9.exe+19038B: C7 44 24 24 00 00 00 00        - mov [rsp+24],00000000
+ed9.exe+190393: 48 8D 4C 24 24                 - lea rcx,[rsp+24]
+ed9.exe+190398: 41 0F 2F C0                    - comiss xmm0,xmm8
+ed9.exe+19039C: F3 0F 11 44 24 20              - movss [rsp+20],xmm0
+ed9.exe+1903A2: F3 0F 10 44 24 28              - movss xmm0,[rsp+28]
+ed9.exe+1903A8: 48 0F 46 C1                    - cmovbe rax,rcx
+ed9.exe+1903AC: 0F 2F C1                       - comiss xmm0,xmm1
+ed9.exe+1903AF: 8B 00                          - mov eax,[rax]
+// ---------- INJECTING HERE ----------
+ed9.exe+1903B1: 89 83 9C 08 00 00              - mov [rbx+0000089C],eax
+ed9.exe+1903B7: 72 5A                          - jb ed9.exe+190413
+ed9.exe+1903B9: C7 83 9C 08 00 00 00 00 00 00  - mov [rbx+0000089C],00000000
+// ---------- DONE INJECTING  ----------
+ed9.exe+1903C3: EB 4E                          - jmp ed9.exe+190413
+ed9.exe+1903C5: F6 87 0A 01 00 00 08           - test byte ptr [rdi+0000010A],08
+ed9.exe+1903CC: 74 0C                          - je ed9.exe+1903DA
+ed9.exe+1903CE: C7 83 9C 08 00 00 00 00 80 3F  - mov [rbx+0000089C],3F800000
+ed9.exe+1903D8: EB 39                          - jmp ed9.exe+190413
+ed9.exe+1903DA: F3 0F 58 BB 9C 08 00 00        - addss xmm7,[rbx+0000089C]
+ed9.exe+1903E2: 48 8D 44 24 28                 - lea rax,[rsp+28]
+ed9.exe+1903E7: C7 44 24 20 00 00 80 3F        - mov [rsp+20],3F800000
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>5</ID>
+      <Description>"Force Pause Action (Enable first, F5 pause / F6 unpause)"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+aobscanmodule(freezemonitorinjectionpoint_aob,ed9.exe,F3 0F 10 8B 58 16 00 00) // should be unique
+aobscanmodule(freezeaction_aob,ed9.exe,FF 50 18 48 8D 7F 08 48 83 EE 01 75 EA 48 8B BC) // should be unique
+aobscanmodule(freezeaction_aob2,ed9.exe,E8 99 CD 17 00) // should be unique
+aobscanmodule(freezeaction_aob3,ed9.exe,E8 E4 2A 33 00) // should be unique
+aobscanmodule(cutscenefreeze_aob,ed9.exe,48 8B 01 FF 50 20 48 8D) // should be unique
+aobscanmodule(cutscenefreeze_aob2,ed9.exe,0F 85 DB 00 00 00 48 8B 8F) // should be unique
+alloc(newmem,$1000,freezeaction_aob)
+registersymbol(freezemonitorinjectionpoint_aob)
+registersymbol(freezeaction_aob)
+registersymbol(freezeaction_aob2)
+registersymbol(freezeaction_aob3)
+registersymbol(cutscenefreeze_aob)
+registersymbol(cutscenefreeze_aob2)
+registersymbol(freeze)
+
+label(toggleon)
+label(toggleoff)
+label(code)
+label(code1)
+label(code2)
+label(code3)
+label(code4)
+label(code5)
+label(freeze)
+label(return)
+label(return1)
+label(return2)
+label(return3)
+label(return4)
+label(return5)
+
+newmem:
+
+toggleon:
+  push rax
+  push rcx
+  push rdx
+  push r8
+  push r9
+  push r10
+  push r11
+  sub rsp,28
+  mov rcx,74 //VK_F5
+  call GetAsyncKeyState
+  add rsp,28
+  pop r11
+  pop r10
+  pop r9
+  pop r8
+  pop rdx
+  pop rcx
+  test ax,8001
+  pop rax
+  jz toggleoff
+  mov [freeze],#1
+  jmp code
+
+toggleoff:
+  push rax
+  push rcx
+  push rdx
+  push r8
+  push r9
+  push r10
+  push r11
+  sub rsp,28
+  mov rcx,75 //VK_F6
+  call GetAsyncKeyState
+  add rsp,28
+  pop r11
+  pop r10
+  pop r9
+  pop r8
+  pop rdx
+  pop rcx
+  test ax,8001
+  pop rax
+  jz code
+  mov [freeze],#0
+
+code:
+  movss xmm1,[rbx+00001658]
+  jmp return
+
+code1:
+  pushf
+  cmp [freeze],#0
+  je @f
+  popf
+  lea rdi,[rdi+08]
+  jmp return1
+@@:
+  popf
+  call qword ptr [rax+18]
+  lea rdi,[rdi+08]
+  jmp return1
+
+code2:
+  cmp [freeze],#0
+  jne @f
+  call ed9.exe+1E6CD0
+@@:
+  jmp return2
+code3:
+  cmp [freeze],#0
+  jne @f
+  call ed9.exe+39CA90
+@@:
+  jmp return3
+code4:
+  cmp [freeze],#0
+  jne @f
+  mov rax,[rcx]
+  call qword ptr [rax+20]
+@@:
+  jmp return4
+code5:
+  pushf
+  cmp [freeze],#0
+  je @f
+  popf
+  jmp return5
+@@:
+  popf
+  jne ed9.exe+10D9B8
+  jmp return5
+
+freeze:
+  dd #0
+
+freezemonitorinjectionpoint_aob:
+  jmp newmem
+  nop 3
+return:
+
+freezeaction_aob:
+  jmp code1
+  nop 2
+return1:
+
+freezeaction_aob2:
+  jmp code2
+return2:
+
+freezeaction_aob3:
+  jmp code3
+return3:
+
+cutscenefreeze_aob:
+  jmp code4
+  nop
+return4:
+
+cutscenefreeze_aob2:
+  jmp code5
+  nop
+return5:
+
+[DISABLE]
+
+freezemonitorinjectionpoint_aob:
+  db F3 0F 10 8B 58 16 00 00
+
+freezeaction_aob:
+  db FF 50 18 48 8D 7F 08
+
+freezeaction_aob2:
+  db E8 99 CD 17 00
+
+freezeaction_aob3:
+  db E8 E4 2A 33 00
+
+cutscenefreeze_aob:
+  db 48 8B 01 FF 50 20
+
+cutscenefreeze_aob2:
+  db 0F 85 DB 00 00 00
+
+unregistersymbol(freezemonitorinjectionpoint_aob)
+unregistersymbol(freezeaction_aob)
+unregistersymbol(freezeaction_aob2)
+unregistersymbol(freezeaction_aob3)
+unregistersymbol(cutscenefreeze_aob)
+unregistersymbol(cutscenefreeze_aob2)
+unregistersymbol(freeze)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+69E93 - Safe injection point to check keypresses
+
+ed9.exe+69E66: 48 63 41 5C              - movsxd  rax,dword ptr [rcx+5C]
+ed9.exe+69E6A: 48 8D 14 40              - lea rdx,[rax+rax*2]
+ed9.exe+69E6E: 83 7C 91 28 01           - cmp dword ptr [rcx+rdx*4+28],01
+ed9.exe+69E73: 74 0A                    - je ed9.exe+69E7F
+ed9.exe+69E75: F3 0F 10 05 03 7D 6C 00  - movss xmm0,[ed9.exe+731B80]
+ed9.exe+69E7D: EB 08                    - jmp ed9.exe+69E87
+ed9.exe+69E7F: F3 0F 10 05 D1 7E 6C 00  - movss xmm0,[ed9.exe+731D58]
+ed9.exe+69E87: F3 0F 59 F8              - mulss xmm7,xmm0
+ed9.exe+69E8B: 0F 28 CF                 - movaps xmm1,xmm7
+ed9.exe+69E8E: E8 ED C1 1D 00           - call ed9.exe+246080
+// ---------- INJECTING HERE ----------
+ed9.exe+69E93: F3 0F 10 8B 58 16 00 00  - movss xmm1,[rbx+00001658]
+// ---------- DONE INJECTING  ----------
+ed9.exe+69E9B: 0F 57 C0                 - xorps xmm0,xmm0
+ed9.exe+69E9E: 0F 2F C8                 - comiss xmm1,xmm0
+ed9.exe+69EA1: 0F 28 F7                 - movaps xmm6,xmm7
+ed9.exe+69EA4: F3 0F 11 BB 34 16 00 00  - movss [rbx+00001634],xmm7
+ed9.exe+69EAC: F3 0F 59 B3 40 16 00 00  - mulss xmm6,[rbx+00001640]
+ed9.exe+69EB4: 76 07                    - jna ed9.exe+69EBD
+ed9.exe+69EB6: 0F 28 F1                 - movaps xmm6,xmm1
+ed9.exe+69EB9: F3 0F 59 F7              - mulss xmm6,xmm7
+ed9.exe+69EBD: 80 BB 68 16 00 00 00     - cmp byte ptr [rbx+00001668],00
+ed9.exe+69EC4: F3 0F 11 7C 24 20        - movss [rsp+20],xmm7
+
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+69F09 - Freeze action
+
+ed9.exe+69ED0: 75 54                             - jne ed9.exe+69F26
+ed9.exe+69ED2: 48 89 B4 24 80 00 00 00           - mov [rsp+00000080],rsi
+ed9.exe+69EDA: BE 0A 00 00 00                    - mov esi,0000000A
+ed9.exe+69EDF: 48 89 BC 24 88 00 00 00           - mov [rsp+00000088],rdi
+ed9.exe+69EE7: 48 8B 3D 5A 6E 76 00              - mov rdi,[ed9.exe+7D0D48]
+ed9.exe+69EEE: 48 81 C7 88 16 01 00              - add rdi,00011688
+ed9.exe+69EF5: 66 66 66 0F 1F 84 00 00 00 00 00  - nop word ptr [rax+rax+00000000]
+ed9.exe+69F00: 48 8B 0F                          - mov rcx,[rdi]
+ed9.exe+69F03: 0F 28 CE                          - movaps xmm1,xmm6
+ed9.exe+69F06: 48 8B 01                          - mov rax,[rcx]
+// ---------- INJECTING HERE ----------
+ed9.exe+69F09: FF 50 18                          - call qword ptr [rax+18]
+// ---------- DONE INJECTING  ----------
+ed9.exe+69F0C: 48 8D 7F 08                       - lea rdi,[rdi+08]
+ed9.exe+69F10: 48 83 EE 01                       - sub rsi,01
+ed9.exe+69F14: 75 EA                             - jne ed9.exe+69F00
+ed9.exe+69F16: 48 8B BC 24 88 00 00 00           - mov rdi,[rsp+00000088]
+ed9.exe+69F1E: 48 8B B4 24 80 00 00 00           - mov rsi,[rsp+00000080]
+ed9.exe+69F26: 48 8B 0D BB 6D 76 00              - mov rcx,[ed9.exe+7D0CE8]
+ed9.exe+69F2D: 48 8D 54 24 20                    - lea rdx,[rsp+20]
+// ---------- INJECTING HERE ----------
+ed9.exe+69F32: E8 99 CD 17 00                    - call ed9.exe+1E6CD0
+// ---------- DONE INJECTING  ----------
+ed9.exe+69F37: 80 BB 68 16 00 00 00              - cmp byte ptr [rbx+00001668],00
+ed9.exe+69F3E: 75 31                             - jne ed9.exe+69F71
+ed9.exe+69F40: 48 8B 05 A1 6D 76 00              - mov rax,[ed9.exe+7D0CE8]
+ed9.exe+69F47: 0F B6 88 90 19 00 00              - movzx ecx,byte ptr [rax+00001990]
+ed9.exe+69F4E: 84 C9                             - test cl,cl
+ed9.exe+69F50: 75 1F                             - jne ed9.exe+69F71
+ed9.exe+69F52: 48 8B 0D 77 6D 76 00              - mov rcx,[ed9.exe+7D0CD0]
+ed9.exe+69F59: F6 81 34 07 00 00 01              - test byte ptr [rcx+00000734],01
+ed9.exe+69F60: 74 0F                             - je ed9.exe+69F71
+ed9.exe+69F62: 44 8B 81 30 07 00 00              - mov r8d,[rcx+00000730]
+ed9.exe+69F69: 0F 28 CE                          - movaps xmm1,xmm6
+ed9.exe+69F6C: E8 8F 38 0A 00                    - call ed9.exe+10D800
+ed9.exe+69F71: 48 8B 0D 70 6D 76 00              - mov rcx,[ed9.exe+7D0CE8]
+ed9.exe+69F78: 0F 28 CE                          - movaps xmm1,xmm6
+ed9.exe+69F7B: E8 F0 D5 17 00                    - call ed9.exe+1E7570
+ed9.exe+69F80: 48 8B 0D D1 6D 76 00              - mov rcx,[ed9.exe+7D0D58]
+ed9.exe+69F87: 0F 28 CF                          - movaps xmm1,xmm7
+ed9.exe+69F8A: E8 91 AD 2E 00                    - call ed9.exe+354D20
+ed9.exe+69F8F: 4C 8B 05 3A 6D 76 00              - mov r8,[ed9.exe+7D0CD0]
+ed9.exe+69F96: 0F 28 CF                          - movaps xmm1,xmm7
+ed9.exe+69F99: 48 8B 0D C8 F3 76 00              - mov rcx,[ed9.exe+7D9368]
+ed9.exe+69FA0: 4D 8B 80 90 06 00 00              - mov r8,[r8+00000690]
+// ---------- INJECTING HERE ----------
+ed9.exe+69FA7: E8 E4 2A 33 00                    - call ed9.exe+39CA90
+// ---------- DONE INJECTING  ----------
+ed9.exe+69FAC: 48 8B 0D 9D 6D 76 00              - mov rcx,[ed9.exe+7D0D50]
+ed9.exe+69FB3: 0F 28 CF                          - movaps xmm1,xmm7
+ed9.exe+69FB6: E8 D5 EE 2B 00                    - call ed9.exe+328E90
+ed9.exe+69FBB: 48 8B 0D 76 6D 76 00              - mov rcx,[ed9.exe+7D0D38]
+ed9.exe+69FC2: 41 0F 28 C8                       - movaps xmm1,xmm8
+ed9.exe+69FC6: E8 E5 3C 24 00                    - call ed9.exe+2ADCB0
+ed9.exe+69FCB: 48 8B 0D DE 6C 76 00              - mov rcx,[ed9.exe+7D0CB0]
+ed9.exe+69FD2: 0F 28 CF                          - movaps xmm1,xmm7
+ed9.exe+69FD5: E8 D6 7D FF FF                    - call ed9.exe+61DB0
+ed9.exe+69FDA: 48 8B 0D CF 6C 76 00              - mov rcx,[ed9.exe+7D0CB0]
+
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+10D85F - Prevent cutsccene from taking camera control
+
+ed9.exe+10D832: 48 8B 05 5F 29 6A 00     - mov rax,[ed9.exe+7B0198]
+ed9.exe+10D839: 48 33 C4                 - xor rax,rsp
+ed9.exe+10D83C: 48 89 44 24 40           - mov [rsp+40],rax
+ed9.exe+10D841: 4D 63 F8                 - movsxd  r15,r8d
+ed9.exe+10D844: 48 8B F9                 - mov rdi,rcx
+ed9.exe+10D847: 49 69 F7 A0 01 00 00     - imul rsi,r15,000001A0
+ed9.exe+10D84E: 44 0F 28 D9              - movaps xmm11,xmm1
+ed9.exe+10D852: 4A 8B 8C F9 98 06 00 00  - mov rcx,[rcx+r15*8+00000698]
+ed9.exe+10D85A: 48 85 C9                 - test rcx,rcx
+ed9.exe+10D85D: 74 06                    - je ed9.exe+10D865
+// ---------- INJECTING HERE ----------
+ed9.exe+10D85F: 48 8B 01                 - mov rax,[rcx]
+// ---------- DONE INJECTING  ----------
+ed9.exe+10D862: FF 50 20                 - call qword ptr [rax+20]
+ed9.exe+10D865: 48 8D 9F B0 06 00 00     - lea rbx,[rdi+000006B0]
+ed9.exe+10D86C: 45 32 F6                 - xor r14l,r14l
+ed9.exe+10D86F: 48 8D AB 80 00 00 00     - lea rbp,[rbx+00000080]
+ed9.exe+10D876: 45 0F 57 D2              - xorps xmm10,xmm10
+ed9.exe+10D87A: 0F 57 F6                 - xorps xmm6,xmm6
+ed9.exe+10D87D: 45 0F 57 C0              - xorps xmm8,xmm8
+ed9.exe+10D881: 45 0F 57 C9              - xorps xmm9,xmm9
+ed9.exe+10D885: 0F 57 FF                 - xorps xmm7,xmm7
+ed9.exe+10D888: 48 3B DD                 - cmp rbx,rbp
+ed9.exe+10D88B: 74 40                    - je ed9.exe+10D8CD
+ed9.exe+10D88D: 0F 1F 00                 - nop dword ptr [rax]
+ed9.exe+10D890: F3 0F 10 43 04           - movss xmm0,[rbx+04]
+ed9.exe+10D895: 41 0F 2F C2              - comiss xmm0,xmm10
+ed9.exe+10D899: 76 29                    - jna ed9.exe+10D8C4
+ed9.exe+10D89B: 41 0F 28 D3              - movaps xmm2,xmm11
+ed9.exe+10D89F: 48 8D 54 24 30           - lea rdx,[rsp+30]
+ed9.exe+10D8A4: 48 8B CB                 - mov rcx,rbx
+ed9.exe+10D8A7: E8 04 C3 25 00           - call ed9.exe+369BB0
+ed9.exe+10D8AC: 41 B6 01                 - mov r14l,01
+ed9.exe+10D8AF: F3 0F 58 30              - addss xmm6,[rax]
+ed9.exe+10D8B3: F3 44 0F 58 40 04        - addss xmm8,[rax+04]
+ed9.exe+10D8B9: F3 44 0F 58 48 08        - addss xmm9,[rax+08]
+ed9.exe+10D8BF: F3 0F 58 78 0C           - addss xmm7,[rax+0C]
+ed9.exe+10D8C4: 48 83 C3 40              - add rbx,40
+ed9.exe+10D8C8: 48 3B DD                 - cmp rbx,rbp
+ed9.exe+10D8CB: 75 C3                    - jne ed9.exe+10D890
+ed9.exe+10D8CD: 8B 87 34 07 00 00        - mov eax,[rdi+00000734]
+ed9.exe+10D8D3: D1 E8                    - shr eax,1
+ed9.exe+10D8D5: A8 01                    - test al,01
+// ---------- INJECTING HERE ----------
+ed9.exe+10D8D7: 0F 85 DB 00 00 00        - jne ed9.exe+10D9B8
+// ---------- DONE INJECTING  ----------
+ed9.exe+10D8DD: 48 8B 8F 90 06 00 00     - mov rcx,[rdi+00000690]
+ed9.exe+10D8E4: 8B 84 3E C8 01 00 00     - mov eax,[rsi+rdi+000001C8]
+ed9.exe+10D8EB: 89 41 08                 - mov [rcx+08],eax
+ed9.exe+10D8EE: 8B 84 3E CC 01 00 00    - mov eax,[rsi+rdi+000001CC]
+ed9.exe+10D8F5: 89 41 0C                 - mov [rcx+0C],eax
+ed9.exe+10D8F8: 8B 84 3E D0 01 00 00     - mov eax,[rsi+rdi+000001D0]
+ed9.exe+10D8FF: 89 41 10                 - mov [rcx+10],eax
+ed9.exe+10D902: 48 8B 8F 90 06 00 00     - mov rcx,[rdi+00000690]
+ed9.exe+10D909: 8B 84 3E 04 02 00 00     - mov eax,[rsi+rdi+00000204]
+ed9.exe+10D910: 89 41 18                 - mov [rcx+18],eax
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>6</ID>
+      <Description>"Hide HUD / Dialogue / Interface (F7 Toggle)"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+
+aobscanmodule(showinterface_aob,ed9.exe,F3 0F 11 47 68 48 85 C9 0F) // should be unique
+alloc(newmem,$1000,showinterface_aob)
+
+label(code)
+label(return)
+
+newmem:
+  push rax
+  xor eax,eax
+  movd xmm0,eax
+  pop rax
+code:
+  movss [rdi+68],xmm0
+  jmp return
+
+showinterface_aob:
+  jmp newmem
+return:
+registersymbol(showinterface_aob)
+
+[DISABLE]
+
+showinterface_aob:
+  db F3 0F 11 47 68
+
+unregistersymbol(showinterface_aob)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+36D499
+
+ed9.exe+36D464: 89 47 58                 - mov [rdi+58],eax
+ed9.exe+36D467: 8B 87 FC 01 00 00        - mov eax,[rdi+000001FC]
+ed9.exe+36D46D: 89 47 5C                 - mov [rdi+5C],eax
+ed9.exe+36D470: 8B 87 00 02 00 00        - mov eax,[rdi+00000200]
+ed9.exe+36D476: 89 47 60                 - mov [rdi+60],eax
+ed9.exe+36D479: F3 0F 10 86 D4 00 00 00  - movss xmm0,[rsi+000000D4]
+ed9.exe+36D481: F3 0F 59 87 1C 02 00 00  - mulss xmm0,[rdi+0000021C]
+ed9.exe+36D489: 48 8B 4F 70              - mov rcx,[rdi+70]
+ed9.exe+36D48D: 8B 87 D8 00 00 00        - mov eax,[rdi+000000D8]
+ed9.exe+36D493: 89 87 DC 00 00 00        - mov [rdi+000000DC],eax
+// ---------- INJECTING HERE ----------
+ed9.exe+36D499: F3 0F 11 47 68           - movss [rdi+68],xmm0
+// ---------- DONE INJECTING  ----------
+ed9.exe+36D49E: 48 85 C9                 - test rcx,rcx
+ed9.exe+36D4A1: 0F 84 57 03 00 00        - je ed9.exe+36D7FE
+ed9.exe+36D4A7: 8B 87 BC 00 00 00        - mov eax,[rdi+000000BC]
+ed9.exe+36D4AD: 83 E0 0E                 - and eax,0E
+ed9.exe+36D4B0: 4C 89 A4 24 F8 02 00 00  - mov [rsp+000002F8],r12
+ed9.exe+36D4B8: 3C 0E                    - cmp al,0E
+ed9.exe+36D4BA: 0F 85 97 00 00 00        - jne ed9.exe+36D557
+ed9.exe+36D4C0: 4C 8D 77 38              - lea r14,[rdi+38]
+ed9.exe+36D4C4: 48 83 C1 08              - add rcx,08
+ed9.exe+36D4C8: 4D 8B C6                 - mov r8,r14
+}
+</AssemblerScript>
+      <Hotkeys>
+        <Hotkey>
+          <Action>Toggle Activation</Action>
+          <Keys>
+            <Key>118</Key>
+          </Keys>
+          <ID>0</ID>
+        </Hotkey>
+      </Hotkeys>
+    </CheatEntry>
+  </CheatEntries>
+  <Comments>The movement algorithm is based on Cyber's CS4 script, adapted for Kuro's engine by me.  Credit also goes to DhaosCollider for AOB for FOV, to lock player movement, and for the fantastic idea of using the latter to allow WASD control.  My eternal gratitude to both!
+</Comments>
+</CheatTable>

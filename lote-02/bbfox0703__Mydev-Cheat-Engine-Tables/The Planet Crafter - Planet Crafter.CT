@@ -1,0 +1,2833 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="42">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>24</ID>
+      <Description>"Compact Mode"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+--https://forum.cheatengine.org/viewtopic.php?t=570055
+LuaCall(function cycleFullCompact(sender,force) local state = not(compactmenuitem.Caption == 'Compact View Mode'); if force~=nil then state = not force end; compactmenuitem.Caption = state and 'Compact View Mode' or 'Full View Mode'; getMainForm().Splitter1.Visible = state; getMainForm().Panel4.Visible    = state; getMainForm().Panel5.Visible    = state; end; function addCompactMenu() if compactmenualreadyexists then return end; local parent = getMainForm().Menu.Items; compactmenuitem = createMenuItem(parent); parent.add(compactmenuitem); compactmenuitem.Caption = 'Compact View Mode'; compactmenuitem.OnClick = cycleFullCompact; compactmenualreadyexists = 'yes'; end; addCompactMenu(); cycleFullCompact(nil,true))
+
+[DISABLE]
+LuaCall(cycleFullCompact(nil,false))
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>129</ID>
+      <Description>"Make sure all mono related windows (.Net info, Disseect Mono) is closed"</Description>
+      <Color>400080</Color>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>80</ID>
+      <Description>"Enable (enable twice)"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript Async="1">[ENABLE]
+{$lua}
+if syntaxcheck then return end
+if process == nil then ShowMessage('Process is not selected.')
+elseif readInteger(process) == 0 then ShowMessage('Process cannot be opened.')
+else
+  if (monopipe~=nil) and (monopipe.ProcessID~=getOpenedProcessID()) then
+    monopipe.destroy()
+    monopipe=nil
+  end
+  if (monopipe==nil) then
+    LaunchMonoDataCollector()
+  end
+end
+
+{$asm}
+define(Turn_MoveUpdateProc,"SpaceCraft.Turn_Move:Update")
+define(PlayerStatusProc,"SpaceCraft.PlayerStatus:Update")
+define(WorldUnitProc,"SpaceCraft.WorldUnit:Compute")
+define(PlayerGaugeProc,"SpaceCraft.PlayerGauge:AddToCurrentValue")
+define(PlayerMovableProc,"SpaceCraft.PlayerMovable:InputOnRun")
+define(Inventory_RemoveItemProc,"SpaceCraft.Inventory:RemoveItem")
+define(Inventory_RemoveItemsProc,"SpaceCraft.Inventory:RemoveItems")
+define(UiWindowConstructionProc,"SpaceCraft.UiWindowConstruction:Construct")
+define(PlayerCanActProc,"SpaceCraft.PlayerCanAct:Update")
+define(UiWindowEquipmentProc,"SpaceCraft.UiWindowEquipment:OnOpen")
+define(InventorySetSizeProc,"SpaceCraft.Inventory:SetSize")
+define(UiWindowContainerOnOpenProc,"SpaceCraft.UiWindowContainer:OnOpen")
+define(SpaceCraftCraftManagerTryToCraftInInventoryProc,"SpaceCraft.CraftManager:TryToCraftInInventory")
+define(SpaceCraftPlayModeHandlerGetFreeCraftProc,"SpaceCraft.PlayModeHandler:GetFreeCraft")
+define(SpaceCraftPlayerMovableUpdatePlayerMovementProc,"SpaceCraft.PlayerMovable:UpdatePlayerMovement")
+
+
+registersymbol(Turn_MoveUpdateProc)
+registersymbol(PlayerStatusProc)
+registersymbol(WorldUnitProc)
+registersymbol(PlayerGaugeProc)
+registersymbol(PlayerMovableProc)
+registersymbol(Inventory_RemoveItemProc)
+registersymbol(Inventory_RemoveItemsProc)
+registersymbol(UiWindowConstructionProc)
+registersymbol(PlayerCanActProc)
+registersymbol(UiWindowEquipmentProc)
+registersymbol(InventorySetSizeProc)
+registersymbol(UiWindowContainerOnOpenProc)
+registersymbol(SpaceCraftCraftManagerTryToCraftInInventoryProc)
+registersymbol(SpaceCraftPlayModeHandlerGetFreeCraftProc)
+registersymbol(SpaceCraftPlayerMovableUpdatePlayerMovementProc)
+[DISABLE]
+{$lua}
+if not syntaxcheck and monopipe then monopipe = nil,monopipe.Destroy()end
+
+{$asm}
+unregistersymbol(*)
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>1</ID>
+          <Description>"Life gauges"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript Async="1">{ Game   : Planet Crafter.exe
+  Version: 
+  Date   : 2022-03-26
+  Author : bbfox @ https://opencheattables.com
+}
+
+[ENABLE]
+aobscanregion(INJECT_LIFE_DATA,PlayerGaugeProc+37,PlayerGaugeProc+13b,F3 0F 11 6E 50 F3 0F 10 45) // should be unique
+alloc(newmem,$1000,INJECT_LIFE_DATA)
+
+label(code)
+label(return)
+label(is_life_data_on)
+label(vf_life_min_value)
+
+newmem:
+  cmp dword ptr [is_life_data_on], 1
+  jne code
+  vmovss xmm15, [vf_life_min_value]
+  vcomiss xmm5, xmm15
+  ja code
+  vmovss xmm5, [rsi+58]
+
+code:
+  movss [rsi+50],xmm5
+  jmp return
+
+align 10 cc
+  is_life_data_on:
+  dd 1
+  vf_life_min_value:
+  dd (float)50
+
+
+INJECT_LIFE_DATA:
+  jmp newmem
+return:
+
+registersymbol(is_life_data_on)
+registersymbol(vf_life_min_value)
+registersymbol(INJECT_LIFE_DATA)
+
+[DISABLE]
+
+INJECT_LIFE_DATA:
+  db F3 0F 11 6E 50
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: SpaceCraft.PlayerGauge:AddToCurrentValue+3b
+
+SpaceCraft.PlayerGauge:AddToCurrentValue+f: F3 0F 11 4D E0     - movss [rbp-20],xmm1
+SpaceCraft.PlayerGauge:AddToCurrentValue+14: F3 0F 10 46 50     - movss xmm0,[rsi+50]
+SpaceCraft.PlayerGauge:AddToCurrentValue+19: F3 0F 5A C0        - cvtss2sd xmm0,xmm0
+SpaceCraft.PlayerGauge:AddToCurrentValue+1d: F3 0F 10 4D E0     - movss xmm1,[rbp-20]
+SpaceCraft.PlayerGauge:AddToCurrentValue+22: F3 0F 5A C9        - cvtss2sd xmm1,xmm1
+SpaceCraft.PlayerGauge:AddToCurrentValue+26: F2 0F 58 C1        - addsd xmm0,xmm1
+SpaceCraft.PlayerGauge:AddToCurrentValue+2a: F2 0F 10 C8        - movsd xmm1,xmm0
+SpaceCraft.PlayerGauge:AddToCurrentValue+2e: F2 0F 5A E9        - cvtsd2ss xmm5,xmm1
+SpaceCraft.PlayerGauge:AddToCurrentValue+32: F3 0F 11 6D F4     - movss [rbp-0C],xmm5
+SpaceCraft.PlayerGauge:AddToCurrentValue+37: F2 0F 5A E8        - cvtsd2ss xmm5,xmm0
+// ---------- INJECTING HERE ----------
+SpaceCraft.PlayerGauge:AddToCurrentValue+3b: F3 0F 11 6E 50     - movss [rsi+50],xmm5
+// ---------- DONE INJECTING  ----------
+SpaceCraft.PlayerGauge:AddToCurrentValue+40: F3 0F 10 45 F4     - movss xmm0,[rbp-0C]
+SpaceCraft.PlayerGauge:AddToCurrentValue+45: F3 0F 5A C0        - cvtss2sd xmm0,xmm0
+SpaceCraft.PlayerGauge:AddToCurrentValue+49: F2 0F 10 D0        - movsd xmm2,xmm0
+SpaceCraft.PlayerGauge:AddToCurrentValue+4d: F3 0F 10 4E 58     - movss xmm1,[rsi+58]
+SpaceCraft.PlayerGauge:AddToCurrentValue+52: F3 0F 5A C9        - cvtss2sd xmm1,xmm1
+SpaceCraft.PlayerGauge:AddToCurrentValue+56: F2 0F 11 55 E8     - movsd [rbp-18],xmm2
+SpaceCraft.PlayerGauge:AddToCurrentValue+5b: 66 0F 2F C8        - comisd xmm1,xmm0
+SpaceCraft.PlayerGauge:AddToCurrentValue+5f: 0F 8A 22 00 00 00  - jp SpaceCraft.PlayerGauge:AddToCurrentValue+87
+SpaceCraft.PlayerGauge:AddToCurrentValue+65: 0F 83 1C 00 00 00  - jae SpaceCraft.PlayerGauge:AddToCurrentValue+87
+SpaceCraft.PlayerGauge:AddToCurrentValue+6b: F2 0F 10 45 E8     - movsd xmm0,[rbp-18]
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>2</ID>
+              <Description>"Turn on??"</Description>
+              <DropDownList DisplayValueAsItem="1">0:No
+1:Yes
+</DropDownList>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>is_life_data_on</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>3</ID>
+              <Description>"Min. value"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>vf_life_min_value</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>12</ID>
+          <Description>"Ti/Pressure... multiplier"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript Async="1">{ Game   : Planet Crafter.exe
+  Version: 
+  Date   : 2022-03-26
+  Author : bbfox @ https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanregion(INJECT_TI_DATA,WorldUnitProc+2f, WorldUnitProc+12f, F2 0F 59 CA F2 0F 58 C1 F2 0F 5A E8 F3 0F 11 6E 18) // should be unique
+alloc(newmem,$1000,INJECT_TI_DATA)
+
+label(code)
+label(return)
+label(i_ti_base_addr)
+label(vf_ti_multi)
+label(i_ti_value_addr)
+label(i_pressure_value_addr)
+label(i_heat_value_addr)
+label(is_all_multiplier_on)
+label(i_oxygen_value_addr)
+label(i_biomass_value_addr)
+label(i_energy_value_addr)
+label(is_en_set_positive)
+
+newmem:
+  push rax
+  db EB 3B 54 68 69 73 20 74
+  db 61 62 6C 65 20 63 6F 6D 65 73 20 66 72 6F 6D 20
+  db 68 74 74 70 73 3A 2F
+  db 2F 6F 70 65 6E 63 68 65
+  db 61 74
+  db 74 61 62 6C 65 73 2E 63 6F 6D
+  db 20 2F 20 43 45 20 37 2E 34 2B
+
+  mov eax, [rsi+2C]
+  //Ti=5
+  cmp eax, 5
+  mov [i_cur_type], eax
+  jne check_next1
+  mov [i_ti_base_addr], rsi
+  lea rax, [rsi+18]
+  mov [i_ti_value_addr], rax
+
+check_next1:
+  cmp eax, 4 //pressure
+  jne check_next2
+  lea rax, [rsi+18]
+  mov [i_pressure_value_addr], rax
+
+check_next2:
+  cmp eax, 3//heat
+  jne check_next3
+  lea rax, [rsi+18]
+  mov [i_heat_value_addr], rax
+
+check_next3:
+  cmp eax, 1//Oxygen
+  jne check_next4
+  lea rax, [rsi+18]
+  mov [i_oxygen_value_addr], rax
+
+
+check_next4:
+  cmp eax, 6//Biomass
+  jne check_next5
+  lea rax, [rsi+18]
+  mov [i_biomass_value_addr], rax
+
+check_next5:
+  cmp eax, 2//Energy
+  jne check_end
+  lea rax, [rsi+18]
+  mov [i_energy_value_addr], rax
+
+
+check_end:
+  pop rax
+  cmp dword ptr [i_cur_type], 0
+  je endp
+  cmp dword ptr [i_cur_type], 2
+  je do_energy
+  cmp dword ptr [is_all_multiplier_on], 1
+  jne endp
+  vmovsd xmm15, [vf_ti_multi]
+  vmulsd xmm2, xmm2, xmm15
+  jmp endp
+
+do_energy: //18 = current en (inf), 1C = currentValuePerSec, 20 = increaseValuePerSec, 24 = decreaseValuePerSec
+  cmp dword ptr [is_en_set_positive], 1
+  jne endp
+  vmovss xmm15, [rsi+1C]
+  vmovss xmm14, [vf_20]
+  vcomiss xmm15, xmm14
+  ja endp
+  vmovss [rsi+1C], xmm14
+  movss xmm0, xmm14
+  vmovss xmm14, [vf_m_0_1]
+  vmovss [rsi+24], xmm14
+
+
+endp:
+  push rax
+  mov eax, 0
+  mov [i_cur_type], eax
+  pop rax
+
+code:
+  mulsd xmm1,xmm2
+  addsd xmm0,xmm1
+  jmp return
+
+align 10 cc
+  is_all_multiplier_on:
+  dd 1
+  i_cur_type:
+  dd 0
+  vf_ti_multi: // all except energy
+  dq (double)2.5
+  is_en_set_positive:
+  dd 0
+  i_ti_base_addr:
+  dq 0
+  i_ti_value_addr:
+  dq 0
+  i_pressure_value_addr:
+  dq 0
+  i_heat_value_addr:
+  dq 0
+  i_biomass_value_addr:
+  dq 0
+  i_oxygen_value_addr:
+  dq 0
+  i_energy_value_addr:
+  dq 0
+  vf_0_1:
+  dd (float)0.1
+  vf_20:
+  dd (float)20
+  vf_m_0_1:
+  dd (float)-0.1
+
+INJECT_TI_DATA:
+  jmp newmem
+  nop 3
+return:
+
+registersymbol(is_en_set_positive)
+registersymbol(i_energy_value_addr)
+registersymbol(i_biomass_value_addr)
+registersymbol(i_oxygen_value_addr)
+registersymbol(is_all_multiplier_on)
+registersymbol(i_heat_value_addr)
+registersymbol(i_pressure_value_addr)
+registersymbol(i_ti_value_addr)
+registersymbol(i_ti_base_addr)
+registersymbol(vf_ti_multi)
+registersymbol(INJECT_TI_DATA)
+
+[DISABLE]
+
+INJECT_TI_DATA:
+  db F2 0F 59 CA F2 0F 58 C1
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: SpaceCraft.WorldUnit:Compute+2f
+
+SpaceCraft.WorldUnit:Compute+4: 48 83 EC 30                    - sub rsp,30
+SpaceCraft.WorldUnit:Compute+8: 48 89 75 F8                    - mov [rbp-08],rsi
+SpaceCraft.WorldUnit:Compute+c: 48 8B F1                       - mov rsi,rcx
+SpaceCraft.WorldUnit:Compute+f: F3 0F 11 4D F0                 - movss [rbp-10],xmm1
+SpaceCraft.WorldUnit:Compute+14: F3 0F 10 46 18                 - movss xmm0,[rsi+18]
+SpaceCraft.WorldUnit:Compute+19: F3 0F 5A C0                    - cvtss2sd xmm0,xmm0
+SpaceCraft.WorldUnit:Compute+1d: F3 0F 10 4E 1C                 - movss xmm1,[rsi+1C]
+SpaceCraft.WorldUnit:Compute+22: F3 0F 5A C9                    - cvtss2sd xmm1,xmm1
+SpaceCraft.WorldUnit:Compute+26: F3 0F 10 55 F0                 - movss xmm2,[rbp-10]
+SpaceCraft.WorldUnit:Compute+2b: F3 0F 5A D2                    - cvtss2sd xmm2,xmm2
+// ---------- INJECTING HERE ----------
+SpaceCraft.WorldUnit:Compute+2f: F2 0F 59 CA                    - mulsd xmm1,xmm2
+// ---------- DONE INJECTING  ----------
+SpaceCraft.WorldUnit:Compute+33: F2 0F 58 C1                    - addsd xmm0,xmm1
+SpaceCraft.WorldUnit:Compute+37: F2 0F 5A E8                    - cvtsd2ss xmm5,xmm0
+SpaceCraft.WorldUnit:Compute+3b: F3 0F 11 6E 18                 - movss [rsi+18],xmm5
+SpaceCraft.WorldUnit:Compute+40: 48 8B CE                       - mov rcx,rsi
+SpaceCraft.WorldUnit:Compute+43: 66 66 90                       - nop 3
+SpaceCraft.WorldUnit:Compute+46: 49 BB 00 9D 67 19 61 01 00 00  - mov r11,SpaceCraft.WorldUnit:SetCurrentLabelIndex
+SpaceCraft.WorldUnit:Compute+50: 41 FF D3                       - call r11
+SpaceCraft.WorldUnit:Compute+53: 48 8B 75 F8                    - mov rsi,[rbp-08]
+SpaceCraft.WorldUnit:Compute+57: 48 8D 65 00                    - lea rsp,[rbp+00]
+SpaceCraft.WorldUnit:Compute+5b: 5D                             - pop rbp
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>14</ID>
+              <Description>"Grow multiplier (exclude energy)"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Double</VariableType>
+              <Address>vf_ti_multi</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>13</ID>
+              <Description>"Ti"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>i_ti_value_addr</Address>
+              <Offsets>
+                <Offset>0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>15</ID>
+              <Description>"Pressure"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>i_pressure_value_addr</Address>
+              <Offsets>
+                <Offset>0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>16</ID>
+              <Description>"Heat"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>i_heat_value_addr</Address>
+              <Offsets>
+                <Offset>0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>17</ID>
+              <Description>"Oxygen"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>i_oxygen_value_addr</Address>
+              <Offsets>
+                <Offset>0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>18</ID>
+              <Description>"Biomass"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>i_biomass_value_addr</Address>
+              <Offsets>
+                <Offset>0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>25</ID>
+              <Description>"Try to keep energy positive?"</Description>
+              <DropDownListLink>Turn on??</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>is_en_set_positive</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>23</ID>
+              <Description>"Energy"</Description>
+              <Options moHideChildren="1"/>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>19</ID>
+                  <Description>"currentTotalValue"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>i_energy_value_addr</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>20</ID>
+                  <Description>"currentValuePerSec"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>i_energy_value_addr</Address>
+                  <Offsets>
+                    <Offset>4</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>21</ID>
+                  <Description>"increaseValuePerSec"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>i_energy_value_addr</Address>
+                  <Offsets>
+                    <Offset>8</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>22</ID>
+                  <Description>"decreaseValuePerSec"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>i_energy_value_addr</Address>
+                  <Offsets>
+                    <Offset>C</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>26</ID>
+          <Description>"PlayerStatus"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript Async="1">{ Game   : Planet Crafter.exe
+  Version: 
+  Date   : 2022-03-26
+  Author : bbfox @ https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanregion(INJECT_PLAYERSTATUS,PlayerStatusProc+12, PlayerStatusProc+102, 48 8B 46 30 48 8B C8) // should be unique
+alloc(newmem,$1000,INJECT_PLAYERSTATUS)
+
+label(code)
+label(return)
+label(i_playerstatus_addr)
+
+newmem:
+  mov [i_playerstatus_addr], rsi
+
+code:
+  mov rax,[rsi+30]
+  mov rcx,rax
+  jmp return
+
+align 10 cc
+  i_playerstatus_addr:
+  dq 0
+  i_tick:
+  dd 0
+
+INJECT_PLAYERSTATUS:
+  jmp newmem
+  nop 2
+return:
+registersymbol(i_playerstatus_addr)
+registersymbol(INJECT_PLAYERSTATUS)
+
+[DISABLE]
+
+INJECT_PLAYERSTATUS:
+  db 48 8B 46 30 48 8B C8
+
+unregistersymbol(INJECT_PLAYERSTATUS)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: SpaceCraft.PlayerStatus:Update+12
+
+193BC76BD53: 05 04 03 01 50                 - add eax,50010304
+193BC76BD58: 00 00                          - add [rax],al
+193BC76BD5A: 00 00                          - add [rax],al
+193BC76BD5C: 00 00                          - add [rax],al
+193BC76BD5E: 00 00                          - add [rax],al
+SpaceCraft.PlayerStatus:Update: 55                             - push rbp
+SpaceCraft.PlayerStatus:Update+1: 48 8B EC                       - mov rbp,rsp
+SpaceCraft.PlayerStatus:Update+4: 48 81 EC C0 00 00 00           - sub rsp,000000C0
+SpaceCraft.PlayerStatus:Update+b: 48 89 75 F8                    - mov [rbp-08],rsi
+SpaceCraft.PlayerStatus:Update+f: 48 8B F1                       - mov rsi,rcx
+// ---------- INJECTING HERE ----------
+SpaceCraft.PlayerStatus:Update+12: 48 8B 46 30                    - mov rax,[rsi+30]
+// ---------- DONE INJECTING  ----------
+SpaceCraft.PlayerStatus:Update+16: 48 8B C8                       - mov rcx,rax
+SpaceCraft.PlayerStatus:Update+19: 83 39 00                       - cmp dword ptr [rcx],00
+SpaceCraft.PlayerStatus:Update+1c: 48 8B 40 20                    - mov rax,[rax+20]
+SpaceCraft.PlayerStatus:Update+20: 48 8B C8                       - mov rcx,rax
+SpaceCraft.PlayerStatus:Update+23: 83 38 00                       - cmp dword ptr [rax],00
+SpaceCraft.PlayerStatus:Update+26: 49 BB 10 C3 76 BC 93 01 00 00  - mov r11,SpaceCraft.PlayerGauge:GetValue
+SpaceCraft.PlayerStatus:Update+30: 41 FF D3                       - call r11
+SpaceCraft.PlayerStatus:Update+33: F3 0F 5A C0                    - cvtss2sd xmm0,xmm0
+SpaceCraft.PlayerStatus:Update+37: 66 0F 57 C9                    - xorpd xmm1,xmm1
+SpaceCraft.PlayerStatus:Update+3b: 66 0F 2F C8                    - comisd xmm1,xmm0
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>27</ID>
+              <Description>"Base addr."</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>808080</Color>
+              <VariableType>8 Bytes</VariableType>
+              <Address>i_playerstatus_addr</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>40</ID>
+              <Description>"canisterGroup+"</Description>
+              <Options moHideChildren="1"/>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>28</ID>
+                  <Description>"hideInCrafter"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Byte</VariableType>
+                  <Address>[i_playerstatus_addr]+20</Address>
+                  <Offsets>
+                    <Offset>40</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>29</ID>
+                  <Description>"unlockingWorldUnit"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[i_playerstatus_addr]+20</Address>
+                  <Offsets>
+                    <Offset>44</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>30</ID>
+                  <Description>"unlockingValue"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_playerstatus_addr]+20</Address>
+                  <Offsets>
+                    <Offset>48</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>31</ID>
+                  <Description>"inventorySize"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[i_playerstatus_addr]+20</Address>
+                  <Offsets>
+                    <Offset>4C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>32</ID>
+                  <Description>"unitGenerationOxygen"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_playerstatus_addr]+20</Address>
+                  <Offsets>
+                    <Offset>50</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>33</ID>
+                  <Description>"unitGenerationPressure"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_playerstatus_addr]+20</Address>
+                  <Offsets>
+                    <Offset>54</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>34</ID>
+                  <Description>"unitGenerationHeat"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_playerstatus_addr]+20</Address>
+                  <Offsets>
+                    <Offset>58</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>35</ID>
+                  <Description>"unitGenerationEnergy"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_playerstatus_addr]+20</Address>
+                  <Offsets>
+                    <Offset>5C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>36</ID>
+                  <Description>"unitGenerationBiomass"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_playerstatus_addr]+20</Address>
+                  <Offsets>
+                    <Offset>60</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>37</ID>
+                  <Description>"rotationFixed"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Byte</VariableType>
+                  <Address>[i_playerstatus_addr]+20</Address>
+                  <Offsets>
+                    <Offset>64</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>38</ID>
+                  <Description>"groupCategory"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[i_playerstatus_addr]+20</Address>
+                  <Offsets>
+                    <Offset>68</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>39</ID>
+                  <Description>"worlUnitMultiplied"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[i_playerstatus_addr]+20</Address>
+                  <Offsets>
+                    <Offset>6C</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>69</ID>
+              <Description>"playerGaugeHandler+"</Description>
+              <Options moHideChildren="1"/>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>47</ID>
+                  <Description>"gOxygen+"</Description>
+                  <Options moHideChildren="1"/>
+                  <GroupHeader>1</GroupHeader>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>41</ID>
+                      <Description>"gaugeValue"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Float</VariableType>
+                      <Address>[i_playerstatus_addr]+30</Address>
+                      <Offsets>
+                        <Offset>48</Offset>
+                        <Offset>18</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>42</ID>
+                      <Description>"initialValue"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Float</VariableType>
+                      <Address>[i_playerstatus_addr]+30</Address>
+                      <Offsets>
+                        <Offset>50</Offset>
+                        <Offset>30</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>43</ID>
+                      <Description>"maxValue"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Float</VariableType>
+                      <Address>[i_playerstatus_addr]+30</Address>
+                      <Offsets>
+                        <Offset>58</Offset>
+                        <Offset>30</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>44</ID>
+                      <Description>"isInited"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Byte</VariableType>
+                      <Address>[i_playerstatus_addr]+30</Address>
+                      <Offsets>
+                        <Offset>5C</Offset>
+                        <Offset>30</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>45</ID>
+                      <Description>"hasAlertedCritical"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Byte</VariableType>
+                      <Address>[i_playerstatus_addr]+30</Address>
+                      <Offsets>
+                        <Offset>60</Offset>
+                        <Offset>30</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>46</ID>
+                      <Description>"hasAlertedLow"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Byte</VariableType>
+                      <Address>[i_playerstatus_addr]+30</Address>
+                      <Offsets>
+                        <Offset>61</Offset>
+                        <Offset>30</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>54</ID>
+                  <Description>"gThirst+"</Description>
+                  <Options moHideChildren="1"/>
+                  <GroupHeader>1</GroupHeader>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>48</ID>
+                      <Description>"gaugeValue"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Float</VariableType>
+                      <Address>[i_playerstatus_addr]+30</Address>
+                      <Offsets>
+                        <Offset>50</Offset>
+                        <Offset>38</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>49</ID>
+                      <Description>"initialValue"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Float</VariableType>
+                      <Address>[i_playerstatus_addr]+30</Address>
+                      <Offsets>
+                        <Offset>54</Offset>
+                        <Offset>38</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>50</ID>
+                      <Description>"maxValue"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Float</VariableType>
+                      <Address>[i_playerstatus_addr]+30</Address>
+                      <Offsets>
+                        <Offset>58</Offset>
+                        <Offset>38</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>51</ID>
+                      <Description>"isInited"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Byte</VariableType>
+                      <Address>[i_playerstatus_addr]+30</Address>
+                      <Offsets>
+                        <Offset>5C</Offset>
+                        <Offset>38</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>52</ID>
+                      <Description>"hasAlertedCritical"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Byte</VariableType>
+                      <Address>[i_playerstatus_addr]+30</Address>
+                      <Offsets>
+                        <Offset>60</Offset>
+                        <Offset>38</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>53</ID>
+                      <Description>"hasAlertedLow"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Byte</VariableType>
+                      <Address>[i_playerstatus_addr]+30</Address>
+                      <Offsets>
+                        <Offset>61</Offset>
+                        <Offset>38</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>61</ID>
+                  <Description>"gHealth+"</Description>
+                  <Options moHideChildren="1"/>
+                  <GroupHeader>1</GroupHeader>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>55</ID>
+                      <Description>"gaugeValue"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Float</VariableType>
+                      <Address>[i_playerstatus_addr]+30</Address>
+                      <Offsets>
+                        <Offset>50</Offset>
+                        <Offset>40</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>56</ID>
+                      <Description>"initialValue"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Float</VariableType>
+                      <Address>[i_playerstatus_addr]+30</Address>
+                      <Offsets>
+                        <Offset>54</Offset>
+                        <Offset>40</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>57</ID>
+                      <Description>"maxValue"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Float</VariableType>
+                      <Address>[i_playerstatus_addr]+30</Address>
+                      <Offsets>
+                        <Offset>58</Offset>
+                        <Offset>40</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>58</ID>
+                      <Description>"isInited"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Byte</VariableType>
+                      <Address>[i_playerstatus_addr]+30</Address>
+                      <Offsets>
+                        <Offset>5C</Offset>
+                        <Offset>40</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>59</ID>
+                      <Description>"hasAlertedCritical"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Byte</VariableType>
+                      <Address>[i_playerstatus_addr]+30</Address>
+                      <Offsets>
+                        <Offset>60</Offset>
+                        <Offset>40</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>60</ID>
+                      <Description>"hasAlertedLow"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Byte</VariableType>
+                      <Address>[i_playerstatus_addr]+30</Address>
+                      <Offsets>
+                        <Offset>61</Offset>
+                        <Offset>40</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>62</ID>
+                  <Description>"oxygenChangeValuePerSec"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_playerstatus_addr]+30</Address>
+                  <Offsets>
+                    <Offset>50</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>63</ID>
+                  <Description>"healthChangeValuePerSec"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_playerstatus_addr]+30</Address>
+                  <Offsets>
+                    <Offset>54</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>64</ID>
+                  <Description>"thirstChangeValuePerSec"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_playerstatus_addr]+30</Address>
+                  <Offsets>
+                    <Offset>58</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>65</ID>
+                  <Description>"outsideOxygenChangeValuePerSec"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_playerstatus_addr]+30</Address>
+                  <Offsets>
+                    <Offset>5C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>66</ID>
+                  <Description>"insideOxygenChangeValuePerSec"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_playerstatus_addr]+30</Address>
+                  <Offsets>
+                    <Offset>60</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>67</ID>
+                  <Description>"playerHaveOxygenRebreather"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Byte</VariableType>
+                  <Address>[i_playerstatus_addr]+30</Address>
+                  <Offsets>
+                    <Offset>64</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>221</ID>
+                  <Description>"playerCanBreath"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Byte</VariableType>
+                  <Address>[i_playerstatus_addr]+30</Address>
+                  <Offsets>
+                    <Offset>65</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>68</ID>
+                  <Description>"coroutineHasStarted"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Byte</VariableType>
+                  <Address>[i_playerstatus_addr]+30</Address>
+                  <Offsets>
+                    <Offset>66</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>70</ID>
+              <Description>"lastBreathingPosition"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>[i_playerstatus_addr]+38</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>71</ID>
+              <Description>"isDying"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>[i_playerstatus_addr]+44</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>72</ID>
+              <Description>"timeStartDying"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>[i_playerstatus_addr]+48</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>136</ID>
+          <Description>"PlayerCanAct"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : Planet Crafter.exe
+  Version: 
+  Date   : 2022-03-31
+  Author : bbfox @ https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanregion(INJECT_PLAYER_CANACT,PlayerCanActProc+19, PlayerCanActProc+119,48 8B 4E 30 33 D2 48 8D AD) // should be unique
+alloc(newmem,$1000,INJECT_PLAYER_CANACT)
+
+label(code)
+label(return)
+label(i_player_canact_addr)
+
+newmem:
+  mov [i_player_canact_addr], rsi
+
+code:
+  mov rcx,[rsi+30]
+  xor edx,edx
+  jmp return
+
+align 10 cc
+  i_player_canact_addr:
+  dq 0
+
+INJECT_PLAYER_CANACT:
+  jmp newmem
+  nop
+return:
+registersymbol(i_player_canact_addr)
+registersymbol(INJECT_PLAYER_CANACT)
+
+[DISABLE]
+
+INJECT_PLAYER_CANACT:
+  db 48 8B 4E 30 33 D2
+
+unregistersymbol(INJECT_PLAYER_CANACT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: SpaceCraft.PlayerCanAct:Update+19
+
+1BBA05BA83C: 00 00                          - add [rax],al
+1BBA05BA83E: 00 00                          - add [rax],al
+SpaceCraft.PlayerCanAct:Update: 55                             - push rbp
+SpaceCraft.PlayerCanAct:Update+1: 48 8B EC                       - mov rbp,rsp
+SpaceCraft.PlayerCanAct:Update+4: 48 83 EC 30                    - sub rsp,30
+SpaceCraft.PlayerCanAct:Update+8: 48 89 75 F0                    - mov [rbp-10],rsi
+SpaceCraft.PlayerCanAct:Update+c: 48 89 7D F8                    - mov [rbp-08],rdi
+SpaceCraft.PlayerCanAct:Update+10: 48 8B F1                       - mov rsi,rcx
+SpaceCraft.PlayerCanAct:Update+13: 33 C0                          - xor eax,eax
+SpaceCraft.PlayerCanAct:Update+15: 48 0F B6 F8                    - movzx rdi,al
+// ---------- INJECTING HERE ----------
+SpaceCraft.PlayerCanAct:Update+19: 48 8B 4E 30                    - mov rcx,[rsi+30]
+// ---------- DONE INJECTING  ----------
+SpaceCraft.PlayerCanAct:Update+1d: 33 D2                          - xor edx,edx
+SpaceCraft.PlayerCanAct:Update+1f: 48 8D AD 00 00 00 00           - lea rbp,[rbp+00000000]
+SpaceCraft.PlayerCanAct:Update+26: 49 BB 10 D0 39 57 BB 01 00 00  - mov r11,UnityEngine.Object:op_Inequality
+SpaceCraft.PlayerCanAct:Update+30: 41 FF D3                       - call r11
+SpaceCraft.PlayerCanAct:Update+33: 85 C0                          - test eax,eax
+SpaceCraft.PlayerCanAct:Update+35: 74 1C                          - je SpaceCraft.PlayerCanAct:Update+53
+SpaceCraft.PlayerCanAct:Update+37: 48 8B 46 30                    - mov rax,[rsi+30]
+SpaceCraft.PlayerCanAct:Update+3b: 48 8B C8                       - mov rcx,rax
+SpaceCraft.PlayerCanAct:Update+3e: 83 39 00                       - cmp dword ptr [rcx],00
+SpaceCraft.PlayerCanAct:Update+41: 48 63 40 40                    - movsxd  rax,dword ptr [rax+40]
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>137</ID>
+              <Description>"Base addr"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>808080</Color>
+              <VariableType>8 Bytes</VariableType>
+              <Address>i_player_canact_addr</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>159</ID>
+              <Description>"playerMovable+"</Description>
+              <Options moHideChildren="1"/>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>168</ID>
+                  <Description>"playerGroundRelation+"</Description>
+                  <Options moHideChildren="1"/>
+                  <GroupHeader>1</GroupHeader>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>160</ID>
+                      <Description>"isGrounded"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Byte</VariableType>
+                      <Address>[i_player_canact_addr]+18</Address>
+                      <Offsets>
+                        <Offset>18</Offset>
+                        <Offset>30</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>161</ID>
+                      <Description>"isOnTerrain"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Byte</VariableType>
+                      <Address>[i_player_canact_addr]+18</Address>
+                      <Offsets>
+                        <Offset>19</Offset>
+                        <Offset>30</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>162</ID>
+                      <Description>"isOnMetal"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Byte</VariableType>
+                      <Address>[i_player_canact_addr]+18</Address>
+                      <Offsets>
+                        <Offset>1A</Offset>
+                        <Offset>30</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>163</ID>
+                      <Description>"isOnRocks"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Byte</VariableType>
+                      <Address>[i_player_canact_addr]+18</Address>
+                      <Offsets>
+                        <Offset>1B</Offset>
+                        <Offset>30</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>164</ID>
+                      <Description>"consideredGroundedDistance"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Float</VariableType>
+                      <Address>[i_player_canact_addr]+18</Address>
+                      <Offsets>
+                        <Offset>1C</Offset>
+                        <Offset>30</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>165</ID>
+                      <Description>"groundDistance"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Float</VariableType>
+                      <Address>[i_player_canact_addr]+18</Address>
+                      <Offsets>
+                        <Offset>20</Offset>
+                        <Offset>30</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>166</ID>
+                      <Description>"groundHit"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>[i_player_canact_addr]+18</Address>
+                      <Offsets>
+                        <Offset>24</Offset>
+                        <Offset>30</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>167</ID>
+                      <Description>"previousPosition"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>[i_player_canact_addr]+18</Address>
+                      <Offsets>
+                        <Offset>30</Offset>
+                        <Offset>30</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>174</ID>
+                  <Description>"playerFallDamage+"</Description>
+                  <Options moHideChildren="1"/>
+                  <GroupHeader>1</GroupHeader>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>169</ID>
+                      <Description>"fallDamage"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>[i_player_canact_addr]+18</Address>
+                      <Offsets>
+                        <Offset>38</Offset>
+                        <Offset>40</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>170</ID>
+                      <Description>"maximumFallVelocity"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Float</VariableType>
+                      <Address>[i_player_canact_addr]+18</Address>
+                      <Offsets>
+                        <Offset>3C</Offset>
+                        <Offset>40</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>171</ID>
+                      <Description>"shouldBeHurt"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Byte</VariableType>
+                      <Address>[i_player_canact_addr]+18</Address>
+                      <Offsets>
+                        <Offset>40</Offset>
+                        <Offset>40</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>172</ID>
+                      <Description>"lastGroundedPlace"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>[i_player_canact_addr]+18</Address>
+                      <Offsets>
+                        <Offset>44</Offset>
+                        <Offset>40</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>173</ID>
+                      <Description>"distanceMinForDamage"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Float</VariableType>
+                      <Address>[i_player_canact_addr]+18</Address>
+                      <Offsets>
+                        <Offset>50</Offset>
+                        <Offset>40</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>138</ID>
+                  <Description>"PlayerHeight"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_canact_addr]+18</Address>
+                  <Offsets>
+                    <Offset>48</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>139</ID>
+                  <Description>"PlayerRadius"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_canact_addr]+18</Address>
+                  <Offsets>
+                    <Offset>4C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>140</ID>
+                  <Description>"PlayerWeight"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_canact_addr]+18</Address>
+                  <Offsets>
+                    <Offset>50</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>141</ID>
+                  <Description>"flyMode"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Byte</VariableType>
+                  <Address>[i_player_canact_addr]+18</Address>
+                  <Offsets>
+                    <Offset>54</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>142</ID>
+                  <Description>"isSwimming"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Byte</VariableType>
+                  <Address>[i_player_canact_addr]+18</Address>
+                  <Offsets>
+                    <Offset>55</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>143</ID>
+                  <Description>"MoveSpeed"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_canact_addr]+18</Address>
+                  <Offsets>
+                    <Offset>58</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>144</ID>
+                  <Description>"RunSpeed"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_canact_addr]+18</Address>
+                  <Offsets>
+                    <Offset>5C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>145</ID>
+                  <Description>"MaximumFallVelocity"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_canact_addr]+18</Address>
+                  <Offsets>
+                    <Offset>60</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>146</ID>
+                  <Description>"EnableJump"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Byte</VariableType>
+                  <Address>[i_player_canact_addr]+18</Address>
+                  <Offsets>
+                    <Offset>64</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>147</ID>
+                  <Description>"JumpImpulse"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_canact_addr]+18</Address>
+                  <Offsets>
+                    <Offset>68</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>148</ID>
+                  <Description>"m_Fall"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_canact_addr]+18</Address>
+                  <Offsets>
+                    <Offset>6C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>149</ID>
+                  <Description>"m_Grounded"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Byte</VariableType>
+                  <Address>[i_player_canact_addr]+18</Address>
+                  <Offsets>
+                    <Offset>70</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>150</ID>
+                  <Description>"jumpActionValue"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_canact_addr]+18</Address>
+                  <Offsets>
+                    <Offset>74</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>151</ID>
+                  <Description>"runActionValue"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_canact_addr]+18</Address>
+                  <Offsets>
+                    <Offset>78</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>152</ID>
+                  <Description>"lastMoveAxis"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[i_player_canact_addr]+18</Address>
+                  <Offsets>
+                    <Offset>7C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>153</ID>
+                  <Description>"moveSpeedChangePercentage"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_canact_addr]+18</Address>
+                  <Offsets>
+                    <Offset>84</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>154</ID>
+                  <Description>"autoRun"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Byte</VariableType>
+                  <Address>[i_player_canact_addr]+18</Address>
+                  <Offsets>
+                    <Offset>88</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>155</ID>
+                  <Description>"lastRunValue"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_canact_addr]+18</Address>
+                  <Offsets>
+                    <Offset>8C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>156</ID>
+                  <Description>"jetpackFactor"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_canact_addr]+18</Address>
+                  <Offsets>
+                    <Offset>90</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>157</ID>
+                  <Description>"jumpStatusInAir"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[i_player_canact_addr]+18</Address>
+                  <Offsets>
+                    <Offset>94</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>158</ID>
+                  <Description>"previousSwimmingStatus"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Byte</VariableType>
+                  <Address>[i_player_canact_addr]+18</Address>
+                  <Offsets>
+                    <Offset>98</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>189</ID>
+              <Description>"playerLookable+"</Description>
+              <Options moHideChildren="1"/>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>178</ID>
+                  <Description>"sensitivity"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[i_player_canact_addr]+20</Address>
+                  <Offsets>
+                    <Offset>40</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>179</ID>
+                  <Description>"gamePadLookSensitivity"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_canact_addr]+20</Address>
+                  <Offsets>
+                    <Offset>48</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>180</ID>
+                  <Description>"PitchSpeed"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_canact_addr]+20</Address>
+                  <Offsets>
+                    <Offset>4C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>181</ID>
+                  <Description>"TurnSpeed"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_canact_addr]+20</Address>
+                  <Offsets>
+                    <Offset>50</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>182</ID>
+                  <Description>"MaxPitch"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_canact_addr]+20</Address>
+                  <Offsets>
+                    <Offset>54</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>183</ID>
+                  <Description>"isIntro"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Byte</VariableType>
+                  <Address>[i_player_canact_addr]+20</Address>
+                  <Offsets>
+                    <Offset>58</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>184</ID>
+                  <Description>"m_Pitch"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_canact_addr]+20</Address>
+                  <Offsets>
+                    <Offset>5C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>185</ID>
+                  <Description>"mouseDelta"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[i_player_canact_addr]+20</Address>
+                  <Offsets>
+                    <Offset>60</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>186</ID>
+                  <Description>"smoothMouse"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[i_player_canact_addr]+20</Address>
+                  <Offsets>
+                    <Offset>68</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>187</ID>
+                  <Description>"invertMouseAxisX"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Byte</VariableType>
+                  <Address>[i_player_canact_addr]+20</Address>
+                  <Offsets>
+                    <Offset>70</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>188</ID>
+                  <Description>"invertMouseAxisY"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Byte</VariableType>
+                  <Address>[i_player_canact_addr]+20</Address>
+                  <Offsets>
+                    <Offset>71</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>196</ID>
+              <Description>"playerActionController+"</Description>
+              <Options moHideChildren="1"/>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>198</ID>
+                  <Description>"distanceHitLimit"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_canact_addr]+28</Address>
+                  <Offsets>
+                    <Offset>48</Offset>
+                    <Offset>18</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>191</ID>
+                  <Description>"mousePosition"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[i_player_canact_addr]+28</Address>
+                  <Offsets>
+                    <Offset>4C</Offset>
+                    <Offset>18</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>192</ID>
+                  <Description>"aimingRay"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[i_player_canact_addr]+28</Address>
+                  <Offsets>
+                    <Offset>54</Offset>
+                    <Offset>18</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>193</ID>
+                  <Description>"layerMask"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[i_player_canact_addr]+28</Address>
+                  <Offsets>
+                    <Offset>6C</Offset>
+                    <Offset>18</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>202</ID>
+                  <Description>"previousMultitoolState"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[i_player_canact_addr]+28</Address>
+                  <Offsets>
+                    <Offset>70</Offset>
+                    <Offset>18</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>195</ID>
+                  <Description>"centerMousePosition"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[i_player_canact_addr]+28</Address>
+                  <Offsets>
+                    <Offset>74</Offset>
+                    <Offset>18</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>203</ID>
+                  <Description>"mineTime"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_canact_addr]+28</Address>
+                  <Offsets>
+                    <Offset>38</Offset>
+                    <Offset>20</Offset>
+                    <Offset>38</Offset>
+                    <Offset>18</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>204</ID>
+                  <Description>"mineTimeReducer"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_canact_addr]+28</Address>
+                  <Offsets>
+                    <Offset>3C</Offset>
+                    <Offset>20</Offset>
+                    <Offset>38</Offset>
+                    <Offset>18</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>175</ID>
+              <Description>"hasToBeBlocked"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>[i_player_canact_addr]+38</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>176</ID>
+              <Description>"devBlockView"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>[i_player_canact_addr]+39</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>177</ID>
+              <Description>"isDying"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>[i_player_canact_addr]+3A</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>87</ID>
+          <Description>"PlayerMovable"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : Planet Crafter.exe
+  Version: 
+  Date   : 2022-03-30
+  Author : bbfox @ https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanregion(INJECT_PLAYER_MOVABLE,PlayerMovableProc+16,PlayerMovableProc+116,0F B6 86 88 00 00 00 85 C0 75 18) // should be unique
+alloc(newmem,$1000,INJECT_PLAYER_MOVABLE)
+
+label(code)
+label(return)
+label(i_player_movable_addr)
+
+newmem:
+  mov [i_player_movable_addr], rsi
+
+code:
+  movzx eax,byte ptr [rsi+00000088]
+  jmp return
+
+align 10 cc
+  i_player_movable_addr:
+  dq 0
+
+INJECT_PLAYER_MOVABLE:
+  jmp newmem
+  nop 2
+return:
+
+registersymbol(i_player_movable_addr)
+registersymbol(INJECT_PLAYER_MOVABLE)
+
+[DISABLE]
+
+INJECT_PLAYER_MOVABLE:
+  db 0F B6 86 88 00 00 00
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: SpaceCraft.PlayerMovable:InputOnRun+16
+
+16BA919B323: 05 04 03 01 50           - add eax,50010304
+16BA919B328: 00 00                    - add [rax],al
+16BA919B32A: 00 00                    - add [rax],al
+16BA919B32C: 00 00                    - add [rax],al
+16BA919B32E: 00 00                    - add [rax],al
+SpaceCraft.PlayerMovable:InputOnRun: 48 83 EC 28              - sub rsp,28
+SpaceCraft.PlayerMovable:InputOnRun+4: 48 89 34 24              - mov [rsp],rsi
+SpaceCraft.PlayerMovable:InputOnRun+8: 4C 89 7C 24 08           - mov [rsp+08],r15
+SpaceCraft.PlayerMovable:InputOnRun+d: 48 8B F1                 - mov rsi,rcx
+SpaceCraft.PlayerMovable:InputOnRun+10: F3 0F 11 4C 24 18        - movss [rsp+18],xmm1
+// ---------- INJECTING HERE ----------
+SpaceCraft.PlayerMovable:InputOnRun+16: 0F B6 86 88 00 00 00     - movzx eax,byte ptr [rsi+00000088]
+// ---------- DONE INJECTING  ----------
+SpaceCraft.PlayerMovable:InputOnRun+1d: 85 C0                    - test eax,eax
+SpaceCraft.PlayerMovable:InputOnRun+1f: 75 18                    - jne SpaceCraft.PlayerMovable:InputOnRun+39
+SpaceCraft.PlayerMovable:InputOnRun+21: F3 0F 10 44 24 18        - movss xmm0,[rsp+18]
+SpaceCraft.PlayerMovable:InputOnRun+27: F3 0F 5A C0              - cvtss2sd xmm0,xmm0
+SpaceCraft.PlayerMovable:InputOnRun+2b: F2 0F 5A E8              - cvtsd2ss xmm5,xmm0
+SpaceCraft.PlayerMovable:InputOnRun+2f: F3 0F 11 6E 78           - movss [rsi+78],xmm5
+SpaceCraft.PlayerMovable:InputOnRun+34: E9 A0 00 00 00           - jmp SpaceCraft.PlayerMovable:InputOnRun+d9
+SpaceCraft.PlayerMovable:InputOnRun+39: F3 0F 10 44 24 18        - movss xmm0,[rsp+18]
+SpaceCraft.PlayerMovable:InputOnRun+3f: F3 0F 5A C0              - cvtss2sd xmm0,xmm0
+SpaceCraft.PlayerMovable:InputOnRun+43: F3 0F 10 0D A5 00 00 00  - movss xmm1,[SpaceCraft.PlayerMovable:InputOnRun+f0]
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>88</ID>
+              <Description>"Base addr."</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>808080</Color>
+              <VariableType>8 Bytes</VariableType>
+              <Address>i_player_movable_addr</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>110</ID>
+              <Description>"General+"</Description>
+              <Options moHideChildren="1"/>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>89</ID>
+                  <Description>"PlayerHeight"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_movable_addr]+48</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>90</ID>
+                  <Description>"PlayerRadius"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_movable_addr]+4C</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>91</ID>
+                  <Description>"PlayerWeight"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_movable_addr]+50</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>92</ID>
+                  <Description>"flyMode"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Byte</VariableType>
+                  <Address>[i_player_movable_addr]+54</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>93</ID>
+                  <Description>"isSwimming"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Byte</VariableType>
+                  <Address>[i_player_movable_addr]+55</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>94</ID>
+                  <Description>"MoveSpeed"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_movable_addr]+58</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>95</ID>
+                  <Description>"RunSpeed"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_movable_addr]+5C</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>96</ID>
+                  <Description>"MaximumFallVelocity"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_movable_addr]+60</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>97</ID>
+                  <Description>"EnableJump"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Byte</VariableType>
+                  <Address>[i_player_movable_addr]+64</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>98</ID>
+                  <Description>"JumpImpulse"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>A00000</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_movable_addr]+68</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>99</ID>
+                  <Description>"m_Fall"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_movable_addr]+6C</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>100</ID>
+                  <Description>"m_Grounded"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Byte</VariableType>
+                  <Address>[i_player_movable_addr]+70</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>101</ID>
+                  <Description>"jumpActionValue"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_movable_addr]+74</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>102</ID>
+                  <Description>"runActionValue"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_movable_addr]+78</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>103</ID>
+                  <Description>"lastMoveAxis"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[i_player_movable_addr]+7C</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>104</ID>
+                  <Description>"moveSpeedChangePercentage"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_movable_addr]+84</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>105</ID>
+                  <Description>"autoRun"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Byte</VariableType>
+                  <Address>[i_player_movable_addr]+88</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>106</ID>
+                  <Description>"lastRunValue"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_movable_addr]+8C</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>107</ID>
+                  <Description>"jetpackFactor"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_movable_addr]+90</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>108</ID>
+                  <Description>"jumpStatusInAir"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[i_player_movable_addr]+94</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>109</ID>
+                  <Description>"previousSwimmingStatus"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Byte</VariableType>
+                  <Address>[i_player_movable_addr]+98</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>119</ID>
+              <Description>"playerGroundRelation+"</Description>
+              <Options moHideChildren="1"/>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>111</ID>
+                  <Description>"isGrounded"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Byte</VariableType>
+                  <Address>[i_player_movable_addr]+30</Address>
+                  <Offsets>
+                    <Offset>18</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>112</ID>
+                  <Description>"isOnTerrain"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Byte</VariableType>
+                  <Address>[i_player_movable_addr]+30</Address>
+                  <Offsets>
+                    <Offset>19</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>113</ID>
+                  <Description>"isOnMetal"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Byte</VariableType>
+                  <Address>[i_player_movable_addr]+30</Address>
+                  <Offsets>
+                    <Offset>1A</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>114</ID>
+                  <Description>"isOnRocks"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Byte</VariableType>
+                  <Address>[i_player_movable_addr]+30</Address>
+                  <Offsets>
+                    <Offset>1B</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>115</ID>
+                  <Description>"consideredGroundedDistance"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_movable_addr]+30</Address>
+                  <Offsets>
+                    <Offset>1C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>116</ID>
+                  <Description>"consideredGroundedDistance"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_movable_addr]+30</Address>
+                  <Offsets>
+                    <Offset>20</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>222</ID>
+                  <Description>"groundDistance"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_movable_addr]+30</Address>
+                  <Offsets>
+                    <Offset>24</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>117</ID>
+                  <Description>"groundHit"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[i_player_movable_addr]+30</Address>
+                  <Offsets>
+                    <Offset>28</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>118</ID>
+                  <Description>"previousPosition"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[i_player_movable_addr]+30</Address>
+                  <Offsets>
+                    <Offset>34</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>125</ID>
+              <Description>"playerFallDamage+"</Description>
+              <Options moHideChildren="1"/>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>120</ID>
+                  <Description>"fallDamage"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[i_player_movable_addr]+40</Address>
+                  <Offsets>
+                    <Offset>38</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>121</ID>
+                  <Description>"maximumFallVelocity"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_movable_addr]+40</Address>
+                  <Offsets>
+                    <Offset>3C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>122</ID>
+                  <Description>"shouldBeHurt"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Byte</VariableType>
+                  <Address>[i_player_movable_addr]+40</Address>
+                  <Offsets>
+                    <Offset>40</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>123</ID>
+                  <Description>"lastGroundedPlace"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[i_player_movable_addr]+40</Address>
+                  <Offsets>
+                    <Offset>44</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>124</ID>
+                  <Description>"distanceMinForDamage"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>[i_player_movable_addr]+40</Address>
+                  <Offsets>
+                    <Offset>50</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>216</ID>
+          <Description>"Jump multiplier"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : Planet Crafter.exe
+  Version: 
+  Date   : 2022-05-19
+  Author : bbfox @ https://opencheattables.com
+}
+
+[ENABLE]
+
+//aobscan(INJECT_JUMP_MULTI,F3 0F 10 46 68 F3 0F 5A C0 66) // should be unique
+aobscanregion(INJECT_JUMP_MULTI,SpaceCraftPlayerMovableUpdatePlayerMovementProc+1d8,SpaceCraftPlayerMovableUpdatePlayerMovementProc+2d8,F3 0F 10 46 68 F3 0F 5A C0 66) // should be unique
+alloc(newmem,$1000,INJECT_JUMP_MULTI)
+
+label(code)
+label(return)
+label(vf_jump_multi)
+
+newmem:
+
+code:
+  movss xmm0,[rsi+68]
+
+  //****
+  vmovss xmm15, [vf_jump_multi]
+  vmulss xmm0,xmm0, xmm15
+
+
+  //****
+
+  jmp return
+
+vf_jump_multi:
+  dd (float)2
+
+INJECT_JUMP_MULTI:
+  jmp newmem
+return:
+registersymbol(vf_jump_multi)
+registersymbol(INJECT_JUMP_MULTI)
+
+[DISABLE]
+
+INJECT_JUMP_MULTI:
+  db F3 0F 10 46 68
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: SpaceCraft.PlayerMovable:UpdatePlayerMovement+1e8
+
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+1c7: 85 C0                          - test eax,eax
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+1c9: 0F 84 42 00 00 00              - je SpaceCraft.PlayerMovable:UpdatePlayerMovement+211
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+1cf: 85 FF                          - test edi,edi
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+1d1: 74 2F                          - je SpaceCraft.PlayerMovable:UpdatePlayerMovement+202
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+1d3: F3 0F 10 46 74                 - movss xmm0,[rsi+74]
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+1d8: F3 0F 5A C0                    - cvtss2sd xmm0,xmm0
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+1dc: 66 0F 57 C9                    - xorpd xmm1,xmm1
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+1e0: 66 0F 2F C8                    - comisd xmm1,xmm0
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+1e4: 7A 1C                          - jp SpaceCraft.PlayerMovable:UpdatePlayerMovement+202
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+1e6: 73 1A                          - jae SpaceCraft.PlayerMovable:UpdatePlayerMovement+202
+// ---------- INJECTING HERE ----------
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+1e8: F3 0F 10 46 68                 - movss xmm0,[rsi+68]
+// ---------- DONE INJECTING  ----------
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+1ed: F3 0F 5A C0                    - cvtss2sd xmm0,xmm0
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+1f1: 66 0F 57 05 87 16 00 00        - xorpd xmm0,[SpaceCraft.PlayerMovable:UpdatePlayerMovement+1880]
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+1f9: F2 0F 5A E8                    - cvtsd2ss xmm5,xmm0
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+1fd: F3 0F 11 6E 6C                 - movss [rsi+6C],xmm5
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+202: C7 86 94 00 00 00 00 00 00 00  - mov [rsi+00000094],00000000
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+20c: E9 17 03 00 00                 - jmp SpaceCraft.PlayerMovable:UpdatePlayerMovement+528
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+211: F3 0F 10 46 74                 - movss xmm0,[rsi+74]
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+216: F3 0F 5A C0                    - cvtss2sd xmm0,xmm0
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+21a: 66 0F 57 C9                    - xorpd xmm1,xmm1
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+21e: 66 0F 2F C8                    - comisd xmm1,xmm0
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>217</ID>
+              <Description>"Multiplier"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>vf_jump_multi</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>218</ID>
+          <Description>"Run multiplier"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : Planet Crafter.exe
+  Version: 
+  Date   : 2022-05-19
+  Author : bbfox @ https://opencheattables.com
+}
+
+[ENABLE]
+
+//aobscan(INJECT_RUN_MULTI,F8 F3 0F 10 46 5C) // should be unique
+aobscanregion(INJECT_RUN_MULTI,SpaceCraftPlayerMovableUpdatePlayerMovementProc+a4,SpaceCraftPlayerMovableUpdatePlayerMovementProc+1b4,F3 0F 10 46 5C) // should be unique
+alloc(newmem,$1000,INJECT_RUN_MULTI)
+
+label(code)
+label(return)
+label(vf_run_multi)
+
+newmem:
+
+code:
+  movss xmm0,[rsi+5C]
+  //*****
+  vmovss xmm15, [vf_run_multi]
+  vmulss xmm0, xmm0, xmm15
+  //*****
+  jmp return
+
+align 10 cc
+  vf_run_multi:
+  dd (float)2
+
+INJECT_RUN_MULTI:
+  jmp newmem
+return:
+registersymbol(vf_run_multi)
+registersymbol(INJECT_RUN_MULTI)
+
+[DISABLE]
+
+INJECT_RUN_MULTI:
+  db F3 0F 10 46 5C
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: SpaceCraft.PlayerMovable:UpdatePlayerMovement+b4
+
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+86: 48 81 C2 18 FD FF FF           - add rdx,FFFFFFFFFFFFFD18
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+8d: 48 8B C8                       - mov rcx,rax
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+90: 83 38 00                       - cmp dword ptr [rax],00
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+93: 66 66 90                       - nop 3
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+96: 49 BB D0 A3 AF B2 99 01 00 00  - mov r11,UnityEngine.Transform:get_forward
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+a0: 41 FF D3                       - call r11
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+a3: F3 0F 10 46 50                 - movss xmm0,[rsi+50]
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+a8: F3 0F 5A C0                    - cvtss2sd xmm0,xmm0
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+ac: 0F B6 46 64                    - movzx eax,byte ptr [rsi+64]
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+b0: 48 0F B6 F8                    - movzx rdi,al
+// ---------- INJECTING HERE ----------
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+b4: F3 0F 10 46 5C                 - movss xmm0,[rsi+5C]
+// ---------- DONE INJECTING  ----------
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+b9: F3 0F 5A C0                    - cvtss2sd xmm0,xmm0
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+bd: F2 0F 5A E8                    - cvtsd2ss xmm5,xmm0
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+c1: F3 0F 11 6D DC                 - movss [rbp-24],xmm5
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+c6: F3 0F 10 46 60                 - movss xmm0,[rsi+60]
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+cb: F3 0F 5A C0                    - cvtss2sd xmm0,xmm0
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+cf: F2 0F 5A E8                    - cvtsd2ss xmm5,xmm0
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+d3: F3 0F 11 AD 14 FD FF FF        - movss [rbp-000002EC],xmm5
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+db: 0F B6 46 54                    - movzx eax,byte ptr [rsi+54]
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+df: 85 C0                          - test eax,eax
+SpaceCraft.PlayerMovable:UpdatePlayerMovement+e1: 0F 84 74 00 00 00              - je SpaceCraft.PlayerMovable:UpdatePlayerMovement+15b
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>219</ID>
+              <Description>"Multiplier"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>vf_run_multi</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>215</ID>
+          <Description>"Free Craft - All (include construction &amp; station)"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : Planet Crafter.exe
+  Version: 
+  Date   : 2022-04-02
+  Author : bbfox @ https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanregion(INJECT_FREE_CRAFT_ALL,SpaceCraftPlayModeHandlerGetFreeCraftProc+A0,SpaceCraftPlayModeHandlerGetFreeCraftProc+F0,48 8D 65 00 5D) // should be unique
+alloc(newmem,$1000,INJECT_FREE_CRAFT_ALL)
+
+label(code)
+label(return)
+
+newmem:
+  mov eax, 1
+
+code:
+  lea rsp,[rbp+00]
+  pop rbp
+  jmp return
+
+INJECT_FREE_CRAFT_ALL:
+  jmp newmem
+return:
+registersymbol(INJECT_FREE_CRAFT_ALL)
+
+[DISABLE]
+
+INJECT_FREE_CRAFT_ALL:
+  db 48 8D 65 00 5D
+
+unregistersymbol(INJECT_FREE_CRAFT_ALL)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: SpaceCraft.PlayModeHandler:GetFreeCraft+bb
+
+SpaceCraft.PlayModeHandler:GetFreeCraft+89: BA 02 00 00 00                 - mov edx,00000002
+SpaceCraft.PlayModeHandler:GetFreeCraft+8e: 83 38 00                       - cmp dword ptr [rax],00
+SpaceCraft.PlayModeHandler:GetFreeCraft+91: 48 8D 64 24 00                 - lea rsp,[rsp+00]
+SpaceCraft.PlayModeHandler:GetFreeCraft+96: 49 BB 30 92 95 64 8F 02 00 00  - mov r11,System.Collections.Generic.List`1[SpaceCraft.DataConfig+PlayMode]:Add
+SpaceCraft.PlayModeHandler:GetFreeCraft+a0: 41 FF D3                       - call r11
+SpaceCraft.PlayModeHandler:GetFreeCraft+a3: 48 8B 55 F0                    - mov rdx,[rbp-10]
+SpaceCraft.PlayModeHandler:GetFreeCraft+a7: 48 8B 4D F8                    - mov rcx,[rbp-08]
+SpaceCraft.PlayModeHandler:GetFreeCraft+ab: 66 66 90                       - nop 3
+SpaceCraft.PlayModeHandler:GetFreeCraft+ae: 49 BB 00 95 95 64 8F 02 00 00  - mov r11,SpaceCraft.PlayModeHandler:YesIfModes
+SpaceCraft.PlayModeHandler:GetFreeCraft+b8: 41 FF D3                       - call r11
+// ---------- INJECTING HERE ----------
+SpaceCraft.PlayModeHandler:GetFreeCraft+bb: 48 8D 65 00                    - lea rsp,[rbp+00]
+// ---------- DONE INJECTING  ----------
+SpaceCraft.PlayModeHandler:GetFreeCraft+bf: 5D                             - pop rbp
+SpaceCraft.PlayModeHandler:GetFreeCraft+c0: C3                             - ret 
+28ED7C4C781: 00 00                          - add [rax],al
+28ED7C4C783: 00 00                          - add [rax],al
+28ED7C4C785: 00 00                          - add [rax],al
+28ED7C4C787: 00 01                          - add [rcx],al
+28ED7C4C789: 04 02                          - add al,02
+28ED7C4C78B: 05 04 03 01 50                 - add eax,50010304
+28ED7C4C790: 00 00                          - add [rax],al
+28ED7C4C792: 00 00                          - add [rax],al
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>214</ID>
+          <Description>"Free Craft - Craft Station"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : Planet Crafter.exe
+  Version: 
+  Date   : 2022-04-01
+  Author : bbfox @ https://opencheattables.com
+}
+
+[ENABLE]
+
+//aobscan(INJECT_FREE_CRAFT_ITEM,48 8B C3 85 C0 0F 84 A4) // should be unique
+aobscanregion(INJECT_FREE_CRAFT_ITEM,SpaceCraftCraftManagerTryToCraftInInventoryProc+C0, SpaceCraftCraftManagerTryToCraftInInventoryProc+1C0,48 8B C3 85 C0 0F 84) // should be unique
+alloc(newmem,$1000,INJECT_FREE_CRAFT_ITEM)
+
+label(code)
+label(return)
+
+newmem:
+  mov ebx, 1
+
+code:
+  mov rax,rbx
+  test eax,eax
+  jmp return
+
+INJECT_FREE_CRAFT_ITEM:
+  jmp newmem
+return:
+registersymbol(INJECT_FREE_CRAFT_ITEM)
+
+[DISABLE]
+
+INJECT_FREE_CRAFT_ITEM:
+  db 48 8B C3 85 C0
+
+unregistersymbol(INJECT_FREE_CRAFT_ITEM)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: SpaceCraft.CraftManager:TryToCraftInInventory+c7
+
+SpaceCraft.CraftManager:TryToCraftInInventory+9e: 83 38 00                       - cmp dword ptr [rax],00
+SpaceCraft.CraftManager:TryToCraftInInventory+a1: 48 8D 64 24 00                 - lea rsp,[rsp+00]
+SpaceCraft.CraftManager:TryToCraftInInventory+a6: 49 BB C0 C6 C4 D7 8E 02 00 00  - mov r11,SpaceCraft.PlayModeHandler:GetFreeCraft
+SpaceCraft.CraftManager:TryToCraftInInventory+b0: 41 FF D3                       - call r11
+SpaceCraft.CraftManager:TryToCraftInInventory+b3: 48 8B C8                       - mov rcx,rax
+SpaceCraft.CraftManager:TryToCraftInInventory+b6: 48 8B 45 B8                    - mov rax,[rbp-48]
+SpaceCraft.CraftManager:TryToCraftInInventory+ba: 4C 0F B6 E1                    - movzx r12,cl
+SpaceCraft.CraftManager:TryToCraftInInventory+be: 49 8B CC                       - mov rcx,r12
+SpaceCraft.CraftManager:TryToCraftInInventory+c1: 0B C1                          - or eax,ecx
+SpaceCraft.CraftManager:TryToCraftInInventory+c3: 48 0F B6 D8                    - movzx rbx,al
+// ---------- INJECTING HERE ----------
+SpaceCraft.CraftManager:TryToCraftInInventory+c7: 48 8B C3                       - mov rax,rbx
+// ---------- DONE INJECTING  ----------
+SpaceCraft.CraftManager:TryToCraftInInventory+ca: 85 C0                          - test eax,eax
+SpaceCraft.CraftManager:TryToCraftInInventory+cc: 0F 84 A4 01 00 00              - je SpaceCraft.CraftManager:TryToCraftInInventory+276
+SpaceCraft.CraftManager:TryToCraftInInventory+d2: 41 83 7D 00 00                 - cmp dword ptr [r13+00],00
+SpaceCraft.CraftManager:TryToCraftInInventory+d7: 49 63 45 18                    - movsxd  rax,dword ptr [r13+18]
+SpaceCraft.CraftManager:TryToCraftInInventory+db: 83 F8 01                       - cmp eax,01
+SpaceCraft.CraftManager:TryToCraftInInventory+de: 0F 8D 7E 00 00 00              - jnl SpaceCraft.CraftManager:TryToCraftInInventory+162
+SpaceCraft.CraftManager:TryToCraftInInventory+e4: 48 8B CF                       - mov rcx,rdi
+SpaceCraft.CraftManager:TryToCraftInInventory+e7: 83 3F 00                       - cmp dword ptr [rdi],00
+SpaceCraft.CraftManager:TryToCraftInInventory+ea: 48 8D 6D 00                    - lea rbp,[rbp+00]
+SpaceCraft.CraftManager:TryToCraftInInventory+ee: 49 BB CC F3 92 64 8F 02 00 00  - mov r11,0000028F6492F3CC
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>130</ID>
+          <Description>"Backpack item will not be removed temporary (include seed, blueprint chip..)"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript Async="1">{ Game   : Planet Crafter.exe
+  Version: 
+  Date   : 2022-03-30
+  Author : bbfox @ https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanregion(INJECT_REMOVE_ITEM,Inventory_RemoveItemProc+27,Inventory_RemoveItemProc+127,48 8D AD 00 00 00 00 49 BB) // should be unique
+alloc(newmem,$1000,INJECT_REMOVE_ITEM)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  lea rbp,[rbp+00000000]
+  jmp INJECT_REMOVE_ITEM+14
+  //jmp Inventory_RemoveItemProc+3b
+  jmp return
+
+INJECT_REMOVE_ITEM:
+  jmp newmem
+  nop 2
+return:
+registersymbol(INJECT_REMOVE_ITEM)
+
+[DISABLE]
+
+INJECT_REMOVE_ITEM:
+  db 48 8D AD 00 00 00 00
+
+
+unregistersymbol(INJECT_REMOVE_ITEM)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: SpaceCraft.Inventory:RemoveItem+2e
+
+SpaceCraft.Inventory:RemoveItem+8: 48 89 7D F0                    - mov [rbp-10],rdi
+SpaceCraft.Inventory:RemoveItem+c: 4C 89 7D F8                    - mov [rbp-08],r15
+SpaceCraft.Inventory:RemoveItem+10: 4C 8B F9                       - mov r15,rcx
+SpaceCraft.Inventory:RemoveItem+13: 48 8B FA                       - mov rdi,rdx
+SpaceCraft.Inventory:RemoveItem+16: 4C 89 45 E8                    - mov [rbp-18],r8
+SpaceCraft.Inventory:RemoveItem+1a: 49 8B 47 18                    - mov rax,[r15+18]
+SpaceCraft.Inventory:RemoveItem+1e: 48 8B C8                       - mov rcx,rax
+SpaceCraft.Inventory:RemoveItem+21: 48 8B D7                       - mov rdx,rdi
+SpaceCraft.Inventory:RemoveItem+24: 83 38 00                       - cmp dword ptr [rax],00
+SpaceCraft.Inventory:RemoveItem+27: 48 8D AD 00 00 00 00           - lea rbp,[rbp+00000000]
+// ---------- INJECTING HERE ----------
+SpaceCraft.Inventory:RemoveItem+2e: 49 BB 80 FF E7 A5 6B 01 00 00  - mov r11,System.Collections.Generic.List`1[T_REF]:Remove
+// ---------- DONE INJECTING  ----------
+SpaceCraft.Inventory:RemoveItem+38: 41 FF D3                       - call r11
+SpaceCraft.Inventory:RemoveItem+3b: 49 8B CF                       - mov rcx,r15
+SpaceCraft.Inventory:RemoveItem+3e: 48 8B D7                       - mov rdx,rdi
+SpaceCraft.Inventory:RemoveItem+41: 45 33 C0                       - xor r8d,r8d
+SpaceCraft.Inventory:RemoveItem+44: 66 90                          - nop 2
+SpaceCraft.Inventory:RemoveItem+46: 49 BB 90 13 32 A9 6B 01 00 00  - mov r11,SpaceCraft.Inventory:PropagateModification
+SpaceCraft.Inventory:RemoveItem+50: 41 FF D3                       - call r11
+SpaceCraft.Inventory:RemoveItem+53: 49 8B CF                       - mov rcx,r15
+SpaceCraft.Inventory:RemoveItem+56: 49 BB F0 13 32 A9 6B 01 00 00  - mov r11,SpaceCraft.Inventory:RefreshDisplayerContent
+SpaceCraft.Inventory:RemoveItem+60: 41 FF D3                       - call r11
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>131</ID>
+              <Description>"Drop = duplicate; Turn off when not in use"</Description>
+              <Color>400080</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>132</ID>
+          <Description>"Build / Craft will not consume materials (temporary, lost after load from save, materials must exist)"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : Planet Crafter.exe
+  Version: 
+  Date   : 2022-03-30
+  Author : bbfox @ https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanregion(INJECT_REMOVE_ITEMS,Inventory_RemoveItemsProc+220,Inventory_RemoveItemsProc+360,45 33 C0 48 8D 6D 00) // should be unique
+alloc(newmem,$1000,INJECT_REMOVE_ITEMS)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  xor r8d,r8d
+  lea rbp,[rbp+00]
+  //jmp Inventory_RemoveItemsProc+25b
+  jmp INJECT_REMOVE_ITEMS+14
+  jmp return
+
+INJECT_REMOVE_ITEMS:
+  jmp newmem
+  nop 2
+return:
+registersymbol(INJECT_REMOVE_ITEMS)
+
+[DISABLE]
+
+INJECT_REMOVE_ITEMS:
+  db 45 33 C0 48 8D 6D 00
+
+unregistersymbol(INJECT_REMOVE_ITEMS)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: SpaceCraft.Inventory:RemoveItems+24e
+SpaceCraft.Inventory:RemoveItems+208 - 41 FF D3              - call r11
+SpaceCraft.Inventory:RemoveItems+20b - 48 8B 85 40FFFFFF     - mov rax,[rbp-000000C0]
+SpaceCraft.Inventory:RemoveItems+212 - 48 8B 40 10           - mov rax,[rax+10]
+SpaceCraft.Inventory:RemoveItems+216 - 48 63 8D 38FFFFFF     - movsxd  rcx,dword ptr [rbp-000000C8]
+SpaceCraft.Inventory:RemoveItems+21d - 48 63 C9              - movsxd  rcx,ecx
+SpaceCraft.Inventory:RemoveItems+220 - 48 8D 44 C8 20        - lea rax,[rax+rcx*8+20]
+SpaceCraft.Inventory:RemoveItems+225 - 48 8B 10              - mov rdx,[rax]
+SpaceCraft.Inventory:RemoveItems+228 - 48 8B 8D 48FFFFFF     - mov rcx,[rbp-000000B8]
+
+SpaceCraft.Inventory:RemoveItems+22f - 45 33 C0              - xor r8d,r8d
+SpaceCraft.Inventory:RemoveItems+232 - 48 8D 6D 00           - lea rbp,[rbp+00]
+
+SpaceCraft.Inventory:RemoveItems+236 - 49 BB E690EFEED8010000 - mov r11,000001D8EEEF90E6
+SpaceCraft.Inventory:RemoveItems+240 - 41 FF D3              - call r11
+SpaceCraft.Inventory:RemoveItems+243 - EB 0D                 - jmp SpaceCraft.Inventory:RemoveItems+252
+SpaceCraft.Inventory:RemoveItems+245 - 41 FF CC              - dec r12d
+SpaceCraft.Inventory:RemoveItems+248 - 41 83 FC FF           - cmp r12d,-01
+SpaceCraft.Inventory:RemoveItems+24c - 0F8F 9EFEFFFF         - jg SpaceCraft.Inventory:RemoveItems+f0
+SpaceCraft.Inventory:RemoveItems+252 - 48 8B CD              - mov rcx,rbp
+SpaceCraft.Inventory:RemoveItems+255 - 48 81 C1 70FFFFFF     - add rcx,FFFFFFFFFFFFFF70
+SpaceCraft.Inventory:RemoveItems+25c - 49 BA 786EDFD0D8010000 - mov r10,000001D8D0DF6E78
+SpaceCraft.Inventory:RemoveItems+266 - 49 BB BA90EFEED8010000 - mov r11,000001D8EEEF90BA
+SpaceCraft.Inventory:RemoveItems+270 - 41 FF D3              - call r11
+SpaceCraft.Inventory:RemoveItems+273 - 85 C0                 - test eax,eax
+SpaceCraft.Inventory:RemoveItems+275 - 0F85 45FEFFFF         - jne SpaceCraft.Inventory:RemoveItems+c0
+SpaceCraft.Inventory:RemoveItems+27b - 48 C7 85 30FFFFFF 00000000 - mov qword ptr [rbp-000000D0],00000000
+SpaceCraft.Inventory:RemoveItems+286 - 48 83 EC 08           - sub rsp,08
+SpaceCraft.Inventory:RemoveItems+28a - E8 26000000           - call SpaceCraft.Inventory:RemoveItems+2b5
+
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>133</ID>
+              <Description>"After reload save, material will be lost. destruct building and use its "dummy" material to construct building."</Description>
+              <Color>400080</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>212</ID>
+          <Description>"Set left/right container to max (Usage: open container twice)"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript Async="1">{ Game   : Planet Crafter.exe
+  Version: 
+  Date   : 2022-04-01
+  Author : bbfox @ https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanregion(INJECT_CONTAINER_OPEN,UiWindowContainerOnOpenProc+f,UiWindowContainerOnOpenProc+2f,48 8B 46 38 48 8B C8) // should be unique
+alloc(newmem,$1000,INJECT_CONTAINER_OPEN)
+
+label(code)
+label(return)
+
+newmem:
+  push rbx
+  mov rax, [rsi+48]
+  mov ebx, [rax+3C]
+  cmp ebx, #40
+  je check2
+  cmp ebx, 1
+  je check2
+  mov ebx, #40
+  mov [rax+3C], ebx
+
+check2:
+  mov rax, [rsi+40]
+  mov ebx, [rax+3C]
+  cmp ebx, #40
+  je endp
+  cmp ebx, 1
+  je endp
+  mov ebx, #40
+  mov [rax+3C], ebx
+
+endp:
+  pop rbx
+
+code:
+  mov rax,[rsi+38]
+  mov rcx,rax
+  jmp return
+
+INJECT_CONTAINER_OPEN:
+  jmp newmem
+  nop 2
+return:
+registersymbol(INJECT_CONTAINER_OPEN)
+
+[DISABLE]
+
+INJECT_CONTAINER_OPEN:
+  db 48 8B 46 38 48 8B C8
+
+unregistersymbol(INJECT_CONTAINER_OPEN)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: SpaceCraft.UiWindowContainer:OnOpen+f
+
+23D62D8AA46: 00 00                          - add [rax],al
+23D62D8AA48: 00 00                          - add [rax],al
+23D62D8AA4A: 00 00                          - add [rax],al
+23D62D8AA4C: 00 00                          - add [rax],al
+23D62D8AA4E: 00 00                          - add [rax],al
+SpaceCraft.UiWindowContainer:OnOpen: 55                             - push rbp
+SpaceCraft.UiWindowContainer:OnOpen+1: 48 8B EC                       - mov rbp,rsp
+SpaceCraft.UiWindowContainer:OnOpen+4: 48 83 EC 30                    - sub rsp,30
+SpaceCraft.UiWindowContainer:OnOpen+8: 48 89 75 F8                    - mov [rbp-08],rsi
+SpaceCraft.UiWindowContainer:OnOpen+c: 48 8B F1                       - mov rsi,rcx
+// ---------- INJECTING HERE ----------
+SpaceCraft.UiWindowContainer:OnOpen+f: 48 8B 46 38                    - mov rax,[rsi+38]
+// ---------- DONE INJECTING  ----------
+SpaceCraft.UiWindowContainer:OnOpen+13: 48 8B C8                       - mov rcx,rax
+SpaceCraft.UiWindowContainer:OnOpen+16: 83 38 00                       - cmp dword ptr [rax],00
+SpaceCraft.UiWindowContainer:OnOpen+19: 48 8D 64 24 00                 - lea rsp,[rsp+00]
+SpaceCraft.UiWindowContainer:OnOpen+1e: 49 BB 80 61 CF AB 3D 02 00 00  - mov r11,UnityEngine.Component:get_gameObject
+SpaceCraft.UiWindowContainer:OnOpen+28: 41 FF D3                       - call r11
+SpaceCraft.UiWindowContainer:OnOpen+2b: 48 8B C8                       - mov rcx,rax
+SpaceCraft.UiWindowContainer:OnOpen+2e: 33 D2                          - xor edx,edx
+SpaceCraft.UiWindowContainer:OnOpen+30: 83 38 00                       - cmp dword ptr [rax],00
+SpaceCraft.UiWindowContainer:OnOpen+33: 66 66 90                       - nop 3
+SpaceCraft.UiWindowContainer:OnOpen+36: 49 BB 80 59 E4 AB 3D 02 00 00  - mov r11,UnityEngine.GameObject:SetActive
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>213</ID>
+              <Description>"Disable when not in use!!"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>206</ID>
+          <Description>"Backpack size 40"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript Async="1">{ Game   : Planet Crafter.exe
+  Version: 
+  Date   : 2022-04-01
+  Author : bbfox @ https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanregion(INJECT_INVENTORY_SIZE,InventorySetSizeProc+16,InventorySetSizeProc+116,48 63 47 3C 3B F0) // should be unique
+alloc(newmem,$1000,INJECT_INVENTORY_SIZE)
+
+label(code)
+label(return)
+label(i_inventory_size)
+label(i_inventory_base_addr)
+
+newmem:
+  movsxd rax,dword ptr [rdi+3C]
+  push rbx
+  mov ebx, [i_inventory_size]
+  cmp eax, ebx
+  //cmovl esi, ebx
+  mov esi, ebx
+  pop rbx
+
+
+code:
+  movsxd  rax,dword ptr [rdi+3C]
+  cmp esi,eax
+  jmp return
+
+align 10 cc
+  i_inventory_size:
+  dd #40
+  i_inventory_base_addr:
+  dq 0
+
+INJECT_INVENTORY_SIZE:
+  jmp newmem
+  nop
+return:
+registersymbol(i_inventory_base_addr)
+registersymbol(INJECT_INVENTORY_SIZE)
+
+[DISABLE]
+
+INJECT_INVENTORY_SIZE:
+  db 48 63 47 3C 3B F0
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: SpaceCraft.Inventory:SetSize+16
+
+1AC173DFD3A: 00 00                          - add [rax],al
+1AC173DFD3C: 00 00                          - add [rax],al
+1AC173DFD3E: 00 00                          - add [rax],al
+SpaceCraft.Inventory:SetSize: 55                             - push rbp
+SpaceCraft.Inventory:SetSize+1: 48 8B EC                       - mov rbp,rsp
+SpaceCraft.Inventory:SetSize+4: 48 83 EC 30                    - sub rsp,30
+SpaceCraft.Inventory:SetSize+8: 48 89 75 F0                    - mov [rbp-10],rsi
+SpaceCraft.Inventory:SetSize+c: 48 89 7D F8                    - mov [rbp-08],rdi
+SpaceCraft.Inventory:SetSize+10: 48 8B F9                       - mov rdi,rcx
+SpaceCraft.Inventory:SetSize+13: 48 8B F2                       - mov rsi,rdx
+// ---------- INJECTING HERE ----------
+SpaceCraft.Inventory:SetSize+16: 48 63 47 3C                    - movsxd  rax,dword ptr [rdi+3C]
+// ---------- DONE INJECTING  ----------
+SpaceCraft.Inventory:SetSize+1a: 3B F0                          - cmp esi,eax
+SpaceCraft.Inventory:SetSize+1c: 74 15                          - je SpaceCraft.Inventory:SetSize+33
+SpaceCraft.Inventory:SetSize+1e: 89 77 3C                       - mov [rdi+3C],esi
+SpaceCraft.Inventory:SetSize+21: 48 8B CF                       - mov rcx,rdi
+SpaceCraft.Inventory:SetSize+24: 66 90                          - nop 2
+SpaceCraft.Inventory:SetSize+26: 49 BB 80 AC 31 17 AC 01 00 00  - mov r11,SpaceCraft.Inventory:RefreshDisplayerContent
+SpaceCraft.Inventory:SetSize+30: 41 FF D3                       - call r11
+SpaceCraft.Inventory:SetSize+33: 48 8B 75 F0                    - mov rsi,[rbp-10]
+SpaceCraft.Inventory:SetSize+37: 48 8B 7D F8                    - mov rdi,[rbp-08]
+SpaceCraft.Inventory:SetSize+3b: 48 8D 65 00                    - lea rsp,[rbp+00]
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>211</ID>
+              <Description>"usage: Turn on, Open backpack -&gt;change size -&gt; turn off immediately"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>220</ID>
+      <Description>"The Planet Crafter v0.6.007  /  https://opencheattables.com  /  CE 7.4+"</Description>
+      <Color>400080</Color>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols>
+    <SymbolEntry>
+      <Name>tapmult</Name>
+      <Address>2088B700000</Address>
+    </SymbolEntry>
+  </UserdefinedSymbols>
+</CheatTable>

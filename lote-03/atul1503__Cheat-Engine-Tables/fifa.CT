@@ -1,0 +1,496 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>0</ID>
+      <Description>"ball x coord"</Description>
+      <Options moAllowManualCollapseAndExpand="1"/>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>Float</VariableType>
+      <Address>[ball]+60</Address>
+      <Hotkeys>
+        <Hotkey>
+          <Action>Set Value</Action>
+          <Keys>
+            <Key>76</Key>
+          </Keys>
+          <Value>180</Value>
+          <ID>0</ID>
+        </Hotkey>
+        <Hotkey>
+          <Action>Set Value</Action>
+          <Keys>
+            <Key>80</Key>
+          </Keys>
+          <Value>-180</Value>
+          <ID>1</ID>
+        </Hotkey>
+      </Hotkeys>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>1</ID>
+          <Description>"ball y coord"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>+8</Address>
+          <Hotkeys>
+            <Hotkey>
+              <Action>Set Value</Action>
+              <Keys>
+                <Key>76</Key>
+              </Keys>
+              <Value>0</Value>
+              <ID>0</ID>
+            </Hotkey>
+            <Hotkey>
+              <Action>Set Value</Action>
+              <Keys>
+                <Key>80</Key>
+              </Keys>
+              <Value>0</Value>
+              <ID>1</ID>
+            </Hotkey>
+          </Hotkeys>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>2</ID>
+          <Description>"ball z coord"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>+4</Address>
+          <Hotkeys>
+            <Hotkey>
+              <Action>Set Value</Action>
+              <Keys>
+                <Key>76</Key>
+              </Keys>
+              <Value>0.365</Value>
+              <ID>0</ID>
+            </Hotkey>
+            <Hotkey>
+              <Action>Set Value</Action>
+              <Keys>
+                <Key>80</Key>
+              </Keys>
+              <Value>0.365</Value>
+              <ID>1</ID>
+            </Hotkey>
+          </Hotkeys>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>11</ID>
+          <Description>"ball x speed"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>+20</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>13</ID>
+          <Description>"ball y speed"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>+20+8</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>12</ID>
+          <Description>"ball z speed"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>+20+4</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>16</ID>
+      <Description>"Ball coords capture"</Description>
+      <Options moDeactivateChildrenAsWell="1" moAllowManualCollapseAndExpand="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : fifa.exe
+  Version: 
+  Date   : 2024-06-16
+  Author : atult
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(ball_coord,fifa.exe,0F 28 50 60 8B 45 0C) // should be unique
+alloc(newmem,$400)
+alloc(ball,4)
+registersymbol(ball)
+label(code)
+label(return)
+
+newmem:
+mov [ball],eax
+
+code:
+  movaps xmm2,[eax+60]
+  mov eax,[ebp+0C]
+  jmp return
+
+ball_coord:
+  jmp newmem
+  nop 2
+return:
+registersymbol(ball_coord)
+
+[DISABLE]
+
+ball_coord:
+  db 0F 28 50 60 8B 45 0C
+
+unregistersymbol(ball_coord)
+dealloc(newmem)
+unregistersymbol(ball)
+dealloc(ball)
+
+{
+// ORIGINAL CODE - INJECTION POINT: fifa.exe+6C4A65
+
+fifa.exe+6C4A3D: 0F 28 EB              - movaps xmm5,xmm3
+fifa.exe+6C4A40: 80 BE 50 04 00 00 00  - cmp byte ptr [esi+00000450],00
+fifa.exe+6C4A47: 0F C6 EB 01           - shufps xmm5,xmm3,01
+fifa.exe+6C4A4B: 0F 58 C5              - addps xmm0,xmm5
+fifa.exe+6C4A4E: 0F 58 C3              - addps xmm0,xmm3
+fifa.exe+6C4A51: 0F C6 C0 00           - shufps xmm0,xmm0,00
+fifa.exe+6C4A55: 0F 51 C0              - sqrtps xmm0,xmm0
+fifa.exe+6C4A58: 0F 5E C8              - divps xmm1,xmm0
+fifa.exe+6C4A5B: 0F 28 80 80 00 00 00  - movaps xmm0,[eax+00000080]
+fifa.exe+6C4A62: 0F 59 CA              - mulps xmm1,xmm2
+// ---------- INJECTING HERE ----------
+fifa.exe+6C4A65: 0F 28 50 60           - movaps xmm2,[eax+60]
+// ---------- DONE INJECTING  ----------
+fifa.exe+6C4A69: 8B 45 0C              - mov eax,[ebp+0C]
+fifa.exe+6C4A6C: 0F 28 18              - movaps xmm3,[eax]
+fifa.exe+6C4A6F: 0F 59 C3              - mulps xmm0,xmm3
+fifa.exe+6C4A72: 0F 58 C2              - addps xmm0,xmm2
+fifa.exe+6C4A75: 0F 29 54 24 10        - movaps [esp+10],xmm2
+fifa.exe+6C4A7A: 0F 29 44 24 60        - movaps [esp+60],xmm0
+fifa.exe+6C4A7F: 74 35                 - je fifa.exe+6C4AB6
+fifa.exe+6C4A81: 0F 5C C4              - subps xmm0,xmm4
+fifa.exe+6C4A84: 0F 59 C1              - mulps xmm0,xmm1
+fifa.exe+6C4A87: 0F 28 C8              - movaps xmm1,xmm0
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>17</ID>
+          <Description>"Multiple goal script"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+
+[ENABLE]
+
+local delta=5
+
+local coords={
+{x=-100,y=50,z=0,speed=4/128000},
+{x=-140,y=25,z=0,speed=4/128000},
+{x=-180,y=12.5,z=0,speed=7/12800}
+}
+
+-- coords is the array of coords which will be the target to reach by the ball.
+-- the first coord of coords array(that is coords[1]) will be reached first then the second one will be reached.
+-- each coordinate has four values, x coord ,y coord, z coord and speed by which that coordinate will be reached.
+-- each coordinate can't be reached exactly so that is why delta is present. delta is like the amount of error that is allowed.
+-- you can have more coordinates also in this array but accordingly modify the hotkey function.
+
+-- keep in mind that never use this hotkey when the goalkeeper or the first striker has hit the ball and the ball has not reached their other team member (in case of first strike) or grounded (in case of goalkeeper kick).
+
+x=getAddressList().getMemoryRecordByDescription("ball x speed")
+y=getAddressList().getMemoryRecordByDescription("ball y speed")
+z=getAddressList().getMemoryRecordByDescription("ball z speed")
+xcoord=getAddressList().getMemoryRecordByDescription("ball x coord")
+ycoord=getAddressList().getMemoryRecordByDescription("ball y coord")
+zcoord=getAddressList().getMemoryRecordByDescription("ball z coord")
+
+function reach(targetx,targety,targetz,speed)
+local hasReached=false
+while hasReached==false do
+    if tonumber(xcoord.Value)&gt;targetx then
+	    x.Value=x.Value-speed
+    end
+
+    if tonumber(xcoord.Value)&lt;targetx then
+	    x.Value=x.Value+speed
+    end
+
+    if tonumber(ycoord.Value)&gt;targety then
+	    y.Value=y.Value-speed
+    end
+
+    if tonumber(ycoord.Value)&lt;targety then
+	    y.Value=y.Value+speed
+    end
+
+    if tonumber(zcoord.Value)&gt;targetz then
+	    z.Value=z.Value-speed
+    end
+
+    if tonumber(zcoord.Value)&lt;targetz then
+	    z.Value=z.Value+speed
+    end
+
+    if math.abs(tonumber(xcoord.Value)-targetx)&lt;delta then
+       if math.abs(tonumber(ycoord.Value)-targety)&lt;delta then
+          if math.abs(tonumber(zcoord.Value)-targetz)&lt;delta then
+             speak("reached there sir")
+             hasReached=true
+          end
+       end
+    end
+    if isKeyPressed(0x53) then --S
+       speak("broke out of the loop")
+       break
+    end
+end
+end
+
+
+hk1=createHotkey(function()
+reach(coords[1].x,coords[1].y,coords[1].z,coords[1].speed)
+reach(coords[2].x,coords[2].y,coords[2].z,coords[2].speed)
+reach(coords[3].x,coords[3].y,coords[3].z,coords[3].speed)
+end,0x57) --W
+
+
+[DISABLE]
+hk1.destroy()
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>15</ID>
+          <Description>"Extreme goal script"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+
+[ENABLE]
+
+local speed=1/16
+local close_speed=0.8
+local targetx=-180
+local goalArea=150
+local targety=0
+local targetz=0
+
+
+-- speed is the speed by which the ball will try to reach the goal if it is far from goalArea.
+-- close_speed is the speed by which the ball will reach the goal if it is nearer to the goalArea.
+-- targetx,  targety and targetz are the coordinates of the goal which the ball will try to reach.
+-- goalArea is the x coordinate by reaching which the ball will move with close_speed towards the goal. This should be higher than speed.
+
+-- keep in mind that never use this hotkey when the goalkeeper or the first striker has hit the ball and the ball has not reached their other team member (in case of first strike) or grounded (in case of goalkeeper kick).
+
+
+
+
+
+x=getAddressList().getMemoryRecordByDescription("ball x speed")
+y=getAddressList().getMemoryRecordByDescription("ball y speed")
+z=getAddressList().getMemoryRecordByDescription("ball z speed")
+xcoord=getAddressList().getMemoryRecordByDescription("ball x coord")
+ycoord=getAddressList().getMemoryRecordByDescription("ball y coord")
+zcoord=getAddressList().getMemoryRecordByDescription("ball z coord")
+
+hk1=createHotkey(function()
+if math.abs(tonumber(xcoord.Value))&gt;=math.abs(goalArea) then
+   if tonumber(xcoord.Value)&lt;targetx then
+	 x.Value=x.Value+close_speed
+   else
+       x.Value=x.Value-close_speed
+   end
+else
+   if tonumber(xcoord.Value)&lt;targetx then
+	 x.Value=x.Value+speed
+   else
+       x.Value=x.Value-speed
+   end
+
+end
+
+if math.abs(tonumber(xcoord.Value))&gt;=math.abs(goalArea) then
+   if tonumber(ycoord.Value)&lt;targety then
+	 y.Value=y.Value+close_speed
+   else
+       y.Value=y.Value-close_speed
+   end
+else
+   if tonumber(ycoord.Value)&lt;targety then
+	 y.Value=y.Value+speed
+   else
+       y.Value=y.Value-speed
+   end
+
+end
+
+if math.abs(tonumber(xcoord.Value))&gt;=math.abs(goalArea) then
+   if tonumber(zcoord.Value)&lt;targetz then
+	 z.Value=z.Value+close_speed
+   else
+       z.Value=z.Value-close_speed
+   end
+else
+   if tonumber(zcoord.Value)&lt;targetz then
+	 z.Value=z.Value+speed
+   else
+       z.Value=z.Value-speed
+   end
+
+end
+
+end,0x26)
+
+
+[DISABLE]
+hk1.destroy()
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>14</ID>
+          <Description>"Goal script"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{$lua}
+if syntaxcheck then return end
+
+[ENABLE]
+
+local speed=1/32
+local targetx=180
+local targety=30
+local targetz=0
+
+-- speed is the speed by which the ball will try to reach the goal
+-- close_speed is the speed by which the ball will reach the goal
+-- targetx,  targety and targetz are the coordinates of the goal which the ball will try to reach.
+
+-- keep in mind that never use this hotkey when the goalkeeper or the first striker has hit the ball and the ball has not reached their other team member (in case of first strike) or grounded (in case of goalkeeper kick).
+
+x=getAddressList().getMemoryRecordByDescription("ball x speed")
+y=getAddressList().getMemoryRecordByDescription("ball y speed")
+z=getAddressList().getMemoryRecordByDescription("ball z speed")
+xcoord=getAddressList().getMemoryRecordByDescription("ball x coord")
+ycoord=getAddressList().getMemoryRecordByDescription("ball y coord")
+zcoord=getAddressList().getMemoryRecordByDescription("ball z coord")
+
+hk1=createHotkey(function()
+if tonumber(xcoord.Value)&gt;targetx then
+	x.Value=x.Value-speed
+end
+
+if tonumber(xcoord.Value)&lt;targetx then
+	x.Value=x.Value+speed
+end
+
+if tonumber(ycoord.Value)&gt;targety then
+	y.Value=y.Value-speed
+end
+
+if tonumber(ycoord.Value)&lt;targety then
+	y.Value=y.Value+speed
+end
+
+if tonumber(zcoord.Value)&gt;targetz then
+	z.Value=z.Value-speed
+end
+
+if tonumber(zcoord.Value)&lt;targetz then
+	z.Value=z.Value+speed
+end
+
+end,0x26)
+
+
+[DISABLE]
+hk1.destroy()
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <CheatCodes>
+    <CodeEntry>
+      <Description>Code :movaps xmm1,[esi-10] (ball coord reference)</Description>
+      <AddressString>fifa.exe+5CC440</AddressString>
+      <Before>
+        <Byte>82</Byte>
+        <Byte>8D</Byte>
+        <Byte>64</Byte>
+        <Byte>24</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>0F</Byte>
+        <Byte>28</Byte>
+        <Byte>4E</Byte>
+        <Byte>F0</Byte>
+      </Actual>
+      <After>
+        <Byte>0F</Byte>
+        <Byte>29</Byte>
+        <Byte>4C</Byte>
+        <Byte>24</Byte>
+        <Byte>10</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :movaps xmm2,[eax+60] (ball coord x)</Description>
+      <AddressString>fifa.exe+6C4A65</AddressString>
+      <Before>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>0F</Byte>
+        <Byte>59</Byte>
+        <Byte>CA</Byte>
+      </Before>
+      <Actual>
+        <Byte>0F</Byte>
+        <Byte>28</Byte>
+        <Byte>50</Byte>
+        <Byte>60</Byte>
+      </Actual>
+      <After>
+        <Byte>8B</Byte>
+        <Byte>45</Byte>
+        <Byte>0C</Byte>
+        <Byte>0F</Byte>
+        <Byte>28</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :movaps xmm0,[eax+00000080] (ball speed x)</Description>
+      <AddressString>fifa.exe+6C4A5B</AddressString>
+      <Before>
+        <Byte>51</Byte>
+        <Byte>C0</Byte>
+        <Byte>0F</Byte>
+        <Byte>5E</Byte>
+        <Byte>C8</Byte>
+      </Before>
+      <Actual>
+        <Byte>0F</Byte>
+        <Byte>28</Byte>
+        <Byte>80</Byte>
+        <Byte>80</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>0F</Byte>
+        <Byte>59</Byte>
+        <Byte>CA</Byte>
+        <Byte>0F</Byte>
+        <Byte>28</Byte>
+      </After>
+    </CodeEntry>
+  </CheatCodes>
+  <UserdefinedSymbols/>
+  <Comments>layout is x,z,y
+goal is x=(+/-)180
+and y=0
+</Comments>
+</CheatTable>

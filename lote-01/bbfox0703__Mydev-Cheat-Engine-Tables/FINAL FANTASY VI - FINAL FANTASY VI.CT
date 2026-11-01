@@ -1,0 +1,2356 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="46">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>189</ID>
+      <Description>"Toggle Compact View"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+if syntaxcheck then return end
+
+if not toggleCompactView then
+    function toggleCompactView(sender, forceEnable)
+        local isCompactMode = not (compactViewMenuItem.Caption == 'Compact View Mode')
+        if forceEnable ~= nil then
+            isCompactMode = not forceEnable
+        end
+
+        synchronize(function()
+            compactViewMenuItem.Caption = isCompactMode and 'Compact View Mode' or 'Full View Mode'
+            getMainForm().Splitter1.Visible = isCompactMode
+            getMainForm().Panel4.Visible    = isCompactMode
+            getMainForm().Panel5.Visible    = isCompactMode
+        end)
+    end
+end
+
+if not createCompactViewMenu then
+    function createCompactViewMenu()
+        if isCompactMenuCreated then return end
+
+        synchronize(function()
+            local mainMenu = getMainForm().Menu.Items
+            compactViewMenuItem = createMenuItem(mainMenu)
+            compactViewMenuItem.Caption = 'Compact View Mode'
+            compactViewMenuItem.OnClick = toggleCompactView
+            mainMenu.add(compactViewMenuItem)
+        end)
+
+        isCompactMenuCreated = true
+    end
+end
+
+createCompactViewMenu()
+toggleCompactView(nil, true)
+
+[DISABLE]
+{$lua}
+if toggleCompactView then
+    toggleCompactView(nil, false)
+end
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>171</ID>
+      <Description>"Enable (enable twice: 1st: waiting for IL2CPP to complete, then enable again)"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript Async="1">[ENABLE]
+{$lua}
+if syntaxcheck then return end
+-- 📏 SafeMonoDestroy: Clean up all Mono-related state
+if _G.SafeMonoDestroy == nil then
+  _G.SafeMonoDestroy = function()
+    print("🪚 SafeMonoDestroy: Begin cleanup...")
+
+    -- 1. Stop symbol enumeration thread if running
+    if monoSymbolEnum then
+      print("🚬 Terminating monoSymbolEnum thread...")
+      pcall(function()
+        monoSymbolEnum.terminate()
+        if not monoSymbolEnum.waitfor(3000) then
+          print("⚠ Timeout: monoSymbolEnum didn't terminate in time")
+        end
+        monoSymbolEnum.destroy()
+        monoSymbolEnum = nil
+      end)
+    end
+
+    -- 2. Stop progressbar timer
+    if monoSymbolList and monoSymbolList.progressbar then
+      monoSymbolList.progressbar.OnTimer = nil
+    end
+
+    -- 3. Unlock pipe (try unlock even if uncertain)
+    print("🔓 Attempting to unlock pipe...")
+    pcall(function()
+      if monopipe and monopipe.unlock then
+        monopipe.unlock()
+      end
+    end)
+
+    -- 4. Delay before destroy to let MonoCollector finish its work
+    print("⌛ Waiting before destroy (sleep 250ms)...")
+    sleep(250)  -- let it flush pipe state
+
+    -- 5. Destroy main pipe
+    local t0 = os.clock()
+    print(string.format("🚨 Destroying monopipe，This may take several minutes (or longer)👺👺👺... [Start: %.3fs]", t0))
+
+    pcall(function()
+      if monopipe then
+        monopipe.destroy()
+        monopipe = nil
+      end
+    end)
+
+    local t1 = os.clock()
+    print(string.format("👻 monopipe.destroy() completed [End: %.3fs | Duration: %.3fs]", t1, t1 - t0))
+
+
+    -- 6. Destroy symbol list
+    if monoSymbolList then
+      monoSymbolList.destroy()
+      monoSymbolList = nil
+    end
+
+    -- 7. Destroy event pipe if exists
+    if monoeventpipe then
+      monoeventpipe.destroy()
+      monoeventpipe = nil
+    end
+
+    print("👻 SafeMonoDestroy: Cleanup complete.")
+  end
+end
+
+-- 列出指定 class 中、同名方法的所有 overload，回傳詳盡資訊（不註冊符號）
+if _G.mono_listMethodsByName == nil then
+  _G.mono_listMethodsByName = function(namespace, classname, methodname)
+    local cls = mono_findClass(namespace, classname)
+    if not cls then
+      print(string.format("💔 Class not found: %s.%s", namespace, classname))
+      return {}
+    end
+
+    local mtds = mono_class_enumMethods(cls)
+    if not mtds then
+      print(string.format("💔 No methods in: %s.%s", namespace, classname))
+      return {}
+    end
+
+    local out = {}
+    local cnt = 0
+    for _, v in ipairs(mtds) do
+      if v.name == methodname then
+        local entry = { name = v.name, method = v.method }
+
+        -- 參數/回傳型別（用 CE 提供的 parameters API，比較穩）
+        local okP, p = pcall(mono_method_get_parameters, v.method)
+        if okP and p and p.parameters then
+          entry.params = p.parameters         -- array of {typename=..., name=...}
+          entry.paramnames = {}
+          for i, pi in ipairs(p.parameters) do
+            entry.paramnames[i] = pi.name
+          end
+          entry.returntype = p.returntype and p.returntype.name or nil
+        else
+          -- 後備：某些版本 mono_method_getSignature 可能回傳字串或多返回值
+          local okS, a, b, c = pcall(mono_method_getSignature, v.method)
+          if okS then
+            -- 嘗試相容 ijm_mtd_by_sig 的 (params, paramnames, returntype)
+            entry.params      = a
+            entry.paramnames  = b
+            entry.returntype  = c
+            entry.signature   = type(a) == "string" and a or nil
+          end
+        end
+
+        -- 編譯 JIT 取得地址
+        local addr = mono_compile_method(v.method)
+        entry.address = addr
+
+        cnt = cnt + 1
+        out[cnt] = entry
+      end
+    end
+
+    print(string.format("🔎 Found %d overload(s) for %s.%s.%s", cnt, namespace, classname, methodname))
+    return out
+  end
+end
+
+-- 產生欄位 offset 對照表（若 CE 版本支援欄位列舉/offset 取得）
+if _G.mono_offsetsTable == nil then
+  _G.mono_offsetsTable = function(cacheTable, classname, namespace, opts)
+    -- 行為與 ijm_offset_table 類似：若已有表且非空就直接回傳
+    if cacheTable and type(cacheTable) == "table" then
+      local hasAny = next(cacheTable) ~= nil
+      if hasAny then return cacheTable end
+    end
+
+    local t = {}
+    local cls = mono_findClass(namespace or "", classname)
+    if not cls then
+      print(string.format("💔 Class not found: %s.%s", namespace or "", classname))
+      return t
+    end
+
+    -- 嘗試列舉欄位
+    local fields = nil
+    if mono_class_enumFields then
+      local okF, res = pcall(mono_class_enumFields, cls)
+      if okF then fields = res end
+    end
+
+    if not fields or #fields == 0 then
+      print("⚠ 無法列舉欄位（當前 CE/Mono 外掛可能不支援 mono_class_enumFields）。")
+      return t
+    end
+
+    for _, f in ipairs(fields) do
+      local fname = f.name or ("&lt;noname_"..tostring(_).."&gt;")
+      local off = nil
+      if mono_field_get_offset then
+        local okO, o = pcall(mono_field_get_offset, f.field)
+        if okO then off = o end
+      end
+      t[fname] = off
+    end
+
+    -- 若需要標註是 Mono 單例/IL2CPP Enum 等，可透過 opts 設定，這裡僅示意保留
+    if opts and opts.meta then t.__meta = opts.meta end
+
+    return t
+  end
+end
+
+-- 📏 Register symbol by parameter type array (exact match)
+if _G.mono_registerSymbolEx == nil then
+  _G.mono_registerSymbolEx = function(symbolname, namespace, classname, methodname, paramTypes)
+    local cls = mono_findClass(namespace, classname)
+    if not cls then
+      print(string.format("💔 Error: Class not found - %s.%s", namespace, classname))
+      return
+    end
+
+    local methods = mono_class_enumMethods(cls)
+    for _, m in ipairs(methods) do
+      if m.name == methodname then
+        local p = mono_method_get_parameters(m.method)
+        local matched = true
+
+        if #p.parameters ~= #paramTypes then
+          matched = false
+        else
+          for i = 1, #paramTypes do
+            if not string.find(p.parameters[i].typename, paramTypes[i], 1, true) then
+              matched = false
+              break
+            end
+          end
+        end
+
+        if matched then
+          local addr = mono_compile_method(m.method)
+          if addr == 0 then
+            print("💔 Error: Method found but failed to compile.")
+            return
+          end
+          registerSymbol(symbolname, addr)
+          print(string.format("🪧 Symbol registered: %s = %X", symbolname, addr))
+          return
+        end
+      end
+    end
+
+    print(string.format("💔 Error: No matching method found - %s.%s.%s", namespace, classname, methodname))
+  end
+end
+
+-- 📏 Register symbol by partial signature match (overload-safe, with excludes and match info)
+if _G.mono_registerSymbolBySignatureMatch == nil then
+  _G.mono_registerSymbolBySignatureMatch = function(symbolname, namespace, classname, methodname, sigContains, sigExcludes)
+    local cls = mono_findClass(namespace, classname)
+    if not cls then
+      print(string.format("💔 Error: Class not found - %s.%s", namespace, classname))
+      return
+    end
+
+    local methods = mono_class_enumMethods(cls)
+    if not methods then
+      print(string.format("💔 Error: No methods found in %s.%s", namespace, classname))
+      return
+    end
+
+    for _, m in ipairs(methods) do
+      if m.name == methodname then
+        local sig = mono_method_getSignature(m.method)
+        local matched = true
+
+        -- Check required substrings
+        for _, kw in ipairs(sigContains) do
+          if not string.find(sig, kw, 1, true) then
+            matched = false
+            break
+          end
+        end
+
+        -- Check excluded substrings (if given)
+        if matched and sigExcludes then
+          for _, ex in ipairs(sigExcludes) do
+            if string.find(sig, ex, 1, true) then
+              matched = false
+              break
+            end
+          end
+        end
+
+        if matched then
+          local addr = mono_compile_method(m.method)
+          if addr == 0 then
+            print("💔 Error: Signature matched but failed to compile method.")
+            return
+          end
+          registerSymbol(symbolname, addr)
+          print(string.format("🪧 Symbol registered: %s = %X", symbolname, addr))
+          print(string.format("🔎 Matched Signature: %s", sig))
+          return
+        end
+      end
+    end
+
+    print(string.format("💔 Error: No matching signature found - %s.%s.%s", namespace, classname, methodname))
+  end
+end
+
+
+-- 📏 Register symbol by simple method name (first match)
+if _G.mono_registerSymbol == nil then
+  _G.mono_registerSymbol = function(symbolname, namespace, classname, methodname)
+    local m = mono_findMethod(namespace, classname, methodname)
+    if m == nil or m == 0 then
+      print(string.format("💔 Error: Method not found - %s.%s.%s", namespace, classname, methodname))
+      return
+    end
+
+    local addr = mono_compile_method(m)
+    if addr == 0 then
+      print(string.format("💔 Error: Could not compile method - %s.%s.%s", namespace, classname, methodname))
+      return
+    end
+
+    registerSymbol(symbolname, addr)
+    print(string.format("🪧 Symbol registered: %s = %X", symbolname, addr))
+  end
+end
+
+-- 🌀 Attach Mono if needed
+local pid = getOpenedProcessID()
+if pid == 0 then
+  print("⚠ Warning: No process is currently open.")
+  return
+end
+
+if _G.lastMonoPID == nil then _G.lastMonoPID = -1 end
+
+if monopipe == nil or _G.lastMonoPID ~= pid then
+  if monopipe ~= nil then
+    pcall(_G.SafeMonoDestroy)
+  end
+  pcall(LaunchMonoDataCollector)
+  _G.lastMonoPID = pid
+end
+
+-- ⚡ Example usage - Register Mono methods to CE symbol table
+-- These functions compile (JIT) a Mono method and register it as a CE symbol
+
+-- 🔹 1. mono_registerSymbol(symbolname, namespace, classname, methodname)
+-- Description: Registers the first matched method with given name.
+-- ⚠ Use this only when there's no overload (or you're fine with the first one).
+-- Params:
+--   symbolname: The name you want to register (used in CE as a label)
+--   namespace:  Mono namespace of the class (can be "" if none)
+--   classname:  Class name that contains the method
+--   methodname: Method name to find (first match will be used)
+-- Example:
+
+--_G.mono_registerSymbol("MyAttack", "Game.Logic", "BattleManager", "Attack")
+--_G.mono_registerSymbol("UseAbility_Any", "Elin", "Chara", "UseAbility")
+
+
+-- 🔹 2. mono_registerSymbolEx(symbolname, namespace, classname, methodname, paramTypes)
+-- Description: Registers a method that exactly matches the provided parameter types.
+-- Use this when there are multiple overloads of a method.
+-- Params:
+--   symbolname: The name to register
+--   namespace:  Mono namespace
+--   classname:  Class name
+--   methodname: Method name (exact match)
+--   paramTypes: Array of expected parameter type strings (must match count &amp; order)
+--               These are matched using `string.find`, so partial match is allowed.
+-- Example:
+--   UseAbility(string idAct, Card tc, Point pos, bool pt)
+
+--[[
+_G.mono_registerSymbolEx("UseAbility_Exact", "Elin", "Chara", "UseAbility", {
+  "System.String", "Card", "Point", "System.Boolean"
+})
+--]]
+
+
+-- 🔹 3. mono_registerSymbolBySignatureMatch(symbolname, namespace, classname, methodname, sigContains, sigExcludes)
+-- Description: Registers the method whose signature contains all given substrings.
+-- Flexible, and suitable when exact type names vary or signature format is uncertain.
+-- Params:
+--   symbolname: The symbol name to register
+--   namespace:  Mono namespace
+--   classname:  Class name
+--   methodname: Method name (will scan all overloads)
+--   sigContains: Array of strings that should all appear in the method signature
+--                e.g., { "Act", "Card", "Point", "bool" }
+--   sigExcludes: Signatures to exclude
+-- Example:
+--   Will match method like: UseAbility(Act a, Card tc, Point pos, bool pt)
+
+--[[
+_G.mono_registerSymbolBySignatureMatch("UseAbility_Act", "Elin", "Chara", "UseAbility", {
+  "Act", "Card", "Point", "bool"
+})
+
+_G.mono_registerSymbolBySignatureMatch("GetItemCount_Item", "Assembly-CSharp", "ItemStorage", "GetItemCount",
+  {"Item"},      -- sigContains
+  {"List"}       -- sigExcludes
+)
+
+Signatures above:
+System.Collections.Generic.List&lt;Item&gt;
+Item
+
+** Both have "Item" but first one have "List"
+--]]
+
+--[[
+
+Type Mapping (for overload filtering)
+-------------------------------------
+String      System.String        C#: string
+int         System.Int32         C#: int
+float       System.Single        C#: float
+bool        System.Boolean       C#: bool
+Vector3     UnityEngine.Vector3
+Color       UnityEngine.Color
+Point       (Game defined)
+Card        (Game defined)
+Act         (Game defined)
+
+--]]
+if process == nil then
+    ShowMessage("Process is not selected.")
+elseif readInteger(process) == 0 then
+    ShowMessage("Process cannot be opened.")
+else
+    if (monopipe == nil) then
+        LaunchMonoDataCollector()
+    end
+end
+
+{$asm}
+
+define(CharacterParameterBaseset_CurrentMPProc,"Last.Data.CharacterParameterBase.set_CurrentMP")
+define(SetGilProc,"Last.Management.UserDataManager.Last.Management.OwnedItemClient.IOwnedItemClient.SetGil")
+define(LastDataUserOwnedItemDataset_CountProc,"Last.Data.User.OwnedItemData.set_Count")
+define(LastDataUserOwnedItemDatactorProc,"Last.Data.User.OwnedItemData..ctor")
+define(LastDataMasterAbilityget_WeakHitRateProc,"Last.Data.Master.Ability.get_WeakHitRate")
+define(LastDataCharacterParameterBaseset_CurrentHPProc,"Last.Data.CharacterParameterBase.set_CurrentHP")
+define(LastBattleInstantiateManagerGetMonsterPartyProc,"Last.Battle.InstantiateManager.GetMonsterParty")
+define(LastBattleFunctionFuncitonNormalAttackUpdateParameterProc,"Last.Battle.Function.FuncitonNormalAttack.UpdateParameter")
+define(LastBattleFunctionMagicFunctionUpdateParameterProc,"Last.Battle.Function.MagicFunction.UpdateParameter")
+define(LastBattleFunctionRecoveryFunctionUpdateParameterProc,"Last.Battle.Function.RecoveryFunction.UpdateParameter")
+define(LastBattleFunctionBattleFunction52FF6StealItemProc, "Last.Battle.Function.BattleFunction52FF6.StealItem")
+define(LastBattleBattleStealItemPlugStealItemProc, "Last.Battle.BattleStealItemPlug.StealItem")
+Define(LastDataUserOwnedItemDataget_Count, "Last.Data.User.OwnedItemData.get_Count")
+
+
+registersymbol(CharacterParameterBaseset_CurrentMPProc)
+registersymbol(SetGilProc)
+registersymbol(LastDataUserOwnedItemDataset_CountProc)
+registersymbol(LastDataUserOwnedItemDatactorProc)
+registersymbol(LastDataMasterAbilityget_WeakHitRateProc)
+registersymbol(LastDataCharacterParameterBaseset_CurrentHPProc)
+registersymbol(LastBattleInstantiateManagerGetMonsterPartyProc)
+registersymbol(LastBattleFunctionFuncitonNormalAttackUpdateParameterProc)
+registersymbol(LastBattleFunctionMagicFunctionUpdateParameterProc)
+registersymbol(LastBattleFunctionRecoveryFunctionUpdateParameterProc)
+registersymbol(LastBattleFunctionBattleFunction52FF6StealItemProc)
+registersymbol(LastBattleBattleStealItemPlugStealItemProc)
+registersymbol(LastDataUserOwnedItemDataget_Count)
+[DISABLE]
+{$lua}
+if syntaxcheck then return end
+--pcall(_G.SafeMonoDestroy)
+{$asm}
+//unregistersymbol(*)
+
+{$asm}
+unregistersymbol(*)
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>10</ID>
+          <Description>"MP do not decrease (all)"</Description>
+          <Options moHideChildren="1"/>
+          <Color>FF4040</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : FINAL FANTASY VI.exe
+  Version: 
+  Date   : 2022-03-01
+  Author : bbfox @ https://opencheattables.org/
+}
+
+[ENABLE]
+
+aobscanregion(INJECT_BATTLE_MP,CharacterParameterBaseset_CurrentMPProc+14, CharacterParameterBaseset_CurrentMPProc+200,89 79 18 48 8B 01) // should be unique
+//aobscanmodule(INJECT_BATTLE_MP,CharacterParameterBaseset_CurrentMPProc+98,89 79 18 48 8B 01)
+alloc(newmem,$1000,INJECT_BATTLE_MP)
+
+label(code)
+label(return)
+label(mp_addr)
+label(char_b_m_id)
+
+newmem:
+
+code:
+  push rax
+  lea rax, [rcx+10]
+  mov [mp_addr], rax
+  mov eax, [rcx+10]
+  mov [char_b_m_id], eax
+
+  mov eax, [rcx+10]
+  cmp eax, #4
+  ja @F
+  mov edi, #999
+@@:
+  pop rax
+
+
+  mov [rcx+18],edi
+  mov rax,[rcx]
+  jmp return
+align 10 cc
+  mp_addr:
+  dq 0
+  char_b_m_id:
+  dd 0
+
+
+INJECT_BATTLE_MP:
+  jmp newmem
+  nop
+return:
+
+registersymbol(mp_addr)
+registersymbol(char_b_m_id)
+registersymbol(INJECT_BATTLE_MP)
+
+[DISABLE]
+
+INJECT_BATTLE_MP:
+  db 89 79 18 48 8B 01
+
+unregistersymbol(mp_addr)
+unregistersymbol(char_b_m_id)
+unregistersymbol(INJECT_BATTLE_MP)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+4ACBF9
+
+GameAssembly.dll+4ACBDF: CC                    - int 3 
+GameAssembly.dll+4ACBE0: 48 89 5C 24 08        - mov [rsp+08],rbx
+GameAssembly.dll+4ACBE5: 57                    - push rdi
+GameAssembly.dll+4ACBE6: 48 83 EC 20           - sub rsp,20
+GameAssembly.dll+4ACBEA: 48 8B D9              - mov rbx,rcx
+GameAssembly.dll+4ACBED: 33 FF                 - xor edi,edi
+GameAssembly.dll+4ACBEF: 85 D2                 - test edx,edx
+GameAssembly.dll+4ACBF1: 0F 49 FA              - cmovns edi,edx
+GameAssembly.dll+4ACBF4: 48 85 C9              - test rcx,rcx
+GameAssembly.dll+4ACBF7: 74 49                 - je GameAssembly.dll+4ACC42
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+4ACBF9: 89 79 18              - mov [rcx+18],edi
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+4ACBFC: 48 8B 01              - mov rax,[rcx]
+GameAssembly.dll+4ACBFF: 48 8B 90 98 01 00 00  - mov rdx,[rax+00000198]
+GameAssembly.dll+4ACC06: FF 90 90 01 00 00     - call qword ptr [rax+00000190]
+GameAssembly.dll+4ACC0C: 3B F8                 - cmp edi,eax
+GameAssembly.dll+4ACC0E: 7D 11                 - jnl GameAssembly.dll+4ACC21
+GameAssembly.dll+4ACC10: 8B 43 18              - mov eax,[rbx+18]
+GameAssembly.dll+4ACC13: 89 43 18              - mov [rbx+18],eax
+GameAssembly.dll+4ACC16: 48 8B 5C 24 30        - mov rbx,[rsp+30]
+GameAssembly.dll+4ACC1B: 48 83 C4 20           - add rsp,20
+GameAssembly.dll+4ACC1F: 5F                    - pop rdi
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>11</ID>
+              <Description>"MP"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>808080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>mp_addr</Address>
+              <Offsets>
+                <Offset>8</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>12</ID>
+              <Description>"Char ID"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>808080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>char_b_m_id</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>19</ID>
+          <Description>"Min. Gil"</Description>
+          <Options moHideChildren="1"/>
+          <Color>FF4040</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : FINAL FANTASY VI.exe
+  Version: 
+  Date   : 2022-03-01
+  Author : bbfox @ https://opencheattables.org/
+}
+
+[ENABLE]
+
+//aobscanmodule(INJECT_COCO_INC,GameAssembly.dll+6846CE,89 50 30 48 83 C4 28 C3 E8 ?3) // should be unique 13
+aobscanregion(INJECT_COCO_INC,SetGilProc,SetGilProc+100,89 50 30 48 83 C4 28) // should be unique 13/83==&gt; ?3
+alloc(newmem,$1000,INJECT_COCO_INC)
+
+label(code)
+label(return)
+label(min_coco)
+
+newmem:
+
+code:
+  cmp edx, [min_coco]
+  cmovl edx, [min_coco]
+  mov [rax+30],edx
+  add rsp,28
+  jmp return
+
+align 10 cc
+  min_coco:
+  dd #100000
+
+INJECT_COCO_INC:
+  jmp newmem
+  nop 2
+return:
+
+registersymbol(min_coco)
+registersymbol(INJECT_COCO_INC)
+
+[DISABLE]
+
+INJECT_COCO_INC:
+  db 89 50 30 48 83 C4 28
+
+unregistersymbol(min_coco)
+unregistersymbol(INJECT_COCO_INC)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+872A50
+
+GameAssembly.dll+872A3A: CC                    - int 3 
+GameAssembly.dll+872A3B: CC                    - int 3 
+GameAssembly.dll+872A3C: CC                    - int 3 
+GameAssembly.dll+872A3D: CC                    - int 3 
+GameAssembly.dll+872A3E: CC                    - int 3 
+GameAssembly.dll+872A3F: CC                    - int 3 
+GameAssembly.dll+872A40: 48 83 EC 28           - sub rsp,28
+GameAssembly.dll+872A44: 48 8B 81 A8 00 00 00  - mov rax,[rcx+000000A8]
+GameAssembly.dll+872A4B: 48 85 C0              - test rax,rax
+GameAssembly.dll+872A4E: 74 08                 - je GameAssembly.dll+872A58
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+872A50: 89 50 30              - mov [rax+30],edx
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+872A53: 48 83 C4 28           - add rsp,28
+GameAssembly.dll+872A57: C3                    - ret 
+GameAssembly.dll+872A58: E8 13 AC 92 FF        - call GameAssembly.dll+19D670
+GameAssembly.dll+872A5D: CC                    - int 3 
+GameAssembly.dll+872A5E: CC                    - int 3 
+GameAssembly.dll+872A5F: CC                    - int 3 
+GameAssembly.dll+872A60: 48 83 EC 28           - sub rsp,28
+GameAssembly.dll+872A64: 48 8B 81 A8 00 00 00  - mov rax,[rcx+000000A8]
+GameAssembly.dll+872A6B: 48 85 C0              - test rax,rax
+GameAssembly.dll+872A6E: 74 0B                 - je GameAssembly.dll+872A7B
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>20</ID>
+              <Description>"Threshold"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>min_coco</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>22</ID>
+          <Description>"Last item used? (Save &amp; load if change ID)"</Description>
+          <Options moHideChildren="1"/>
+          <Color>FF4040</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : FINAL FANTASY VI.exe
+  Version: 
+  Date   : 2022-03-01
+  Author : bbfox @ https://opencheattables.org/
+}
+
+[ENABLE]
+
+//aobscanmodule(INJECT_ITEM_USE,GameAssembly.dll,89 50 14 48 83 C4 28 C3 E8 23) // should be unique
+
+aobscanregion(INJECT_ITEM_USE,LastDataUserOwnedItemDataset_CountProc,LastDataUserOwnedItemDataset_CountProc+27,89 50 14 48 83 C4 28 C3) // should be unique
+alloc(newmem,$1000,INJECT_ITEM_USE)
+label(code)
+label(return)
+label(item_use_addr)
+
+newmem:
+
+code:
+  push rax
+  lea rax, [rax+14]
+  mov [item_use_addr], rax
+  pop rax
+
+  cmp edx, 1
+  ja skip_num
+  add edx, 2
+  jmp item_endp
+skip_num:
+  add edx, 1
+
+item_endp:
+  mov [rax+14],edx
+  add rsp,28
+  jmp return
+
+align 10 cc
+  item_use_addr:
+  dq 0
+
+INJECT_ITEM_USE:
+  jmp newmem
+  nop 2
+return:
+
+registersymbol(item_use_addr)
+registersymbol(INJECT_ITEM_USE)
+
+[DISABLE]
+
+INJECT_ITEM_USE:
+  db 89 50 14 48 83 C4 28
+
+unregistersymbol(item_use_addr)
+unregistersymbol(INJECT_ITEM_USE)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+8E0F40
+
+GameAssembly.dll+8E0F2A: CC                    - int 3 
+GameAssembly.dll+8E0F2B: CC                    - int 3 
+GameAssembly.dll+8E0F2C: CC                    - int 3 
+GameAssembly.dll+8E0F2D: CC                    - int 3 
+GameAssembly.dll+8E0F2E: CC                    - int 3 
+GameAssembly.dll+8E0F2F: CC                    - int 3 
+GameAssembly.dll+8E0F30: 48 83 EC 28           - sub rsp,28
+GameAssembly.dll+8E0F34: 48 8B 81 80 00 00 00  - mov rax,[rcx+00000080]
+GameAssembly.dll+8E0F3B: 48 85 C0              - test rax,rax
+GameAssembly.dll+8E0F3E: 74 08                 - je GameAssembly.dll+8E0F48
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+8E0F40: 89 50 14              - mov [rax+14],edx
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+8E0F43: 48 83 C4 28           - add rsp,28
+GameAssembly.dll+8E0F47: C3                    - ret 
+GameAssembly.dll+8E0F48: E8 23 C7 8B FF        - call GameAssembly.dll+19D670
+GameAssembly.dll+8E0F4D: CC                    - int 3 
+GameAssembly.dll+8E0F4E: CC                    - int 3 
+GameAssembly.dll+8E0F4F: CC                    - int 3 
+GameAssembly.dll+8E0F50: 48 89 5C 24 08        - mov [rsp+08],rbx
+GameAssembly.dll+8E0F55: 48 89 6C 24 10        - mov [rsp+10],rbp
+GameAssembly.dll+8E0F5A: 48 89 74 24 18        - mov [rsp+18],rsi
+GameAssembly.dll+8E0F5F: 57                    - push rdi
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>24</ID>
+              <Description>"ID"</Description>
+              <DropDownListLink>Item ID</DropDownListLink>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>item_use_addr</Address>
+              <Offsets>
+                <Offset>-4</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>25</ID>
+              <Description>"ID (ja)"</Description>
+              <DropDownList DisplayValueAsItem="1">0002:ポーション
+0003:ハイポーション
+0004:エクスポーション
+0005:エーテル
+0006:エーテルターボ
+0007:エーテルスーパー
+0008:エリクサー
+0009:ラストエリクサー
+000A:フェニックスの尾
+000B:聖水
+000C:毒消し
+000D:目薬
+000E:金の針
+000F:万能薬
+0010:ねぶくろ
+0011:テント
+0012:イエローチェリー
+0013:魔石のかけら
+0014:スーパーボール
+0015:やまびこ煙幕
+0016:煙玉
+0017:テレポストーン
+0018:干し肉
+</DropDownList>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>item_use_addr</Address>
+              <Offsets>
+                <Offset>-4</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>79</ID>
+              <Description>"ID (zh)"</Description>
+              <DropDownList DisplayValueAsItem="1">0002:治療劑
+0003:高級治療劑
+0004:特級治療劑
+0005:乙太
+0006:高級乙太
+0007:特級乙太
+0008:萬靈藥
+0009:終極萬靈藥
+000A:鳳凰尾巴
+000B:聖水
+000C:解毒藥
+000D:眼藥
+000E:金針
+000F:萬能藥
+0010:睡袋
+0011:帳篷
+0012:黃櫻桃
+0013:魔石碎片
+0014:超級彈球
+0015:山彥煙幕
+0016:煙霧彈
+0017:傳送石
+0018:肉乾
+</DropDownList>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>item_use_addr</Address>
+              <Offsets>
+                <Offset>-4</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>23</ID>
+              <Description>"Item count"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>item_use_addr</Address>
+              <Offsets>
+                <Offset>0</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>188</ID>
+          <Description>"Fill item count to 50 (to use: open item menu)"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : FINAL FANTASY VI.exe
+  Version: 
+  Date   : 2024-01-31
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanregion(INJECT_FILL_ITEM,LastDataUserOwnedItemDataget_Count+0b,LastDataUserOwnedItemDataget_Count+3b,8B 40 14 48 83 C4 28) // should be unique
+alloc(newmem,$1000,INJECT_FILL_ITEM)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+
+  // code start
+  cmp dword ptr [rax+10], #39
+  jl next1
+  cmp dword ptr [rax+10], #89
+  ja next1
+  cmp dword ptr [rax+10], #183
+  jle next1
+  cmp dword ptr [rax+10], #201
+  jl fill_endp
+  cmp dword ptr [rax+10], #329
+  ja fill_endp
+
+  jmp next1
+
+
+next1:
+  push rcx
+  mov ecx,[rax+14]
+  cmp ecx, #50
+  ja @F
+  mov ecx, #50
+next2:
+  mov [rax+14],ecx
+
+  pop rcx
+
+fill_endp:
+
+
+  // code end
+
+  mov eax,[rax+14]
+  add rsp,28
+  jmp return
+
+INJECT_FILL_ITEM:
+  jmp newmem
+  nop 2
+return:
+registersymbol(INJECT_FILL_ITEM)
+
+[DISABLE]
+
+INJECT_FILL_ITEM:
+  db 8B 40 14 48 83 C4 28
+
+unregistersymbol(INJECT_FILL_ITEM)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+49D590
+
+GameAssembly.dll+49D57A: CC                    - int 3 
+GameAssembly.dll+49D57B: CC                    - int 3 
+GameAssembly.dll+49D57C: CC                    - int 3 
+GameAssembly.dll+49D57D: CC                    - int 3 
+GameAssembly.dll+49D57E: CC                    - int 3 
+GameAssembly.dll+49D57F: CC                    - int 3 
+LastDataUserOwnedItemDataget_Count: 48 83 EC 28           - sub rsp,28
+GameAssembly.dll+49D584: 48 8B 81 80 00 00 00  - mov rax,[rcx+00000080]
+GameAssembly.dll+49D58B: 48 85 C0              - test rax,rax
+GameAssembly.dll+49D58E: 74 08                 - je GameAssembly.dll+49D598
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+49D590: 8B 40 14              - mov eax,[rax+14]
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+49D593: 48 83 C4 28           - add rsp,28
+GameAssembly.dll+49D597: C3                    - ret 
+GameAssembly.dll+49D598: E8 93 1C DB FF        - call GameAssembly.dll+24F230
+GameAssembly.dll+49D59D: CC                    - int 3 
+GameAssembly.dll+49D59E: CC                    - int 3 
+GameAssembly.dll+49D59F: CC                    - int 3 
+Last.Data.User.OwnedItemData.get_Deiscription: 40 57                 - push rdi
+GameAssembly.dll+49D5A2: 48 83 EC 20           - sub rsp,20
+GameAssembly.dll+49D5A6: 80 3D 23 8C D5 01 00  - cmp byte ptr [GameAssembly.dll+21F61D0],00
+GameAssembly.dll+49D5AD: 48 8B F9              - mov rdi,rcx
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>76</ID>
+          <Description>"XP Multiplier"</Description>
+          <Options moHideChildren="1"/>
+          <Color>FF4040</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : FINAL FANTASY VI.exe
+  Version: 
+  Date   : 2022-03-02
+  Author : bbfox @ https://opencheattables.org/
+}
+
+[ENABLE]
+//8B 40 50 48 83 C4 28 C3 E8 F0
+aobscanregion(INJECT_XP_ST1,LastDataMasterAbilityget_WeakHitRateProc,LastDataMasterAbilityget_WeakHitRateProc+30,8B 40 50 48 83 C4 28 C3) // should be unique
+alloc(newmem,$1000,INJECT_XP_ST1)
+
+label(code)
+label(return)
+label(i_xp_mul)
+
+newmem:
+  mov [i_old_rax], rax
+
+code:
+  mov eax,[rax+50]
+  cmp r10, 5
+  jne skip_2_end
+  cmp r12, 1
+  jne skip_2_end
+  cmp r14, 0
+  jne skip_2_end
+  cmp rbp, 0
+  je skip_2_end
+  cmp r15, 1
+  jle skip_2_end
+  cmp r8, E
+  jle skip_2_end
+  push rbx
+  push rax
+  mov rax, [i_old_rax]
+  mov ebx, [rax+58]
+  cmp ebx, 1
+  pop rax
+  pop rbx
+  jne skip_2_end
+
+  cvtsi2ss xmm15, eax
+  vmovss xmm14, [i_xp_mul]
+  vmulss xmm15, xmm15, xmm14
+  cvtss2si eax, xmm15
+
+skip_2_end:
+
+  add rsp,28
+  jmp return
+align 10 cc
+  i_xp_mul:
+  dd (float)2
+  i_old_rax:
+  dq 0
+
+
+INJECT_XP_ST1:
+  jmp newmem
+  nop 2
+return:
+
+registersymbol(i_xp_mul)
+registersymbol(INJECT_XP_ST1)
+
+[DISABLE]
+
+INJECT_XP_ST1:
+  db 8B 40 50 48 83 C4 28
+
+unregistersymbol(i_xp_mul)
+unregistersymbol(INJECT_XP_ST1)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+150CDD3
+
+GameAssembly.dll+150CDBC: CC              - int 3
+GameAssembly.dll+150CDBD: CC              - int 3
+GameAssembly.dll+150CDBE: CC              - int 3
+GameAssembly.dll+150CDBF: CC              - int 3
+LastDataMasterAbilityget_WeakHitRateProc: 48 83 EC 28     - sub rsp,28
+GameAssembly.dll+150CDC4: 48 8B 41 18     - mov rax,[rcx+18]
+GameAssembly.dll+150CDC8: 48 85 C0        - test rax,rax
+GameAssembly.dll+150CDCB: 74 0E           - je GameAssembly.dll+150CDDB
+GameAssembly.dll+150CDCD: 83 78 18 0C     - cmp dword ptr [rax+18],0C
+GameAssembly.dll+150CDD1: 76 0E           - jna GameAssembly.dll+150CDE1
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+150CDD3: 8B 40 50        - mov eax,[rax+50]
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+150CDD6: 48 83 C4 28     - add rsp,28
+GameAssembly.dll+150CDDA: C3              - ret
+GameAssembly.dll+150CDDB: E8 F0 2C C3 FE  - call GameAssembly.dll+13FAD0
+GameAssembly.dll+150CDE0: CC              - int 3
+GameAssembly.dll+150CDE1: E8 FA 2A C3 FE  - call GameAssembly.dll+13F8E0
+GameAssembly.dll+150CDE6: 48 8B C8        - mov rcx,rax
+GameAssembly.dll+150CDE9: 33 D2           - xor edx,edx
+GameAssembly.dll+150CDEB: E8 B0 2C C3 FE  - call GameAssembly.dll+13FAA0
+GameAssembly.dll+150CDF0: CC              - int 3
+GameAssembly.dll+150CDF1: CC              - int 3
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>77</ID>
+              <Description>"XP multiplier"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>i_xp_mul</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>172</ID>
+          <Description>"Set AP Value"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : FINAL FANTASY VI.exe
+  Version: 
+  Date   : 2022-04-01
+  Author : bbfox @ https://opencheattables.org/
+}
+
+[ENABLE]
+
+aobscanregion(INJECT_AP_MULTI,LastBattleInstantiateManagerGetMonsterPartyProc,LastBattleInstantiateManagerGetMonsterPartyProc+20,48 8B 41 38 48 85 C0) // should be unique
+alloc(newmem,$1000,INJECT_AP_MULTI)
+
+label(code)
+label(return)
+label(i_ap_value)
+label(i_prev_rcx_value)
+
+newmem:
+  cmp [i_prev_rcx_value], rcx
+  je code
+  mov [i_prev_rcx_value], rcx
+  push rax
+  push r15
+  mov rax, [rcx+38]
+  mov rax, [rax+10]
+  cmp rax, 0
+  je endp
+  mov rax, [rax+18]
+  cmp rax, 0
+  je endp
+  mov r15d, [i_ap_value]
+  mov [rax+54], r15d
+
+endp:
+  pop r15
+  pop rax
+
+code:
+  mov rax,[rcx+38]
+  test rax,rax
+  jmp return
+
+align 10 cc
+  i_ap_value:
+  dd #10
+  i_prev_rcx_value:
+  dq 0
+
+INJECT_AP_MULTI:
+  jmp newmem
+  nop 2
+return:
+
+registersymbol(i_ap_value)
+registersymbol(INJECT_AP_MULTI)
+
+[DISABLE]
+
+INJECT_AP_MULTI:
+  db 48 8B 41 38 48 85 C0
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+15C2374
+
+GameAssembly.dll+15C235C: 5D              - pop rbp
+GameAssembly.dll+15C235D: C3              - ret 
+GameAssembly.dll+15C235E: 33 C0           - xor eax,eax
+GameAssembly.dll+15C2360: EB E1           - jmp GameAssembly.dll+15C2343
+GameAssembly.dll+15C2362: E8 C9 E9 C6 FE  - call GameAssembly.dll+230D30
+GameAssembly.dll+15C2367: CC              - int 3 
+GameAssembly.dll+15C2368: 33 D2           - xor edx,edx
+GameAssembly.dll+15C236A: E8 91 E9 C6 FE  - call GameAssembly.dll+230D00
+GameAssembly.dll+15C236F: CC              - int 3 
+LastBattleInstantiateManagerGetMonsterPartyProc: 48 83 EC 28     - sub rsp,28
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+15C2374: 48 8B 41 38     - mov rax,[rcx+38]
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+15C2378: 48 85 C0        - test rax,rax
+GameAssembly.dll+15C237B: 74 09           - je GameAssembly.dll+15C2386
+GameAssembly.dll+15C237D: 48 8B 40 10     - mov rax,[rax+10]
+GameAssembly.dll+15C2381: 48 83 C4 28     - add rsp,28
+GameAssembly.dll+15C2385: C3              - ret 
+GameAssembly.dll+15C2386: E8 A5 E9 C6 FE  - call GameAssembly.dll+230D30
+GameAssembly.dll+15C238B: CC              - int 3 
+GameAssembly.dll+15C238C: CC              - int 3 
+GameAssembly.dll+15C238D: CC              - int 3 
+GameAssembly.dll+15C238E: CC              - int 3 
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>173</ID>
+              <Description>"AP value"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_ap_value</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>183</ID>
+          <Description>"100% Steal"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : FINAL FANTASY VI.exe
+  Version: 
+  Date   : 2024-01-31
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+//aobscanmodule(INJECT_STEAL_ITEM,GameAssembly.dll,40 84 ED 0F 85 05 01 00 00) // should be unique
+aobscanregion(INJECT_STEAL_ITEM,LastBattleFunctionBattleFunction52FF6StealItemProc+90, LastBattleFunctionBattleFunction52FF6StealItemProc+F0,40 84 ED 0F 85 ?? ?? ?? ?? 48 85 FF) // should be unique
+alloc(newmem,$1000,INJECT_STEAL_ITEM)
+alloc(INJECT_STEAL_ITEMo,9)
+
+label(code)
+label(return)
+
+INJECT_STEAL_ITEMo:
+  readmem(INJECT_STEAL_ITEM, 9)
+
+newmem:
+  mov bpl, 1
+code:
+  test bpl,bpl
+  //jne GameAssembly.dll+12E1741
+  reassemble(INJECT_STEAL_ITEM+3)
+  jmp return
+
+INJECT_STEAL_ITEM:
+  jmp newmem
+  nop 4
+return:
+registersymbol(INJECT_STEAL_ITEM)
+registersymbol(INJECT_STEAL_ITEMo)
+[DISABLE]
+
+INJECT_STEAL_ITEM:
+  //db 40 84 ED 0F 85 05 01 00 00
+  readmem(INJECT_STEAL_ITEMo, 9)
+
+unregistersymbol(INJECT_STEAL_ITEM)
+unregistersymbol(INJECT_STEAL_ITEMo)
+dealloc(newmem)
+dealloc(INJECT_STEAL_ITEMo)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+69B0EA
+
+GameAssembly.dll+69B0C4: E8 27 41 BB FF           - call GameAssembly.dll+24F1F0
+GameAssembly.dll+69B0C9: 33 D2                    - xor edx,edx
+GameAssembly.dll+69B0CB: 48 8B C8                 - mov rcx,rax
+GameAssembly.dll+69B0CE: 48 8B D8                 - mov rbx,rax
+GameAssembly.dll+69B0D1: E8 CA 04 62 00           - call Last.Data.Master.Content..ctor
+GameAssembly.dll+69B0D6: 48 8B D3                 - mov rdx,rbx
+GameAssembly.dll+69B0D9: 49 89 5D 18              - mov [r13+18],rbx
+GameAssembly.dll+69B0DD: 49 8D 4D 18              - lea rcx,[r13+18]
+GameAssembly.dll+69B0E1: E8 3A 3D BB FF           - call GameAssembly.dll+24EE20
+GameAssembly.dll+69B0E6: 45 89 75 10              - mov [r13+10],r14d
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+69B0EA: 40 84 ED                 - test bpl,bpl
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+69B0ED: 0F 85 05 01 00 00        - jne GameAssembly.dll+69B1F8
+GameAssembly.dll+69B0F3: 48 85 FF                 - test rdi,rdi
+GameAssembly.dll+69B0F6: 0F 84 C4 05 00 00        - je GameAssembly.dll+69B6C0
+GameAssembly.dll+69B0FC: 4C 8B 07                 - mov r8,[rdi]
+GameAssembly.dll+69B0FF: 48 8B 15 EA 3B E7 01     - mov rdx,[GameAssembly.dll+250ECF0]
+GameAssembly.dll+69B106: 45 0F B6 88 28 01 00 00  - movzx r9d,byte ptr [r8+00000128]
+GameAssembly.dll+69B10E: 0F B6 82 28 01 00 00     - movzx eax,byte ptr [rdx+00000128]
+GameAssembly.dll+69B115: 44 3A C8                 - cmp r9b,al
+GameAssembly.dll+69B118: 0F 82 A2 05 00 00        - jb GameAssembly.dll+69B6C0
+GameAssembly.dll+69B11E: 8B C8                    - mov ecx,eax
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>187</ID>
+          <Description>"Steal rare item if available (need to confirm)"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : FINAL FANTASY VI.exe
+  Version: 
+  Date   : 2024-01-31
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+//aobscanmodule(INJECT_STEAL_RARE,GameAssembly.dll,41 8D 5E 01 83 F8 20) // should be unique
+aobscanregion(INJECT_STEAL_RARE,LastBattleFunctionBattleFunction52FF6StealItemProc+260,LastBattleFunctionBattleFunction52FF6StealItemProc+300,8D 5D 01 83 F8 20) // should be unique
+alloc(newmem,$1000,INJECT_STEAL_RARE)
+
+label(code)
+label(return)
+
+newmem:
+  mov eax, 10
+
+code:
+  lea ebx,[rbp+01]
+  cmp eax,20
+  jmp return
+
+INJECT_STEAL_RARE:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT_STEAL_RARE)
+
+[DISABLE]
+
+INJECT_STEAL_RARE:
+  db 8D 5D 01 83 F8 20
+
+unregistersymbol(INJECT_STEAL_RARE)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+69B31C
+
+GameAssembly.dll+69B2ED: 48 8B 0D AC 59 E7 01  - mov rcx,[GameAssembly.dll+2510CA0]
+GameAssembly.dll+69B2F4: F6 81 2F 01 00 00 02  - test byte ptr [rcx+0000012F],02
+GameAssembly.dll+69B2FB: 74 0E                 - je GameAssembly.dll+69B30B
+GameAssembly.dll+69B2FD: 44 39 B1 E0 00 00 00  - cmp [rcx+000000E0],r14d
+GameAssembly.dll+69B304: 75 05                 - jne GameAssembly.dll+69B30B
+GameAssembly.dll+69B306: E8 05 19 B4 FF        - call GameAssembly.il2cpp_runtime_class_init
+GameAssembly.dll+69B30B: 33 D2                 - xor edx,edx
+GameAssembly.dll+69B30D: B9 00 01 00 00        - mov ecx,00000100
+GameAssembly.dll+69B312: BD 01 00 00 00        - mov ebp,00000001
+GameAssembly.dll+69B317: E8 84 DC CA FF        - call CommonUtility.GetRand
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+69B31C: 8D 5D 01              - lea ebx,[rbp+01]
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+69B31F: 83 F8 20              - cmp eax,20
+GameAssembly.dll+69B322: 7D 1C                 - jnl GameAssembly.dll+69B340
+GameAssembly.dll+69B324: 33 D2                 - xor edx,edx
+GameAssembly.dll+69B326: 48 8B CE              - mov rcx,rsi
+GameAssembly.dll+69B329: E8 62 85 AE 00        - call Last.Data.Master.Monster.get_StealContentId2
+GameAssembly.dll+69B32E: 85 C0                 - test eax,eax
+GameAssembly.dll+69B330: 74 0E                 - je GameAssembly.dll+69B340
+GameAssembly.dll+69B332: 33 D2                 - xor edx,edx
+GameAssembly.dll+69B334: 48 8B CE              - mov rcx,rsi
+GameAssembly.dll+69B337: 8B EB                 - mov ebp,ebx
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>184</ID>
+          <Description>"Steal - Set item - Specify ID &amp; count"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : FINAL FANTASY VI.exe
+  Version: 
+  Date   : 2022-08-19
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+//aobscanmodule(INJECT_STEAL_EXTRA_ITEM,GameAssembly.dll,B5 D9 FE CC CC CC CC CC CC CC CC CC CC CC CC CC CC CC CC 48 89 5C 24 08) // should be unique
+aobscanregion(INJECT_STEAL_EXTRA_ITEM,LastBattleBattleStealItemPlugStealItemProc,LastBattleBattleStealItemPlugStealItemProc+12,48 89 5C 24 08 48 89 74 24 10 57 48 83 EC 20) //48 89 5C 24 08 48 89 74 24 10 57 48 83 EC 20
+alloc(newmem,$1000,INJECT_STEAL_EXTRA_ITEM)
+
+label(code)
+label(return)
+label(i_steal_item_count)
+label(i_steam_item_id)
+
+newmem:
+  mov rdx, [i_steam_item_id]
+  mov r8, [i_steal_item_count]
+
+code:
+  mov [rsp+08],rbx
+  jmp return
+align 10 cc
+  i_steal_item_count:
+  dd 1
+  i_steam_item_id:
+  dd 8
+
+
+INJECT_STEAL_EXTRA_ITEM:
+  jmp newmem
+return:
+registersymbol(INJECT_STEAL_EXTRA_ITEM)
+registersymbol(i_steal_item_count)
+registersymbol(i_steam_item_id)
+[DISABLE]
+
+INJECT_STEAL_EXTRA_ITEM:
+  db 48 89 5C 24 08
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: LastBattleBattleStealItemPlugStealItemProc
+
+GameAssembly.dll+13A45B6: CC                    - int 3 
+GameAssembly.dll+13A45B7: CC                    - int 3 
+GameAssembly.dll+13A45B8: CC                    - int 3 
+GameAssembly.dll+13A45B9: CC                    - int 3 
+GameAssembly.dll+13A45BA: CC                    - int 3 
+GameAssembly.dll+13A45BB: CC                    - int 3 
+GameAssembly.dll+13A45BC: CC                    - int 3 
+GameAssembly.dll+13A45BD: CC                    - int 3 
+GameAssembly.dll+13A45BE: CC                    - int 3 
+GameAssembly.dll+13A45BF: CC                    - int 3 
+// ---------- INJECTING HERE ----------
+LastBattleBattleStealItemPlugStealItemProc: 48 89 5C 24 08        - mov [rsp+08],rbx
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+13A45C5: 48 89 74 24 10        - mov [rsp+10],rsi
+GameAssembly.dll+13A45CA: 57                    - push rdi
+GameAssembly.dll+13A45CB: 48 83 EC 20           - sub rsp,20
+GameAssembly.dll+13A45CF: 80 3D 07 F6 C3 00 00  - cmp byte ptr [GameAssembly.dll+1FE3BDD],00
+GameAssembly.dll+13A45D6: 41 8B F0              - mov esi,r8d
+GameAssembly.dll+13A45D9: 8B FA                 - mov edi,edx
+GameAssembly.dll+13A45DB: 48 8B D9              - mov rbx,rcx
+GameAssembly.dll+13A45DE: 75 12                 - jne GameAssembly.dll+13A45F2
+GameAssembly.dll+13A45E0: 8B 0D 62 1A 58 00     - mov ecx,[GameAssembly.dll+1926048]
+GameAssembly.dll+13A45E6: E8 75 B3 D9 FE        - call GameAssembly.dll+13F960
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>185</ID>
+              <Description>"Item ID"</Description>
+              <DropDownList DisplayValueAsItem="1">1:?
+2:Potion
+3:Hi Potion
+4:X-Potion
+5:Ether
+6:Hi Ether
+7:X-Ether
+8:Elixir
+9:Megalixir
+10:Phoenix Down
+11:Holy Water
+12:Antidote
+13:Eye Drop
+14:Gold Needle
+15:Remedy
+16:Sleeping Bag
+17:Tent
+18:Green Cherry
+19:Magicite Shard
+20:Super Ball
+21:Echo Screen
+22:Smoke Bomb
+23:Teleport Stone
+24:Dried Meat
+25:Rename Card
+26:Flame Scroll
+27:Water Scroll
+28:Lightning Scroll
+29:Invisibility Scroll
+30:Shadow Scroll
+31:Noise Blaster
+32:Bioblaster
+33:Flash
+34:Chainsaw
+35:Debillitator
+36:Drill
+37:Air Anchor
+38:Auto Crossbow
+39:Cider
+40:Old Clock Key
+41:Fish
+42:Fish
+43:Fish
+44:Fish
+45:Lump of Metal
+46:Lola's Letter
+47:Coral
+48:Books
+49:Emperor's Letter
+50:Rust-Rid
+51:*Freeze
+52:*Freeze
+53:*Freeze
+54:*Assume Freeze
+55:*Assume Freeze
+56:*Assume Freeze
+57:*Assume Freeze
+58:*Assume Freeze
+59:*Assume Freeze
+60:*Freeze
+61:*Freeze
+62:Ramuh
+63:Kirin
+64:Siren
+65:Cait Sith
+66:Ifrit
+67:Shiva
+68:Unicorn
+69:Maduin
+70:Catoblepas
+71:Phantom
+72:Carbuncle
+73:Bismarck
+74:Golem
+75:Zona Seeker
+76:Seraph
+77:Quetzalli
+78:Fenrir
+79:Valigarmanda
+80:Midgardsormr
+81:Lakshmi
+82:Alexander
+83:Phoenix
+84:Odin
+85:Bahamut
+86:Ragnarok
+87:Crusader
+88:Raiden
+89:*Freeze
+90:*Assume Freeze
+91:*Assume Freeze
+92:*Freeze
+93:Empty
+94:Dagger
+95:Mythril Knife
+96:Main Gauche
+97:Air Knife
+98:Thief's Knife
+99:Assassin's Dagger
+100:Man-Eater
+101:SwordBreaker
+102:Gladius
+103:Valiant Knife
+104:Mythril Sword
+105:Great Sword
+106:Rune Blade
+107:Flametounge
+108:Icebrand
+109:Thunder Blade
+110:Bastard Sword
+111:Stone Blade
+112:Blood Sword
+113:Enhancer
+114:Crystal Sword
+115:Falchion
+116:Soul Sabre
+117:Ogrenyx
+118:Excalibur
+119:Zantetsuken
+120:Lightbringer
+121:Ragnarok
+122:Ultimate Weapon
+123:Mythril Spear
+124:Trident
+125:Heavy Lance
+126:Partisan
+127:Holy Lance
+128:Golden Spear
+129:Radiant Lance
+130:Impartisan
+131:Kunai
+132:Kodachi
+133:Sakura
+134:Sasuke
+135:Ichigeki
+136:Kagenui
+137:Ashura
+138:Kotetsu
+139:Kikuichimonji
+140:Kazekiri
+141:Murasame
+142:Masamune
+143:Murakumo
+144:Mutsunokami
+145:Healing Rod
+146:Mythril Rod
+147:Flame Rod
+148:Ice Rod
+149:Thunder Rod
+150:Poison Rod
+151:Holy Rod
+152:Gravity Rod
+153:Punisher
+154:Magus Rod
+155:Chocobo Brush
+156:Da Vinci Brush
+157:Magical Brush
+158:Rainbow Brush
+159:Shuriken
+160:Fuma Star
+161:Pinwheel
+162:Chain Flail
+163:Moonring Blade
+164:Morning Star
+165:Boomerang
+166:Rising Sun
+167:HawkEye
+168:Bone Club
+169:Sniper
+170:Wing Edge
+171:Cards
+172:Darts
+173:Death Tarrot
+174:Viper Darts
+175:Dice
+176:Fixed Dice
+177:Metal Knuckles
+178:Mythril Claws
+179:Kaiser Knuckles
+180:Venom Claws
+181:Burning Fist
+182:Dragon Claws
+183:Tigerfang
+184:*Freeze
+185:*Freeze
+186:*Assume Freeze
+187:*Assume Freeze
+188:*Assume Freeze
+189:*Assume Freeze
+190:*Assume Freeze
+191:*Assume Freeze
+192:*Assume Freeze
+193:*Assume Freeze
+194:*Assume Freeze
+195:*Assume Freeze
+196:*Freeze
+197:None
+198:None
+199:None
+200:*Freeze
+201:Buckler
+202:Heavy Shield
+203:Mythril Shield
+204:Golden Shield
+205:Aegis Shield
+206:Diamond Shield
+207:Flame Shield
+208:Ice Shield
+209:Thunder Shield
+210:Crystal Shield
+211:Genji Shield
+212:Tortoise Shield
+213:Cursed Shield
+214:Paladin's Shield
+215:Force Shield
+216:Leather Cap
+217:Hairband
+218:Plumed Hat
+219:Beret
+220:Magus Hat
+221:Bandana
+222:Iron Helmet
+223:Hypno Crown
+224:Priest's Miter
+225:Green Beret
+226:Twist Headband
+227:Mythril Helm
+228:Tiara
+229:Golden Helmet
+230:Tiger Mask
+231:Red Cap
+232:Mystery Veil
+233:Circlet
+234:Royal Crown
+235:Diamond Helm
+236:Black Cowl
+237:Crystal Helm
+238:Oath Veil
+239:Cat-Ear] Hood
+240:Genji Helmet
+241:Thornlet
+242:Saucer
+243:*Freeze
+244:Leather Armor
+245:Cotton Robe
+246:Kenpo Suit
+247:Iron Armor
+248:Silk Robe
+249:Mythril Vest
+250:Ninja Gear
+251:White Dress
+252:Mythril Mail
+253:Gaia Gear
+254:Mirage Vest
+255:Golden Armor
+256:Power Sash
+257:Luminous Robe
+258:Diamond Vest
+259:Red Jacket
+260:Force Armor
+261:Diamond Armor
+262:Black Garb
+263:Magus Robe
+264:Crystal Mail
+265:Regal Gown
+266:Genji Armor
+267:Reed Cloak
+268:Minerva Bustier
+269:Tabby Suit
+270:Chocobo Suit
+271:Moogle Suit
+272:Nutkin Suit
+273:Behemoth Suit
+274:Snow Scarf
+275:Silver Spectacles
+276:Star Pendant
+277:Peace Ring
+278:Amulet
+279:White Cape
+280:Jeweled Ring
+281:Fairy Ring
+282:Barrier Ring
+283:Mythril Glove
+284:Protect Ring
+285:Hermes Sandals
+286:Reflect Ring
+287:Angel Wings
+288:Angel Ring
+289:Knight's Code
+290:Dragoon Boots
+291:Zephyr Cape
+292:Princess Ring
+293:Cursed Ring
+294:Earrings
+295:Gigas Glove
+296:Blizzard Orb
+297:Berserker Ring
+298:Thief's Bracer
+299:Guard Bracelet
+300:Hero's Ring
+301:Ribbon
+302:Muscle Belt
+303:Crystal Orb
+304:Gold Hairpin
+305:Celestriad
+306:Brigand's Glove
+307:Gauntlet
+308:Genji Glove
+309:Hyper Wrist
+310:Master's Scroll
+311:Prayer Beads
+312:Black Belt
+313:Heiji's Jitte
+314:Fake Mustache
+315:Soul of Thamasa
+316:Dragon Horn
+317:Merit Award
+318:Memento Ring
+319:Safety Bit
+320:Lich Ring
+321:Molulu's Charm
+322:Ward Bangle
+323:Miracle Shoes
+324:Alarm Earring
+325:Gale Hairpin
+326:Sniper Eye
+327:Growth Egg
+328:Tintinnabulum
+329:Sprint Shoes
+330:*Freeze
+</DropDownList>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_steam_item_id</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>186</ID>
+              <Description>"Count"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_steal_item_count</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>181</ID>
+          <Description>"***Notice: All "Damage control" display values are unchanged"</Description>
+          <Color>400080</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>174</ID>
+          <Description>"Damage control - Normal attack"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : FINAL FANTASY VI.exe
+  Version: 
+  Date   : 2024-01-31
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanregion(INJECT_NORMAL_ATTACK,LastBattleFunctionFuncitonNormalAttackUpdateParameterProc+20,LastBattleFunctionFuncitonNormalAttackUpdateParameterProc+200,4C 8B 43 20 4D 85 C0 0F) // should be unique
+alloc(newmem,$1000,INJECT_NORMAL_ATTACK)
+
+label(code)
+label(return)
+label(vf_player_nattack_multi)
+label(vf_monster_nattack_multi)
+
+newmem:
+  mov r8,[rbx+20]
+  test r8,r8
+  je code
+  push r8
+  push rbx
+  mov r8d, [rbx+50]
+  mov rbx, [rbx+20]
+
+  cmp r8d, 1
+  je monster_2_player
+  cmp r8d, 3
+  je player_2_monster
+  jmp endp
+player_2_monster:
+  vmovss xmm14, [vf_player_nattack_multi]
+  jmp attack_calc
+monster_2_player:
+  vmovss xmm14, [vf_monster_nattack_multi]
+
+attack_calc:
+  mov r8d, [rbx+10]
+  cvtsi2ss xmm15, r8d
+  vmulss xmm15, xmm15, xmm14
+  cvtss2si r8d, xmm15
+  mov [rbx+10], r8d
+
+endp:
+  pop rbx
+  pop r8
+
+code:
+  mov r8,[rbx+20]
+  test r8,r8
+  jmp return
+
+align 10 cc
+  vf_player_nattack_multi:
+  dd (float)1.5
+  vf_monster_nattack_multi:
+  dd (float)0.75
+
+INJECT_NORMAL_ATTACK:
+  jmp newmem
+  nop 2
+return:
+registersymbol(vf_player_nattack_multi)
+registersymbol(vf_monster_nattack_multi)
+registersymbol(INJECT_NORMAL_ATTACK)
+
+[DISABLE]
+
+INJECT_NORMAL_ATTACK:
+  db 4C 8B 43 20 4D 85 C0
+
+unregistersymbol(*)
+dealloc(newmem)
+
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+6A3A38
+
+GameAssembly.dll+6A3A0B: 48 8B D9              - mov rbx,rcx
+GameAssembly.dll+6A3A0E: 80 3D E5 3A B5 01 00  - cmp byte ptr [GameAssembly.dll+21F74FA],00
+GameAssembly.dll+6A3A15: 75 12                 - jne GameAssembly.dll+6A3A29
+GameAssembly.dll+6A3A17: 8B 0D 87 39 30 01     - mov ecx,[GameAssembly.dll+19A73A4]
+GameAssembly.dll+6A3A1D: E8 9E B6 BA FF        - call GameAssembly.dll+24F0C0
+GameAssembly.dll+6A3A22: C6 05 D1 3A B5 01 01  - mov byte ptr [GameAssembly.dll+21F74FA],01
+GameAssembly.dll+6A3A29: 8B 04 24              - mov eax,[rsp]
+GameAssembly.dll+6A3A2C: 48 83 EC 10           - sub rsp,10
+GameAssembly.dll+6A3A30: 4C 8D 7C 24 20        - lea r15,[rsp+20]
+GameAssembly.dll+6A3A35: 41 8B 07              - mov eax,[r15]
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+6A3A38: 4C 8B 43 20           - mov r8,[rbx+20]
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+6A3A3C: 4D 85 C0              - test r8,r8
+GameAssembly.dll+6A3A3F: 0F 84 22 02 00 00     - je GameAssembly.dll+6A3C67
+GameAssembly.dll+6A3A45: 45 33 C9              - xor r9d,r9d
+GameAssembly.dll+6A3A48: 48 8B 15 91 A7 E6 01  - mov rdx,[GameAssembly.dll+250E1E0]
+GameAssembly.dll+6A3A4F: 41 8D 49 03           - lea ecx,[r9+03]
+GameAssembly.dll+6A3A53: E8 F8 23 A4 FF        - call GameAssembly.dll+E5E50
+GameAssembly.dll+6A3A58: 44 8B F0              - mov r14d,eax
+GameAssembly.dll+6A3A5B: 48 8B 0D D6 D8 E6 01  - mov rcx,[GameAssembly.dll+2511338]
+GameAssembly.dll+6A3A62: F6 81 2F 01 00 00 02  - test byte ptr [rcx+0000012F],02
+GameAssembly.dll+6A3A69: 74 0E                 - je GameAssembly.dll+6A3A79
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>175</ID>
+              <Description>"Player2Monster factor"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>vf_player_nattack_multi</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>176</ID>
+              <Description>"Monster2Player factor"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>vf_monster_nattack_multi</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>178</ID>
+          <Description>"Damage control - Magic attack"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : FINAL FANTASY VI.exe
+  Version: 
+  Date   : 2022-04-01
+  Author :
+}
+
+[ENABLE]
+
+//aobscanmodule(INJECT_MAGIC_FUNCTION,GameAssembly.dll,02 B2 FF C6 05 * * * * 01 4C 8B 47 20 48 89 5C 24 30) // should be unique
+aobscanregion(INJECT_MAGIC_FUNCTION,LastBattleFunctionMagicFunctionUpdateParameterProc+10,LastBattleFunctionMagicFunctionUpdateParameterProc+50,4C 8B 47 20 48 89 5C 24 30) // should be unique
+
+alloc(newmem,$1000,INJECT_MAGIC_FUNCTION)
+
+label(code)
+label(return)
+label(vf_player_mattack_multi)
+label(vf_monster_mattack_multi)
+
+newmem:
+  push r8
+  push rdi
+  mov r8d, [rdi+50]
+  mov rdi, [rdi+20]
+
+  cmp r8d, 1
+  je monster_2_player
+  cmp r8d, 3
+  je player_2_monster
+  jmp endp
+player_2_monster:
+  vmovss xmm14, [vf_player_mattack_multi]
+  jmp attack_calc
+monster_2_player:
+  vmovss xmm14, [vf_monster_mattack_multi]
+
+attack_calc:
+  mov r8d, [rdi+10]
+  cvtsi2ss xmm15, r8d
+  vmulss xmm15, xmm15, xmm14
+  cvtss2si r8d, xmm15
+  mov [rdi+10], r8d
+
+endp:
+  pop rdi
+  pop r8
+
+code:
+  mov r8,[rdi+20]
+  mov [rsp+30],rbx
+  jmp return
+
+align 10 cc
+  vf_player_mattack_multi:
+  dd (float)1.5
+  vf_monster_mattack_multi:
+  dd (float)0.5
+
+INJECT_MAGIC_FUNCTION:
+  jmp newmem
+  nop 4
+return:
+registersymbol(vf_player_mattack_multi)
+registersymbol(vf_monster_mattack_multi)
+registersymbol(INJECT_MAGIC_FUNCTION)
+
+[DISABLE]
+
+INJECT_MAGIC_FUNCTION:
+  db 4C 8B 47 20 48 89 5C 24 30
+
+unregistersymbol(INJECT_MAGIC_FUNCTION)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+10CA674
+
+GameAssembly.dll+10CA64E: CC                    - int 3
+GameAssembly.dll+10CA64F: CC                    - int 3
+LastBattleFunctionMagicFunctionUpdateParameterProc: 40 57                 - push rdi
+GameAssembly.dll+10CA652: 48 83 EC 20           - sub rsp,20
+GameAssembly.dll+10CA656: 80 3D E3 7A F1 00 00  - cmp byte ptr [GameAssembly.dll+1FE2140],00
+GameAssembly.dll+10CA65D: 48 8B F9              - mov rdi,rcx
+GameAssembly.dll+10CA660: 75 12                 - jne GameAssembly.dll+10CA674
+GameAssembly.dll+10CA662: 8B 0D 20 75 7D 00     - mov ecx,[GameAssembly.dll+18A1B88]
+GameAssembly.dll+10CA668: E8 F3 52 07 FF        - call GameAssembly.dll+13F960
+GameAssembly.dll+10CA66D: C6 05 CC 7A F1 00 01  - mov byte ptr [GameAssembly.dll+1FE2140],01
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+10CA674: 4C 8B 47 20           - mov r8,[rdi+20]
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+10CA678: 48 89 5C 24 30        - mov [rsp+30],rbx
+GameAssembly.dll+10CA67D: 4D 85 C0              - test r8,r8
+GameAssembly.dll+10CA680: 0F 84 AB 00 00 00     - je GameAssembly.dll+10CA731
+GameAssembly.dll+10CA686: 48 8B 15 CB B7 F7 00  - mov rdx,[GameAssembly.dll+2045E58]
+GameAssembly.dll+10CA68D: 45 33 C9              - xor r9d,r9d
+GameAssembly.dll+10CA690: 41 8D 49 03           - lea ecx,[r9+03]
+GameAssembly.dll+10CA694: E8 67 6A F6 FE        - call GameAssembly.dll+31100
+GameAssembly.dll+10CA699: 4C 8B 47 20           - mov r8,[rdi+20]
+GameAssembly.dll+10CA69D: 8B D8                 - mov ebx,eax
+GameAssembly.dll+10CA69F: 4D 85 C0              - test r8,r8
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>179</ID>
+              <Description>"Player2Monster factor"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>vf_player_mattack_multi</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>180</ID>
+              <Description>"Monster2Player factor"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>vf_monster_mattack_multi</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>161</ID>
+          <Description>"Battle control (affect on normal hit)"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : FINAL FANTASY VI.exe
+  Version: 
+  Date   : 2024-01-31
+  Author : bbfox @ https://opencheattables.com/
+}
+
+[ENABLE]
+aobscanregion(INJECT_CURR_HP,LastDataCharacterParameterBaseset_CurrentHPProc+20,LastDataCharacterParameterBaseset_CurrentHPProc+60,89 7B 14 48 8B CB)
+alloc(newmem,$1000,INJECT_CURR_HP)
+
+label(code)
+label(return)
+label(p1_curr_hp_addr)
+label(is_full_stat)
+label(is_full_hp)
+label(is_full_mp)
+label(enemy_hp_flag)
+label(enemy_mp_flag)
+label(is_enemy)
+
+newmem:
+  mov dword ptr [is_enemy], 0
+  push rbx
+  mov ebx, [rbx+10] //&lt;BaseLevel&gt;k__BackingField
+  cmp ebx, 1 // level
+  pop rbx
+
+  je check_start
+  //jmp enemy_check
+  push rbx
+  mov ebx, [rbx+178]
+  cmp ebx, 1 // monster: &lt;IsAnzen&gt;k__BackingField, player:&lt;TemporaryMaxMpCountList&gt;k__BackingField
+  jae endpop1 // player
+  mov dword ptr [is_enemy], 1
+endpop1:
+  pop rbx
+
+
+check_start:
+player_check:
+  push rax
+  push r15
+  push r14
+  xor r15, r15
+  xor r14, r14
+
+  cmp dword ptr [is_enemy], 1
+  je enemy_check
+
+  lea rax, [rbx+14] //currentHP
+  mov [p1_curr_hp_addr], rax
+  cmp dword ptr [is_full_hp], 0
+  je next_mp
+next_hp:
+  mov r15d, #9999
+  //mov r14d, [rcx+BC]//&lt;TemporaryMaxHp&gt;k__BackingField
+  //cmp r15d, r14d
+  //cmovg r15d, r14d
+  //mov [rbx+14], r15d
+  mov edi, r15d
+next_mp:
+  cmp dword ptr [is_full_mp], 0
+  je next_full_stat
+  mov r15d, #999
+  //mov r14d, [rcx+C0]// &lt;TemporaryMaxMp&gt;k__BackingField
+  //cmp r15d, r14d
+  //cmovg r15d, r14d
+  mov [rbx+18], r15d //currentMP
+
+next_full_stat:
+  cmp dword ptr [is_full_stat], 0
+  je addr_last
+  mov r15d, [rcx+5C]
+  cmp r15d, #255
+  je player_stat_end
+  //mov r15d, #9999
+  //mov [rcx+1c], r15d //&lt;BaseMaxHp&gt;k__BackingField
+  mov r15d, #128
+  //mov [rcx+20], r15d //&lt;BaseMaxMp&gt;k__BackingField
+  mov [rbx+24], r15d //&lt;BaseMaxMpCount&gt;k__BackingField
+  mov [rbx+28], r15d //&lt;BasePower&gt;k__BackingField
+  mov [rbx+2C], r15d //&lt;BaseVitality&gt;k__BackingField
+  mov [rbx+30], r15d //&lt;BaseAgility&gt;k__BackingField
+  //mov [rcx+34], r15d //&lt;BaseWeight&gt;k__BackingField
+  mov [rbx+38], r15d //&lt;BaseIntelligence&gt;k__BackingField
+  mov [rbx+3C], r15d //&lt;BaseSpirit&gt;k__BackingField
+
+  mov r15d, #255
+  mov [rbx+40], r15d //&lt;BaseAttack&gt;k__BackingField
+  mov [rbx+44], r15d //&lt;BaseDefense&gt;k__BackingField
+  mov [rcx+48], r15d //&lt;BaseAbilityDefense&gt;k__BackingField
+  mov [rcx+4c], r15d //&lt;BaseAbilityEvasionRate&gt;k__BackingField
+  mov [rbx+50], r15d //&lt;BaseMagic&gt;k__BackingField
+  mov [rbx+54], r15d //&lt;BaseLuck&gt;k__BackingField
+  mov [rbx+58], r15d //&lt;BaseAccuracyRate&gt;k__BackingField
+  mov [rcx+5C], r15d //&lt;BaseEvasionRate&gt;k__BackingField
+  //mov [rcx+60], r15d //&lt;BaseAbilityDisturbedRate&gt;k__BackingField
+  //mov [rbx+64], r15d //&lt;BaseCriticalRate&gt;k__BackingField
+  //mov [rcx+68], r15d //&lt;BaseDamageDiameter&gt;k__BackingField
+  //mov [rcx+6C], r15d //&lt;BaseAttackSpeed&gt;k__BackingField
+player_stat_end:
+
+  jmp addr_last
+
+enemy_check:
+  cmp dword ptr [enemy_hp_flag], 0
+  je check_enemy_mp
+  cmp dword ptr [enemy_hp_flag], 2
+  je instant_kill
+  mov r15d, 1
+  //mov [rbx+14], r15d
+  mov edi, r15d
+  jmp check_enemy_mp
+
+instant_kill:
+  mov r15d, 0
+  //mov [rbx+14], r15d
+  mov edi, r15d
+  jmp addr_last
+
+check_enemy_mp:
+  cmp dword ptr [enemy_mp_flag] , 0
+  je addr_last
+  mov r15d, 0
+  mov [rbx+18], r15d
+
+addr_last:
+  pop r14
+  pop r15
+  pop rax
+
+  //mov edi, [rbx+14]
+
+code:
+  mov [rbx+14],edi
+  mov rcx,rbx
+  jmp return
+
+align 10 cc
+  p1_curr_hp_addr:
+  dq 0
+  is_full_hp:
+  dd 1
+  is_full_mp:
+  dd 1
+  is_full_stat:
+  dd 0
+  enemy_hp_flag: //0:Normal, 1: HP=1, 2:HP=0
+  dd 2
+  enemy_mp_flag: //0: Normal, 1: Zero
+  dd 0
+  is_enemy:
+  dd 0
+
+INJECT_CURR_HP:
+  jmp newmem
+  nop
+return:
+
+registersymbol(is_full_hp)
+registersymbol(is_full_mp)
+registersymbol(enemy_hp_flag)
+registersymbol(enemy_mp_flag)
+registersymbol(is_full_stat)
+registersymbol(p1_curr_hp_addr)
+registersymbol(INJECT_CURR_HP)
+
+[DISABLE]
+
+INJECT_CURR_HP:
+  db 89 7B 14 48 8B CB
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+4AB6AB
+
+GameAssembly.dll+4AB688: 48 8B D9              - mov rbx,rcx
+GameAssembly.dll+4AB68B: 75 12                 - jne GameAssembly.dll+4AB69F
+GameAssembly.dll+4AB68D: 8B 0D E1 E8 67 01     - mov ecx,[GameAssembly.dll+1B29F74]
+GameAssembly.dll+4AB693: E8 C8 57 D8 FF        - call GameAssembly.dll+230E60
+GameAssembly.dll+4AB698: C6 05 4D A7 AF 01 01  - mov byte ptr [GameAssembly.dll+1FA5DEC],01
+GameAssembly.dll+4AB69F: 33 FF                 - xor edi,edi
+GameAssembly.dll+4AB6A1: 85 F6                 - test esi,esi
+GameAssembly.dll+4AB6A3: 0F 49 FE              - cmovns edi,esi
+GameAssembly.dll+4AB6A6: 48 85 DB              - test rbx,rbx
+GameAssembly.dll+4AB6A9: 74 6C                 - je GameAssembly.dll+4AB717
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+4AB6AB: 89 7B 14              - mov [rbx+14],edi
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+4AB6AE: 48 8B CB              - mov rcx,rbx
+GameAssembly.dll+4AB6B1: 48 8B 03              - mov rax,[rbx]
+GameAssembly.dll+4AB6B4: 48 8B 90 88 01 00 00  - mov rdx,[rax+00000188]
+GameAssembly.dll+4AB6BB: FF 90 80 01 00 00     - call qword ptr [rax+00000180]
+GameAssembly.dll+4AB6C1: 3B F8                 - cmp edi,eax
+GameAssembly.dll+4AB6C3: 7D 05                 - jnl GameAssembly.dll+4AB6CA
+GameAssembly.dll+4AB6C5: 8B 43 14              - mov eax,[rbx+14]
+GameAssembly.dll+4AB6C8: EB 13                 - jmp GameAssembly.dll+4AB6DD
+GameAssembly.dll+4AB6CA: 48 8B 03              - mov rax,[rbx]
+GameAssembly.dll+4AB6CD: 48 8B CB              - mov rcx,rbx
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>162</ID>
+              <Description>"Player HP full?"</Description>
+              <DropDownList DescriptionOnly="1" DisplayValueAsItem="1">0:No
+1:Yes
+</DropDownList>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>is_full_hp</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>163</ID>
+              <Description>"Player MP full?"</Description>
+              <DropDownList DescriptionOnly="1" DisplayValueAsItem="1">0:No
+1:Yes
+</DropDownList>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>is_full_mp</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>164</ID>
+              <Description>"Player full stats?"</Description>
+              <DropDownList DescriptionOnly="1" DisplayValueAsItem="1">0:No
+1:Yes
+</DropDownList>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>is_full_stat</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>165</ID>
+              <Description>"Monster HP control"</Description>
+              <DropDownList DescriptionOnly="1" DisplayValueAsItem="1">0:Normal
+1:1 pt
+2:Instant kill
+</DropDownList>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>enemy_hp_flag</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>166</ID>
+              <Description>"Moster MP control"</Description>
+              <DropDownList DescriptionOnly="1" DisplayValueAsItem="1">0:Normal
+1:Zero
+</DropDownList>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>enemy_mp_flag</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>170</ID>
+              <Description>"Last get hit char"</Description>
+              <Options moHideChildren="1"/>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>169</ID>
+                  <Description>"Base LV"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>p1_curr_hp_addr</Address>
+                  <Offsets>
+                    <Offset>-4</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>167</ID>
+                  <Description>"HP"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>p1_curr_hp_addr</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>168</ID>
+                  <Description>"MP"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>p1_curr_hp_addr</Address>
+                  <Offsets>
+                    <Offset>4</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>182</ID>
+      <Description>"FINAL FANTASY VI v1.1.0  /  https://opencheattables.com  /  CE 7.5+"</Description>
+      <Color>00B900</Color>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

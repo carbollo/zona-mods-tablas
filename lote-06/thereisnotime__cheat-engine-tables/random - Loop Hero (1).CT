@@ -1,0 +1,720 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="34">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>21</ID>
+      <Description>"Inf Health"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{
+	Game	: Loop Hero.exe
+	Version	: 1.0.0.0
+	Date	: 2021-03-05
+	Author	: aSwedishMagyar
+}
+[ENABLE]
+aobscanmodule(infHealth,Loop Hero.exe,55 89 E5 53 57 56 83 E4 ? 81 EC ? ? ? ? 89 E6 89 AE ? ? ? ? 89 A6 ? ? ? ? C7 86 58 05 00 00)
+registersymbol(infHealth)
+
+infHealth:
+  ret
+[DISABLE]
+infHealth:
+  db 55
+
+unregistersymbol(infHealth)
+
+{
+// ORIGINAL CODE - INJECTION POINT: Loop Hero.exe+24B6D0
+
+Loop Hero.exe+24B698: 89 3C 24                       - mov [esp],edi
+Loop Hero.exe+24B69B: E8 80 F8 4B 01                 - call "Loop Hero.exe"+170AF20
+Loop Hero.exe+24B6A0: 83 C4 14                       - add esp,14
+Loop Hero.exe+24B6A3: 5D                             - pop ebp
+Loop Hero.exe+24B6A4: C3                             - ret
+Loop Hero.exe+24B6A5: 66 2E 0F 1F 84 00 00 00 00 00  - nop word ptr cs:[eax+eax+00000000]
+Loop Hero.exe+24B6AF: 90                             - nop
+Loop Hero.exe+24B6B0: 55                             - push ebp
+Loop Hero.exe+24B6B1: 83 EC 14                       - sub esp,14
+Loop Hero.exe+24B6B4: 8D 75 BC                       - lea esi,[ebp-44]
+Loop Hero.exe+24B6B7: 8B 6E 30                       - mov ebp,[esi+30]
+Loop Hero.exe+24B6BA: FF 15 F0 74 53 02              - call dword ptr ["Loop Hero.exe"+1A874F0]
+Loop Hero.exe+24B6C0: B8 18 EB 54 02                 - mov eax,"Loop Hero.exe"+1A9EB18
+Loop Hero.exe+24B6C5: E9 4F 5D 6F 01                 - jmp "Loop Hero.exe"+1941419
+Loop Hero.exe+24B6CA: CC                             - int 3
+Loop Hero.exe+24B6CB: CC                             - int 3
+Loop Hero.exe+24B6CC: CC                             - int 3
+Loop Hero.exe+24B6CD: CC                             - int 3
+Loop Hero.exe+24B6CE: CC                             - int 3
+Loop Hero.exe+24B6CF: CC                             - int 3
+// ---------- INJECTING HERE ----------
+Loop Hero.exe+24B6D0: 55                             - push ebp
+// ---------- DONE INJECTING  ----------
+Loop Hero.exe+24B6D1: 89 E5                          - mov ebp,esp
+Loop Hero.exe+24B6D3: 53                             - push ebx
+Loop Hero.exe+24B6D4: 57                             - push edi
+Loop Hero.exe+24B6D5: 56                             - push esi
+Loop Hero.exe+24B6D6: 83 E4 F0                       - and esp,-10
+Loop Hero.exe+24B6D9: 81 EC 60 05 00 00              - sub esp,00000560
+Loop Hero.exe+24B6DF: 89 E6                          - mov esi,esp
+Loop Hero.exe+24B6E1: 89 AE 48 05 00 00              - mov [esi+00000548],ebp
+Loop Hero.exe+24B6E7: 89 A6 4C 05 00 00              - mov [esi+0000054C],esp
+Loop Hero.exe+24B6ED: C7 86 58 05 00 00 FF FF FF FF  - mov [esi+00000558],FFFFFFFF
+Loop Hero.exe+24B6F7: C7 86 54 05 00 00 10 ED D1 00  - mov [esi+00000554],"Loop Hero.exe"+26ED10
+Loop Hero.exe+24B701: 8D 96 50 05 00 00              - lea edx,[esi+00000550]
+Loop Hero.exe+24B707: 8B 45 08                       - mov eax,[ebp+08]
+Loop Hero.exe+24B70A: 8D 9E 94 00 00 00              - lea ebx,[esi+00000094]
+Loop Hero.exe+24B710: 64 8B 3D 00 00 00 00           - mov edi,fs:[00000000]
+Loop Hero.exe+24B717: 89 C1                          - mov ecx,eax
+Loop Hero.exe+24B719: 89 BE 50 05 00 00              - mov [esi+00000550],edi
+Loop Hero.exe+24B71F: 64 89 15 00 00 00 00           - mov fs:[00000000],edx
+Loop Hero.exe+24B726: C7 86 98 00 00 00 FC 65 43 02  - mov [esi+00000098],"Loop Hero.exe"+19865FC
+Loop Hero.exe+24B730: C7 86 9C 00 00 00 00 00 00 00  - mov [esi+0000009C],00000000
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>62</ID>
+      <Description>"Modify Attack Speed (values of 100 and above mean instant attacks)"</Description>
+      <Options moHideChildren="1"/>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{
+	Game	: Loop Hero.exe
+	Version	: 1.0.0.0
+	Date	: 2021-03-05
+	Author	: aSwedishMagyar
+}
+[ENABLE]
+aobscanmodule(attackSpeed,Loop Hero.exe,8D 86 80 01 00 00 50 E8 27)
+registersymbol(attackSpeed)
+registersymbol(attackSpeedMult)
+alloc(newattackSpeed,100,attackSpeed)
+label(returnattackSpeed)
+
+newattackSpeed:
+  lea eax,[esi+00000180]
+  movsd xmm0,[eax]
+  mulsd xmm0,[attackSpeedMult]
+  movsd [eax],xmm0
+  jmp returnattackSpeed
+attackSpeedMult:
+  dq (double)1
+attackSpeed:
+  jmp newattackSpeed
+  nop
+returnattackSpeed:
+
+[DISABLE]
+attackSpeed:
+  db 8D 86 80 01 00 00
+
+unregistersymbol(attackSpeed)
+unregistersymbol(attackSpeedMult)
+dealloc(newattackSpeed)
+
+{
+// ORIGINAL CODE - INJECTION POINT: Loop Hero.exe+123617D
+
+Loop Hero.exe+1236135: 8B 40 08                       - mov eax,[eax+08]
+Loop Hero.exe+1236138: C7 86 B8 02 00 00 59 00 00 00  - mov [esi+000002B8],00000059
+Loop Hero.exe+1236142: 68 BC 8C 01 00                 - push 00018CBC
+Loop Hero.exe+1236147: FF D0                          - call eax
+Loop Hero.exe+1236149: 6A 00                          - push 00
+Loop Hero.exe+123614B: 50                             - push eax
+Loop Hero.exe+123614C: E8 0F E6 DC FE                 - call "Loop Hero.exe"+4760
+Loop Hero.exe+1236151: 83 C4 08                       - add esp,08
+Loop Hero.exe+1236154: 84 C0                          - test al,al
+Loop Hero.exe+1236156: 74 3B                          - je "Loop Hero.exe"+1236193
+Loop Hero.exe+1236158: 8B 4D 08                       - mov ecx,[ebp+08]
+Loop Hero.exe+123615B: C7 46 34 53 00 00 00           - mov [esi+34],00000053
+Loop Hero.exe+1236162: 8B 01                          - mov eax,[ecx]
+Loop Hero.exe+1236164: 68 2A 8D 01 00                 - push 00018D2A
+Loop Hero.exe+1236169: FF 50 08                       - call dword ptr [eax+08]
+Loop Hero.exe+123616C: 89 46 08                       - mov [esi+08],eax
+Loop Hero.exe+123616F: FF 75 08                       - push [ebp+08]
+Loop Hero.exe+1236172: E8 29 7C 4B 00                 - call "Loop Hero.exe"+16EDDA0
+Loop Hero.exe+1236177: 83 C4 04                       - add esp,04
+Loop Hero.exe+123617A: 8B 4E 08                       - mov ecx,[esi+08]
+// ---------- INJECTING HERE ----------
+Loop Hero.exe+123617D: 8D 86 80 01 00 00              - lea eax,[esi+00000180]
+// ---------- DONE INJECTING  ----------
+Loop Hero.exe+1236183: 50                             - push eax
+Loop Hero.exe+1236184: E8 27 58 DD FE                 - call "Loop Hero.exe"+B9B0
+Loop Hero.exe+1236189: 6A 01                          - push 01
+Loop Hero.exe+123618B: E8 70 7B 4B 00                 - call "Loop Hero.exe"+16EDD00
+Loop Hero.exe+1236190: 83 C4 04                       - add esp,04
+Loop Hero.exe+1236193: 8B 4D 08                       - mov ecx,[ebp+08]
+Loop Hero.exe+1236196: C7 46 34 54 00 00 00           - mov [esi+34],00000054
+Loop Hero.exe+123619D: 8B 01                          - mov eax,[ecx]
+Loop Hero.exe+123619F: 68 33 88 01 00                 - push 00018833
+Loop Hero.exe+12361A4: FF 50 04                       - call dword ptr [eax+04]
+Loop Hero.exe+12361A7: 6A FF                          - push -01
+Loop Hero.exe+12361A9: 50                             - push eax
+Loop Hero.exe+12361AA: E8 B1 E5 DC FE                 - call "Loop Hero.exe"+4760
+Loop Hero.exe+12361AF: 83 C4 08                       - add esp,08
+Loop Hero.exe+12361B2: 84 C0                          - test al,al
+Loop Hero.exe+12361B4: 0F 85 80 0F 00 00              - jne "Loop Hero.exe"+123713A
+Loop Hero.exe+12361BA: 8B 4D 08                       - mov ecx,[ebp+08]
+Loop Hero.exe+12361BD: 8B 01                          - mov eax,[ecx]
+Loop Hero.exe+12361BF: 68 AA 89 01 00                 - push 000189AA
+Loop Hero.exe+12361C4: FF 50 04                       - call dword ptr [eax+04]
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>63</ID>
+          <Description>"Multiplier"</Description>
+          <LastState Value="100" RealAddress="02D2001B"/>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Double</VariableType>
+          <Address>attackSpeedMult</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>24</ID>
+      <Description>"Modify Item Pickup Amount"</Description>
+      <Options moHideChildren="1"/>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{
+	Game	: Loop Hero.exe
+	Version	: 1.0.0.0
+	Date	: 2021-03-05
+	Author	: aSwedishMagyar
+}
+[ENABLE]
+aobscanmodule(itemPickup,Loop Hero.exe,C7 86 70 01 00 00 3D 00 00 00)
+registersymbol(itemPickup)
+registersymbol(itemPickupMult)
+alloc(newitemPickup,100,itemPickup)
+label(codeitemPickup)
+label(returnitemPickup)
+label(itemPickupMult)
+newitemPickup:
+  movsd xmm7,[eax]
+  push ebx
+  mov ebx,[itemPickupMult]
+  cvtsi2sd xmm6,ebx
+  pop ebx
+  mulsd xmm7,xmm6
+  movsd [eax],xmm7
+  xorps xmm6,xmm6
+  xorps xmm7,xmm7
+codeitemPickup:
+  mov [esi+00000170],0000003D
+  jmp returnitemPickup
+itemPickupMult:
+  dd 1
+itemPickup:
+  jmp newitemPickup
+  nop 5
+returnitemPickup:
+
+[DISABLE]
+itemPickup:
+  db C7 86 70 01 00 00 3D 00 00 00
+
+unregistersymbol(itemPickup)
+unregistersymbol(itemPickupMult)
+dealloc(newitemPickup)
+
+{
+// ORIGINAL CODE - INJECTION POINT: Loop Hero.exe+14ABC25
+
+Loop Hero.exe+14ABBE8: 8D 8E 50 01 00 00              - lea ecx,[esi+00000150]
+Loop Hero.exe+14ABBEE: C7 86 70 01 00 00 3C 00 00 00  - mov [esi+00000170],0000003C
+Loop Hero.exe+14ABBF8: 8D 56 08                       - lea edx,[esi+08]
+Loop Hero.exe+14ABBFB: 51                             - push ecx
+Loop Hero.exe+14ABBFC: 50                             - push eax
+Loop Hero.exe+14ABBFD: 6A 02                          - push 02
+Loop Hero.exe+14ABBFF: 52                             - push edx
+Loop Hero.exe+14ABC00: FF 75 0C                       - push [ebp+0C]
+Loop Hero.exe+14ABC03: FF 75 08                       - push [ebp+08]
+Loop Hero.exe+14ABC06: E8 95 47 24 00                 - call "Loop Hero.exe"+16F03A0
+Loop Hero.exe+14ABC0B: 83 C4 18                       - add esp,18
+Loop Hero.exe+14ABC0E: 8D 4E 58                       - lea ecx,[esi+58]
+Loop Hero.exe+14ABC11: 8D 56 30                       - lea edx,[esi+30]
+Loop Hero.exe+14ABC14: 51                             - push ecx
+Loop Hero.exe+14ABC15: 50                             - push eax
+Loop Hero.exe+14ABC16: 52                             - push edx
+Loop Hero.exe+14ABC17: E8 D4 65 B6 FE                 - call "Loop Hero.exe"+121F0
+Loop Hero.exe+14ABC1C: 83 C4 0C                       - add esp,0C
+Loop Hero.exe+14ABC1F: 8B 4E 1C                       - mov ecx,[esi+1C]
+Loop Hero.exe+14ABC22: 8D 46 30                       - lea eax,[esi+30]
+// ---------- INJECTING HERE ----------
+Loop Hero.exe+14ABC25: C7 86 70 01 00 00 3D 00 00 00  - mov [esi+00000170],0000003D
+// ---------- DONE INJECTING  ----------
+Loop Hero.exe+14ABC2F: 50                             - push eax
+Loop Hero.exe+14ABC30: E8 FB 5D B5 FE                 - call "Loop Hero.exe"+1A30
+Loop Hero.exe+14ABC35: 8B 46 3C                       - mov eax,[esi+3C]
+Loop Hero.exe+14ABC38: 8D 48 FF                       - lea ecx,[eax-01]
+Loop Hero.exe+14ABC3B: F7 C1 FC FF FF 00              - test ecx,"Loop Hero.exe"+54FFFC
+Loop Hero.exe+14ABC41: 0F 84 0D 03 00 00              - je "Loop Hero.exe"+14ABF54
+Loop Hero.exe+14ABC47: 8B 46 64                       - mov eax,[esi+64]
+Loop Hero.exe+14ABC4A: 8D 48 FF                       - lea ecx,[eax-01]
+Loop Hero.exe+14ABC4D: F7 C1 FC FF FF 00              - test ecx,"Loop Hero.exe"+54FFFC
+Loop Hero.exe+14ABC53: 0F 84 64 06 00 00              - je "Loop Hero.exe"+14AC2BD
+Loop Hero.exe+14ABC59: C7 46 74 08 00 00 00           - mov [esi+74],00000008
+Loop Hero.exe+14ABC60: C7 86 70 01 00 00 29 00 00 00  - mov [esi+00000170],00000029
+Loop Hero.exe+14ABC6A: 8D 4E 30                       - lea ecx,[esi+30]
+Loop Hero.exe+14ABC6D: FF 76 1C                       - push [esi+1C]
+Loop Hero.exe+14ABC70: E8 3B 62 B5 FE                 - call "Loop Hero.exe"+1EB0
+Loop Hero.exe+14ABC75: C7 86 70 01 00 00 2A 00 00 00  - mov [esi+00000170],0000002A
+Loop Hero.exe+14ABC7F: 8D 4E 30                       - lea ecx,[esi+30]
+Loop Hero.exe+14ABC82: FF 76 54                       - push [esi+54]
+Loop Hero.exe+14ABC85: E8 26 FD B5 FE                 - call "Loop Hero.exe"+B9B0
+Loop Hero.exe+14ABC8A: 8D 4E 58                       - lea ecx,[esi+58]
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>25</ID>
+          <Description>"Multiplier"</Description>
+          <LastState Value="5" RealAddress="030D002D"/>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>itemPickupMult</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>1</ID>
+      <Description>"Get Player"</Description>
+      <Options moHideChildren="1"/>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{
+	Game	: Loop Hero.exe
+	Version	: 1.0.0.0
+	Date	: 2021-03-05
+	Author	: aSwedishMagyar
+}
+[ENABLE]
+aobscanmodule(getPlayer,Loop Hero.exe,8B 46 10 8D 04 88 85 C0 75)
+registersymbol(getPlayer)
+registersymbol(basePlayer)
+alloc(newgetPlayer,100,getPlayer)
+label(codegetPlayer)
+label(returngetPlayer)
+label(basePlayer)
+newgetPlayer:
+  mov eax,[esi+10]
+  cmp ecx,138
+  jne codegetPlayer
+  mov [basePlayer],eax
+codegetPlayer:
+  lea eax,[eax+ecx*4]
+  jmp returngetPlayer
+basePlayer:
+  dd 0
+getPlayer:
+  jmp newgetPlayer
+  nop
+returngetPlayer:
+
+[DISABLE]
+getPlayer:
+  db 8B 46 10 8D 04 88
+
+unregistersymbol(getPlayer)
+unregistersymbol(basePlayer)
+dealloc(newgetPlayer)
+
+{
+// ORIGINAL CODE - INJECTION POINT: Loop Hero.exe+171002F
+
+Loop Hero.exe+170FFFD: CC              - int 3 
+Loop Hero.exe+170FFFE: CC              - int 3 
+Loop Hero.exe+170FFFF: CC              - int 3 
+Loop Hero.exe+1710000: 53              - push ebx
+Loop Hero.exe+1710001: 56              - push esi
+Loop Hero.exe+1710002: 57              - push edi
+Loop Hero.exe+1710003: 8B F9           - mov edi,ecx
+Loop Hero.exe+1710005: 83 7F 2C 00     - cmp dword ptr [edi+2C],00
+Loop Hero.exe+1710009: 75 05           - jne "Loop Hero.exe"+1710010
+Loop Hero.exe+171000B: E8 40 AE FF FF  - call "Loop Hero.exe"+170AE50
+Loop Hero.exe+1710010: 8B 77 2C        - mov esi,[edi+2C]
+Loop Hero.exe+1710013: 8D 44 24 10     - lea eax,[esp+10]
+Loop Hero.exe+1710017: 8B 5C 24 10     - mov ebx,[esp+10]
+Loop Hero.exe+171001B: 8B CE           - mov ecx,esi
+Loop Hero.exe+171001D: 50              - push eax
+Loop Hero.exe+171001E: 89 5C 24 14     - mov [esp+14],ebx
+Loop Hero.exe+1710022: E8 D9 EF FF FF  - call "Loop Hero.exe"+170F000
+Loop Hero.exe+1710027: 83 F8 FF        - cmp eax,-01
+Loop Hero.exe+171002A: 74 0D           - je "Loop Hero.exe"+1710039
+Loop Hero.exe+171002C: 8D 0C 40        - lea ecx,[eax+eax*2]
+// ---------- INJECTING HERE ----------
+Loop Hero.exe+171002F: 8B 46 10        - mov eax,[esi+10]
+// ---------- DONE INJECTING  ----------
+Loop Hero.exe+1710032: 8D 04 88        - lea eax,[eax+ecx*4]
+Loop Hero.exe+1710035: 85 C0           - test eax,eax
+Loop Hero.exe+1710037: 75 2C           - jne "Loop Hero.exe"+1710065
+Loop Hero.exe+1710039: 8B 47 10        - mov eax,[edi+10]
+Loop Hero.exe+171003C: 85 C0           - test eax,eax
+Loop Hero.exe+171003E: 74 2D           - je "Loop Hero.exe"+171006D
+Loop Hero.exe+1710040: 8B 70 2C        - mov esi,[eax+2C]
+Loop Hero.exe+1710043: 8D 44 24 10     - lea eax,[esp+10]
+Loop Hero.exe+1710047: 50              - push eax
+Loop Hero.exe+1710048: 8B CE           - mov ecx,esi
+Loop Hero.exe+171004A: 89 5C 24 14     - mov [esp+14],ebx
+Loop Hero.exe+171004E: E8 AD EF FF FF  - call "Loop Hero.exe"+170F000
+Loop Hero.exe+1710053: 83 F8 FF        - cmp eax,-01
+Loop Hero.exe+1710056: 74 15           - je "Loop Hero.exe"+171006D
+Loop Hero.exe+1710058: 8D 0C 40        - lea ecx,[eax+eax*2]
+Loop Hero.exe+171005B: 8B 46 10        - mov eax,[esi+10]
+Loop Hero.exe+171005E: 8D 04 88        - lea eax,[eax+ecx*4]
+Loop Hero.exe+1710061: 85 C0           - test eax,eax
+Loop Hero.exe+1710063: 74 08           - je "Loop Hero.exe"+171006D
+Loop Hero.exe+1710065: 8B 00           - mov eax,[eax]
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>42</ID>
+          <Description>"Loop Level"</Description>
+          <LastState Value="152" RealAddress="0BE0D050"/>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Double</VariableType>
+          <Address>basePlayer</Address>
+          <Offsets>
+            <Offset>0</Offset>
+            <Offset>CC3*4</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>65</ID>
+          <Description>"Time of Day"</Description>
+          <LastState Value="130" RealAddress="0BE43FF0"/>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Double</VariableType>
+          <Address>basePlayer</Address>
+          <Offsets>
+            <Offset>0</Offset>
+            <Offset>8D*4</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>50</ID>
+          <Description>"Health"</Description>
+          <LastState Value="" RealAddress="00000000"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>2</ID>
+              <Description>"Current Health"</Description>
+              <LastState Value="482" RealAddress="0BE44640"/>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Double</VariableType>
+              <Address>basePlayer</Address>
+              <Offsets>
+                <Offset>0</Offset>
+                <Offset>138*4</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>26</ID>
+              <Description>"Max Health Mult"</Description>
+              <LastState Value="1.24" RealAddress="0BE44650"/>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Double</VariableType>
+              <Address>basePlayer</Address>
+              <Offsets>
+                <Offset>0</Offset>
+                <Offset>16E3*4</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>20</ID>
+              <Description>"Max Health"</Description>
+              <LastState Value="250" RealAddress="0BE50970"/>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Double</VariableType>
+              <Address>basePlayer</Address>
+              <Offsets>
+                <Offset>0</Offset>
+                <Offset>1494*4</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>49</ID>
+              <Description>"HP Per Day"</Description>
+              <LastState Value="26" RealAddress="0BE0D0C0"/>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Double</VariableType>
+              <Address>basePlayer</Address>
+              <Offsets>
+                <Offset>0</Offset>
+                <Offset>A1D*4</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>51</ID>
+          <Description>"Stats"</Description>
+          <LastState Value="" RealAddress="00000000"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>45</ID>
+              <Description>"Attack"</Description>
+              <LastState Value="1" RealAddress="0BE0D310"/>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Double</VariableType>
+              <Address>basePlayer</Address>
+              <Offsets>
+                <Offset>0</Offset>
+                <Offset>417*4</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>59</ID>
+              <Description>"Defense"</Description>
+              <LastState Value="351" RealAddress="0BE0D1A0"/>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Double</VariableType>
+              <Address>basePlayer</Address>
+              <Offsets>
+                <Offset>0</Offset>
+                <Offset>14AF*4</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>53</ID>
+              <Description>"Counter"</Description>
+              <LastState Value="9" RealAddress="0BE0D140"/>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Double</VariableType>
+              <Address>basePlayer</Address>
+              <Offsets>
+                <Offset>0</Offset>
+                <Offset>1029*4</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>57</ID>
+              <Description>"Evasion"</Description>
+              <LastState Value="7" RealAddress="0BE0D130"/>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Double</VariableType>
+              <Address>basePlayer</Address>
+              <Offsets>
+                <Offset>0</Offset>
+                <Offset>C75*4</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>55</ID>
+              <Description>"Vampirism"</Description>
+              <LastState Value="15" RealAddress="0BE0D1C0"/>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Double</VariableType>
+              <Address>basePlayer</Address>
+              <Offsets>
+                <Offset>0</Offset>
+                <Offset>1677*4</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>43</ID>
+      <Description>"Debug/Do Not Use"</Description>
+      <Options moHideChildren="1"/>
+      <LastState Value="" RealAddress="00000000"/>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>31</ID>
+          <Description>"Get Inventory"</Description>
+          <Options moHideChildren="1"/>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{
+	Game	: Loop Hero.exe
+	Version	: 1.0.0.0
+	Date	: 2021-03-05
+	Author	: aSwedishMagyar
+}
+[ENABLE]
+aobscanmodule(getInventory,Loop Hero.exe,8B 46 10 8D 04 88 EB 02 33 C0 33)
+registersymbol(getInventory)
+registersymbol(baseInventory)
+alloc(newgetInventory,100,getInventory)
+label(codegetInventory)
+label(returngetInventory)
+label(baseInventory)
+newgetInventory:
+  mov eax,[esi+10]
+  cmp ecx,30
+  jne codegetInventory
+  mov [baseInventory],eax
+codegetInventory:
+  lea eax,[eax+ecx*4]
+  jmp returngetInventory
+baseInventory:
+  dd 0
+getInventory:
+  jmp newgetInventory
+  nop
+returngetInventory:
+
+[DISABLE]
+getInventory:
+  db 8B 46 10 8D 04 88
+
+unregistersymbol(getInventory)
+unregistersymbol(baseInventory)
+dealloc(newgetInventory)
+
+{
+// ORIGINAL CODE - INJECTION POINT: Loop Hero.exe+17100D0
+
+Loop Hero.exe+171009E: CC                 - int 3 
+Loop Hero.exe+171009F: CC                 - int 3 
+Loop Hero.exe+17100A0: 53                 - push ebx
+Loop Hero.exe+17100A1: 8B D9              - mov ebx,ecx
+Loop Hero.exe+17100A3: 55                 - push ebp
+Loop Hero.exe+17100A4: 56                 - push esi
+Loop Hero.exe+17100A5: 57                 - push edi
+Loop Hero.exe+17100A6: 83 7B 2C 00        - cmp dword ptr [ebx+2C],00
+Loop Hero.exe+17100AA: 75 05              - jne "Loop Hero.exe"+17100B1
+Loop Hero.exe+17100AC: E8 9F AD FF FF     - call "Loop Hero.exe"+170AE50
+Loop Hero.exe+17100B1: 8B 73 2C           - mov esi,[ebx+2C]
+Loop Hero.exe+17100B4: 8D 44 24 14        - lea eax,[esp+14]
+Loop Hero.exe+17100B8: 8B 6C 24 14        - mov ebp,[esp+14]
+Loop Hero.exe+17100BC: 8B CE              - mov ecx,esi
+Loop Hero.exe+17100BE: 50                 - push eax
+Loop Hero.exe+17100BF: 89 6C 24 18        - mov [esp+18],ebp
+Loop Hero.exe+17100C3: E8 38 EF FF FF     - call "Loop Hero.exe"+170F000
+Loop Hero.exe+17100C8: 83 F8 FF           - cmp eax,-01
+Loop Hero.exe+17100CB: 74 0B              - je "Loop Hero.exe"+17100D8
+Loop Hero.exe+17100CD: 8D 0C 40           - lea ecx,[eax+eax*2]
+// ---------- INJECTING HERE ----------
+Loop Hero.exe+17100D0: 8B 46 10           - mov eax,[esi+10]
+// ---------- DONE INJECTING  ----------
+Loop Hero.exe+17100D3: 8D 04 88           - lea eax,[eax+ecx*4]
+Loop Hero.exe+17100D6: EB 02              - jmp "Loop Hero.exe"+17100DA
+Loop Hero.exe+17100D8: 33 C0              - xor eax,eax
+Loop Hero.exe+17100DA: 33 FF              - xor edi,edi
+Loop Hero.exe+17100DC: 85 C0              - test eax,eax
+Loop Hero.exe+17100DE: 0F 85 6D 01 00 00  - jne "Loop Hero.exe"+1710251
+Loop Hero.exe+17100E4: 8B 43 10           - mov eax,[ebx+10]
+Loop Hero.exe+17100E7: 85 C0              - test eax,eax
+Loop Hero.exe+17100E9: 74 25              - je "Loop Hero.exe"+1710110
+Loop Hero.exe+17100EB: 8B 70 2C           - mov esi,[eax+2C]
+Loop Hero.exe+17100EE: 8D 44 24 14        - lea eax,[esp+14]
+Loop Hero.exe+17100F2: 50                 - push eax
+Loop Hero.exe+17100F3: 8B CE              - mov ecx,esi
+Loop Hero.exe+17100F5: 89 6C 24 18        - mov [esp+18],ebp
+Loop Hero.exe+17100F9: E8 02 EF FF FF     - call "Loop Hero.exe"+170F000
+Loop Hero.exe+17100FE: 83 F8 FF           - cmp eax,-01
+Loop Hero.exe+1710101: 74 0B              - je "Loop Hero.exe"+171010E
+Loop Hero.exe+1710103: 8D 0C 40           - lea ecx,[eax+eax*2]
+Loop Hero.exe+1710106: 8B 46 10           - mov eax,[esi+10]
+Loop Hero.exe+1710109: 8D 3C 88           - lea edi,[eax+ecx*4]
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>29</ID>
+              <Description>"No description"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Double</VariableType>
+              <Address>baseInventory</Address>
+              <Offsets>
+                <Offset>0</Offset>
+                <Offset>51*4</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>37</ID>
+              <Description>"No description"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Double</VariableType>
+              <Address>baseInventory</Address>
+              <Offsets>
+                <Offset>0</Offset>
+                <Offset>51*4</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>35</ID>
+          <Description>"Enable"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{
+	Game	: Loop Hero.exe
+	Version	: 1.0.0.0
+	Date	: 2021-03-05
+	Author	: aSwedishMagyar
+}
+[ENABLE]
+aobscanmodule(getBase,Loop Hero.exe,A1 70 AC 61 02 23 CA 8B 04 C8 85 C0 74 10 0F 1F 40 00 39 50 08 74 1F)
+registersymbol(baseGame)
+[getBase+1]:
+	baseGame:
+
+[DISABLE]
+unregistersymbol(baseGame)
+
+{
+// ORIGINAL CODE - INJECTION POINT: Loop Hero.exe+171393E
+
+Loop Hero.exe+1713920: C3                    - ret 
+Loop Hero.exe+1713921: CC                    - int 3 
+Loop Hero.exe+1713922: CC                    - int 3 
+Loop Hero.exe+1713923: CC                    - int 3 
+Loop Hero.exe+1713924: CC                    - int 3 
+Loop Hero.exe+1713925: CC                    - int 3 
+Loop Hero.exe+1713926: CC                    - int 3 
+Loop Hero.exe+1713927: CC                    - int 3 
+Loop Hero.exe+1713928: CC                    - int 3 
+Loop Hero.exe+1713929: CC                    - int 3 
+Loop Hero.exe+171392A: CC                    - int 3 
+Loop Hero.exe+171392B: CC                    - int 3 
+Loop Hero.exe+171392C: CC                    - int 3 
+Loop Hero.exe+171392D: CC                    - int 3 
+Loop Hero.exe+171392E: CC                    - int 3 
+Loop Hero.exe+171392F: CC                    - int 3 
+Loop Hero.exe+1713930: 8B 54 24 04           - mov edx,[esp+04]
+Loop Hero.exe+1713934: 85 D2                 - test edx,edx
+Loop Hero.exe+1713936: 78 24                 - js "Loop Hero.exe"+171395C
+Loop Hero.exe+1713938: 8B 0D 74 AC 61 02     - mov ecx,["Loop Hero.exe"+1B6AC74]
+// ---------- INJECTING HERE ----------
+Loop Hero.exe+171393E: A1 70 AC 61 02        - mov eax,["Loop Hero.exe"+1B6AC70]
+// ---------- DONE INJECTING  ----------
+Loop Hero.exe+1713943: 23 CA                 - and ecx,edx
+Loop Hero.exe+1713945: 8B 04 C8              - mov eax,[eax+ecx*8]
+Loop Hero.exe+1713948: 85 C0                 - test eax,eax
+Loop Hero.exe+171394A: 74 10                 - je "Loop Hero.exe"+171395C
+Loop Hero.exe+171394C: 0F 1F 40 00           - nop dword ptr [eax+00]
+Loop Hero.exe+1713950: 39 50 08              - cmp [eax+08],edx
+Loop Hero.exe+1713953: 74 1F                 - je "Loop Hero.exe"+1713974
+Loop Hero.exe+1713955: 8B 40 04              - mov eax,[eax+04]
+Loop Hero.exe+1713958: 85 C0                 - test eax,eax
+Loop Hero.exe+171395A: 75 F4                 - jne "Loop Hero.exe"+1713950
+Loop Hero.exe+171395C: 33 C0                 - xor eax,eax
+Loop Hero.exe+171395E: 85 C0                 - test eax,eax
+Loop Hero.exe+1713960: 74 17                 - je "Loop Hero.exe"+1713979
+Loop Hero.exe+1713962: F6 80 80 00 00 00 01  - test byte ptr [eax+00000080],01
+Loop Hero.exe+1713969: 75 0E                 - jne "Loop Hero.exe"+1713979
+Loop Hero.exe+171396B: 89 44 24 04           - mov [esp+04],eax
+Loop Hero.exe+171396F: E9 8C FD FF FF        - jmp "Loop Hero.exe"+1713700
+Loop Hero.exe+1713974: 8B 40 0C              - mov eax,[eax+0C]
+Loop Hero.exe+1713977: EB E5                 - jmp "Loop Hero.exe"+171395E
+Loop Hero.exe+1713979: C6 05 F9 01 6C 02 01  - mov byte ptr ["Loop Hero.exe"+1C101F9],01
+}
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

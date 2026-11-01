@@ -1,0 +1,2192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>0</ID>
+      <Description>"Compact Mode"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+--https://forum.cheatengine.org/viewtopic.php?t=570055
+LuaCall(function cycleFullCompact(sender,force) local state = not(compactmenuitem.Caption == 'Compact View Mode'); if force~=nil then state = not force end; compactmenuitem.Caption = state and 'Compact View Mode' or 'Full View Mode'; getMainForm().Splitter1.Visible = state; getMainForm().Panel4.Visible    = state; getMainForm().Panel5.Visible    = state; end; function addCompactMenu() if compactmenualreadyexists then return end; local parent = getMainForm().Menu.Items; compactmenuitem = createMenuItem(parent); parent.add(compactmenuitem); compactmenuitem.Caption = 'Compact View Mode'; compactmenuitem.OnClick = cycleFullCompact; compactmenualreadyexists = 'yes'; end; addCompactMenu(); cycleFullCompact(nil,true))
+
+[DISABLE]
+LuaCall(cycleFullCompact(nil,false))
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>73</ID>
+      <Description>"Toggle some scripts on/off"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript Async="1">[ENABLE]
+{$lua}
+if (syntaxcheck) then return end
+if memrec then print(memrec.Description) end
+getLuaEngine().menuItem5.doClick()
+getLuaEngine().Close()
+
+
+local enableBattleScripts = {
+  1, -- "Min. growth points (Usage: spend points)"
+  10, -- "Min. upgrade stones. (must &gt;=1)"
+  11, -- "Battle: Controlled player"
+  18, -- "Fast group skill gauge"
+  2, -- "Min. money (Usage: visit Blacksmith)"
+  21, -- "KO multiplier (trash mob count must &gt; 90)"
+  23, -- "Gauntlet mode: fast group skill gauge"
+  24, -- "Gauntlet mode: Inf. HP (turn on before enter battle; turn off in safe area) / not god mode"
+  25, -- "Gauntlet mode: Get zone unlock stone (Usage: zone selection)"
+  30, -- "Fast musou gauge"
+  46, -- "View Weapon (Usage: Weapon selection)"
+  8, -- "Min. Material (Usage: sell mat. menu in blacksmith)"
+  9, -- "Min. Orbs (Usage: sell orbs menu in blacksmith)"
+  12, -- "Inf. HP / not god mode"
+  0, -- "Compact Mode"
+}
+local addressList = getAddressList()
+
+for _, id in ipairs(enableBattleScripts) do
+  addressList.getMemoryRecordByID(id).Active = true
+end
+
+print("Scripts ON; Total " .. #enableBattleScripts .. " items.")
+getLuaEngine().Close()
+
+[DISABLE]
+{$lua}
+if (syntaxcheck) then return end
+if memrec then print(memrec.Description) end
+getLuaEngine().menuItem5.doClick()
+getLuaEngine().Close()
+
+
+local disableBattleScripts = {
+  70, -- "Get KO count"
+  12, -- "Inf. HP / not god mode"
+  9, -- "Min. Orbs (Usage: sell orbs menu in blacksmith)"
+  8, -- "Min. Material (Usage: sell mat. menu in blacksmith)"
+  69, -- "_WIP"
+  46, -- "View Weapon (Usage: Weapon selection)"
+  37, -- "Char. Viewer"
+  30, -- "Fast musou gauge"
+  25, -- "Gauntlet mode: Get zone unlock stone (Usage: zone selection)"
+  24, -- "Gauntlet mode: Inf. HP (turn on before enter battle; turn off in safe area) / not god mode"
+  23, -- "Gauntlet mode: fast group skill gauge"
+  21, -- "KO multiplier (trash mob count must &gt; 90)"
+  2, -- "Min. money (Usage: visit Blacksmith)"
+  18, -- "Fast group skill gauge"
+  11, -- "Battle: Controlled player"
+  10, -- "Min. upgrade stones. (must &gt;=1)"
+  1, -- "Min. growth points (Usage: spend points)"
+  0, -- "Compact Mode"
+}
+local addressList = getAddressList()
+
+for _, id in ipairs(disableBattleScripts) do
+  addressList.getMemoryRecordByID(id).Active = false
+end
+
+print("Scripts OFF.")
+getLuaEngine().Close()
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>1</ID>
+      <Description>"Min. growth points (Usage: spend points)"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : WO3U.exe
+  Version: 
+  Date   : 2022-09-25
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_MIN_STOCK_EXP,WO3U.exe,8B 90 D8 4E 03 00 E8) // should be unique
+alloc(newmem,$1000,INJECT_MIN_STOCK_EXP)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  mov edx,[rax+00034ED8]
+  //
+  cmp edx, #3000000
+  jae endp
+  mov edx, #3000000
+  mov [rax+00034ED8], edx
+
+endp:
+  //
+  jmp return
+
+INJECT_MIN_STOCK_EXP:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT_MIN_STOCK_EXP)
+
+[DISABLE]
+
+INJECT_MIN_STOCK_EXP:
+  db 8B 90 D8 4E 03 00
+
+unregistersymbol(INJECT_MIN_STOCK_EXP)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: WO3U.exe+32EDD6
+
+WO3U.exe+32EDA4: 83 79 20 01                    - cmp dword ptr [rcx+20],01
+WO3U.exe+32EDA8: 74 22                          - je WO3U.exe+32EDCC
+WO3U.exe+32EDAA: 48 8B 01                       - mov rax,[rcx]
+WO3U.exe+32EDAD: 48 C7 41 20 01 00 00 00        - mov qword ptr [rcx+20],00000001
+WO3U.exe+32EDB5: 89 69 28                       - mov [rcx+28],ebp
+WO3U.exe+32EDB8: C7 41 2C 0C 00 00 00           - mov [rcx+2C],0000000C
+WO3U.exe+32EDBF: C7 81 94 00 00 00 03 00 00 00  - mov [rcx+00000094],00000003
+WO3U.exe+32EDC9: FF 50 30                       - call qword ptr [rax+30]
+WO3U.exe+32EDCC: 48 8B 05 75 5F 89 00           - mov rax,[WO3U.exe+BC4D48]
+WO3U.exe+32EDD3: 48 8B CB                       - mov rcx,rbx
+// ---------- INJECTING HERE ----------
+WO3U.exe+32EDD6: 8B 90 D8 4E 03 00              - mov edx,[rax+00034ED8]
+// ---------- DONE INJECTING  ----------
+WO3U.exe+32EDDC: E8 2F 02 00 00                 - call WO3U.exe+32F010
+WO3U.exe+32EDE1: 48 8B 05 60 5F 89 00           - mov rax,[WO3U.exe+BC4D48]
+WO3U.exe+32EDE8: F6 80 B2 4D 03 00 01           - test byte ptr [rax+00034DB2],01
+WO3U.exe+32EDEF: 75 21                          - jne WO3U.exe+32EE12
+WO3U.exe+32EDF1: 48 8B 05 28 93 89 00           - mov rax,[WO3U.exe+BC8120]
+WO3U.exe+32EDF8: 8B 48 08                       - mov ecx,[rax+08]
+WO3U.exe+32EDFB: 8D 41 F9                       - lea eax,[rcx-07]
+WO3U.exe+32EDFE: A9 F6 FF FF FF                 - test eax,FFFFFFF6
+WO3U.exe+32EE03: 75 0D                          - jne WO3U.exe+32EE12
+WO3U.exe+32EE05: 83 F9 10                       - cmp ecx,10
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>2</ID>
+      <Description>"Min. money (Usage: visit Blacksmith)"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : WO3U.exe
+  Version: 
+  Date   : 2022-09-25
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_MIN_MONEY,WO3U.exe,8B 98 DC 4E 03 00) // should be unique
+alloc(newmem,$1000,INJECT_MIN_MONEY)
+
+label(code)
+label(return)
+label(i_base_money_addr)
+
+newmem:
+  mov [i_base_money_addr], rax
+
+code:
+  mov ebx,[rax+00034EDC]
+
+  //
+  cmp ebx, #300000
+  jae endp
+  mov ebx, #300000
+  mov [rax+00034EDC], ebx
+endp:
+  //
+
+  jmp return
+align 10 cc
+  i_base_money_addr:
+  dq 0
+
+
+INJECT_MIN_MONEY:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT_MIN_MONEY)
+registersymbol(i_base_money_addr)
+
+[DISABLE]
+
+INJECT_MIN_MONEY:
+  db 8B 98 DC 4E 03 00
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: WO3U.exe+34F212
+
+WO3U.exe+34F1DB: F3 0F 11 74 24 20        - movss [rsp+20],xmm6
+WO3U.exe+34F1E1: 41 B1 01                 - mov r9l,01
+WO3U.exe+34F1E4: 48 8D 96 68 02 00 00     - lea rdx,[rsi+00000268]
+WO3U.exe+34F1EB: 4C 8B C0                 - mov r8,rax
+WO3U.exe+34F1EE: 49 8B CE                 - mov rcx,r14
+WO3U.exe+34F1F1: E8 4A AB E9 FF           - call WO3U.exe+1E9D40
+WO3U.exe+34F1F6: 48 8B 05 4B 5B 87 00     - mov rax,[WO3U.exe+BC4D48]
+WO3U.exe+34F1FD: B9 70 00 00 00           - mov ecx,00000070
+WO3U.exe+34F202: 4C 89 A4 24 98 02 00 00  - mov [rsp+00000298],r12
+WO3U.exe+34F20A: 4C 89 AC 24 58 02 00 00  - mov [rsp+00000258],r13
+// ---------- INJECTING HERE ----------
+WO3U.exe+34F212: 8B 98 DC 4E 03 00        - mov ebx,[rax+00034EDC]
+// ---------- DONE INJECTING  ----------
+WO3U.exe+34F218: E8 D3 08 F2 FF           - call WO3U.exe+26FAF0
+WO3U.exe+34F21D: 48 8B D0                 - mov rdx,rax
+WO3U.exe+34F220: 48 8D 4D A0              - lea rcx,[rbp-60]
+WO3U.exe+34F224: 44 8B C3                 - mov r8d,ebx
+WO3U.exe+34F227: E8 D4 6F E3 FF           - call WO3U.exe+186200
+WO3U.exe+34F22C: F3 0F 10 44 24 64        - movss xmm0,[rsp+64]
+WO3U.exe+34F232: 4C 8D 44 24 50           - lea r8,[rsp+50]
+WO3U.exe+34F237: F3 0F 58 86 9C 00 00 00  - addss xmm0,[rsi+0000009C]
+WO3U.exe+34F23F: 41 B9 07 00 00 00        - mov r9d,00000007
+WO3U.exe+34F245: C7 44 24 50 00 00 C0 41  - mov [rsp+50],41C00000
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>3</ID>
+          <Description>"Stock EXP"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_money_addr</Address>
+          <Offsets>
+            <Offset>34ED8</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>4</ID>
+          <Description>"Gems"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_money_addr</Address>
+          <Offsets>
+            <Offset>34EDC</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>5</ID>
+          <Description>"??"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_money_addr</Address>
+          <Offsets>
+            <Offset>34EE0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>6</ID>
+          <Description>"Tickets"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_money_addr</Address>
+          <Offsets>
+            <Offset>42330</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>7</ID>
+          <Description>"Crystals"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_base_money_addr</Address>
+          <Offsets>
+            <Offset>4113C</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>8</ID>
+      <Description>"Min. Material (Usage: sell mat. menu in blacksmith)"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : WO3U.exe
+  Version: 
+  Date   : 2022-09-26
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_SELL_MATERIAL,WO3U.exe,45 0F B6 BC 06 08 25 04 00) // should be unique
+alloc(newmem,$1000,INJECT_SELL_MATERIAL)
+
+label(code)
+label(return)
+
+newmem:
+  push rbx
+  mov bl, byte ptr [r14+rax+00042508]
+  cmp bl, #50
+  jae endp
+  mov bl, #50
+  mov [r14+rax+00042508], bl
+endp:
+  pop rbx
+
+code:
+  movzx r15d,byte ptr [r14+rax+00042508]
+  jmp return
+
+INJECT_SELL_MATERIAL:
+  jmp newmem
+  nop 4
+return:
+registersymbol(INJECT_SELL_MATERIAL)
+
+[DISABLE]
+
+INJECT_SELL_MATERIAL:
+  db 45 0F B6 BC 06 08 25 04 00
+
+unregistersymbol(INJECT_SELL_MATERIAL)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: WO3U.exe+41DEEC
+
+WO3U.exe+41DEBA: 48 8D 97 60 01 00 00        - lea rdx,[rdi+00000160]
+WO3U.exe+41DEC1: C6 44 24 28 01              - mov byte ptr [rsp+28],01
+WO3U.exe+41DEC6: 4C 8D 44 24 50              - lea r8,[rsp+50]
+WO3U.exe+41DECB: 41 B1 01                    - mov r9l,01
+WO3U.exe+41DECE: F3 0F 11 44 24 20           - movss [rsp+20],xmm0
+WO3U.exe+41DED4: 48 8B CE                    - mov rcx,rsi
+WO3U.exe+41DED7: E8 64 BE DC FF              - call WO3U.exe+1E9D40
+WO3U.exe+41DEDC: 41 81 FE FF 01 00 00        - cmp r14d,000001FF
+WO3U.exe+41DEE3: 77 10                       - ja WO3U.exe+41DEF5
+WO3U.exe+41DEE5: 48 8B 05 5C 6E 7A 00        - mov rax,[WO3U.exe+BC4D48]
+// ---------- INJECTING HERE ----------
+WO3U.exe+41DEEC: 45 0F B6 BC 06 08 25 04 00  - movzx r15d,byte ptr [r14+rax+00042508]
+// ---------- DONE INJECTING  ----------
+WO3U.exe+41DEF5: 45 8B C7                    - mov r8d,r15d
+WO3U.exe+41DEF8: 48 8D 15 31 21 6A 00        - lea rdx,[WO3U.exe+AC0030]
+WO3U.exe+41DEFF: 48 8D 4C 24 50              - lea rcx,[rsp+50]
+WO3U.exe+41DF04: E8 F7 82 D6 FF              - call WO3U.exe+186200
+WO3U.exe+41DF09: F3 44 0F 58 05 FE 22 6C 00  - addss xmm8,[WO3U.exe+AE0210]
+WO3U.exe+41DF12: F3 0F 11 7C 24 44           - movss [rsp+44],xmm7
+WO3U.exe+41DF18: 4C 8D 44 24 48              - lea r8,[rsp+48]
+WO3U.exe+41DF1D: 45 8B CC                    - mov r9d,r12d
+WO3U.exe+41DF20: C7 44 24 20 18 00 00 00     - mov [rsp+20],00000018
+WO3U.exe+41DF28: 48 8D 54 24 40              - lea rdx,[rsp+40]
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>9</ID>
+      <Description>"Min. Orbs (Usage: sell orbs menu in blacksmith)"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : WO3U.exe
+  Version: 
+  Date   : 2022-09-26
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_SELL_SKILL_GEM,WO3U.exe,44 0F B6 B4 01 A4 24 04 00) // should be unique
+alloc(newmem,$1000,INJECT_SELL_SKILL_GEM)
+
+label(code)
+label(return)
+
+newmem:
+  push r15
+  xor r15, r15
+  mov r15l, byte ptr [rcx+rax+000424A4]
+  cmp r15l, #50
+  jae endp
+  mov r15l, #50
+  mov byte ptr [rcx+rax+000424A4], r15l
+
+endp:
+  pop r15
+
+
+
+code:
+  movzx r14d,byte ptr [rcx+rax+000424A4]
+  jmp return
+
+INJECT_SELL_SKILL_GEM:
+  jmp newmem
+  nop 4
+return:
+registersymbol(INJECT_SELL_SKILL_GEM)
+
+[DISABLE]
+
+INJECT_SELL_SKILL_GEM:
+  db 44 0F B6 B4 01 A4 24 04 00
+
+unregistersymbol(INJECT_SELL_SKILL_GEM)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: WO3U.exe+41B552
+
+WO3U.exe+41B51D: F3 44 0F 11 44 24 20           - movss [rsp+20],xmm8
+WO3U.exe+41B524: 48 8B CE                       - mov rcx,rsi
+WO3U.exe+41B527: C7 86 34 4D 01 00 02 00 00 00  - mov [rsi+00014D34],00000002
+WO3U.exe+41B531: E8 0A E8 DC FF                 - call WO3U.exe+1E9D40
+WO3U.exe+41B536: 41 0F B6 47 08                 - movzx eax,byte ptr [r15+08]
+WO3U.exe+41B53B: 48 8B 9C 24 D0 01 00 00        - mov rbx,[rsp+000001D0]
+WO3U.exe+41B543: 3C 63                          - cmp al,63
+WO3U.exe+41B545: 77 14                          - ja WO3U.exe+41B55B
+WO3U.exe+41B547: 48 0F BE C8                    - movsx rcx,al
+WO3U.exe+41B54B: 48 8B 05 F6 97 7A 00           - mov rax,[WO3U.exe+BC4D48]
+// ---------- INJECTING HERE ----------
+WO3U.exe+41B552: 44 0F B6 B4 01 A4 24 04 00     - movzx r14d,byte ptr [rcx+rax+000424A4]
+// ---------- DONE INJECTING  ----------
+WO3U.exe+41B55B: 45 8B C6                       - mov r8d,r14d
+WO3U.exe+41B55E: 48 8D 15 CB 4A 6A 00           - lea rdx,[WO3U.exe+AC0030]
+WO3U.exe+41B565: 48 8D 4C 24 50                 - lea rcx,[rsp+50]
+WO3U.exe+41B56A: E8 91 AC D6 FF                 - call WO3U.exe+186200
+WO3U.exe+41B56F: F3 0F 58 3D 99 4C 6C 00        - addss xmm7,[WO3U.exe+AE0210]
+WO3U.exe+41B577: F3 0F 11 74 24 44              - movss [rsp+44],xmm6
+WO3U.exe+41B57D: 4C 8D 44 24 48                 - lea r8,[rsp+48]
+WO3U.exe+41B582: 45 8B CC                       - mov r9d,r12d
+WO3U.exe+41B585: C7 44 24 20 18 00 00 00        - mov [rsp+20],00000018
+WO3U.exe+41B58D: 48 8D 54 24 40                 - lea rdx,[rsp+40]
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>10</ID>
+      <Description>"Min. upgrade stones. (must &gt;=1)"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : WO3U.exe
+  Version: 
+  Date   : 2022-09-27
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_GROTH_ORB,WO3U.exe,45 0F B7 86 F2 00 00 00) // should be unique
+alloc(newmem,$1000,INJECT_GET_GROTH_ORB)
+
+label(code)
+label(return)
+
+newmem:
+  push rax
+  mov ax, [r14+000000F2]
+  cmp ax, #500
+  jae endp
+  mov ax, #500
+  mov [r14+000000F2], ax
+
+endp:
+  pop rax
+
+
+code:
+  movzx r8d,word ptr [r14+000000F2]
+  jmp return
+
+INJECT_GET_GROTH_ORB:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_GET_GROTH_ORB)
+
+[DISABLE]
+
+INJECT_GET_GROTH_ORB:
+  db 45 0F B7 86 F2 00 00 00
+
+unregistersymbol(INJECT_GET_GROTH_ORB)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: WO3U.exe+361276
+
+WO3U.exe+361240: 4C 8B C5                          - mov r8,rbp
+WO3U.exe+361243: 49 8B CF                          - mov rcx,r15
+WO3U.exe+361246: F3 0F 11 44 24 20                 - movss [rsp+20],xmm0
+WO3U.exe+36124C: 41 C7 87 34 4D 01 00 01 00 00 00  - mov [r15+00014D34],00000001
+WO3U.exe+361257: E8 E4 8A E8 FF                    - call WO3U.exe+1E9D40
+WO3U.exe+36125C: 33 D2                             - xor edx,edx
+WO3U.exe+36125E: 48 8D 4C 24 50                    - lea rcx,[rsp+50]
+WO3U.exe+361263: 41 B8 80 00 00 00                 - mov r8d,00000080
+WO3U.exe+361269: E8 22 47 3E 00                    - call WO3U.exe+745990
+WO3U.exe+36126E: F3 0F 58 3D 12 EC 77 00           - addss xmm7,[WO3U.exe+ADFE88]
+// ---------- INJECTING HERE ----------
+WO3U.exe+361276: 45 0F B7 86 F2 00 00 00           - movzx r8d,word ptr [r14+000000F2]
+// ---------- DONE INJECTING  ----------
+WO3U.exe+36127E: 48 8D 15 3B AC 76 00              - lea rdx,[WO3U.exe+ACBEC0]
+WO3U.exe+361285: F3 0F 11 74 24 44                 - movss [rsp+44],xmm6
+WO3U.exe+36128B: 48 8D 4C 24 50                    - lea rcx,[rsp+50]
+WO3U.exe+361290: F3 0F 11 7C 24 40                 - movss [rsp+40],xmm7
+WO3U.exe+361296: 48 8B 44 24 40                    - mov rax,[rsp+40]
+WO3U.exe+36129B: 48 89 44 24 48                    - mov [rsp+48],rax
+WO3U.exe+3612A0: E8 5B 4F E2 FF                    - call WO3U.exe+186200
+WO3U.exe+3612A5: 44 8B CB                          - mov r9d,ebx
+WO3U.exe+3612A8: C7 44 24 40 00 00 C0 41           - mov [rsp+40],41C00000
+WO3U.exe+3612B0: 4C 8D 44 24 40                    - lea r8,[rsp+40]
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>11</ID>
+      <Description>"Battle: Controlled player"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : WO3U.exe
+  Version: 
+  Date   : 2022-09-25
+  Author :
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_CTRL_PLAYER_DATA,WO3U.exe,AC 00 00 00 8B 43 EC 89 43 F0 F3 0F 2C 86 98 01 00 00) // should be unique
+alloc(newmem,$1000,INJECT_GET_CTRL_PLAYER_DATA)
+
+label(code)
+label(return)
+label(i_base_ctrl_player_addr)
+label(i_ctrl_player_hp_addr)
+
+newmem:
+  mov [i_base_ctrl_player_addr], rsi
+  push r15
+  lea r15, [rsi+1A0]
+  mov [i_ctrl_player_hp_addr], r15
+  pop r15
+  {
+  vmovss xmm15, [rsi+000001A4]
+  vmovss xmm14, [rsi+000001A8]
+  vsubss xmm13, xmm15, xmm14
+  vmovss xmm12, [vf_10]
+  vucomiss xmm13, xmm12
+  jbe next1
+  vsubss xmm14, xmm15, xmm12
+  vmovss [rsi+000001A8], xmm14
+  }
+next1:
+
+
+code:
+  cvttss2si eax,[rsi+00000198]
+  jmp return
+align 10 cc
+  i_base_ctrl_player_addr:
+  dq 0
+  i_ctrl_player_hp_addr:
+  dq 0
+  vf_10:
+  dd (float)3
+
+INJECT_GET_CTRL_PLAYER_DATA+0A:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_GET_CTRL_PLAYER_DATA)
+registersymbol(i_base_ctrl_player_addr)
+registersymbol(i_ctrl_player_hp_addr)
+
+[DISABLE]
+
+INJECT_GET_CTRL_PLAYER_DATA+0A:
+  db F3 0F 2C 86 98 01 00 00
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: WO3U.exe+17DA52
+
+WO3U.exe+17DA28: 4B 8D 0C 40              - lea rcx,[r8+r8*2]
+WO3U.exe+17DA2C: 48 C1 E1 04              - shl rcx,04
+WO3U.exe+17DA30: 48 8D 47 04              - lea rax,[rdi+04]
+WO3U.exe+17DA34: 48 03 C1                 - add rax,rcx
+WO3U.exe+17DA37: 48 89 87 70 2D 00 00     - mov [rdi+00002D70],rax
+WO3U.exe+17DA3E: 66 90                    - nop 2
+WO3U.exe+17DA40: 39 AF 94 00 00 00        - cmp [rdi+00000094],ebp
+WO3U.exe+17DA46: 0F 85 AC 00 00 00        - jne WO3U.exe+17DAF8
+WO3U.exe+17DA4C: 8B 43 EC                 - mov eax,[rbx-14]
+WO3U.exe+17DA4F: 89 43 F0                 - mov [rbx-10],eax
+// ---------- INJECTING HERE ----------
+WO3U.exe+17DA52: F3 0F 2C 86 98 01 00 00  - cvttss2si eax,[rsi+00000198]
+// ---------- DONE INJECTING  ----------
+WO3U.exe+17DA5A: 89 43 E8                 - mov [rbx-18],eax
+WO3U.exe+17DA5D: F3 0F 2C 86 9C 01 00 00  - cvttss2si eax,[rsi+0000019C]
+WO3U.exe+17DA65: 89 43 EC                 - mov [rbx-14],eax
+WO3U.exe+17DA68: F3 0F 2C 86 A4 01 00 00  - cvttss2si eax,[rsi+000001A4]
+WO3U.exe+17DA70: 89 43 F8                 - mov [rbx-08],eax
+WO3U.exe+17DA73: F3 0F 2C 86 A8 01 00 00  - cvttss2si eax,[rsi+000001A8]
+WO3U.exe+17DA7B: 89 43 FC                 - mov [rbx-04],eax
+WO3U.exe+17DA7E: 44 38 7E 1C              - cmp [rsi+1C],r15l
+WO3U.exe+17DA82: 75 04                    - jne WO3U.exe+17DA88
+WO3U.exe+17DA84: 32 C0                    - xor al,al
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>12</ID>
+          <Description>"Inf. HP / not god mode"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : WO3U.exe
+  Version: 
+  Date   : 2022-09-25
+  Author :
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_CTRL_PLAYER_HP,WO3U.exe,F3 0F 11 51 08 F3 0F 58 49) // should be unique
+alloc(newmem,$1000,INJECT_CTRL_PLAYER_HP)
+
+label(code)
+label(return)
+
+newmem:
+  push r15
+  lea r15, [rcx+08]
+  cmp [i_ctrl_player_hp_addr], r15
+  pop r15
+  jne code
+
+  //vmovss xmm15, [rcx+0C]
+  //vmovss xmm14, [vf_150]
+  //vucomiss xmm15, xmm14
+  //jbe code
+  //vmovss xmm14, [rcx+04]
+  //vmovss xmm15, [rcx+08]
+  //vucomiss xmm14, xmm15
+  //jne code
+  //vmovss xmm15, [rcx+18]
+  //vmovss xmm14, [vf_999]
+  //vucomiss xmm15, xmm14
+  //jne code
+
+  vmovss xmm15, [rcx]
+  vmovss [rcx+08], xmm15
+  vmovss [rcx+04], xmm15
+  vmovss xmm2, [rcx]
+
+
+code:
+  movss [rcx+08],xmm2
+  jmp return
+align 10 cc
+  vf_150:
+  dd (float)150
+  vf_999:
+  dd (float)999
+
+INJECT_CTRL_PLAYER_HP:
+  jmp newmem
+return:
+registersymbol(INJECT_CTRL_PLAYER_HP)
+
+[DISABLE]
+
+INJECT_CTRL_PLAYER_HP:
+  db F3 0F 11 51 08
+
+unregistersymbol(INJECT_CTRL_PLAYER_HP)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: WO3U.exe+641A4
+
+WO3U.exe+64180: F3 0F 10 51 04           - movss xmm2,[rcx+04]
+WO3U.exe+64185: F3 0F 10 05 AB B8 A7 00  - movss xmm0,[WO3U.exe+ADFA38]
+WO3U.exe+6418D: 0F 2F C2                 - comiss xmm0,xmm2
+WO3U.exe+64190: 77 4C                    - ja WO3U.exe+641DE
+WO3U.exe+64192: 0F 57 DB                 - xorps xmm3,xmm3
+WO3U.exe+64195: 0F 57 E4                 - xorps xmm4,xmm4
+WO3U.exe+64198: F3 0F 5F DA              - maxss xmm3,xmm2
+WO3U.exe+6419C: 0F 2F DA                 - comiss xmm3,xmm2
+WO3U.exe+6419F: 77 03                    - ja WO3U.exe+641A4
+WO3U.exe+641A1: 0F 28 D3                 - movaps xmm2,xmm3
+// ---------- INJECTING HERE ----------
+WO3U.exe+641A4: F3 0F 11 51 08           - movss [rcx+08],xmm2
+// ---------- DONE INJECTING  ----------
+WO3U.exe+641A9: F3 0F 58 49 04           - addss xmm1,[rcx+04]
+WO3U.exe+641AE: F3 0F 5F E1              - maxss xmm4,xmm1
+WO3U.exe+641B2: F3 0F 10 09              - movss xmm1,[rcx]
+WO3U.exe+641B6: 0F 2F E1                 - comiss xmm4,xmm1
+WO3U.exe+641B9: 77 03                    - ja WO3U.exe+641BE
+WO3U.exe+641BB: 0F 28 CC                 - movaps xmm1,xmm4
+WO3U.exe+641BE: F3 0F 11 49 04           - movss [rcx+04],xmm1
+WO3U.exe+641C3: 45 84 C0                 - test r8l,r8l
+WO3U.exe+641C6: 74 19                    - je WO3U.exe+641E1
+WO3U.exe+641C8: 0F 2F C1                 - comiss xmm0,xmm1
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>13</ID>
+          <Description>"Max HP"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>i_base_ctrl_player_addr</Address>
+          <Offsets>
+            <Offset>198</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>14</ID>
+          <Description>"Cur HP1"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>i_base_ctrl_player_addr</Address>
+          <Offsets>
+            <Offset>19C</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>15</ID>
+          <Description>"Cur HP2"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>i_base_ctrl_player_addr</Address>
+          <Offsets>
+            <Offset>1A0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>16</ID>
+          <Description>"Max Musou gauge"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>i_base_ctrl_player_addr</Address>
+          <Offsets>
+            <Offset>1A4</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>17</ID>
+          <Description>"Musou gauge"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>i_base_ctrl_player_addr</Address>
+          <Offsets>
+            <Offset>1A8</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>18</ID>
+      <Description>"Fast group skill gauge"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : WO3U.exe
+  Version: 
+  Date   : 2022-09-25
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_FAST_GSKILL_GAUGE,WO3U.exe,66 03 C3 66 3B C2) // should be unique
+alloc(newmem,$1000,INJECT_FAST_GSKILL_GAUGE)
+
+label(code)
+label(return)
+label(vf_musou_multi)
+label(i_base_musou_addr)
+
+newmem:
+  mov [i_base_musou_addr], rdi
+  push r15
+  push r14
+  xor r15, r15
+  xor r14, r14
+  mov r15w, ax
+  mov r14w, bx
+  cvtsi2ss xmm15, r15d
+  cvtsi2ss xmm14, r14d
+  vmovss xmm13, [vf_musou_multi]
+  vmulss xmm14, xmm14, xmm13
+  cvtss2si r14d, xmm14
+  mov bx, r14w
+
+next1:
+
+endp:
+  pop r14
+  pop r15
+
+code:
+  add ax,bx
+  cmp ax,dx
+  jmp return
+align 10 cc
+  vf_musou_multi:
+  dd (float)9.333
+  vf_30000:
+  dd (float)30000.0
+  i_base_musou_addr:
+  dq 0
+
+
+INJECT_FAST_GSKILL_GAUGE:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT_FAST_GSKILL_GAUGE)
+registersymbol(vf_musou_multi)
+registersymbol(i_base_musou_addr)
+
+[DISABLE]
+
+INJECT_FAST_GSKILL_GAUGE:
+  db 66 03 C3 66 3B C2
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: WO3U.exe+C8E0B
+
+WO3U.exe+C8DE3: F3 41 0F 5E C3        - divss xmm0,xmm11
+WO3U.exe+C8DE8: EB 04                 - jmp WO3U.exe+C8DEE
+WO3U.exe+C8DEA: 41 0F 28 C2           - movaps xmm0,xmm10
+WO3U.exe+C8DEE: F3 41 0F 59 C3        - mulss xmm0,xmm11
+WO3U.exe+C8DF3: F3 48 0F 2C C0        - cvttss2si rax,xmm0
+WO3U.exe+C8DF8: 03 D8                 - add ebx,eax
+WO3U.exe+C8DFA: 0F B7 87 A4 05 00 00  - movzx eax,word ptr [rdi+000005A4]
+WO3U.exe+C8E01: BA 30 75 00 00        - mov edx,00007530
+WO3U.exe+C8E06: 66 3B C2              - cmp ax,dx
+WO3U.exe+C8E09: 73 11                 - jae WO3U.exe+C8E1C
+// ---------- INJECTING HERE ----------
+WO3U.exe+C8E0B: 66 03 C3              - add ax,bx
+// ---------- DONE INJECTING  ----------
+WO3U.exe+C8E0E: 66 3B C2              - cmp ax,dx
+WO3U.exe+C8E11: 66 0F 47 C2           - cmova ax,dx
+WO3U.exe+C8E15: 66 89 87 A4 05 00 00  - mov [rdi+000005A4],ax
+WO3U.exe+C8E1C: 66 44 3B FA           - cmp r15w,dx
+WO3U.exe+C8E20: 73 60                 - jae WO3U.exe+C8E82
+WO3U.exe+C8E22: BB 68 19 00 00        - mov ebx,00001968
+WO3U.exe+C8E27: 41 F6 04 24 01        - test byte ptr [r12],01
+WO3U.exe+C8E2C: 74 08                 - je WO3U.exe+C8E36
+WO3U.exe+C8E2E: 45 33 FF              - xor r15d,r15d
+WO3U.exe+C8E31: 41 8B CF              - mov ecx,r15d
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>19</ID>
+          <Description>"Multiplier (don't set too high)"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF0080</Color>
+          <VariableType>Float</VariableType>
+          <Address>vf_musou_multi</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>20</ID>
+          <Description>"Gauge"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_musou_addr</Address>
+          <Offsets>
+            <Offset>5a4</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>21</ID>
+      <Description>"KO multiplier (trash mob count must &gt; 90)"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : WO3U.exe
+  Version: 
+  Date   : 2022-09-27
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_FAST_KO_COUNT,WO3U.exe,FF C2 41 3B D7 41) // should be unique
+alloc(newmem,$1000,INJECT_FAST_KO_COUNT)
+
+label(code)
+label(return)
+label(vf_ko_milti)
+
+newmem:
+  cmp edx, 5A
+  jb code
+
+  cvtsi2ss xmm15, edx
+  vmovss xmm14, [vf_ko_milti]
+  vmovss xmm13, [vf_1]
+  //vsubss xmm14, xmm14, xmm13
+  vaddss xmm15, xmm15, xmm14
+  cvtss2si edx, xmm15
+  jmp code1
+
+code:
+  inc edx
+
+code1:
+  cmp edx,r15d
+  jmp return
+align 10 cc
+  vf_ko_milti:
+  dd (float)4
+  vf_1:
+  dd (float)1
+
+INJECT_FAST_KO_COUNT:
+  jmp newmem
+
+
+return:
+registersymbol(INJECT_FAST_KO_COUNT)
+registersymbol(vf_ko_milti)
+
+[DISABLE]
+
+INJECT_FAST_KO_COUNT:
+  db FF C2 41 3B D7
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: WO3U.exe+23EF73
+
+WO3U.exe+23EF4B: 41 BF 3F 42 0F 00     - mov r15d,000F423F
+WO3U.exe+23EF51: 45 3B F7              - cmp r14d,r15d
+WO3U.exe+23EF54: 77 44                 - ja WO3U.exe+23EF9A
+WO3U.exe+23EF56: 8B C5                 - mov eax,ebp
+WO3U.exe+23EF58: 83 FD 04              - cmp ebp,04
+WO3U.exe+23EF5B: 76 06                 - jna WO3U.exe+23EF63
+WO3U.exe+23EF5D: 8B 83 A0 05 00 00     - mov eax,[rbx+000005A0]
+WO3U.exe+23EF63: 48 98                 - cdqe 
+WO3U.exe+23EF65: 48 69 C8 F0 00 00 00  - imul rcx,rax,000000F0
+WO3U.exe+23EF6C: 8B 94 19 18 01 00 00  - mov edx,[rcx+rbx+00000118]
+// ---------- INJECTING HERE ----------
+WO3U.exe+23EF73: FF C2                 - inc edx
+// ---------- DONE INJECTING  ----------
+WO3U.exe+23EF75: 41 3B D7              - cmp edx,r15d
+WO3U.exe+23EF78: 41 0F 47 D7           - cmova edx,r15d
+WO3U.exe+23EF7C: 83 FD 04              - cmp ebp,04
+WO3U.exe+23EF7F: 76 06                 - jna WO3U.exe+23EF87
+WO3U.exe+23EF81: 8B AB A0 05 00 00     - mov ebp,[rbx+000005A0]
+WO3U.exe+23EF87: 48 63 C5              - movsxd  rax,ebp
+WO3U.exe+23EF8A: 48 69 C8 F0 00 00 00  - imul rcx,rax,000000F0
+WO3U.exe+23EF91: 89 94 19 18 01 00 00  - mov [rcx+rbx+00000118],edx
+WO3U.exe+23EF98: EB 03                 - jmp WO3U.exe+23EF9D
+WO3U.exe+23EF9A: 44 8B F7              - mov r14d,edi
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>22</ID>
+          <Description>"Multiplier (must &gt; 1)"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF0080</Color>
+          <VariableType>Float</VariableType>
+          <Address>vf_ko_milti</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>23</ID>
+      <Description>"Gauntlet mode: fast group skill gauge"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : WO3U.exe
+  Version: 
+  Date   : 2022-09-27
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GUN_GSKILL_FULL,WO3U.exe,F3 0F 11 8B 5C 19 00 00) // should be unique
+alloc(newmem,$1000,INJECT_GUN_GSKILL_FULL)
+
+label(code)
+label(return)
+
+newmem:
+  vmovss xmm1, [vf_500]
+
+code:
+  movss [rbx+0000195C],xmm1
+  jmp return
+align 10 cc
+  vf_500:
+  dd (float)500
+
+INJECT_GUN_GSKILL_FULL:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_GUN_GSKILL_FULL)
+
+[DISABLE]
+
+INJECT_GUN_GSKILL_FULL:
+  db F3 0F 11 8B 5C 19 00 00
+
+unregistersymbol(INJECT_GUN_GSKILL_FULL)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: WO3U.exe+240251
+
+WO3U.exe+240228: F3 0F 5F CE                    - maxss xmm1,xmm6
+WO3U.exe+24022C: F3 0F 59 05 28 FB 89 00        - mulss xmm0,[WO3U.exe+ADFD5C]
+WO3U.exe+240234: 0F 2F C8                       - comiss xmm1,xmm0
+WO3U.exe+240237: 76 13                          - jna WO3U.exe+24024C
+WO3U.exe+240239: F3 0F 11 83 5C 19 00 00        - movss [rbx+0000195C],xmm0
+WO3U.exe+240241: 0F 28 74 24 20                 - movaps xmm6,[rsp+20]
+WO3U.exe+240246: 48 83 C4 30                    - add rsp,30
+WO3U.exe+24024A: 5B                             - pop rbx
+WO3U.exe+24024B: C3                             - ret 
+WO3U.exe+24024C: 0F 28 74 24 20                 - movaps xmm6,[rsp+20]
+// ---------- INJECTING HERE ----------
+WO3U.exe+240251: F3 0F 11 8B 5C 19 00 00        - movss [rbx+0000195C],xmm1
+// ---------- DONE INJECTING  ----------
+WO3U.exe+240259: 48 83 C4 30                    - add rsp,30
+WO3U.exe+24025D: 5B                             - pop rbx
+WO3U.exe+24025E: C3                             - ret 
+WO3U.exe+24025F: CC                             - int 3 
+WO3U.exe+240260: C7 81 20 06 00 00 FF FF FF FF  - mov [rcx+00000620],FFFFFFFF
+WO3U.exe+24026A: 33 C0                          - xor eax,eax
+WO3U.exe+24026C: 89 81 24 06 00 00              - mov [rcx+00000624],eax
+WO3U.exe+240272: C7 81 30 06 00 00 FF FF FF FF  - mov [rcx+00000630],FFFFFFFF
+WO3U.exe+24027C: 89 81 34 06 00 00              - mov [rcx+00000634],eax
+WO3U.exe+240282: C7 81 40 06 00 00 FF FF FF FF  - mov [rcx+00000640],FFFFFFFF
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>24</ID>
+      <Description>"Gauntlet mode: Inf. HP (turn on before enter battle; turn off in safe area) / not god mode"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : WO3U.exe
+  Version: 
+  Date   : 2022-09-26
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_INF_HP_UNLIMITED_MODE,WO3U.exe,F3 0F 2C 90 98 01 00 00) // should be unique
+alloc(newmem,$1000,INJECT_INF_HP_UNLIMITED_MODE)
+
+label(code)
+label(return)
+label(i_base_hp_unlimited_mode_addr)
+label(i_unlim_hp_addr1)
+label(i_unlim_hp_addr2)
+label(i_unlim_hp_addr3)
+label(i_unlim_hp_addr4)
+label(i_unlim_hp_addr5)
+label(i_unlim_hp_reset)
+
+newmem:
+  cmp dword ptr [i_unlim_hp_reset], 0
+  je next1
+  mov qword ptr [i_unlim_hp_addr1], 0
+  mov qword ptr [i_unlim_hp_addr2], 0
+  mov qword ptr [i_unlim_hp_addr3], 0
+  mov qword ptr [i_unlim_hp_addr4], 0
+  mov qword ptr [i_unlim_hp_addr5], 0
+
+next1:
+  mov edx, [rax+0000004C]
+  cmp edx, 0
+  jne code
+
+
+set1:
+  cmp qword ptr [i_unlim_hp_addr1], 0
+  jne set2
+  mov [i_unlim_hp_addr1], rax
+  jmp set_endp
+
+set2:
+  cmp qword ptr [i_unlim_hp_addr2], 0
+  jne set3
+  mov [i_unlim_hp_addr2], rax
+  jmp set_endp
+
+set3:
+  cmp qword ptr [i_unlim_hp_addr3], 0
+  jne set4
+  mov [i_unlim_hp_addr3], rax
+  jmp set_endp
+
+set4:
+  cmp qword ptr [i_unlim_hp_addr4], 0
+  jne set5
+  mov [i_unlim_hp_addr4], rax
+  jmp set_endp
+
+set5:
+  cmp qword ptr [i_unlim_hp_addr5], 0
+  jne set_endp
+  mov [i_unlim_hp_addr5], rax
+  jmp set_endp
+
+set_endp:
+
+check1:
+  cmp rax, [i_unlim_hp_addr1]
+  je do_set_hp
+  cmp rax, [i_unlim_hp_addr2]
+  je do_set_hp
+  cmp rax, [i_unlim_hp_addr3]
+  je do_set_hp
+  cmp rax, [i_unlim_hp_addr4]
+  je do_set_hp
+  cmp rax, [i_unlim_hp_addr5]
+  je do_set_hp
+  jmp to_enemy
+
+  //push rdx
+  //lea rdx, [rax+0000019C]
+  //cmp rdx, [i_base_musou_hp_addr1]
+  //pop rdx
+  //jne code
+
+do_set_hp:
+  mov [i_base_hp_unlimited_mode_addr], rax
+  vmovss xmm15, [rax+00000198]
+  vmovss [rax+0000019C], xmm15
+  vmovss [rax+000001A0], xmm15
+  jmp code
+
+to_enemy:
+  jmp code
+  vmovss xmm14, [rax+0000019C]
+  vmovss xmm15, [rax+0000019A]
+  vmovss xmm13, [vf_1]
+  vucomiss xmm13, xmm14
+  jae code
+  vucomiss xmm13, xmm15
+  jae code
+  vmovss [rax+0000019C], xmm13
+  vmovss [rax+0000019A], xmm13
+
+code:
+  cvttss2si edx,[rax+00000198]
+  jmp return
+align 10 cc
+  i_base_hp_unlimited_mode_addr:
+  dq 0
+  i_unlim_hp_addr1:
+  dq 0
+  i_unlim_hp_addr2:
+  dq 0
+  i_unlim_hp_addr3:
+  dq 0
+  i_unlim_hp_addr4:
+  dq 0
+  i_unlim_hp_addr5:
+  dq 0
+  i_unlim_hp_reset:
+  dd 0
+  vf_1:
+  dd (float)3
+
+INJECT_INF_HP_UNLIMITED_MODE:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_INF_HP_UNLIMITED_MODE)
+registersymbol(i_base_hp_unlimited_mode_addr)
+registersymbol(i_unlim_hp_addr1)
+registersymbol(i_unlim_hp_addr2)
+registersymbol(i_unlim_hp_addr3)
+registersymbol(i_unlim_hp_addr4)
+registersymbol(i_unlim_hp_addr5)
+registersymbol(i_unlim_hp_reset)
+
+[DISABLE]
+
+INJECT_INF_HP_UNLIMITED_MODE:
+  db F3 0F 2C 90 98 01 00 00
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: WO3U.exe+235C89
+
+WO3U.exe+235C5D: 49 0F 45 C9                 - cmovne rcx,r9
+WO3U.exe+235C61: 8B 53 34                    - mov edx,[rbx+34]
+WO3U.exe+235C64: 48 8B 49 18                 - mov rcx,[rcx+18]
+WO3U.exe+235C68: E8 E3 D9 DF FF              - call WO3U.exe+33650
+WO3U.exe+235C6D: 4D 85 C9                    - test r9,r9
+WO3U.exe+235C70: 4D 0F 45 D1                 - cmovne r10,r9
+WO3U.exe+235C74: F3 44 0F 2C 98 9C 01 00 00  - cvttss2si r11d,[rax+0000019C]
+WO3U.exe+235C7D: 49 8B 4A 18                 - mov rcx,[r10+18]
+WO3U.exe+235C81: E8 CA D9 DF FF              - call WO3U.exe+33650
+WO3U.exe+235C86: 8B 4B 3C                    - mov ecx,[rbx+3C]
+// ---------- INJECTING HERE ----------
+WO3U.exe+235C89: F3 0F 2C 90 98 01 00 00     - cvttss2si edx,[rax+00000198]
+// ---------- DONE INJECTING  ----------
+WO3U.exe+235C91: 85 D2                       - test edx,edx
+WO3U.exe+235C93: 75 10                       - jne WO3U.exe+235CA5
+WO3U.exe+235C95: 33 C0                       - xor eax,eax
+WO3U.exe+235C97: 3B C1                       - cmp eax,ecx
+WO3U.exe+235C99: 0F 46 C8                    - cmovbe ecx,eax
+WO3U.exe+235C9C: 89 4B 38                    - mov [rbx+38],ecx
+WO3U.exe+235C9F: 48 83 C4 20                 - add rsp,20
+WO3U.exe+235CA3: 5B                          - pop rbx
+WO3U.exe+235CA4: C3                          - ret 
+WO3U.exe+235CA5: 41 8B C3                    - mov eax,r11d
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>25</ID>
+      <Description>"Gauntlet mode: Get zone unlock stone (Usage: zone selection)"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : WO3U.exe
+  Version: 
+  Date   : 2022-09-27
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_GUNLET_UNLOCK_STONE,WO3U.exe,0F B6 82 00 93 36 00 66 89 81) // should be unique
+alloc(newmem,$1000,INJECT_GET_GUNLET_UNLOCK_STONE)
+
+label(code)
+label(return)
+label(i_base_gunlet_stone_addr)
+newmem:
+  mov [i_base_gunlet_stone_addr], rdx
+
+code:
+  movzx eax,byte ptr [rdx+00369300]
+  jmp return
+align 10 cc
+  i_base_gunlet_stone_addr:
+  dq 0
+
+INJECT_GET_GUNLET_UNLOCK_STONE:
+  jmp newmem
+  nop 2
+return:
+registersymbol(INJECT_GET_GUNLET_UNLOCK_STONE)
+registersymbol(i_base_gunlet_stone_addr)
+
+[DISABLE]
+
+INJECT_GET_GUNLET_UNLOCK_STONE:
+  db 0F B6 82 00 93 36 00
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: WO3U.exe+4472D7
+
+WO3U.exe+4472C7: C3                    - ret 
+WO3U.exe+4472C8: CC                    - int 3 
+WO3U.exe+4472C9: CC                    - int 3 
+WO3U.exe+4472CA: CC                    - int 3 
+WO3U.exe+4472CB: CC                    - int 3 
+WO3U.exe+4472CC: CC                    - int 3 
+WO3U.exe+4472CD: CC                    - int 3 
+WO3U.exe+4472CE: CC                    - int 3 
+WO3U.exe+4472CF: CC                    - int 3 
+WO3U.exe+4472D0: 48 8B 15 71 DA 77 00  - mov rdx,[WO3U.exe+BC4D48]
+// ---------- INJECTING HERE ----------
+WO3U.exe+4472D7: 0F B6 82 00 93 36 00  - movzx eax,byte ptr [rdx+00369300]
+// ---------- DONE INJECTING  ----------
+WO3U.exe+4472DE: 66 89 81 A0 05 00 00  - mov [rcx+000005A0],ax
+WO3U.exe+4472E5: 0F B6 82 01 93 36 00  - movzx eax,byte ptr [rdx+00369301]
+WO3U.exe+4472EC: 66 89 81 A2 05 00 00  - mov [rcx+000005A2],ax
+WO3U.exe+4472F3: 0F B6 82 02 93 36 00  - movzx eax,byte ptr [rdx+00369302]
+WO3U.exe+4472FA: 66 89 81 A4 05 00 00  - mov [rcx+000005A4],ax
+WO3U.exe+447301: 0F B6 82 03 93 36 00  - movzx eax,byte ptr [rdx+00369303]
+WO3U.exe+447308: 66 89 81 A6 05 00 00  - mov [rcx+000005A6],ax
+WO3U.exe+44730F: C3                    - ret 
+WO3U.exe+447310: 4C 8B DC              - mov r11,rsp
+WO3U.exe+447313: 49 89 5B 18           - mov [r11+18],rbx
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>26</ID>
+          <Description>"#1"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>i_base_gunlet_stone_addr</Address>
+          <Offsets>
+            <Offset>369300</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>27</ID>
+          <Description>"#2"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>i_base_gunlet_stone_addr</Address>
+          <Offsets>
+            <Offset>369301</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>28</ID>
+          <Description>"#3"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>i_base_gunlet_stone_addr</Address>
+          <Offsets>
+            <Offset>369302</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>29</ID>
+          <Description>"#4"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>i_base_gunlet_stone_addr</Address>
+          <Offsets>
+            <Offset>369303</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>30</ID>
+      <Description>"Fast musou gauge"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : WO3U.exe
+  Version: 
+  Date   : 2022-09-25
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_FAST_MUSOU2,WO3U.exe,F3 0F 11 81 A8 01 00 00) // should be unique
+alloc(newmem,$1000,INJECT_FAST_MUSOU2)
+
+label(code)
+label(return)
+label(vf_mosou2_multi)
+label(i_base_mosou_addr_1)
+label(i_base_musou_hp_addr1)
+label(i_unlimited_mode_full_musou)
+
+newmem:
+  mov [i_base_mosou_addr_1], rcx
+  push rax
+  lea rax, [rcx+0000019C]
+  mov [i_base_musou_hp_addr1], rax
+  pop rax
+
+  cmp dword ptr [i_unlimited_mode_full_musou], 0
+  je next1
+  vmovss xmm15, [rcx+000001A4]
+  vmovss xmm14, [vf_1_1]
+  vmulss xmm15, xmm15, xmm14
+  vmovss [rcx+000001A8], xmm15
+  movaps xmm0, xmm15
+  jmp code
+
+next1:
+  vmovss xmm15, [rcx+000001A8]
+  vucomiss xmm0, xmm15
+  jbe code
+
+  vsubss xmm14, xmm0, xmm15
+  vmovss xmm13, [vf_mosou2_multi]
+  vmulss xmm14, xmm14, xmm13
+  vaddss xmm0, xmm15, xmm14
+
+
+code:
+  movss [rcx+000001A8],xmm0
+  jmp return
+align 10 cc
+  vf_mosou2_multi:
+  dd (float)16.345
+  i_base_mosou_addr_1:
+  dq 0
+  i_base_musou_hp_addr1:
+  dq 0
+  i_unlimited_mode_full_musou:
+  dd 0
+  vf_1_1:
+  dd (float)1.1
+
+INJECT_FAST_MUSOU2:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_FAST_MUSOU2)
+registersymbol(vf_mosou2_multi)
+registersymbol(i_base_mosou_addr_1)
+registersymbol(i_base_musou_hp_addr1)
+registersymbol(i_unlimited_mode_full_musou)
+
+[DISABLE]
+
+INJECT_FAST_MUSOU2:
+  db F3 0F 11 81 A8 01 00 00
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: WO3U.exe+2BED4
+
+WO3U.exe+2BEBA: 7A 06                    - jp WO3U.exe+2BEC2
+WO3U.exe+2BEBC: 75 04                    - jne WO3U.exe+2BEC2
+WO3U.exe+2BEBE: B0 01                    - mov al,01
+WO3U.exe+2BEC0: EB 02                    - jmp WO3U.exe+2BEC4
+WO3U.exe+2BEC2: 32 C0                    - xor al,al
+WO3U.exe+2BEC4: F3 0F 58 CC              - addss xmm1,xmm4
+WO3U.exe+2BEC8: F3 0F 5F D9              - maxss xmm3,xmm1
+WO3U.exe+2BECC: 0F 2F D8                 - comiss xmm3,xmm0
+WO3U.exe+2BECF: 77 03                    - ja WO3U.exe+2BED4
+WO3U.exe+2BED1: 0F 28 C3                 - movaps xmm0,xmm3
+// ---------- INJECTING HERE ----------
+WO3U.exe+2BED4: F3 0F 11 81 A8 01 00 00  - movss [rcx+000001A8],xmm0
+// ---------- DONE INJECTING  ----------
+WO3U.exe+2BEDC: 84 C0                    - test al,al
+WO3U.exe+2BEDE: 75 0E                    - jne WO3U.exe+2BEEE
+WO3U.exe+2BEE0: 0F 2E 81 A4 01 00 00     - ucomiss xmm0,[rcx+000001A4]
+WO3U.exe+2BEE7: 7A 05                    - jp WO3U.exe+2BEEE
+WO3U.exe+2BEE9: 75 03                    - jne WO3U.exe+2BEEE
+WO3U.exe+2BEEB: B0 01                    - mov al,01
+WO3U.exe+2BEED: C3                       - ret 
+WO3U.exe+2BEEE: 32 C0                    - xor al,al
+WO3U.exe+2BEF0: C3                       - ret 
+WO3U.exe+2BEF1: CC                       - int 3 
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>31</ID>
+          <Description>"Multiplier"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF0080</Color>
+          <VariableType>Float</VariableType>
+          <Address>vf_mosou2_multi</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>32</ID>
+          <Description>"Max HP"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>i_base_mosou_addr_1</Address>
+          <Offsets>
+            <Offset>198</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>33</ID>
+          <Description>"HP1"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>i_base_mosou_addr_1</Address>
+          <Offsets>
+            <Offset>19C</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>34</ID>
+          <Description>"HP2"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>i_base_mosou_addr_1</Address>
+          <Offsets>
+            <Offset>1A0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>35</ID>
+          <Description>"Max Musou gauge"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>i_base_mosou_addr_1</Address>
+          <Offsets>
+            <Offset>1A4</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>36</ID>
+          <Description>"Musou"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>i_base_mosou_addr_1</Address>
+          <Offsets>
+            <Offset>1A8</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>37</ID>
+      <Description>"Char. Viewer"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : WO3U.exe
+  Version: 
+  Date   : 2022-09-26
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_CHAR_VIEWER,WO3U.exe,0F BF 83 FE 17 05 00 44) // should be unique
+alloc(newmem,$1000,INJECT_CHAR_VIEWER)
+
+label(code)
+label(return)
+label(i_base_char_viewer_addr)
+
+newmem:
+  mov [i_base_char_viewer_addr], rbx
+
+code:
+  movsx eax,word ptr [rbx+000517FE]
+  jmp return
+align 10 cc
+  i_base_char_viewer_addr:
+  dq 0
+
+INJECT_CHAR_VIEWER:
+  jmp newmem
+  nop 2
+return:
+registersymbol(INJECT_CHAR_VIEWER)
+registersymbol(i_base_char_viewer_addr)
+
+[DISABLE]
+
+INJECT_CHAR_VIEWER:
+  db 0F BF 83 FE 17 05 00
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: WO3U.exe+25254D
+
+WO3U.exe+252533: 45 8B 1C 80              - mov r11d,[r8+rax*4]
+WO3U.exe+252537: EB 03                    - jmp WO3U.exe+25253C
+WO3U.exe+252539: 44 8B D9                 - mov r11d,ecx
+WO3U.exe+25253C: 85 D2                    - test edx,edx
+WO3U.exe+25253E: 75 04                    - jne WO3U.exe+252544
+WO3U.exe+252540: 8B CD                    - mov ecx,ebp
+WO3U.exe+252542: EB 09                    - jmp WO3U.exe+25254D
+WO3U.exe+252544: 83 FA 07                 - cmp edx,07
+WO3U.exe+252547: 77 04                    - ja WO3U.exe+25254D
+WO3U.exe+252549: 41 8B 0C 90              - mov ecx,[r8+rdx*4]
+// ---------- INJECTING HERE ----------
+WO3U.exe+25254D: 0F BF 83 FE 17 05 00     - movsx eax,word ptr [rbx+000517FE]
+// ---------- DONE INJECTING  ----------
+WO3U.exe+252554: 44 2B D9                 - sub r11d,ecx
+WO3U.exe+252557: F3 0F 10 15 D9 D4 88 00  - movss xmm2,[WO3U.exe+ADFA38]
+WO3U.exe+25255F: 89 47 1C                 - mov [rdi+1C],eax
+WO3U.exe+252562: 0F BF 83 00 18 05 00     - movsx eax,word ptr [rbx+00051800]
+WO3U.exe+252569: 89 47 20                 - mov [rdi+20],eax
+WO3U.exe+25256C: 0F BF 83 02 18 05 00     - movsx eax,word ptr [rbx+00051802]
+WO3U.exe+252573: 89 47 24                 - mov [rdi+24],eax
+WO3U.exe+252576: 0F BF 83 04 18 05 00     - movsx eax,word ptr [rbx+00051804]
+WO3U.exe+25257D: 89 47 28                 - mov [rdi+28],eax
+WO3U.exe+252580: 0F BF 83 06 18 05 00     - movsx eax,word ptr [rbx+00051806]
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>38</ID>
+          <Description>"Base addr."</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>808080</Color>
+          <VariableType>8 Bytes</VariableType>
+          <Address>i_base_char_viewer_addr</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>39</ID>
+          <Description>"Level -1"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>i_base_char_viewer_addr</Address>
+          <Offsets>
+            <Offset>5180F</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>40</ID>
+          <Description>"EXP"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_char_viewer_addr</Address>
+          <Offsets>
+            <Offset>51818</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>41</ID>
+          <Description>"Life"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_base_char_viewer_addr</Address>
+          <Offsets>
+            <Offset>517fe</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>42</ID>
+          <Description>"Attack"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_base_char_viewer_addr</Address>
+          <Offsets>
+            <Offset>51800</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>43</ID>
+          <Description>"Defense"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_base_char_viewer_addr</Address>
+          <Offsets>
+            <Offset>51802</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>44</ID>
+          <Description>"Musou"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_base_char_viewer_addr</Address>
+          <Offsets>
+            <Offset>51804</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>45</ID>
+          <Description>"Speed"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_base_char_viewer_addr</Address>
+          <Offsets>
+            <Offset>51806</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>46</ID>
+      <Description>"View Weapon (Usage: Weapon selection)"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : WO3U.exe
+  Version: 
+  Date   : 2022-09-25
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_WEAPON_INFO,WO3U.exe,0F B6 49 0B 03 C1) // should be unique
+alloc(newmem,$1000,INJECT_WEAPON_INFO)
+
+label(code)
+label(return)
+label(i_base_weapon_addr)
+label(i_auto_set_slot)
+label(i_auto_set_skill_level)
+
+newmem:
+  mov [i_base_weapon_addr], rcx
+  cmp dword ptr [i_auto_set_slot], 1
+  jne next3
+
+  push rax
+  mov al, [rcx+0A]
+  cmp al, 8
+  je next1
+  mov al, 8
+  mov [rcx+0A], al
+
+next1:
+  mov al, [rcx+0B]
+  cmp al, 55
+  jae next2
+  mov al, 55
+  mov [rcx+0B], al
+
+next2:
+  pop rax
+
+next3:
+  cmp dword ptr [i_auto_set_skill_level], 1
+  jne code
+
+  push rbx
+  push rax
+
+  mov bl, 8
+  mov [rcx+0A], bl
+
+  mov eax, 0
+  mov bl, a
+
+loop1:
+  mov bh, [rcx+0C+eax]
+  cmp bh, FF
+  je loop_end
+
+  mov [rcx+14+eax], bl
+
+  inc eax
+
+  cmp eax, 8
+  jae loop_end
+  jmp loop1
+
+loop_end:
+  pop rax
+  pop rbx
+
+code:
+  movzx ecx,byte ptr [rcx+0B]
+  add eax,ecx
+  jmp return
+align 10 cc
+  i_base_weapon_addr:
+  dq 0
+  i_auto_set_slot:
+  dd 1
+  i_auto_set_skill_level:
+  dd 1
+
+
+INJECT_WEAPON_INFO:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT_WEAPON_INFO)
+registersymbol(i_base_weapon_addr)
+registersymbol(i_auto_set_slot)
+registersymbol(i_auto_set_skill_level)
+
+[DISABLE]
+
+INJECT_WEAPON_INFO:
+  db 0F B6 49 0B 03 C1
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: WO3U.exe+207DA0
+
+WO3U.exe+207D71: 48 89 45 E7                    - mov [rbp-19],rax
+WO3U.exe+207D75: 41 8B 4A 1C                    - mov ecx,[r10+1C]
+WO3U.exe+207D79: BA FF FF FF FF                 - mov edx,FFFFFFFF
+WO3U.exe+207D7E: 41 0F 96 C1                    - setbe r9l
+WO3U.exe+207D82: 40 80 FF 04                    - cmp dil,04
+WO3U.exe+207D86: 0F 46 D7                       - cmovbe edx,edi
+WO3U.exe+207D89: 66 41 83 BC C0 C8 B2 08 00 00  - cmp word ptr [r8+rax*8+0008B2C8],00
+WO3U.exe+207D93: 41 0F 9F C0                    - setg r8l
+WO3U.exe+207D97: E8 04 3C 05 00                 - call WO3U.exe+25B9A0
+WO3U.exe+207D9C: 48 8B 4D DF                    - mov rcx,[rbp-21]
+// ---------- INJECTING HERE ----------
+WO3U.exe+207DA0: 0F B6 49 0B                    - movzx ecx,byte ptr [rcx+0B]
+// ---------- DONE INJECTING  ----------
+WO3U.exe+207DA4: 03 C1                          - add eax,ecx
+WO3U.exe+207DA6: 48 8B 4D BF                    - mov rcx,[rbp-41]
+WO3U.exe+207DAA: 89 45 D3                       - mov [rbp-2D],eax
+WO3U.exe+207DAD: 40 80 FF 04                    - cmp dil,04
+WO3U.exe+207DB1: 48 8B 45 E7                    - mov rax,[rbp-19]
+WO3U.exe+207DB5: 0F BF 94 C1 C4 B2 08 00        - movsx edx,word ptr [rcx+rax*8+0008B2C4]
+WO3U.exe+207DBD: 8B 8C C1 E8 B2 08 00           - mov ecx,[rcx+rax*8+0008B2E8]
+WO3U.exe+207DC4: 89 55 D7                       - mov [rbp-29],edx
+WO3U.exe+207DC7: BA FF FF FF FF                 - mov edx,FFFFFFFF
+WO3U.exe+207DCC: 44 8B C2                       - mov r8d,edx
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>47</ID>
+          <Description>"Base addr"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>808080</Color>
+          <VariableType>8 Bytes</VariableType>
+          <Address>i_base_weapon_addr</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>48</ID>
+          <Description>"Auto set #slot &amp; +Damage?"</Description>
+          <DropDownList DisplayValueAsItem="1">0:No
+1:Yes
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF0080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_auto_set_slot</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>49</ID>
+          <Description>"Auto set skill level?"</Description>
+          <DropDownList DisplayValueAsItem="1">0:No
+1:Yes
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF0080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_auto_set_skill_level</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>50</ID>
+          <Description>"Item ID"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_base_weapon_addr</Address>
+          <Offsets>
+            <Offset>8</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>51</ID>
+          <Description>"# of Slots"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>i_base_weapon_addr</Address>
+          <Offsets>
+            <Offset>A</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>52</ID>
+          <Description>"+Damage"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>i_base_weapon_addr</Address>
+          <Offsets>
+            <Offset>B</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>53</ID>
+          <Description>"Slot 1 Skill#"</Description>
+          <DropDownList DisplayValueAsItem="1">0:Flame/炎
+1:Ice/冰
+2:Bolt/雷
+3:Wind/風
+4:Slay/斬
+5:Agility/神速
+6:Reach/增廣
+7:Chronos/連鎖
+8:Brawn/地擊
+9:Might/天擊
+10:Destruction/亂擊
+11:Cavalier/騎擊
+12:Frenzy/極擊
+13:Flak/破天
+14:Blast/波擊
+15:Courage/勇猛
+16:Absorption/吸生
+17:Osmosis/吸活
+18:Celerity/速攻
+19:Prosperity/蒐集
+20:Providence/奪取
+21:Guerdon/獎賞
+22:Wisdom/武勲
+23:Diligence/磨練
+24:Industry/熟習
+25:Harmony/調和
+27:Echo/誘爆
+28:Typhoon/旋風
+30:分身
+35:Icewind/冰風
+36:BoltWind/雷風
+38:Iceslay/冰斬
+255:N/A
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>i_base_weapon_addr</Address>
+          <Offsets>
+            <Offset>C</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>54</ID>
+          <Description>"Slot 2 Skill#"</Description>
+          <DropDownListLink>Slot 1 Skill#</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>i_base_weapon_addr</Address>
+          <Offsets>
+            <Offset>D</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>55</ID>
+          <Description>"Slot 3 Skill#"</Description>
+          <DropDownListLink>Slot 1 Skill#</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>i_base_weapon_addr</Address>
+          <Offsets>
+            <Offset>E</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>56</ID>
+          <Description>"Slot 4 Skill#"</Description>
+          <DropDownListLink>Slot 1 Skill#</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>i_base_weapon_addr</Address>
+          <Offsets>
+            <Offset>F</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>57</ID>
+          <Description>"Slot 5 Skill#"</Description>
+          <DropDownListLink>Slot 1 Skill#</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>i_base_weapon_addr</Address>
+          <Offsets>
+            <Offset>10</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>58</ID>
+          <Description>"Slot 6 Skill#"</Description>
+          <DropDownListLink>Slot 1 Skill#</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>i_base_weapon_addr</Address>
+          <Offsets>
+            <Offset>11</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>59</ID>
+          <Description>"Slot 7 Skill#"</Description>
+          <DropDownListLink>Slot 1 Skill#</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>i_base_weapon_addr</Address>
+          <Offsets>
+            <Offset>12</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>60</ID>
+          <Description>"Slot 8 Skill#"</Description>
+          <DropDownListLink>Slot 1 Skill#</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>i_base_weapon_addr</Address>
+          <Offsets>
+            <Offset>13</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>61</ID>
+          <Description>"Slot 1 Lv"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>i_base_weapon_addr</Address>
+          <Offsets>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>62</ID>
+          <Description>"Slot 2 Lv"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>i_base_weapon_addr</Address>
+          <Offsets>
+            <Offset>15</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>63</ID>
+          <Description>"Slot 3 Lv"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>i_base_weapon_addr</Address>
+          <Offsets>
+            <Offset>16</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>64</ID>
+          <Description>"Slot 4 Lv"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>i_base_weapon_addr</Address>
+          <Offsets>
+            <Offset>17</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>65</ID>
+          <Description>"Slot 5 Lv"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>i_base_weapon_addr</Address>
+          <Offsets>
+            <Offset>18</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>66</ID>
+          <Description>"Slot 6 Lv"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>i_base_weapon_addr</Address>
+          <Offsets>
+            <Offset>19</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>67</ID>
+          <Description>"Slot 7 Lv"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>i_base_weapon_addr</Address>
+          <Offsets>
+            <Offset>1A</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>68</ID>
+          <Description>"Slot 8 Lv"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Byte</VariableType>
+          <Address>i_base_weapon_addr</Address>
+          <Offsets>
+            <Offset>1B</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>69</ID>
+      <Description>"_WIP"</Description>
+      <Options moHideChildren="1"/>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>70</ID>
+          <Description>"Get KO count"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : WO3U.exe
+  Version: 
+  Date   : 2022-09-27
+  Author :
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_KO_COUNT,WO3U.exe,89 83 F8 0F 00 00) // should be unique
+alloc(newmem,$1000,INJECT_KO_COUNT)
+
+label(code)
+label(return)
+label(i_base_ko_count_addr)
+
+newmem:
+  mov [i_base_ko_count_addr], rbx
+
+code:
+  mov [rbx+00000FF8],eax
+  jmp return
+align 10 cc
+  vf_ko_multi:
+  dd (float)2.5
+  i_base_ko_count_addr:
+  dq 0
+
+INJECT_KO_COUNT:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT_KO_COUNT)
+registersymbol(i_base_ko_count_addr)
+
+[DISABLE]
+
+INJECT_KO_COUNT:
+  db 89 83 F8 0F 00 00
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: WO3U.exe+1E1672
+
+WO3U.exe+1E1643: 39 2B                          - cmp [rbx],ebp
+WO3U.exe+1E1645: 0F 85 B1 00 00 00              - jne WO3U.exe+1E16FC
+WO3U.exe+1E164B: 48 8B CB                       - mov rcx,rbx
+WO3U.exe+1E164E: E8 4D 46 F8 FF                 - call WO3U.exe+165CA0
+WO3U.exe+1E1653: 44 8B 83 F8 0F 00 00           - mov r8d,[rbx+00000FF8]
+WO3U.exe+1E165A: 8B C8                          - mov ecx,eax
+WO3U.exe+1E165C: 44 8B 0D 09 3D 9C 00           - mov r9d,[WO3U.exe+BA536C]
+WO3U.exe+1E1663: 44 3B C0                       - cmp r8d,eax
+WO3U.exe+1E1666: 74 12                          - je WO3U.exe+1E167A
+WO3U.exe+1E1668: C7 83 04 10 00 00 12 00 00 00  - mov [rbx+00001004],00000012
+// ---------- INJECTING HERE ----------
+WO3U.exe+1E1672: 89 83 F8 0F 00 00              - mov [rbx+00000FF8],eax
+// ---------- DONE INJECTING  ----------
+WO3U.exe+1E1678: EB 20                          - jmp WO3U.exe+1E169A
+WO3U.exe+1E167A: 8B 93 04 10 00 00              - mov edx,[rbx+00001004]
+WO3U.exe+1E1680: 41 8B C8                       - mov ecx,r8d
+WO3U.exe+1E1683: 85 D2                          - test edx,edx
+WO3U.exe+1E1685: 7E 13                          - jle WO3U.exe+1E169A
+WO3U.exe+1E1687: 8B C2                          - mov eax,edx
+WO3U.exe+1E1689: 41 2B C1                       - sub eax,r9d
+WO3U.exe+1E168C: 78 04                          - js WO3U.exe+1E1692
+WO3U.exe+1E168E: 3B C2                          - cmp eax,edx
+WO3U.exe+1E1690: 7E 02                          - jle WO3U.exe+1E1694
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>71</ID>
+              <Description>"KO count"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_ko_count_addr</Address>
+              <Offsets>
+                <Offset>FF8</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>72</ID>
+      <Description>"WARRIORS OROCHI 3 Ultimate Definitive Edition v1.0.0.1 /  https://opencheattables.com  /  CE 7.4+"</Description>
+      <Color>00B700</Color>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

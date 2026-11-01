@@ -1,0 +1,1312 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="42">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>1</ID>
+      <Description>"Free Camera (Num 0 Toggle)"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+globalalloc(speedModifier,8)
+speedModifier:
+dd (float)3
+globalalloc(useMouse,8)
+useMouse:
+dd (float)1 // 1 to use mouse, 0 to not use mouse
+globalalloc(mouseSensitivity,8)
+mouseSensitivity:
+dd (float)8
+
+aobscanmodule(camera_struct_aob,kyoto_xanadu.exe,48 8B 8B F0 04 00 00 48 8B) // should be unique
+aobscanmodule(camera_control_aob,kyoto_xanadu.exe,89 41 08 41 8B 44 1E 2C) // should be unique
+aobscanmodule(camera_shake_add_aob,kyoto_xanadu.exe,0F 84 D1 00 00 00 F3) // should be unique
+aobscanmodule(move_player_aob,kyoto_xanadu.exe,74 08 49 8B D5 E8 AA) // should be unique
+alloc(newmem,$100,camera_struct_aob)
+alloc(cameracoordinates,$100,camera_struct_aob)
+registersymbol(camera_struct_aob)
+registersymbol(camera_control_aob)
+registersymbol(camera_shake_add_aob)
+registersymbol(move_player_aob)
+registersymbol(cameracoordinates)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  mov rcx,[rbx+000004F0]
+  mov [cameracoordinates],rcx
+  jmp return
+
+camera_struct_aob:
+  jmp newmem
+  nop 2
+return:
+
+camera_control_aob:
+  db 90 90 90 41 8B 44 1E 2C 90 90 90 41 8B 44 1E 30 90 90 90 48 8B 83 F0 04 00 00 90 90 90 90 90 0F 28 BC 24 30 01 00 00 90 90 90 90 90 90 90 90 90 90 41 8B 84 1E A0 00 00 00 48 8B 8B F0 04 00 00 90 90 90 41 8B 84 1E A4 00 00 00 90 90 90 41 8B 84 1E A8 00 00 00 90 90 90
+
+camera_shake_add_aob:
+  db E9 D2 00 00 00 90
+
+move_player_aob:
+  db EB 08
+
+{$lua}
+
+-- normalize, cross, computeUp and computeRoll courtesy of Claude AI
+local function normalize(x, y, z)
+  local len = math.sqrt(x*x + y*y + z*z)
+  if len &lt; 1e-8 then return 0, 0, 0 end
+  return x/len, y/len, z/len
+end
+
+local function cross(ax, ay, az, bx, by, bz)
+  return ay*bz - az*by, az*bx - ax*bz, ax*by - ay*bx
+end
+
+-- eye (ex,ey,ez), target (tx,ty,tz), roll in radians
+function computeUp(ex, ey, ez, tx, ty, tz, roll)
+  local fx, fy, fz = normalize(tx - ex, ty - ey, tz - ez)
+
+  -- level right = worldUp x forward
+  local rx, ry, rz = cross(0, 1, 0, fx, fy, fz)
+  local rlen = math.sqrt(rx*rx + ry*ry + rz*rz)
+  if rlen &lt; 1e-6 then
+    rx, ry, rz = 1, 0, 0              -- looking straight up or down: pick any right
+  else
+    rx, ry, rz = rx/rlen, ry/rlen, rz/rlen
+  end
+
+  -- level up = forward x right
+  local ux, uy, uz = cross(fx, fy, fz, rx, ry, rz)
+
+  local c, s = math.cos(roll), math.sin(roll)
+  return ux*c - rx*s, uy*c - ry*s, uz*c - rz*s
+end
+
+-- eye (ex,ey,ez), target (tx,ty,tz), current up (px,py,pz) read from render_cam+0x28/0x2c/0x30
+function computeRoll(ex, ey, ez, tx, ty, tz, px, py, pz)
+  local fx, fy, fz = normalize(tx - ex, ty - ey, tz - ez)
+
+  -- level right and level up, same construction as computeUp
+  local rx, ry, rz = cross(0, 1, 0, fx, fy, fz)
+  local rlen = math.sqrt(rx*rx + ry*ry + rz*rz)
+  if rlen &lt; 1e-6 then
+    rx, ry, rz = 1, 0, 0              -- looking straight up or down
+  else
+    rx, ry, rz = rx/rlen, ry/rlen, rz/rlen
+  end
+  local ux, uy, uz = cross(fx, fy, fz, rx, ry, rz)
+
+  local cosT =  px*ux + py*uy + pz*uz   -- dot(up, level up)
+  local sinT = -(px*rx + py*ry + pz*rz) -- -dot(up, level right)
+  return math.atan(sinT, cosT)          -- radians, range (-pi, pi]
+end
+
+function checkKeys()
+  if not (getForegroundProcess() == getOpenedProcessID()) then return end -- Only run if in game
+  if (getAddressSafe("[cameracoordinates]")) then
+    --Read and assign speed modifier value
+    local speed = readFloat("speedModifier")
+    local use_mouse = readFloat("useMouse")
+    local mouse_speed = readFloat("mouseSensitivity")
+
+    --Camera Coordinates
+    local camx = readFloat("[cameracoordinates]+08") -- Camera X
+    local camy = readFloat("[cameracoordinates]+10") -- Camera Y
+    local camz = readFloat("[cameracoordinates]+0C") -- Camera Z
+
+    --Target Coordinates
+    local targetx = readFloat("[cameracoordinates]+18") -- Camera Target X
+    local targety = readFloat("[cameracoordinates]+20") -- Camera Target Y
+    local targetz = readFloat("[cameracoordinates]+1C") -- Camera Target Z
+
+    --Camera Up Vector Coordinates
+    local upvx = readFloat("[cameracoordinates]+28") -- Camera Up Vector X
+    local upvy = readFloat("[cameracoordinates]+30") -- Camera Up Vector Y
+    local upvz = readFloat("[cameracoordinates]+2C") -- Camera Up Vector Z
+
+    --Prevent endless error loop if camera status is not initiated
+    if (targetz == nil) or (targetz == camz and targetx == camx and targety == camy) then
+      speed = 0
+      camx = 0
+      camy = 0
+      camz = 0
+      targetx = 0
+      targety = 0
+      targetz = 0
+	  upvx = 0
+	  upvy = 0
+	  upvz = 1
+    else
+
+      local new_mouse_x,new_mouse_y = getMousePos()
+      local mouse_loaded = readInteger("cameracoordinates+38")
+
+      --Initialize mouse coordinates on first run (if using mouse)
+      if not (mouse_loaded == 1) and (use_mouse == 1) then
+        new_mouse_x = getScreenWidth() / 2
+        new_mouse_y = getScreenHeight() / 2
+        setMousePos(getScreenWidth() / 2, getScreenHeight() / 2)
+        writeInteger("cameracoordinates+38",1)
+      end
+
+      --Measure mouse movement from previous cycle
+      local mouse_move_x = new_mouse_x - getScreenWidth() / 2
+      local mouse_move_y = new_mouse_y - getScreenHeight() / 2
+
+      --Mouse Rotation in Radians
+      --Use math.rad() to convert from degrees if game values aren't in radians
+      local camdist = ((targetx - camx)^2 + (targety - camy)^2 + (targetz - camz)^2)^0.5
+      local tilt = math.atan2(camz - targetz, ((targetx - camx)^2 + (targety - camy)^2)^0.5)
+      local pan = math.atan2(targetx - camx, targety - camy) + math.rad(180) -- Horizontal (pan)
+	  local camera_roll = computeRoll(camx, camz, camy, targetx, targetz, targety, upvx, upvz, upvy)
+
+      --Sine and Cosine of Rotation Values
+      local siny = math.sin(pan) -- Sine of Horizontal (pan)
+      local cosy = math.cos(pan) -- Cosine of Horizontal (pan)
+      local sinp = math.sin(tilt) -- Sine of Vertical (tilt)
+      local cosp = math.cos(tilt) -- Cosine of Vertical (tilt)
+
+      --Forward
+      if isKeyPressed(VK_W) then
+        camx = camx - (siny * speed * 0.03)
+        camy = camy - (cosy * speed * 0.03)
+        camz = camz - (sinp * speed * 0.03)
+      end
+      --Left
+      if isKeyPressed(VK_A) then
+        camx = camx + (math.sin(pan - math.rad(90)) * speed * 0.03)
+        camy = camy + (math.cos(pan - math.rad(90)) * speed * 0.03)
+      end
+      --Back
+      if isKeyPressed(VK_S) then
+        camx = camx + (siny * speed * 0.03)
+        camy = camy + (cosy * speed * 0.03)
+        camz = camz + (sinp * speed * 0.03)
+      end
+      --Right
+      if isKeyPressed(VK_D) then
+        camx = camx - (math.sin(pan - math.rad(90)) * speed * 0.03)
+        camy = camy - (math.cos(pan - math.rad(90)) * speed * 0.03)
+      end
+      --Forward/Right
+      if isKeyPressed(VK_W) and isKeyPressed(VK_D) then
+        camx = camx - (math.sin(pan - math.rad(45)) * speed * 0.03)
+        camy = camy - (math.cos(pan - math.rad(45)) * speed * 0.03)
+        camz = camz - (sinp * speed * 0.03)
+      end
+      --Forward/Left
+      if isKeyPressed(VK_W) and isKeyPressed(VK_A) then
+        camx = camx - (math.sin(pan + math.rad(45)) * speed * 0.03)
+        camy = camy - (math.cos(pan + math.rad(45)) * speed * 0.03)
+        camz = camz - (sinp * speed * 0.03)
+      end
+      --Back/Left
+      if isKeyPressed(VK_S) and isKeyPressed(VK_A) then
+        camx = camx + (math.sin(pan - math.rad(45)) * speed * 0.03)
+        camy = camy + (math.cos(pan - math.rad(45)) * speed * 0.03)
+        camz = camz + (sinp * speed * 0.03)
+      end
+      --Back/Right
+      if isKeyPressed(VK_S) and isKeyPressed(VK_D) then
+        camx = camx + (math.sin(pan + math.rad(45)) * speed * 0.03)
+        camy = camy + (math.cos(pan + math.rad(45)) * speed * 0.03)
+        camz = camz + (sinp * speed * 0.03)
+      end
+      --Up
+      if isKeyPressed(VK_R) then
+       camz = camz + (speed * 0.02)
+      end
+      --Down
+      if isKeyPressed(VK_F) then
+       camz = camz - (speed * 0.02)
+      end
+      --Pan right
+      if isKeyPressed(VK_L) then
+        pan = pan - speed * 0.01
+      end
+      --Pan left
+      if isKeyPressed(VK_J) then
+        pan = pan + speed * 0.01
+      end
+      --Tilt up
+      if isKeyPressed(VK_I) then
+        tilt = math.max(tilt - speed * 0.01, math.rad(-89.5))
+      end
+      --Tilt down
+      if isKeyPressed(VK_K) then
+        tilt = math.min(tilt + speed * 0.01, math.rad(89.5))
+      end
+      --Roll left
+      if isKeyPressed(VK_Q) then
+          camera_roll = camera_roll - speed * 0.01
+      end
+      --Roll right
+      if isKeyPressed(VK_E) then
+          camera_roll = camera_roll + speed * 0.01
+      end
+      --Roll neutral
+      if isKeyPressed(VK_C) then
+          camera_roll = 0
+      end
+
+      if (use_mouse == 1) then
+        --Tilt by mouse
+        if not(mouse_move_y == 0) then
+          tilt = math.min(math.max(tilt + mouse_move_y * mouse_speed * 0.0003, math.rad(-89.5)), math.rad(89.5))
+        end
+        --Tilt by mouse
+        if not(mouse_move_x == 0) then
+          pan = pan - mouse_move_x * mouse_speed * 0.0003
+        end
+
+        setMousePos(getScreenWidth() / 2, getScreenHeight() / 2)
+      end
+
+      --Create a copy of the entire memory block before alterations.  I do not know if +14, +24 or +34 are used, but this preserves them.
+      copyMemory("[cameracoordinates]+08",48,"cameracoordinates+08")
+
+	  targetx = camx - (camdist * math.cos(tilt) * math.sin(pan))
+	  targety = camy - (camdist * math.cos(tilt) * math.cos(pan))
+	  targetz = camz - (camdist * math.sin(tilt))
+      upvx, upvz, upvy = computeUp(camx, camz, camy, targetx, targetz, targety, camera_roll)
+
+      --Write new values into the temporary buffer
+      writeFloat("cameracoordinates+08", camx)
+      writeFloat("cameracoordinates+10", camy)
+      writeFloat("cameracoordinates+0C", camz)
+      writeFloat("cameracoordinates+18", targetx)
+      writeFloat("cameracoordinates+20", targety)
+      writeFloat("cameracoordinates+1C", targetz)
+      writeFloat("cameracoordinates+28", upvx)
+      writeFloat("cameracoordinates+30", upvy)
+      writeFloat("cameracoordinates+2C", upvz)
+
+      --Copy buffer back into memory read by game engine
+      copyMemory("cameracoordinates+08",48,"[cameracoordinates]+08")
+    end
+
+
+    --Speed Modifiers
+    if isKeyPressed(VK_F3) then --If F3 is pressed, quadruple the speed
+      writeFloat("speedModifier", 12)
+    elseif isKeyPressed(VK_F2) then --If F2 is pressed, double the speed
+      writeFloat("speedModifier", 6)
+    elseif isKeyPressed(VK_F1) then --If F1 is pressed, slow way down
+      writeFloat("speedModifier", .5)
+    else --If nothing is pressed, speed is normal
+      writeFloat("speedModifier", 3)
+    end
+
+    --Mouse Support
+    if isKeyPressed(VK_PRIOR) then --If Page Up is pressed, enable mouse
+      writeFloat("useMouse", 1)
+    elseif isKeyPressed(VK_NEXT) then --If Page Down is pressed, disable mouse
+      writeFloat("useMouse", 0)
+    end
+  end
+end
+
+t=createTimer(nil)
+timer_setInterval(t, 10)
+timer_onTimer(t, checkKeys)
+timer_setEnabled(t, true)
+
+{$asm}
+
+[DISABLE]
+{$lua}
+
+timer_setEnabled(t, false)
+
+{$asm}
+camera_struct_aob:
+  db 48 8B 8B F0 04 00 00
+
+camera_control_aob:
+  db 89 41 08 41 8B 44 1E 2C 89 41 0C 41 8B 44 1E 30 89 41 10 48 8B 83 F0 04 00 00 F3 0F 11 78 1C 0F 28 BC 24 30 01 00 00 F3 0F 11 48 18 F3 0F 11 50 20 41 8B 84 1E A0 00 00 00 48 8B 8B F0 04 00 00 89 41 28 41 8B 84 1E A4 00 00 00 89 41 2C 41 8B 84 1E A8 00 00 00 89 41 30
+
+camera_shake_add_aob:
+  db 0F 84 D1 00 00 00
+
+move_player_aob:
+  db 74 08
+
+unregistersymbol(camera_struct_aob)
+unregistersymbol(camera_control_aob)
+unregistersymbol(camera_shake_add_aob)
+unregistersymbol(move_player_aob)
+unregistersymbol(cameracoordinates)
+dealloc(cameracoordinates)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: kyoto_xanadu.exe+7D232 - Camera Struct
+
+kyoto_xanadu.exe+7D209: 0F 28 C2                 - movaps xmm0,xmm2
+kyoto_xanadu.exe+7D20C: 0F C6 C9 AA              - shufps xmm1,xmm1,-56
+kyoto_xanadu.exe+7D210: 0F C6 C2 AA              - shufps xmm0,xmm2,-56
+kyoto_xanadu.exe+7D214: 0F 2E C1                 - ucomiss xmm0,xmm1
+kyoto_xanadu.exe+7D217: 7A 19                    - jp kyoto_xanadu.exe+7D232
+kyoto_xanadu.exe+7D219: 75 17                    - jne kyoto_xanadu.exe+7D232
+kyoto_xanadu.exe+7D21B: F3 0F 58 05 0D E8 9D 00  - addss xmm0,[kyoto_xanadu.exe+A5BA30]
+kyoto_xanadu.exe+7D223: F3 0F 11 50 08           - movss [rax+08],xmm2
+kyoto_xanadu.exe+7D228: F3 0F 11 58 0C           - movss [rax+0C],xmm3
+kyoto_xanadu.exe+7D22D: F3 0F 11 40 10           - movss [rax+10],xmm0
+// ---------- INJECTING HERE ----------
+kyoto_xanadu.exe+7D232: 48 8B 8B F0 04 00 00     - mov rcx,[rbx+000004F0]
+// ---------- DONE INJECTING  ----------
+kyoto_xanadu.exe+7D239: 48 8B 01                 - mov rax,[rcx]
+kyoto_xanadu.exe+7D23C: FF 50 10                 - call qword ptr [rax+10]
+kyoto_xanadu.exe+7D23F: 48 8B 4D A8              - mov rcx,[rbp-58]
+kyoto_xanadu.exe+7D243: 48 33 CC                 - xor rcx,rsp
+kyoto_xanadu.exe+7D246: E8 35 6E 67 00           - call kyoto_xanadu.exe+6F4080
+kyoto_xanadu.exe+7D24B: 48 81 C4 68 01 00 00     - add rsp,00000168
+kyoto_xanadu.exe+7D252: 5B                       - pop rbx
+kyoto_xanadu.exe+7D253: 5D                       - pop rbp
+kyoto_xanadu.exe+7D254: C3                       - ret 
+kyoto_xanadu.exe+7D255: CC                       - int 3 
+
+// ORIGINAL CODE - INJECTION POINT: kyoto_xanadu.exe+7D005 - Camera Control
+
+kyoto_xanadu.exe+7CFD6: F3 0F 59 F8                 - mulss xmm7,xmm0
+kyoto_xanadu.exe+7CFDA: 0F 28 C1                    - movaps xmm0,xmm1
+kyoto_xanadu.exe+7CFDD: 0F C6 C1 55                 - shufps xmm0,xmm1,55
+kyoto_xanadu.exe+7CFE1: F3 0F 58 F8                 - addss xmm7,xmm0
+kyoto_xanadu.exe+7CFE5: EB 12                       - jmp kyoto_xanadu.exe+7CFF9
+kyoto_xanadu.exe+7CFE7: F3 0F 10 54 24 70           - movss xmm2,[rsp+70]
+kyoto_xanadu.exe+7CFED: F3 0F 10 7C 24 6C           - movss xmm7,[rsp+6C]
+kyoto_xanadu.exe+7CFF3: F3 0F 10 4C 24 68           - movss xmm1,[rsp+68]
+kyoto_xanadu.exe+7CFF9: 41 8B 44 1E 28              - mov eax,[r14+rbx+28]
+kyoto_xanadu.exe+7CFFE: 48 8B 8B F0 04 00 00        - mov rcx,[rbx+000004F0]
+// ---------- INJECTING HERE ----------
+kyoto_xanadu.exe+7D005: 89 41 08                    - mov [rcx+08],eax
+kyoto_xanadu.exe+7D008: 41 8B 44 1E 2C              - mov eax,[r14+rbx+2C]
+kyoto_xanadu.exe+7D00D: 89 41 0C                    - mov [rcx+0C],eax
+kyoto_xanadu.exe+7D010: 41 8B 44 1E 30              - mov eax,[r14+rbx+30]
+kyoto_xanadu.exe+7D015: 89 41 10                    - mov [rcx+10],eax
+kyoto_xanadu.exe+7D018: 48 8B 83 F0 04 00 00        - mov rax,[rbx+000004F0]
+kyoto_xanadu.exe+7D01F: F3 0F 11 78 1C              - movss [rax+1C],xmm7
+kyoto_xanadu.exe+7D024: 0F 28 BC 24 30 01 00 00     - movaps xmm7,[rsp+00000130]
+kyoto_xanadu.exe+7D02C: F3 0F 11 48 18              - movss [rax+18],xmm1
+kyoto_xanadu.exe+7D031: F3 0F 11 50 20              - movss [rax+20],xmm2
+kyoto_xanadu.exe+7D036: 41 8B 84 1E A0 00 00 00     - mov eax,[r14+rbx+000000A0]
+kyoto_xanadu.exe+7D03E: 48 8B 8B F0 04 00 00        - mov rcx,[rbx+000004F0]
+kyoto_xanadu.exe+7D045: 89 41 28                    - mov [rcx+28],eax
+kyoto_xanadu.exe+7D048: 41 8B 84 1E A4 00 00 00     - mov eax,[r14+rbx+000000A4]
+kyoto_xanadu.exe+7D050: 89 41 2C                    - mov [rcx+2C],eax
+kyoto_xanadu.exe+7D053: 41 8B 84 1E A8 00 00 00     - mov eax,[r14+rbx+000000A8]
+kyoto_xanadu.exe+7D05B: 89 41 30                    - mov [rcx+30],eax
+// ---------- DONE INJECTING  ----------
+kyoto_xanadu.exe+7D05E: 48 8B 83 F0 04 00 00        - mov rax,[rbx+000004F0]
+kyoto_xanadu.exe+7D065: F3 44 0F 11 80 88 01 00 00  - movss [rax+00000188],xmm8
+kyoto_xanadu.exe+7D06E: 48 8B 8B F0 04 00 00        - mov rcx,[rbx+000004F0]
+kyoto_xanadu.exe+7D075: 8B 83 E8 04 00 00           - mov eax,[rbx+000004E8]
+kyoto_xanadu.exe+7D07B: 89 81 90 01 00 00           - mov [rcx+00000190],eax
+kyoto_xanadu.exe+7D081: 48 8B 8B F0 04 00 00        - mov rcx,[rbx+000004F0]
+kyoto_xanadu.exe+7D088: 8B 83 EC 04 00 00           - mov eax,[rbx+000004EC]
+kyoto_xanadu.exe+7D08E: 89 81 94 01 00 00           - mov [rcx+00000194],eax
+kyoto_xanadu.exe+7D094: 44 0F 28 84 24 20 01 00 00  - movaps xmm8,[rsp+00000120]
+kyoto_xanadu.exe+7D09D: 45 84 FF                    - test r15l,r15l
+
+// ORIGINAL CODE - INJECTION POINT: kyoto_xanadu.exe+7D0C8 - Disable the camera shake vector additions
+
+kyoto_xanadu.exe+7D081: 48 8B 8B F0 04 00 00        - mov rcx,[rbx+000004F0]
+kyoto_xanadu.exe+7D088: 8B 83 EC 04 00 00           - mov eax,[rbx+000004EC]
+kyoto_xanadu.exe+7D08E: 89 81 94 01 00 00           - mov [rcx+00000194],eax
+kyoto_xanadu.exe+7D094: 44 0F 28 84 24 20 01 00 00  - movaps xmm8,[rsp+00000120]
+kyoto_xanadu.exe+7D09D: 45 84 FF                    - test r15l,r15l
+kyoto_xanadu.exe+7D0A0: 4C 8B BC 24 50 01 00 00     - mov r15,[rsp+00000150]
+kyoto_xanadu.exe+7D0A8: 0F 28 B4 24 40 01 00 00     - movaps xmm6,[rsp+00000140]
+kyoto_xanadu.exe+7D0B0: 4C 8B B4 24 58 01 00 00     - mov r14,[rsp+00000158]
+kyoto_xanadu.exe+7D0B8: 48 8B BC 24 60 01 00 00     - mov rdi,[rsp+00000160]
+kyoto_xanadu.exe+7D0C0: 48 8B B4 24 98 01 00 00     - mov rsi,[rsp+00000198]
+// ---------- INJECTING HERE ----------
+kyoto_xanadu.exe+7D0C8: 0F 84 D1 00 00 00           - je kyoto_xanadu.exe+7D19F
+// ---------- DONE INJECTING  ----------
+kyoto_xanadu.exe+7D0CE: F3 44 0F 59 25 49 E0 9D 00  - mulss xmm12,[kyoto_xanadu.exe+A5B120]
+kyoto_xanadu.exe+7D0D7: 48 C7 44 24 20 00 00 00 00  - mov qword ptr [rsp+20],00000000
+kyoto_xanadu.exe+7D0E0: 41 0F 28 C4                 - movaps xmm0,xmm12
+kyoto_xanadu.exe+7D0E4: E8 F7 77 73 00              - call kyoto_xanadu.exe+7B48E0
+kyoto_xanadu.exe+7D0E9: F3 0F 11 44 24 28           - movss [rsp+28],xmm0
+kyoto_xanadu.exe+7D0EF: 41 0F 28 C4                 - movaps xmm0,xmm12
+kyoto_xanadu.exe+7D0F3: E8 F8 61 73 00              - call kyoto_xanadu.exe+7B32F0
+kyoto_xanadu.exe+7D0F8: 4C 8B 8B F0 04 00 00        - mov r9,[rbx+000004F0]
+kyoto_xanadu.exe+7D0FF: 48 8D 54 24 20              - lea rdx,[rsp+20]
+kyoto_xanadu.exe+7D104: 48 8D 4C 24 30              - lea rcx,[rsp+30]
+
+// ORIGINAL CODE - INJECTION POINT: kyoto_xanadu.exe+1AA92C
+
+kyoto_xanadu.exe+1AA8F8: 0F 85 89 06 00 00     - jne kyoto_xanadu.exe+1AAF87
+kyoto_xanadu.exe+1AA8FE: 48 63 85 80 01 00 00  - movsxd  rax,dword ptr [rbp+00000180]
+kyoto_xanadu.exe+1AA905: 48 8D 0C 40           - lea rcx,[rax+rax*2]
+kyoto_xanadu.exe+1AA909: 8B 84 8D C4 00 00 00  - mov eax,[rbp+rcx*4+000000C4]
+kyoto_xanadu.exe+1AA910: 83 F8 12              - cmp eax,12
+kyoto_xanadu.exe+1AA913: 0F 84 6E 06 00 00     - je kyoto_xanadu.exe+1AAF87
+kyoto_xanadu.exe+1AA919: 83 F8 0D              - cmp eax,0D
+kyoto_xanadu.exe+1AA91C: 0F 84 65 06 00 00     - je kyoto_xanadu.exe+1AAF87
+kyoto_xanadu.exe+1AA922: 48 8B 8D 10 07 00 00  - mov rcx,[rbp+00000710]
+kyoto_xanadu.exe+1AA929: 48 85 C9              - test rcx,rcx
+// ---------- INJECTING HERE ----------
+kyoto_xanadu.exe+1AA92C: 74 08                 - je kyoto_xanadu.exe+1AA936
+// ---------- DONE INJECTING  ----------
+kyoto_xanadu.exe+1AA92E: 49 8B D5              - mov rdx,r13
+kyoto_xanadu.exe+1AA931: E8 AA 15 FE FF        - call kyoto_xanadu.exe+18BEE0
+kyoto_xanadu.exe+1AA936: 48 8B B5 40 07 00 00  - mov rsi,[rbp+00000740]
+kyoto_xanadu.exe+1AA93D: 8B 85 48 07 00 00     - mov eax,[rbp+00000748]
+kyoto_xanadu.exe+1AA943: 4C 8D 34 C6           - lea r14,[rsi+rax*8]
+kyoto_xanadu.exe+1AA947: 49 3B F6              - cmp rsi,r14
+kyoto_xanadu.exe+1AA94A: 0F 84 05 01 00 00     - je kyoto_xanadu.exe+1AAA55
+kyoto_xanadu.exe+1AA950: 48 8B 1E              - mov rbx,[rsi]
+kyoto_xanadu.exe+1AA953: 48 83 7B 08 00        - cmp qword ptr [rbx+08],00
+kyoto_xanadu.exe+1AA958: 0F 84 EA 00 00 00     - je kyoto_xanadu.exe+1AAA48
+}
+</AssemblerScript>
+      <Hotkeys>
+        <Hotkey>
+          <Action>Toggle Activation</Action>
+          <Keys>
+            <Key>96</Key>
+          </Keys>
+          <ID>0</ID>
+          <ActivateSound>Activate</ActivateSound>
+          <DeactivateSound>Deactivate</DeactivateSound>
+        </Hotkey>
+      </Hotkeys>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>10</ID>
+          <Description>"Camera Coordinates"</Description>
+          <Options moHideChildren="1"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>100</ID>
+              <Description>"Camera X (Read only)"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>cameracoordinates</Address>
+              <Offsets>
+                <Offset>10</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>101</ID>
+              <Description>"Camera Y (Read only)"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>cameracoordinates</Address>
+              <Offsets>
+                <Offset>18</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>102</ID>
+              <Description>"Camera Z (Read only)"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>cameracoordinates</Address>
+              <Offsets>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>103</ID>
+              <Description>"Camera Target X"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>cameracoordinates</Address>
+              <Offsets>
+                <Offset>4C</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>104</ID>
+              <Description>"Camera Target Y"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>cameracoordinates</Address>
+              <Offsets>
+                <Offset>54</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>105</ID>
+              <Description>"Camera Target Z"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>cameracoordinates</Address>
+              <Offsets>
+                <Offset>50</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>106</ID>
+              <Description>"qw"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>cameracoordinates</Address>
+              <Offsets>
+                <Offset>100</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>107</ID>
+              <Description>"qx"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>cameracoordinates</Address>
+              <Offsets>
+                <Offset>104</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>108</ID>
+              <Description>"qy"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>cameracoordinates</Address>
+              <Offsets>
+                <Offset>108</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>109</ID>
+              <Description>"qz"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>cameracoordinates</Address>
+              <Offsets>
+                <Offset>10C</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>8</ID>
+      <Description>"Switch Side Scroll to 3D View (F8 Toggle)"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+aobscanmodule(side_scroll_mode_aob,kyoto_xanadu.exe,B1 01 48 8B 46 08) // should be unique
+registersymbol(side_scroll_mode_aob)
+
+side_scroll_mode_aob:
+  db B1 00
+
+[DISABLE]
+
+side_scroll_mode_aob:
+  db B1 01
+
+unregistersymbol(side_scroll_mode_aob)
+
+{
+// ORIGINAL CODE - INJECTION POINT: kyoto_xanadu.exe+1663F6
+
+kyoto_xanadu.exe+1663D3: 44 0F 45 E8                 - cmovne r13d,eax
+kyoto_xanadu.exe+1663D7: 48 8B 01                    - mov rax,[rcx]
+kyoto_xanadu.exe+1663DA: FF 50 20                    - call qword ptr [rax+20]
+kyoto_xanadu.exe+1663DD: 4C 8B F0                    - mov r14,rax
+kyoto_xanadu.exe+1663E0: 44 38 B8 E8 0B 00 00        - cmp [rax+00000BE8],r15l
+kyoto_xanadu.exe+1663E7: 75 0D                       - jne kyoto_xanadu.exe+1663F6
+kyoto_xanadu.exe+1663E9: 83 BE 54 03 00 00 03        - cmp dword ptr [rsi+00000354],03
+kyoto_xanadu.exe+1663F0: 74 04                       - je kyoto_xanadu.exe+1663F6
+kyoto_xanadu.exe+1663F2: 32 C9                       - xor cl,cl
+kyoto_xanadu.exe+1663F4: EB 02                       - jmp kyoto_xanadu.exe+1663F8
+// ---------- INJECTING HERE ----------
+kyoto_xanadu.exe+1663F6: B1 01                       - mov cl,01
+// ---------- DONE INJECTING  ----------
+kyoto_xanadu.exe+1663F8: 48 8B 46 08                 - mov rax,[rsi+08]
+kyoto_xanadu.exe+1663FC: 45 0F 57 C9                 - xorps xmm9,xmm9
+kyoto_xanadu.exe+166400: F3 44 0F 10 35 AB 52 8F 00  - movss xmm14,[kyoto_xanadu.exe+A5B6B4]
+kyoto_xanadu.exe+166409: 88 8E 58 03 00 00           - mov [rsi+00000358],cl
+kyoto_xanadu.exe+16640F: 80 F1 01                    - xor cl,01
+kyoto_xanadu.exe+166412: 88 88 9C 01 00 00           - mov [rax+0000019C],cl
+kyoto_xanadu.exe+166418: 44 38 BE 6C 02 00 00        - cmp [rsi+0000026C],r15l
+kyoto_xanadu.exe+16641F: 0F 85 AC 00 00 00           - jne kyoto_xanadu.exe+1664D1
+kyoto_xanadu.exe+166425: 44 0F 2F 8E 00 02 00 00     - comiss xmm9,[rsi+00000200]
+kyoto_xanadu.exe+16642D: F3 0F 10 0D 03 4B 8F 00     - movss xmm1,[kyoto_xanadu.exe+A5AF38]
+}
+</AssemblerScript>
+      <Hotkeys>
+        <Hotkey>
+          <Action>Toggle Activation</Action>
+          <Keys>
+            <Key>119</Key>
+          </Keys>
+          <ID>0</ID>
+        </Hotkey>
+      </Hotkeys>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>2</ID>
+      <Description>"Set Custom Camera Distance (F4 Toggle)"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(camdist_aob,kyoto_xanadu.exe,F3 0F 10 BB 70 01 00 00) // should be unique
+aobscanmodule(unlockcamdist1_aob,kyoto_xanadu.exe,F3 44 0F 11 83 70 01 00 00) // should be unique
+aobscanmodule(unlockcamdist2_aob,kyoto_xanadu.exe,F3 0F 11 41 08 48 83 C4) // should be unique
+alloc(newmem,$1000,camdist_aob)
+alloc(camdist,8)
+registersymbol(camdist_aob)
+registersymbol(camdist)
+registersymbol(camdist_set)
+registersymbol(camdist_max)
+registersymbol(unlockcamdist1_aob)
+registersymbol(unlockcamdist2_aob)
+
+label(code)
+label(writecode)
+label(camdist_set)
+label(camdist_step)
+label(camdist_min)
+label(camdist_max)
+label(return)
+label(writereturn)
+
+newmem:
+
+toggleon:
+  push rax
+  push rcx
+  push rdx
+  push r8
+  push r9
+  push r10
+  push r11
+  sub rsp,28
+  mov rcx,23 //VK_END
+  call GetAsyncKeyState
+  add rsp,28
+  pop r11
+  pop r10
+  pop r9
+  pop r8
+  pop rdx
+  pop rcx
+  test ax,8001
+  pop rax
+  jz toggleoff
+  movss xmm7,[rbx+00000170]
+  addss xmm7,[camdist_step]
+  minss xmm7,[camdist_max]
+  movss [camdist_set],xmm7
+  movss [rbx+00000170],xmm7
+  jmp code
+
+toggleoff:
+  push rax
+  push rcx
+  push rdx
+  push r8
+  push r9
+  push r10
+  push r11
+  sub rsp,28
+  mov rcx,24 //VK_HOME
+  call GetAsyncKeyState
+  add rsp,28
+  pop r11
+  pop r10
+  pop r9
+  pop r8
+  pop rdx
+  pop rcx
+  test ax,8001
+  pop rax
+  jz code
+  movss xmm7,[rbx+00000170]
+  subss xmm7,[camdist_step]
+  maxss xmm7,[camdist_min]
+  movss [camdist_set],xmm7
+  movss [rbx+00000170],xmm7
+
+code:
+  mov [camdist],rbx
+  movss xmm7,[rbx+00000170]
+  jmp return
+
+writecode:
+  cmp [camdist_set],(float)0
+  je @f
+  movss xmm8,[camdist_set]
+@@:
+  movss [rbx+00000170],xmm8
+  jmp writereturn
+
+camdist_set:
+  dd (float)0
+
+camdist_step:
+  dd (float)0.3
+
+camdist_min:
+  dd (float)0.1
+
+camdist_max:
+  dd (float)25
+
+camdist_aob:
+  jmp newmem
+  nop 3
+return:
+
+unlockcamdist1_aob:
+  jmp writecode
+  nop 4
+writereturn:
+
+unlockcamdist2_aob:
+  db 90 90 90 90 90
+
+[DISABLE]
+
+camdist_aob:
+  db F3 0F 10 BB 70 01 00 00
+
+unlockcamdist1_aob:
+  db F3 44 0F 11 83 70 01 00 00
+
+unlockcamdist2_aob:
+  db F3 0F 11 41 08
+
+unregistersymbol(unlockcamdist1_aob)
+unregistersymbol(unlockcamdist2_aob)
+unregistersymbol(camdist_aob)
+unregistersymbol(camdist)
+unregistersymbol(camdist_set)
+unregistersymbol(camdist_max)
+dealloc(camdist)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: kyoto_xanadu.exe+1645CD - Read FOV
+
+kyoto_xanadu.exe+1645A0: 41 83 CE 04              - or r14d,04
+kyoto_xanadu.exe+1645A4: E9 A6 00 00 00           - jmp kyoto_xanadu.exe+16464F
+kyoto_xanadu.exe+1645A9: 41 0F 28 CC              - movaps xmm1,xmm12
+kyoto_xanadu.exe+1645AD: 48 8B CE                 - mov rcx,rsi
+kyoto_xanadu.exe+1645B0: E8 AB 12 00 00           - call kyoto_xanadu.exe+165860
+kyoto_xanadu.exe+1645B5: F3 0F 10 8E D4 01 00 00  - movss xmm1,[rsi+000001D4]
+kyoto_xanadu.exe+1645BD: 0F 28 F0                 - movaps xmm6,xmm0
+kyoto_xanadu.exe+1645C0: 48 8B 5E 08              - mov rbx,[rsi+08]
+kyoto_xanadu.exe+1645C4: 41 0F 28 C0              - movaps xmm0,xmm8
+kyoto_xanadu.exe+1645C8: F3 41 0F 5E CF           - divss xmm1,xmm15
+// ---------- INJECTING HERE ----------
+kyoto_xanadu.exe+1645CD: F3 0F 10 BB 70 01 00 00  - movss xmm7,[rbx+00000170]
+// ---------- DONE INJECTING  ----------
+kyoto_xanadu.exe+1645D5: F3 41 0F 5D C8           - minss xmm1,xmm8
+kyoto_xanadu.exe+1645DA: F3 0F 5C C1              - subss xmm0,xmm1
+kyoto_xanadu.exe+1645DE: 41 0F 28 CC              - movaps xmm1,xmm12
+kyoto_xanadu.exe+1645E2: F3 41 0F 59 CF           - mulss xmm1,xmm15
+kyoto_xanadu.exe+1645E7: E8 F4 33 64 00           - call kyoto_xanadu.exe+7A79E0
+kyoto_xanadu.exe+1645EC: F3 0F 10 8E 28 03 00 00  - movss xmm1,[rsi+00000328]
+kyoto_xanadu.exe+1645F4: F3 44 0F 5C C0           - subss xmm8,xmm0
+kyoto_xanadu.exe+1645F9: F3 0F 59 8E 18 03 00 00  - mulss xmm1,[rsi+00000318]
+kyoto_xanadu.exe+164601: F3 0F 10 86 38 03 00 00  - movss xmm0,[rsi+00000338]
+kyoto_xanadu.exe+164609: F3 0F 5C C6              - subss xmm0,xmm6
+
+// ORIGINAL CODE - INJECTION POINT: kyoto_xanadu.exe+164635 - Unlock FOV1
+
+kyoto_xanadu.exe+1645F9: F3 0F 59 8E 18 03 00 00           - mulss xmm1,[rsi+00000318]
+kyoto_xanadu.exe+164601: F3 0F 10 86 38 03 00 00           - movss xmm0,[rsi+00000338]
+kyoto_xanadu.exe+164609: F3 0F 5C C6                       - subss xmm0,xmm6
+kyoto_xanadu.exe+16460D: F3 0F 59 C8                       - mulss xmm1,xmm0
+kyoto_xanadu.exe+164611: F3 0F 58 CE                       - addss xmm1,xmm6
+kyoto_xanadu.exe+164615: F3 0F 5C CF                       - subss xmm1,xmm7
+kyoto_xanadu.exe+164619: F3 44 0F 59 C1                    - mulss xmm8,xmm1
+kyoto_xanadu.exe+16461E: F3 44 0F 58 C7                    - addss xmm8,xmm7
+kyoto_xanadu.exe+164623: F3 44 0F 11 83 68 01 00 00        - movss [rbx+00000168],xmm8
+kyoto_xanadu.exe+16462C: F3 44 0F 11 83 6C 01 00 00        - movss [rbx+0000016C],xmm8
+// ---------- INJECTING HERE ----------
+kyoto_xanadu.exe+164635: F3 44 0F 11 83 70 01 00 00        - movss [rbx+00000170],xmm8
+// ---------- DONE INJECTING  ----------
+kyoto_xanadu.exe+16463E: 48 C7 83 74 01 00 00 00 00 00 00  - mov qword ptr [rbx+00000174],00000000
+kyoto_xanadu.exe+164649: 89 BB 7C 01 00 00                 - mov [rbx+0000017C],edi
+kyoto_xanadu.exe+16464F: 48 8B 46 08                       - mov rax,[rsi+08]
+kyoto_xanadu.exe+164653: F3 0F 10 80 90 01 00 00           - movss xmm0,[rax+00000190]
+kyoto_xanadu.exe+16465B: 0F 2F 80 8C 01 00 00              - comiss xmm0,[rax+0000018C]
+kyoto_xanadu.exe+164662: 73 06                             - jae kyoto_xanadu.exe+16466A
+kyoto_xanadu.exe+164664: 41 83 CE 08                       - or r14d,08
+kyoto_xanadu.exe+164668: EB 31                             - jmp kyoto_xanadu.exe+16469B
+kyoto_xanadu.exe+16466A: F3 0F 10 86 20 01 00 00           - movss xmm0,[rsi+00000120]
+kyoto_xanadu.exe+164672: F3 0F 11 80 80 01 00 00           - movss [rax+00000180],xmm0
+
+// ORIGINAL CODE - INJECTION POINT: kyoto_xanadu.exe+499CD - Unlock FOV2
+
+kyoto_xanadu.exe+499AE: CC              - int 3 
+kyoto_xanadu.exe+499AF: CC              - int 3 
+kyoto_xanadu.exe+499B0: 40 53           - push rbx
+kyoto_xanadu.exe+499B2: 48 83 EC 30     - sub rsp,30
+kyoto_xanadu.exe+499B6: F3 0F 10 41 10  - movss xmm0,[rcx+10]
+kyoto_xanadu.exe+499BB: 48 8B D9        - mov rbx,rcx
+kyoto_xanadu.exe+499BE: F3 0F 10 51 0C  - movss xmm2,[rcx+0C]
+kyoto_xanadu.exe+499C3: 0F 2F C2        - comiss xmm0,xmm2
+kyoto_xanadu.exe+499C6: 72 10           - jb kyoto_xanadu.exe+499D8
+kyoto_xanadu.exe+499C8: F3 0F 10 41 04  - movss xmm0,[rcx+04]
+// ---------- INJECTING HERE ----------
+kyoto_xanadu.exe+499CD: F3 0F 11 41 08  - movss [rcx+08],xmm0
+// ---------- DONE INJECTING  ----------
+kyoto_xanadu.exe+499D2: 48 83 C4 30     - add rsp,30
+kyoto_xanadu.exe+499D6: 5B              - pop rbx
+kyoto_xanadu.exe+499D7: C3              - ret 
+kyoto_xanadu.exe+499D8: 0F 29 74 24 20  - movaps [rsp+20],xmm6
+kyoto_xanadu.exe+499DD: F3 0F 58 C1     - addss xmm0,xmm1
+kyoto_xanadu.exe+499E1: 0F 28 F2        - movaps xmm6,xmm2
+kyoto_xanadu.exe+499E4: F3 0F 5D F0     - minss xmm6,xmm0
+kyoto_xanadu.exe+499E8: F3 0F 11 71 10  - movss [rcx+10],xmm6
+kyoto_xanadu.exe+499ED: 8B 49 14        - mov ecx,[rcx+14]
+kyoto_xanadu.exe+499F0: F3 0F 5E F2     - divss xmm6,xmm2
+}
+</AssemblerScript>
+      <Hotkeys>
+        <Hotkey>
+          <Action>Toggle Activation</Action>
+          <Keys>
+            <Key>115</Key>
+          </Keys>
+          <ID>0</ID>
+        </Hotkey>
+      </Hotkeys>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>21</ID>
+          <Description>"Home Key to Zoom In, End Key to Zoom Out"</Description>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>22</ID>
+          <Description>"Current Camera Distance (read-only)"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>camdist</Address>
+          <Offsets>
+            <Offset>170</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>23</ID>
+          <Description>"Custom Camera Distance"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>camdist_set</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>24</ID>
+          <Description>"Maximum Camera Distance"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>camdist_max</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>3</ID>
+      <Description>"Set Camera Min Z to Floor (Use Unlock Tilt and No Clip)"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+aobscanmodule(camera_pitch_sweep_in_aob,kyoto_xanadu.exe,77 38 0F 54 0D 75 46 8F 00) // should be unique
+registersymbol(camera_pitch_sweep_in_aob)
+
+camera_pitch_sweep_in_aob:
+  db EB 38
+
+[DISABLE]
+
+camera_pitch_sweep_in_aob:
+  db 77 38
+
+unregistersymbol(camera_pitch_sweep_in_aob)
+
+{
+// ORIGINAL CODE - INJECTION POINT: kyoto_xanadu.exe+169462
+
+kyoto_xanadu.exe+169432: F3 0F 5E C1              - divss xmm0,xmm1
+kyoto_xanadu.exe+169436: F3 41 0F 59 C1           - mulss xmm0,xmm9
+kyoto_xanadu.exe+16943B: 0F 57 05 CE 46 8F 00     - xorps xmm0,[kyoto_xanadu.exe+A5DB10]
+kyoto_xanadu.exe+169442: F3 0F 5D C6              - minss xmm0,xmm6
+kyoto_xanadu.exe+169446: F3 44 0F 5F C0           - maxss xmm8,xmm0
+kyoto_xanadu.exe+16944B: 41 0F 28 C0              - movaps xmm0,xmm8
+kyoto_xanadu.exe+16944F: E8 A8 F7 65 00           - call kyoto_xanadu.exe+7C8BFC
+kyoto_xanadu.exe+169454: F3 0F 10 15 FC 25 8F 00  - movss xmm2,[kyoto_xanadu.exe+A5BA58]
+kyoto_xanadu.exe+16945C: 0F 28 C8                 - movaps xmm1,xmm0
+kyoto_xanadu.exe+16945F: 0F 2F CA                 - comiss xmm1,xmm2
+// ---------- INJECTING HERE ----------
+kyoto_xanadu.exe+169462: 77 38                    - ja kyoto_xanadu.exe+16949C
+// ---------- DONE INJECTING  ----------
+kyoto_xanadu.exe+169464: 0F 54 0D 75 46 8F 00     - andps xmm1,[kyoto_xanadu.exe+A5DAE0]
+kyoto_xanadu.exe+16946B: F3 0F 5C F7              - subss xmm6,xmm7
+kyoto_xanadu.exe+16946F: 0F 54 15 6A 46 8F 00     - andps xmm2,[kyoto_xanadu.exe+A5DAE0]
+kyoto_xanadu.exe+169476: F3 0F 10 05 C2 1F 8F 00  - movss xmm0,[kyoto_xanadu.exe+A5B440]
+kyoto_xanadu.exe+16947E: F3 0F 5C CA              - subss xmm1,xmm2
+kyoto_xanadu.exe+169482: F3 0F 5E 0D 9E 1C 8F 00  - divss xmm1,[kyoto_xanadu.exe+A5B128]
+kyoto_xanadu.exe+16948A: F3 0F 5C C1              - subss xmm0,xmm1
+kyoto_xanadu.exe+16948E: F3 0F 59 C1              - mulss xmm0,xmm1
+kyoto_xanadu.exe+169492: F3 0F 59 C6              - mulss xmm0,xmm6
+kyoto_xanadu.exe+169496: F3 0F 58 C7              - addss xmm0,xmm7
+}</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>7</ID>
+      <Description>"Unlock Camera Tilt (Pitch)"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+aobscanmodule(tilt_limit_aob,kyoto_xanadu.exe,F3 41 0F 59 FE 0F 28 C7 E8 25) // should be unique
+alloc(newmem,$1000,tilt_limit_aob)
+
+label(code)
+label(return)
+registersymbol(tilt_limit_aob)
+registersymbol(tiltlimitfieldup)
+registersymbol(tiltlimitfielddown)
+
+newmem:
+
+code:
+  movss xmm7,[tiltlimitfielddown]
+  movss xmm6,[tiltlimitfieldup]
+  mulss xmm7,xmm14
+  jmp return
+
+tiltlimitfielddown:
+dd (float)-1.55
+
+tiltlimitfieldup:
+dd (float)1.55
+
+tilt_limit_aob:
+  jmp newmem
+return:
+
+[DISABLE]
+
+tilt_limit_aob:
+  db F3 41 0F 59 FE
+
+unregistersymbol(tilt_limit_aob)
+unregistersymbol(tiltlimitfieldup)
+unregistersymbol(tiltlimitfielddown)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: kyoto_xanadu.exe+1679AE
+
+kyoto_xanadu.exe+167978: 89 8E 10 01 00 00        - mov [rsi+00000110],ecx
+kyoto_xanadu.exe+16797E: 8B 48 04                 - mov ecx,[rax+04]
+kyoto_xanadu.exe+167981: 89 8E 14 01 00 00        - mov [rsi+00000114],ecx
+kyoto_xanadu.exe+167987: 8B 48 08                 - mov ecx,[rax+08]
+kyoto_xanadu.exe+16798A: 89 8E 18 01 00 00        - mov [rsi+00000118],ecx
+kyoto_xanadu.exe+167990: 8B 40 0C                 - mov eax,[rax+0C]
+kyoto_xanadu.exe+167993: 89 86 1C 01 00 00        - mov [rsi+0000011C],eax
+kyoto_xanadu.exe+167999: E9 7A FD FF FF           - jmp kyoto_xanadu.exe+167718
+kyoto_xanadu.exe+16799E: F3 0F 10 B6 68 01 00 00  - movss xmm6,[rsi+00000168]
+kyoto_xanadu.exe+1679A6: F3 0F 10 BE 64 01 00 00  - movss xmm7,[rsi+00000164]
+// ---------- INJECTING HERE ----------
+kyoto_xanadu.exe+1679AE: F3 41 0F 59 FE           - mulss xmm7,xmm14
+// ---------- DONE INJECTING  ----------
+kyoto_xanadu.exe+1679B3: 0F 28 C7                 - movaps xmm0,xmm7
+kyoto_xanadu.exe+1679B6: E8 25 CF 64 00           - call kyoto_xanadu.exe+7B48E0
+kyoto_xanadu.exe+1679BB: 44 0F 28 D0              - movaps xmm10,xmm0
+kyoto_xanadu.exe+1679BF: 0F 28 C7                 - movaps xmm0,xmm7
+kyoto_xanadu.exe+1679C2: E8 29 B9 64 00           - call kyoto_xanadu.exe+7B32F0
+kyoto_xanadu.exe+1679C7: F3 41 0F 59 F6           - mulss xmm6,xmm14
+kyoto_xanadu.exe+1679CC: 44 0F 28 D8              - movaps xmm11,xmm0
+kyoto_xanadu.exe+1679D0: 0F 28 C6                 - movaps xmm0,xmm6
+kyoto_xanadu.exe+1679D3: E8 08 CF 64 00           - call kyoto_xanadu.exe+7B48E0
+kyoto_xanadu.exe+1679D8: 0F 28 F8                 - movaps xmm7,xmm0
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>4</ID>
+      <Description>"No Clip (Characters)"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+aobscanmodule(noclip_aob,kyoto_xanadu.exe,72 53 F6 80 12 01 00 00 10) // should be unique
+registersymbol(noclip_aob)
+
+noclip_aob:
+  db EB 53
+
+[DISABLE]
+
+noclip_aob:
+  db 72 53
+
+unregistersymbol(noclip_aob)
+
+{
+// ORIGINAL CODE - INJECTION POINT: kyoto_xanadu.exe+F1264
+
+kyoto_xanadu.exe+F1241: 0F 2E C2                 - ucomiss xmm0,xmm2
+kyoto_xanadu.exe+F1244: 77 09                    - ja kyoto_xanadu.exe+F124F
+kyoto_xanadu.exe+F1246: 0F 57 DB                 - xorps xmm3,xmm3
+kyoto_xanadu.exe+F1249: F3 0F 51 DA              - sqrtss xmm3,xmm2
+kyoto_xanadu.exe+F124D: EB 0B                    - jmp kyoto_xanadu.exe+F125A
+kyoto_xanadu.exe+F124F: 0F 28 C2                 - movaps xmm0,xmm2
+kyoto_xanadu.exe+F1252: E8 6D AA 6D 00           - call kyoto_xanadu.exe+7CBCC4
+kyoto_xanadu.exe+F1257: 0F 28 D8                 - movaps xmm3,xmm0
+kyoto_xanadu.exe+F125A: 48 8B 05 87 C3 A8 00     - mov rax,[kyoto_xanadu.exe+B7D5E8]
+kyoto_xanadu.exe+F1261: 0F 2F FB                 - comiss xmm7,xmm3
+// ---------- INJECTING HERE ----------
+kyoto_xanadu.exe+F1264: 72 53                    - jb kyoto_xanadu.exe+F12B9
+// ---------- DONE INJECTING  ----------
+kyoto_xanadu.exe+F1266: F6 80 12 01 00 00 10     - test byte ptr [rax+00000112],10
+kyoto_xanadu.exe+F126D: 74 09                    - je kyoto_xanadu.exe+F1278
+kyoto_xanadu.exe+F126F: 44 89 AF 14 0D 00 00     - mov [rdi+00000D14],r13d
+kyoto_xanadu.exe+F1276: EB 77                    - jmp kyoto_xanadu.exe+F12EF
+kyoto_xanadu.exe+F1278: 41 0F 28 C7              - movaps xmm0,xmm15
+kyoto_xanadu.exe+F127C: F3 0F 59 05 7C A3 96 00  - mulss xmm0,[kyoto_xanadu.exe+A5B600]
+kyoto_xanadu.exe+F1284: F3 0F 10 8F 14 0D 00 00  - movss xmm1,[rdi+00000D14]
+kyoto_xanadu.exe+F128C: F3 0F 5C C8              - subss xmm1,xmm0
+kyoto_xanadu.exe+F1290: F3 0F 10 87 24 0D 00 00  - movss xmm0,[rdi+00000D24]
+kyoto_xanadu.exe+F1298: F3 0F 5F C8              - maxss xmm1,xmm0
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>5</ID>
+      <Description>"Force Pause Action (Enable first, F5 pause / F6 unpause)"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(freezemonitorinjectionpoint_aob,kyoto_xanadu.exe,F3 41 0F 59 B7 20 03 00 00) // should be unique
+aobscanmodule(freezeaction_aob1,kyoto_xanadu.exe,E8 D9 5B 16 00) // should be unique
+alloc(newmem,$1000,freezeaction_aob1)
+registersymbol(freezemonitorinjectionpoint_aob)
+registersymbol(freezeaction_aob1)
+registersymbol(freeze)
+
+label(toggleon)
+label(toggleoff)
+label(code)
+label(code1)
+label(freeze)
+label(return)
+label(return1)
+
+newmem:
+
+toggleon:
+  push rax
+  push rcx
+  push rdx
+  push r8
+  push r9
+  push r10
+  push r11
+  sub rsp,28
+  mov rcx,74 //VK_F5
+  call GetAsyncKeyState
+  add rsp,28
+  pop r11
+  pop r10
+  pop r9
+  pop r8
+  pop rdx
+  pop rcx
+  test ax,8001
+  pop rax
+  jz toggleoff
+  mov [freeze],#1
+  jmp code
+
+toggleoff:
+  push rax
+  push rcx
+  push rdx
+  push r8
+  push r9
+  push r10
+  push r11
+  sub rsp,28
+  mov rcx,75 //VK_F6
+  call GetAsyncKeyState
+  add rsp,28
+  pop r11
+  pop r10
+  pop r9
+  pop r8
+  pop rdx
+  pop rcx
+  test ax,8001
+  pop rax
+  jz code
+  mov [freeze],#0
+
+code:
+  mulss xmm6,[r15+00000320]
+  jmp return
+
+code1:
+  pushf
+  cmp [freeze],#0
+  je @f
+  popf
+  jmp return1
+@@:
+  popf
+  call kyoto_xanadu.exe+1A9540
+  jmp return1
+
+freeze:
+  dd #0
+
+freezemonitorinjectionpoint_aob:
+  jmp newmem
+  nop 4
+return:
+
+freezeaction_aob1:
+  jmp code1
+return1:
+
+[DISABLE]
+
+freezemonitorinjectionpoint_aob:
+db F3 41 0F 59 B7 20 03 00 00
+
+freezeaction_aob1:
+  db E8 D9 5B 16 00
+
+unregistersymbol(freezemonitorinjectionpoint_aob)
+unregistersymbol(freezeaction_aob1)
+unregistersymbol(freeze)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: kyoto_xanadu.exe+438E8 - Safe injection point to check keypresses
+
+kyoto_xanadu.exe+438BB: FF C0                       - inc eax
+kyoto_xanadu.exe+438BD: B9 F8 FF FF 7F              - mov ecx,7FFFFFF8
+kyoto_xanadu.exe+438C2: 3B C1                       - cmp eax,ecx
+kyoto_xanadu.exe+438C4: 0F 4F C1                    - cmovg eax,ecx
+kyoto_xanadu.exe+438C7: 89 44 BB 50                 - mov [rbx+rdi*4+50],eax
+kyoto_xanadu.exe+438CB: 0F 28 F7                    - movaps xmm6,xmm7
+kyoto_xanadu.exe+438CE: F3 41 0F 59 B7 80 03 00 00  - mulss xmm6,[r15+00000380]
+kyoto_xanadu.exe+438D7: 49 8D B7 B8 03 00 00        - lea rsi,[r15+000003B8]
+kyoto_xanadu.exe+438DE: F3 0F 11 3E                 - movss [rsi],xmm7
+kyoto_xanadu.exe+438E2: F3 44 0F 11 46 04           - movss [rsi+04],xmm8
+// ---------- INJECTING HERE ----------
+kyoto_xanadu.exe+438E8: F3 41 0F 59 B7 20 03 00 00  - mulss xmm6,[r15+00000320]
+// ---------- DONE INJECTING  ----------
+kyoto_xanadu.exe+438F1: F3 41 0F 59 B7 68 03 00 00  - mulss xmm6,[r15+00000368]
+kyoto_xanadu.exe+438FA: F3 41 0F 59 B7 50 03 00 00  - mulss xmm6,[r15+00000350]
+kyoto_xanadu.exe+43903: F3 0F 11 76 08              - movss [rsi+08],xmm6
+kyoto_xanadu.exe+43908: 45 38 AF A4 03 00 00        - cmp [r15+000003A4],r13l
+kyoto_xanadu.exe+4390F: 75 2B                       - jne kyoto_xanadu.exe+4393C
+kyoto_xanadu.exe+43911: 48 8B 1D D0 9C B3 00        - mov rbx,[kyoto_xanadu.exe+B7D5E8]
+kyoto_xanadu.exe+43918: 48 81 C3 E8 16 00 00        - add rbx,000016E8
+kyoto_xanadu.exe+4391F: BF 0B 00 00 00              - mov edi,0000000B
+kyoto_xanadu.exe+43924: 48 8B 0B                    - mov rcx,[rbx]
+kyoto_xanadu.exe+43927: 48 8B 01                    - mov rax,[rcx]
+
+// ORIGINAL CODE - INJECTION POINT: kyoto_xanadu.exe+43962 - Freeze action 1
+
+kyoto_xanadu.exe+4393A: EB 1C                       - jmp kyoto_xanadu.exe+43958
+kyoto_xanadu.exe+4393C: 48 8B 05 A5 9C B3 00        - mov rax,[kyoto_xanadu.exe+B7D5E8]
+kyoto_xanadu.exe+43943: 48 8B 88 30 17 00 00        - mov rcx,[rax+00001730]
+kyoto_xanadu.exe+4394A: 48 85 C9                    - test rcx,rcx
+kyoto_xanadu.exe+4394D: 74 09                       - je kyoto_xanadu.exe+43958
+kyoto_xanadu.exe+4394F: 48 8B 01                    - mov rax,[rcx]
+kyoto_xanadu.exe+43952: 0F 28 CE                    - movaps xmm1,xmm6
+kyoto_xanadu.exe+43955: FF 50 18                    - call qword ptr [rax+18]
+kyoto_xanadu.exe+43958: 48 8B D6                    - mov rdx,rsi
+kyoto_xanadu.exe+4395B: 48 8B 0D 36 9C B3 00        - mov rcx,[kyoto_xanadu.exe+B7D598]
+// ---------- INJECTING HERE ----------
+kyoto_xanadu.exe+43962: E8 D9 5B 16 00              - call kyoto_xanadu.exe+1A9540
+// ---------- DONE INJECTING  ----------
+kyoto_xanadu.exe+43967: 48 8B 05 2A 9C B3 00        - mov rax,[kyoto_xanadu.exe+B7D598]
+kyoto_xanadu.exe+4396E: 44 39 A8 80 1C 00 00        - cmp [rax+00001C80],r13d
+kyoto_xanadu.exe+43975: 75 66                       - jne kyoto_xanadu.exe+439DD
+kyoto_xanadu.exe+43977: 45 38 AF A4 03 00 00        - cmp [r15+000003A4],r13l
+kyoto_xanadu.exe+4397E: 75 49                       - jne kyoto_xanadu.exe+439C9
+kyoto_xanadu.exe+43980: F3 41 0F 10 87 68 03 00 00  - movss xmm0,[r15+00000368]
+kyoto_xanadu.exe+43989: F3 41 0F 59 87 20 03 00 00  - mulss xmm0,[r15+00000320]
+kyoto_xanadu.exe+43992: F3 41 0F 59 87 50 03 00 00  - mulss xmm0,[r15+00000350]
+kyoto_xanadu.exe+4399B: 0F 28 CF                    - movaps xmm1,xmm7
+kyoto_xanadu.exe+4399E: F3 0F 59 C8                 - mulss xmm1,xmm0
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>6</ID>
+      <Description>"Hide HUD / Dialogue / Interface (F7 Toggle)"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(showinterface_aob,kyoto_xanadu.exe,F3 0F 11 47 68 48 85) // should be unique
+alloc(newmem,$1000,showinterface_aob)
+
+label(code)
+label(return)
+
+newmem:
+  pxor xmm0,xmm0
+code:
+  movss [rdi+68],xmm0
+  jmp return
+
+showinterface_aob:
+  jmp newmem
+return:
+registersymbol(showinterface_aob)
+
+[DISABLE]
+
+showinterface_aob:
+  db F3 0F 11 47 68
+
+unregistersymbol(showinterface_aob)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: kyoto_xanadu.exe+4BBD67
+
+kyoto_xanadu.exe+4BBD34: 8B 87 0C 02 00 00        - mov eax,[rdi+0000020C]
+kyoto_xanadu.exe+4BBD3A: 89 47 58                 - mov [rdi+58],eax
+kyoto_xanadu.exe+4BBD3D: 8B 87 10 02 00 00        - mov eax,[rdi+00000210]
+kyoto_xanadu.exe+4BBD43: 89 47 5C                 - mov [rdi+5C],eax
+kyoto_xanadu.exe+4BBD46: 8B 87 14 02 00 00        - mov eax,[rdi+00000214]
+kyoto_xanadu.exe+4BBD4C: 89 47 60                 - mov [rdi+60],eax
+kyoto_xanadu.exe+4BBD4F: F3 0F 59 86 D4 00 00 00  - mulss xmm0,[rsi+000000D4]
+kyoto_xanadu.exe+4BBD57: 48 8B 4F 70              - mov rcx,[rdi+70]
+kyoto_xanadu.exe+4BBD5B: 8B 87 DC 00 00 00        - mov eax,[rdi+000000DC]
+kyoto_xanadu.exe+4BBD61: 89 87 E0 00 00 00        - mov [rdi+000000E0],eax
+// ---------- INJECTING HERE ----------
+kyoto_xanadu.exe+4BBD67: F3 0F 11 47 68           - movss [rdi+68],xmm0
+// ---------- DONE INJECTING  ----------
+kyoto_xanadu.exe+4BBD6C: 48 85 C9                 - test rcx,rcx
+kyoto_xanadu.exe+4BBD6F: 0F 84 F3 02 00 00        - je kyoto_xanadu.exe+4BC068
+kyoto_xanadu.exe+4BBD75: 8B 87 BC 00 00 00        - mov eax,[rdi+000000BC]
+kyoto_xanadu.exe+4BBD7B: 83 E0 0E                 - and eax,0E
+kyoto_xanadu.exe+4BBD7E: 3C 0E                    - cmp al,0E
+kyoto_xanadu.exe+4BBD80: 0F 85 D2 00 00 00        - jne kyoto_xanadu.exe+4BBE58
+kyoto_xanadu.exe+4BBD86: F3 0F 10 41 08           - movss xmm0,[rcx+08]
+kyoto_xanadu.exe+4BBD8B: F3 0F 11 85 D0 00 00 00  - movss [rbp+000000D0],xmm0
+kyoto_xanadu.exe+4BBD93: F3 0F 10 49 0C           - movss xmm1,[rcx+0C]
+kyoto_xanadu.exe+4BBD98: F3 0F 11 8D D4 00 00 00  - movss [rbp+000000D4],xmm1
+}
+</AssemblerScript>
+      <Hotkeys>
+        <Hotkey>
+          <Action>Toggle Activation</Action>
+          <Keys>
+            <Key>118</Key>
+          </Keys>
+          <ID>0</ID>
+        </Hotkey>
+      </Hotkeys>
+    </CheatEntry>
+  </CheatEntries>
+  <Comments>The movement algorithm is based on Cyber's CS4 script, adapted for Kyoto Xanadu's engine by me.  Much of the quaternion code is from AI; thank you to AI and all the code and programmers who ended up contributing to its training.
+</Comments>
+</CheatTable>

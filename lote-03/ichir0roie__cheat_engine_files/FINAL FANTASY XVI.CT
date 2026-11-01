@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>46</ID>
+      <Description>"skill no cooldown"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript Async="1">//https://fearlessrevolution.com/viewtopic.php?t=31326#google_vignette
+[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+aobscanmodule(someCoolDownChkAOB,$process,4* * * * C* * * * * 04 C* * * * * 08 7*)
+registersymbol(someCoolDownChkAOB)
+
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode_someCoolDownChkAOB)
+registersymbol(originalcode_someCoolDownChkAOB)
+label(exit)
+
+newmem: //this is allocated memory, you have read,write,execute access
+//place your code here
+lea r9,[rax+10]
+movss xmm0,[r9+4]
+maxss xmm0,[r9+8]
+movss [r9+4],xmm0
+
+originalcode_someCoolDownChkAOB:
+readmem(someCoolDownChkAOB,16)
+//lea r9,[rax+10]
+//vmovss xmm0,[r9+04]
+//vcomiss xmm0,[r9+08]
+
+exit:
+jmp returnhere
+
+///
+
+someCoolDownChkAOB: //"ffxvi.exe"+447BE8:
+jmp far newmem
+nop 2
+returnhere:
+
+
+
+
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+dealloc(newmem)
+someCoolDownChkAOB: //"ffxvi.exe"+447BE8:
+readmem(originalcode_someCoolDownChkAOB,16)
+//db 4C 8D 48 10 C4 C1 7A 10 41 04 C4 C1 78 2F 41 08
+//lea r9,[rax+10]
+//vmovss xmm0,[r9+04]
+//vcomiss xmm0,[r9+08]
+unregistersymbol(originalcode_someCoolDownChkAOB)
+
+/*
+ffxvi.exe+447B2F - 74 22                 - je ffxvi.exe+447B53
+ffxvi.exe+447B31 - 48 8B CF              - mov rcx,rdi
+ffxvi.exe+447B34 - E8 9BA10500           - call ffxvi.exe+4A1CD4
+ffxvi.exe+447B39 - 48 85 C0              - test rax,rax
+ffxvi.exe+447B3C - 74 15                 - je ffxvi.exe+447B53
+ffxvi.exe+447B3E - 48 8B CF              - mov rcx,rdi
+ffxvi.exe+447B41 - E8 8EA10500           - call ffxvi.exe+4A1CD4
+ffxvi.exe+447B46 - 48 8B C8              - mov rcx,rax
+ffxvi.exe+447B49 - 48 8D 54 24 48        - lea rdx,[rsp+48]
+ffxvi.exe+447B4E - E8 2DF50400           - call ffxvi.exe+497080
+ffxvi.exe+447B53 - C4C17B1044 24 20      - vmovsd xmm0,[r12+20]
+ffxvi.exe+447B5A - C4C17C100C 24         - vmovups ymm1,[r12]
+ffxvi.exe+447B60 - C57B1005 90 8D2001    - vmovsd xmm8,[ffxvi.exe+16508F8] { (300000.00) }
+ffxvi.exe+447B68 - C5FB1145 98           - vmovsd [rbp-68],xmm0
+ffxvi.exe+447B6D - C5F857C0              - vxorps xmm0,xmm0,xmm0
+ffxvi.exe+447B71 - C4E3F916C801          - vpextrq al,xmm1,01
+ffxvi.exe+447B77 - C4E1FB2AC0            - vcvtsi2sd xmm0,rax,rax
+ffxvi.exe+447B7C - 41 BF 01000000        - mov r15d,00000001 { 1 }
+ffxvi.exe+447B82 - C4C17B5EC0            - divsd xmm0,xmm0,xmm8
+ffxvi.exe+447B87 - C5FB5AD0              - vcvtsd2ss xmm2,xmm0,xmm0
+ffxvi.exe+447B8B - 44 84 BE 88B50100     - test [rsi+0001B588],r15b
+ffxvi.exe+447B92 - 0F85 FC000000         - jne ffxvi.exe+447C94
+ffxvi.exe+447B98 - 49 8B D5              - mov rdx,r13
+ffxvi.exe+447B9B - 45 8D 47 63           - lea r8d,[r15+63]
+ffxvi.exe+447B9F - 48 89 55 A0           - mov [rbp-60],rdx
+ffxvi.exe+447BA3 - 45 8D 4F 04           - lea r9d,[r15+04]
+ffxvi.exe+447BA7 - 48 8D 8E 60B50100     - lea rcx,[rsi+0001B560]
+ffxvi.exe+447BAE - 44 38 69 04           - cmp [rcx+04],r13b
+ffxvi.exe+447BB2 - 74 07                 - je ffxvi.exe+447BBB
+ffxvi.exe+447BB4 - 41 83 C0 9C           - add r8d,-64 { 156 }
+ffxvi.exe+447BB8 - 44 03 01              - add r8d,[rcx]
+ffxvi.exe+447BBB - 48 83 C1 08           - add rcx,08 { 8 }
+ffxvi.exe+447BBF - 4D 2B CF              - sub r9,r15
+ffxvi.exe+447BC2 - 75 EA                 - jne ffxvi.exe+447BAE
+ffxvi.exe+447BC4 - 41 8B C0              - mov eax,r8d
+ffxvi.exe+447BC7 - 4C 8D 86 40B50100     - lea r8,[rsi+0001B540]
+ffxvi.exe+447BCE - C5F857C0              - vxorps xmm0,xmm0,xmm0
+ffxvi.exe+447BD2 - C4E1FA2AC0            - vcvtsi2ss xmm0,rax,rax
+ffxvi.exe+447BD7 - C5FA5E0D BD 8E2001    - vdivss xmm1,xmm0,[ffxvi.exe+1650A9C] { (100.00) }
+ffxvi.exe+447BDF - 49 8B 00              - mov rax,[r8]
+ffxvi.exe+447BE2 - C5EA59D1              - vmulss xmm2,xmm2,xmm1
+ffxvi.exe+447BE6 - EB 38                 - jmp ffxvi.exe+447C20
+someCoolDownChkAOB- 4C 8D 48 10           - lea r9,[rax+10]
+ffxvi.exe+447BEC - C4C17A1041 04         - vmovss xmm0,[r9+04]
+ffxvi.exe+447BF2 - C4C1782F41 08         - vcomiss xmm0,[r9+08]
+ffxvi.exe+447BF8 - 73 23                 - jae ffxvi.exe+447C1D
+ffxvi.exe+447BFA - C5FA58C2              - vaddss xmm0,xmm0,xmm2
+ffxvi.exe+447BFE - C4C1782F41 08         - vcomiss xmm0,[r9+08]
+ffxvi.exe+447C04 - C4C17A1141 04         - vmovss [r9+04],xmm0
+ffxvi.exe+447C0A - 72 11                 - jb ffxvi.exe+447C1D
+ffxvi.exe+447C0C - 48 8D 4A 01           - lea rcx,[rdx+01]
+ffxvi.exe+447C10 - 48 89 4D A0           - mov [rbp-60],rcx
+ffxvi.exe+447C14 - 4C 89 4C D5 A8        - mov [rbp+rdx*8-58],r9
+ffxvi.exe+447C19 - 48 8B 55 A0           - mov rdx,[rbp-60]
+ffxvi.exe+447C1D - 48 8B 00              - mov rax,[rax]
+ffxvi.exe+447C20 - 49 3B C0              - cmp rax,r8
+ffxvi.exe+447C23 - 75 C3                 - jne someCoolDownChkAOB
+ffxvi.exe+447C25 - 4C 8D 55 A8           - lea r10,[rbp-58]
+ffxvi.exe+447C29 - 4D 8D 14 D2           - lea r10,[r10+rdx*8]
+ffxvi.exe+447C2D - 48 8D 45 A8           - lea rax,[rbp-58]
+ffxvi.exe+447C31 - 4C 8D 4D A8           - lea r9,[rbp-58]
+ffxvi.exe+447C35 - 49 3B C2              - cmp rax,r10
+ffxvi.exe+447C38 - 74 5A                 - je ffxvi.exe+447C94
+ffxvi.exe+447C3A - 49 8B 00              - mov rax,[r8]
+ffxvi.exe+447C3D - 49 3B C0              - cmp rax,r8
+ffxvi.exe+447C40 - 74 49                 - je ffxvi.exe+447C8B
+ffxvi.exe+447C42 - 48 8B 10              - mov rdx,[rax]
+ffxvi.exe+447C45 - 48 8D 48 10           - lea rcx,[rax+10]
+ffxvi.exe+447C49 - 49 3B 09              - cmp rcx,[r9]
+ffxvi.exe+447C4C - 74 0A                 - je ffxvi.exe+447C58
+ffxvi.exe+447C4E - 48 8B C2              - mov rax,rdx
+ffxvi.exe+447C51 - 49 3B D0              - cmp rdx,r8
+ffxvi.exe+447C54 - 75 EC                 - jne ffxvi.exe+447C42
+ffxvi.exe+447C56 - EB 33                 - jmp ffxvi.exe+447C8B
+ffxvi.exe+447C58 - 48 8B 48 08           - mov rcx,[rax+08]
+ffxvi.exe+447C5C - 48 89 4A 08           - mov [rdx+08],rcx
+ffxvi.exe+447C60 - 48 8B 50 08           - mov rdx,[rax+08]
+ffxvi.exe+447C64 - 48 8B 08              - mov rcx,[rax]
+ffxvi.exe+447C67 - 48 89 0A              - mov [rdx],rcx
+ffxvi.exe+447C6A - 48 8D 96 50B50100     - lea rdx,[rsi+0001B550]
+ffxvi.exe+447C71 - 48 89 40 08           - mov [rax+08],rax
+ffxvi.exe+447C75 - 48 89 10              - mov [rax],rdx
+ffxvi.exe+447C78 - 48 8B 4A 08           - mov rcx,[rdx+08]
+ffxvi.exe+447C7C - 48 89 48 08           - mov [rax+08],rcx
+ffxvi.exe+447C80 - 48 89 42 08           - mov [rdx+08],rax
+ffxvi.exe+447C84 - 48 8B 48 08           - mov rcx,[rax+08]
+ffxvi.exe+447C88 - 48 89 01              - mov [rcx],rax
+ffxvi.exe+447C8B - 49 83 C1 08           - add r9,08 { 8 }
+ffxvi.exe+447C8F - 4D 3B CA              - cmp r9,r10
+*/
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>48</ID>
+      <Description>"sub_item"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : FINAL FANTASY XVI
+  Version: 
+  Date   : 2024-09-27
+  Author : ichir
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,ffxvi.exe,2B CB 85 C9 0F 4E CE) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  //sub ecx,ebx
+  test ecx,ecx
+  cmovle ecx,esi
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop 2
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db 2B CB 85 C9 0F 4E CE
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ffxvi.exe+6A9041
+
+ffxvi.exe+6A9028: 48 83 C0 10           - add rax,10
+ffxvi.exe+6A902C: 48 3B CA              - cmp rcx,rdx
+ffxvi.exe+6A902F: 72 F0                 - jb ffxvi.exe+6A9021
+ffxvi.exe+6A9031: EB 18                 - jmp ffxvi.exe+6A904B
+ffxvi.exe+6A9033: 85 DB                 - test ebx,ebx
+ffxvi.exe+6A9035: 79 07                 - jns ffxvi.exe+6A903E
+ffxvi.exe+6A9037: 8B 58 04              - mov ebx,[rax+04]
+ffxvi.exe+6A903A: 8B CB                 - mov ecx,ebx
+ffxvi.exe+6A903C: EB 03                 - jmp ffxvi.exe+6A9041
+ffxvi.exe+6A903E: 8B 48 04              - mov ecx,[rax+04]
+// ---------- INJECTING HERE ----------
+ffxvi.exe+6A9041: 2B CB                 - sub ecx,ebx
+// ---------- DONE INJECTING  ----------
+ffxvi.exe+6A9043: 85 C9                 - test ecx,ecx
+ffxvi.exe+6A9045: 0F 4E CE              - cmovle ecx,esi
+ffxvi.exe+6A9048: 89 48 04              - mov [rax+04],ecx
+ffxvi.exe+6A904B: 48 8B 0D 8E AF 16 01  - mov rcx,[ffxvi.exe+1813FE0]
+ffxvi.exe+6A9052: 48 8D 05 BF BB F6 00  - lea rax,[ffxvi.exe+1614C18]
+ffxvi.exe+6A9059: F7 DB                 - neg ebx
+ffxvi.exe+6A905B: 48 89 44 24 20        - mov [rsp+20],rax
+ffxvi.exe+6A9060: 48 8D 54 24 20        - lea rdx,[rsp+20]
+ffxvi.exe+6A9065: 89 5C 24 2C           - mov [rsp+2C],ebx
+ffxvi.exe+6A9069: 89 7C 24 28           - mov [rsp+28],edi
+}
+</AssemblerScript>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

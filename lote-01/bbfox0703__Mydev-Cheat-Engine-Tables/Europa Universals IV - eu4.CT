@@ -1,0 +1,692 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="42">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>24</ID>
+      <Description>"Enable"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+
+if _eu4_customFloat == nil then
+
+registerCustomTypeAutoAssembler([[
+alloc(TypeName,256)
+alloc(ByteSize,8)
+alloc(ConvertRoutine,1024)
+alloc(ConvertBackRoutine,1024)
+alloc(UsesFloat,1)
+
+TypeName:
+db 'EU4 Float',0
+
+ByteSize:
+dd 4
+
+UsesFloat:
+db 1
+
+ConvertRoutine:
+//at this point ecx contains the address where the bytes are stored
+[64-bit]
+xor rax,rax
+
+mov eax, dword ptr [rcx]
+cvtsi2ss xmm15, eax
+mov eax, (float)1000
+movd xmm14, eax
+vdivss xmm15, xmm15, xmm14
+//vcvtss2si eax, xmm15
+movd eax, xmm15
+
+ret
+[/64-bit]
+ConvertBackRoutine:
+//at this point edx contains the address to write the value to
+//and ecx contains the value
+[64-bit]
+push rax
+mov  eax, ecx
+movd xmm15, eax
+//cvtsi2ss xmm15, eax
+mov eax, (float)1000
+movd xmm14, eax
+vmulss xmm15, xmm15, xmm14
+vcvtss2si eax, xmm15
+//movd eax, xmm15
+
+mov dword ptr [rdx], eax
+pop rax
+ret
+[/64-bit]
+]])
+
+_eu4_customFloat = true
+end
+
+{$asm}
+
+[DISABLE]
+
+
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>0</ID>
+          <Description>"[scripts]"</Description>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : eu4.exe
+  Version: 
+  Date   : 2023-01-18
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_PID,eu4.exe,80 B9 5E 1E 00 00 07 75 17 80 B9 ?? 1E 00 00 00 74 ?? 48 8B 81 ?? 1E 00 00) // should be unique
+alloc(newmem,$1000,INJECT_GET_PID)
+
+label(code)
+label(return)
+label(i_pid)
+label(i_pid_addr)
+
+newmem:
+  push r15
+  mov r15d, [rcx+00001E5C]
+  mov [i_pid], r15d
+  lea r15, [rcx+00001E5C]
+  mov [i_pid_addr], r15
+  pop r15
+code:
+  cmp byte ptr [rcx+00001E5E],07
+  jmp return
+align 10 cc
+  i_pid:
+  dd 0
+  i_pid_addr:
+  dq 0
+
+INJECT_GET_PID:
+  jmp newmem
+  nop 2
+return:
+registersymbol(INJECT_GET_PID)
+registersymbol(i_pid)
+registersymbol(i_pid_addr)
+[DISABLE]
+
+INJECT_GET_PID:
+  db 80 B9 5E 1E 00 00 07
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: eu4.exe+706D00
+
+eu4.exe+706CF6: CC                    - int 3 
+eu4.exe+706CF7: CC                    - int 3 
+eu4.exe+706CF8: CC                    - int 3 
+eu4.exe+706CF9: CC                    - int 3 
+eu4.exe+706CFA: CC                    - int 3 
+eu4.exe+706CFB: CC                    - int 3 
+eu4.exe+706CFC: CC                    - int 3 
+eu4.exe+706CFD: CC                    - int 3 
+eu4.exe+706CFE: CC                    - int 3 
+eu4.exe+706CFF: CC                    - int 3 
+// ---------- INJECTING HERE ----------
+eu4.exe+706D00: 80 B9 5E 1E 00 00 07  - cmp byte ptr [rcx+00001E5E],07
+// ---------- DONE INJECTING  ----------
+eu4.exe+706D07: 75 17                 - jne eu4.exe+706D20
+eu4.exe+706D09: 80 B9 67 1E 00 00 00  - cmp byte ptr [rcx+00001E67],00
+eu4.exe+706D10: 74 0E                 - je eu4.exe+706D20
+eu4.exe+706D12: 48 8B 81 60 1E 00 00  - mov rax,[rcx+00001E60]
+eu4.exe+706D19: 48 89 02              - mov [rdx],rax
+eu4.exe+706D1C: 48 8B C2              - mov rax,rdx
+eu4.exe+706D1F: C3                    - ret 
+eu4.exe+706D20: 48 8B 81 58 1E 00 00  - mov rax,[rcx+00001E58]
+eu4.exe+706D27: 48 89 02              - mov [rdx],rax
+eu4.exe+706D2A: 48 8B C2              - mov rax,rdx
+eu4.exe+706D2D - C3                    - ret
+eu4.exe+706D2E - CC                    - int 3
+eu4.exe+706D2F - CC                    - int 3
+eu4.exe+706D30 - 40 57                 - push rdi
+eu4.exe+706D32 - 48 83 EC 20           - sub rsp,20
+eu4.exe+706D36 - 48 89 91 581E0000     - mov [rcx+00001E58],rdx
+eu4.exe+706D3D - 48 8B F9              - mov rdi,rcx
+eu4.exe+706D40 - 80 B9 5F1E0000 00     - cmp byte ptr [rcx+00001E5F],00
+eu4.exe+706D47 - 0F84 D9000000         - je eu4.exe+706E26
+eu4.exe+706D4D - 48 8B 05 4CEECC01     - mov rax,[eu4.exe+23D5BA0]
+eu4.exe+706D54 - 48 C1 EA 20           - shr rdx,20
+eu4.exe+706D58 - 48 89 5C 24 30        - mov [rsp+30],rbx
+eu4.exe+706D5D - 48 0FBF DA            - movsx rbx,dx
+eu4.exe+706D61 - 48 8B 90 18010000     - mov rdx,[rax+00000118]
+eu4.exe+706D68 - 48 8B 1C DA           - mov rbx,[rdx+rbx*8]
+eu4.exe+706D6C - 48 8B 9B 100D0000     - mov rbx,[rbx+00000D10]
+eu4.exe+706D73 - 48 85 DB              - test rbx,rbx
+eu4.exe+706D76 - 0F84 9F000000         - je eu4.exe+706E1B
+eu4.exe+706D7C - 48 89 74 24 38        - mov [rsp+38],rsi
+eu4.exe+706D81 - 48 8B 8F 98210000     - mov rcx,[rdi+00002198]
+eu4.exe+706D88 - 48 8B 33              - mov rsi,[rbx]
+eu4.exe+706D8B - 48 8B 5B 10           - mov rbx,[rbx+10]
+eu4.exe+706D8F - 48 85 C9              - test rcx,rcx
+
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>1</ID>
+              <Description>"uid"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>808080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_pid</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>2</ID>
+              <Description>"Addr."</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>808080</Color>
+              <VariableType>8 Bytes</VariableType>
+              <Address>i_pid_addr</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>18</ID>
+              <Description>"decat grow up when spend"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{ Game   : eu4.exe
+  Version: 
+  Date   : 2023-01-18
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_ADD_DUCAT,eu4.exe,01 87 A8 0B 00 00) // should be unique
+alloc(newmem,$1000,INJECT_ADD_DUCAT)
+
+label(code)
+label(return)
+
+newmem:
+  pushfq
+  push r15
+
+  mov r15d, [rdi+24]
+  cmp r15d, [i_pid]
+
+  jne pre_code
+
+  //abs()
+  mov r15d, eax
+  neg eax
+  cmovl eax, r15d
+  //
+
+  mov [rsi], eax
+
+pre_code:
+  pop r15
+  popfq
+
+code:
+  add [rdi+00000BA8],eax
+  jmp return
+
+INJECT_ADD_DUCAT:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT_ADD_DUCAT)
+
+[DISABLE]
+
+INJECT_ADD_DUCAT:
+  db 01 87 A8 0B 00 00
+
+unregistersymbol(INJECT_ADD_DUCAT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: eu4.exe+3378F1
+
+eu4.exe+3378C2: 48 89 44 24 58                 - mov [rsp+58],rax
+eu4.exe+3378C7: 89 54 24 20                    - mov [rsp+20],edx
+eu4.exe+3378CB: 4C 8D 4C 24 58                 - lea r9,[rsp+58]
+eu4.exe+3378D0: 4C 8D 05 E9 CF 7A 01           - lea r8,[eu4.exe+1AE48C0]
+eu4.exe+3378D7: BA C9 58 00 00                 - mov edx,000058C9
+eu4.exe+3378DC: 48 8D 0D FD 8D 7A 01           - lea rcx,[eu4.exe+1AE06E0]
+eu4.exe+3378E3: E8 38 05 FB 00                 - call eu4.exe+12E7E20
+eu4.exe+3378E8: 90                             - nop 
+eu4.exe+3378E9: 88 1D 88 B5 D7 01              - mov [eu4.exe+20B2E77],bl
+eu4.exe+3378EF: 8B 06                          - mov eax,[rsi]
+// ---------- INJECTING HERE ----------
+eu4.exe+3378F1: 01 87 A8 0B 00 00              - add [rdi+00000BA8],eax
+// ---------- DONE INJECTING  ----------
+eu4.exe+3378F7: 8B 87 A8 0B 00 00              - mov eax,[rdi+00000BA8]
+eu4.exe+3378FD: 3D 00 CA 9A 3B                 - cmp eax,3B9ACA00
+eu4.exe+337902: 7E 0C                          - jle eu4.exe+337910
+eu4.exe+337904: C7 87 A8 0B 00 00 00 CA 9A 3B  - mov [rdi+00000BA8],3B9ACA00
+eu4.exe+33790E: EB 11                          - jmp eu4.exe+337921
+eu4.exe+337910: 3D 00 36 65 C4                 - cmp eax,C4653600
+eu4.exe+337915: 7D 0A                          - jnl eu4.exe+337921
+eu4.exe+337917: C7 87 A8 0B 00 00 00 36 65 C4  - mov [rdi+00000BA8],C4653600
+eu4.exe+337921: 48 8B 15 B0 07 0A 02           - mov rdx,[eu4.exe+23D80D8]
+eu4.exe+337928: 80 BA 9C 74 00 00 00           - cmp byte ptr [rdx+0000749C],00
+}
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>3</ID>
+              <Description>"Get info."</Description>
+              <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{ Game   : eu4.exe
+  Version: 
+  Date   : 2023-01-18
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_INFO,eu4.exe,4D 8D BE 60 02 00 00) // should be unique
+alloc(newmem,$1000,INJECT_GET_INFO)
+
+label(code)
+label(return)
+label(i_base_ducat_addr)
+
+newmem:
+  mov r15d, [r14+24]
+  cmp r15d, [i_pid]
+  jne code
+  mov [i_base_ducat_addr], r14
+
+
+code:
+  lea r15,[r14+00000260]
+  jmp return
+align 10 cc
+  i_base_ducat_addr:
+  dq 0
+
+INJECT_GET_INFO:
+  jmp newmem
+  nop 2
+return:
+registersymbol(INJECT_GET_INFO)
+registersymbol(i_base_ducat_addr)
+[DISABLE]
+
+INJECT_GET_INFO:
+  db 4D 8D BE 60 02 00 00
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: eu4.exe+12587BF
+eu4.exe+125876C - 48 C1 F8 03           - sar rax,03
+eu4.exe+1258770 - 4C 63 C8              - movsxd  r9,eax
+eu4.exe+1258773 - 49 8B D4              - mov rdx,r12
+eu4.exe+1258776 - 85 C0                 - test eax,eax
+eu4.exe+1258778 - 7E 21                 - jle eu4.exe+125879B
+eu4.exe+125877A - 4C 8B 53 20           - mov r10,[rbx+20]
+eu4.exe+125877E - 66 90                 - nop 2
+eu4.exe+1258780 - 49 8B 04 D2           - mov rax,[r10+rdx*8]
+eu4.exe+1258784 - 48 FF C2              - inc rdx
+eu4.exe+1258787 - 41 8D 48 01           - lea ecx,[r8+01]
+eu4.exe+125878B - 80 78 18 00           - cmp byte ptr [rax+18],00
+eu4.exe+125878F - 41 0F45 C8            - cmovne ecx,r8d
+eu4.exe+1258793 - 44 8B C1              - mov r8d,ecx
+eu4.exe+1258796 - 49 3B D1              - cmp rdx,r9
+eu4.exe+1258799: 7C E5                 - jl eu4.exe+1258780
+eu4.exe+125879B: 44 89 86 B4 05 00 00  - mov [rsi+000005B4],r8d
+eu4.exe+12587A2: 4C 89 64 24 50        - mov [rsp+50],r12
+eu4.exe+12587A7: 4C 89 64 24 58        - mov [rsp+58],r12
+eu4.exe+12587AC: 45 33 C0              - xor r8d,r8d
+eu4.exe+12587AF: 33 D2                 - xor edx,edx
+eu4.exe+12587B1: 48 8D 4C 24 40        - lea rcx,[rsp+40]
+eu4.exe+12587B6: E8 C5 AD E6 FE        - call eu4.exe+C3580
+eu4.exe+12587BB: 90                    - nop 
+eu4.exe+12587BC: 41 8B FC              - mov edi,r12d
+// ---------- INJECTING HERE ----------
+eu4.exe+12587BF: 4D 8D BE 60 02 00 00  - lea r15,[r14+00000260]
+// ---------- DONE INJECTING  ----------
+eu4.exe+12587C6: 41 8B 1F              - mov ebx,[r15]
+eu4.exe+12587C9: 85 DB                 - test ebx,ebx
+eu4.exe+12587CB: 7E 30                 - jle eu4.exe+12587FD
+eu4.exe+12587CD: 8B D7                 - mov edx,edi
+eu4.exe+12587CF: 49 8B CE              - mov rcx,r14
+eu4.exe+12587D2: E8 59 74 12 FF        - call eu4.exe+37FC30
+eu4.exe+12587D7: 3B D8                 - cmp ebx,eax
+eu4.exe+12587D9: 7D 22                 - jnl eu4.exe+12587FD
+eu4.exe+12587DB: 4C 89 64 24 30        - mov [rsp+30],r12
+eu4.exe+12587E0: 4C 89 64 24 38        - mov [rsp+38],r12
+eu4.exe+12587E5 - 45 33 C0              - xor r8d,r8d
+eu4.exe+12587E8 - 33 D2                 - xor edx,edx
+eu4.exe+12587EA - 48 8D 4C 24 20        - lea rcx,[rsp+20]
+eu4.exe+12587EF - E8 8CADE6FE           - call eu4.exe+C3580
+eu4.exe+12587F4 - 48 8D 15 995F8700     - lea rdx,[eu4.exe+1ACE794]
+eu4.exe+12587FB - EB 3C                 - jmp eu4.exe+1258839
+eu4.exe+12587FD - 8B D7                 - mov edx,edi
+eu4.exe+12587FF - 49 8B CE              - mov rcx,r14
+eu4.exe+1258802 - E8 297412FF           - call eu4.exe+37FC30
+eu4.exe+1258807 - 4C 89 64 24 30        - mov [rsp+30],r12
+eu4.exe+125880C - 4C 89 64 24 38        - mov [rsp+38],r12
+eu4.exe+1258811 - 45 33 C0              - xor r8d,r8d
+eu4.exe+1258814 - 33 D2                 - xor edx,edx
+eu4.exe+1258816 - 48 8D 4C 24 20        - lea rcx,[rsp+20]
+eu4.exe+125881B - 3B D8                 - cmp ebx,eax
+eu4.exe+125881D - 75 0E                 - jne eu4.exe+125882D
+eu4.exe+125881F - E8 5CADE6FE           - call eu4.exe+C3580
+eu4.exe+1258824 - 48 8D 15 AD368700     - lea rdx,[eu4.exe+1ACBED8]
+eu4.exe+125882B - EB 0C                 - jmp eu4.exe+1258839
+eu4.exe+125882D - E8 4EADE6FE           - call eu4.exe+C3580
+eu4.exe+1258832 - 48 8D 15 9BAB8E00     - lea rdx,[eu4.exe+1B433D4]
+eu4.exe+1258839 - 41 B8 02000000        - mov r8d,00000002
+
+}
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>19</ID>
+                  <Description>"Data"</Description>
+                  <GroupHeader>1</GroupHeader>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>4</ID>
+                      <Description>"ducat (國庫)"</Description>
+                      <Options moDeactivateChildrenAsWell="1"/>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FF8080</Color>
+                      <VariableType>Custom</VariableType>
+                      <CustomType>EU4 Float</CustomType>
+                      <Address>i_base_ducat_addr</Address>
+                      <Offsets>
+                        <Offset>BA8</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>5</ID>
+                      <Description>"Manpower (人力)"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FF8080</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>i_base_ducat_addr</Address>
+                      <Offsets>
+                        <Offset>DB0</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>6</ID>
+                      <Description>"Max manpower (最大人力值)"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FF8080</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>i_base_ducat_addr</Address>
+                      <Offsets>
+                        <Offset>DB4</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>7</ID>
+                      <Description>"Sailors (水手)"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FF8080</Color>
+                      <VariableType>Custom</VariableType>
+                      <CustomType>EU4 Float</CustomType>
+                      <Address>i_base_ducat_addr</Address>
+                      <Offsets>
+                        <Offset>DB8</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>8</ID>
+                      <Description>"Max sailors (最大水手數)"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FF8080</Color>
+                      <VariableType>Custom</VariableType>
+                      <CustomType>EU4 Float</CustomType>
+                      <Address>i_base_ducat_addr</Address>
+                      <Offsets>
+                        <Offset>DBC</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>9</ID>
+                      <Description>"Stability (穩定度)"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FF8080</Color>
+                      <VariableType>Custom</VariableType>
+                      <CustomType>EU4 Float</CustomType>
+                      <Address>i_base_ducat_addr</Address>
+                      <Offsets>
+                        <Offset>BD0</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>10</ID>
+                      <Description>"Prestige (聲望)"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FF8080</Color>
+                      <VariableType>Custom</VariableType>
+                      <CustomType>EU4 Float</CustomType>
+                      <Address>i_base_ducat_addr</Address>
+                      <Offsets>
+                        <Offset>CF0</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>11</ID>
+                      <Description>"Administrative power (行政點數)"</Description>
+                      <DropDownList DescriptionOnly="1" DisplayValueAsItem="1">1000:1000
+2000:2000
+</DropDownList>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FF8080</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>i_base_ducat_addr</Address>
+                      <Offsets>
+                        <Offset>260</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>12</ID>
+                      <Description>"Diplomatic power (外交點數)"</Description>
+                      <DropDownList DescriptionOnly="1" DisplayValueAsItem="1">1000:1000
+2000:2000
+</DropDownList>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FF8080</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>i_base_ducat_addr</Address>
+                      <Offsets>
+                        <Offset>264</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>13</ID>
+                      <Description>"Military power (軍事點數)"</Description>
+                      <DropDownList DescriptionOnly="1" DisplayValueAsItem="1">1000:1000
+2000:2000
+</DropDownList>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FF8080</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>i_base_ducat_addr</Address>
+                      <Offsets>
+                        <Offset>268</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>14</ID>
+                      <Description>"Army tradition (陸軍傳統)"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FF8080</Color>
+                      <VariableType>Custom</VariableType>
+                      <CustomType>EU4 Float</CustomType>
+                      <Address>i_base_ducat_addr</Address>
+                      <Offsets>
+                        <Offset>E38</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>15</ID>
+                      <Description>"Navy tradition (海軍傳統)"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FF8080</Color>
+                      <VariableType>Custom</VariableType>
+                      <CustomType>EU4 Float</CustomType>
+                      <Address>i_base_ducat_addr</Address>
+                      <Offsets>
+                        <Offset>E3C</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>16</ID>
+                      <Description>"Mercantilism (重商主義)"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FF8080</Color>
+                      <VariableType>Custom</VariableType>
+                      <CustomType>EU4 Float</CustomType>
+                      <Address>i_base_ducat_addr</Address>
+                      <Offsets>
+                        <Offset>1090</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>17</ID>
+                      <Description>"Legitimacy"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FF8080</Color>
+                      <VariableType>Custom</VariableType>
+                      <CustomType>EU4 Float</CustomType>
+                      <Address>i_base_ducat_addr</Address>
+                      <Offsets>
+                        <Offset>1088</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>23</ID>
+          <Description>"Enable achievements"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : eu4.exe
+  Version: 
+  Date   : 2023-01-19
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+//38 5E 01 74 ?? 38 5F 14 74 ?? 38 5E 02
+//38 ?? 01 74 ?? 38 ?? 14 74 ?? 38 ?? 02 74 ?? 45 ?? ?? 75
+//38 5E 01 74 21 38 5F 14 74 1C 38 5E 02 74 17 45 84 C9 75 05
+aobscanmodule(INJECT_BYPASS_ACHI_CHK,eu4.exe,38 ?? 01 74 ?? 38 ?? 14 74 ?? 38 ?? 02 74 ?? 45 ?? ?? 75) // should be unique
+alloc(newmem,$1000,INJECT_BYPASS_ACHI_CHK)
+
+alloc(INJECT_BYPASS_ACHI_CHKo,5)
+
+label(code)
+label(return)
+
+INJECT_BYPASS_ACHI_CHKo:
+  readmem(INJECT_BYPASS_ACHI_CHK, 5)
+
+newmem:
+
+  jmp INJECT_BYPASS_ACHI_CHK+1E
+
+code:
+  //cmp [rsi+01],bl
+  //reassemble(INJECT_BYPASS_ACHI_CHK+3)
+
+  //je eu4.exe+C4A94
+  jmp return
+
+INJECT_BYPASS_ACHI_CHK:
+  jmp newmem
+return:
+registersymbol(INJECT_BYPASS_ACHI_CHK)
+registersymbol(INJECT_BYPASS_ACHI_CHKo)
+
+[DISABLE]
+
+INJECT_BYPASS_ACHI_CHK:
+  //db 38 5E 01 74 21
+  readmem(INJECT_BYPASS_ACHI_CHKo, 5)
+
+unregistersymbol(INJECT_BYPASS_ACHI_CHK)
+unregistersymbol(INJECT_BYPASS_ACHI_CHKo)
+dealloc(newmem)
+dealloc(INJECT_BYPASS_ACHI_CHKo)
+
+{
+// ORIGINAL CODE - INJECTION POINT: eu4.exe+C4A6E
+
+eu4.exe+C4A14 - 33 C0                 - xor eax,eax
+eu4.exe+C4A16 - 48 89 85 A8000000     - mov [rbp+000000A8],rax
+eu4.exe+C4A1D - 66 C7 85 A8000000 2D2D - mov word ptr [rbp+000000A8],2D2D
+eu4.exe+C4A26 - C7 85 AA000000 2D000000 - mov [rbp+000000AA],0000002D
+eu4.exe+C4A30 - 66 89 85 AE000000     - mov [rbp+000000AE],ax
+eu4.exe+C4A37 - 48 8B 89 80000000     - mov rcx,[rcx+00000080]
+eu4.exe+C4A3E - 48 8B D1              - mov rdx,rcx
+eu4.exe+C4A41 - 48 C1 EA 20           - shr rdx,20
+eu4.exe+C4A45 - 48 8B 85 A8000000     - mov rax,[rbp+000000A8]
+eu4.exe+C4A4C - 48 C1 E8 20           - shr rax,20
+eu4.exe+C4A50: 66 3B D0     - cmp dx,ax
+eu4.exe+C4A53: 74 16        - je eu4.exe+C4A6B
+eu4.exe+C4A55: 48 8B 47 0C  - mov rax,[rdi+0C]
+eu4.exe+C4A59: 48 C1 E8 20  - shr rax,20
+eu4.exe+C4A5D: 48 C1 E9 20  - shr rcx,20
+eu4.exe+C4A61: 66 3B C1     - cmp ax,cx
+eu4.exe+C4A64: 74 05        - je eu4.exe+C4A6B
+eu4.exe+C4A66: 45 32 F6     - xor r14b,r14l
+eu4.exe+C4A69: EB 03        - jmp eu4.exe+C4A6E
+eu4.exe+C4A6B: 41 B6 01     - mov r14b,01
+// ---------- INJECTING HERE ----------
+eu4.exe+C4A6E: 38 5E 01     - cmp [rsi+01],bl
+// ---------- DONE INJECTING  ----------
+eu4.exe+C4A71: 74 21        - je eu4.exe+C4A94
+eu4.exe+C4A73: 38 5F 14     - cmp [rdi+14],bl
+eu4.exe+C4A76: 74 1C        - je eu4.exe+C4A94
+eu4.exe+C4A78: 38 5E 02     - cmp [rsi+02],bl
+eu4.exe+C4A7B: 74 17        - je eu4.exe+C4A94
+eu4.exe+C4A7D: 45 84 C9     - test r9l,r9b
+eu4.exe+C4A80: 75 05        - jne eu4.exe+C4A87
+eu4.exe+C4A82: 38 5F 09     - cmp [rdi+09],bl
+eu4.exe+C4A85: 74 0D        - je eu4.exe+C4A94
+eu4.exe+C4A87: 45 84 F6     - test r14l,r14b
+eu4.exe+C4A8A - 74 08                 - je eu4.exe+C4A94
+eu4.exe+C4A8C - 41 B4 01              - mov r12b,01
+eu4.exe+C4A8F - E9 DB030000           - jmp eu4.exe+C4E6F
+eu4.exe+C4A94 - 45 32 E4              - xor r12b,r12b
+eu4.exe+C4A97 - 4D 85 FF              - test r15,r15
+eu4.exe+C4A9A - 0F84 CF030000         - je eu4.exe+C4E6F
+eu4.exe+C4AA0 - 38 5F 09              - cmp [rdi+09],bl
+eu4.exe+C4AA3 - 0F85 A3000000         - jne eu4.exe+C4B4C
+eu4.exe+C4AA9 - 45 84 C9              - test r9l,r9b
+eu4.exe+C4AAC - 0F85 9A000000         - jne eu4.exe+C4B4C
+eu4.exe+C4AB2 - 48 8D 15 07D79F01     - lea rdx,[eu4.exe+1AC21C0]
+eu4.exe+C4AB9 - 48 8D 4C 24 60        - lea rcx,[rsp+60]
+eu4.exe+C4ABE - E8 1DC5FFFF           - call eu4.exe+C0FE0
+eu4.exe+C4AC3 - 90                    - nop
+
+}
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

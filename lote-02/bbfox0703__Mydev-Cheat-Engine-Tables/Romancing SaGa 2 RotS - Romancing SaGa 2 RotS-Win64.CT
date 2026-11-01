@@ -1,0 +1,1465 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="46">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>48</ID>
+      <Description>"Comact mode"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+--https://forum.cheatengine.org/viewtopic.php?t=570055
+LuaCall(function cycleFullCompact(sender,force) local state = not(compactmenuitem.Caption == 'Compact View Mode'); if force~=nil then state = not force end; compactmenuitem.Caption = state and 'Compact View Mode' or 'Full View Mode'; getMainForm().Splitter1.Visible = state; getMainForm().Panel4.Visible    = state; getMainForm().Panel5.Visible    = state; end; function addCompactMenu() if compactmenualreadyexists then return end; local parent = getMainForm().Menu.Items; compactmenuitem = createMenuItem(parent); parent.add(compactmenuitem); compactmenuitem.Caption = 'Compact View Mode'; compactmenuitem.OnClick = cycleFullCompact; compactmenualreadyexists = 'yes'; end; addCompactMenu(); cycleFullCompact(nil,true))
+
+[DISABLE]
+LuaCall(cycleFullCompact(nil,false))
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>66</ID>
+      <Description>"Battle end: restore overdrive to high watermark"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : Romancing SaGa 2 RotS-Win64.exe
+  Version: 
+  Date   : 2024-11-07
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_SET_BATT_OD,$process,89 01 48 8B F9 48 83 C1 08 48 83 C2 08 E8 ?? ?? ?? ?? ?? ?? ?? 58) // should be unique
+alloc(newmem,$1000,INJECT_SET_BATT_OD)
+
+label(code)
+label(return)
+label(i_od_watermark)
+
+newmem:
+  cmp dword ptr[rcx+10], 0
+  je chk_update
+
+  cmp [i_od_watermark], eax
+  jb save_data
+  ja update_value
+  jmp code
+
+chk_update:
+  cmp [i_od_watermark], eax
+  ja update_value
+  jmp code
+
+save_data:
+  mov [i_od_watermark], eax
+  jmp code
+
+update_value:
+  mov eax, [i_od_watermark]
+
+code:
+  mov [rcx],eax
+  mov rdi,rcx
+  jmp return
+align 10 cc
+  i_od_watermark:
+  dd 64
+
+INJECT_SET_BATT_OD:
+  jmp newmem
+return:
+registersymbol(INJECT_SET_BATT_OD)
+registersymbol(i_od_watermark)
+
+[DISABLE]
+
+INJECT_SET_BATT_OD:
+  db 89 01 48 8B F9
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "Romancing SaGa 2 RotS-Win64.exe"+15137BF
+
+"Romancing SaGa 2 RotS-Win64.exe"+15137AB: 5D                    - pop rbp
+"Romancing SaGa 2 RotS-Win64.exe"+15137AC: C3                    - ret
+"Romancing SaGa 2 RotS-Win64.exe"+15137AD: CC                    - int 3
+"Romancing SaGa 2 RotS-Win64.exe"+15137AE: CC                    - int 3
+"Romancing SaGa 2 RotS-Win64.exe"+15137AF: CC                    - int 3
+"Romancing SaGa 2 RotS-Win64.exe"+15137B0: 48 89 5C 24 08        - mov [rsp+08],rbx
+"Romancing SaGa 2 RotS-Win64.exe"+15137B5: 57                    - push rdi
+"Romancing SaGa 2 RotS-Win64.exe"+15137B6: 48 83 EC 20           - sub rsp,20
+"Romancing SaGa 2 RotS-Win64.exe"+15137BA: 8B 02                 - mov eax,[rdx]
+"Romancing SaGa 2 RotS-Win64.exe"+15137BC: 48 8B DA              - mov rbx,rdx
+// ---------- INJECTING HERE ----------
+"Romancing SaGa 2 RotS-Win64.exe"+15137BF: 89 01                 - mov [rcx],eax
+// ---------- DONE INJECTING  ----------
+"Romancing SaGa 2 RotS-Win64.exe"+15137C1: 48 8B F9              - mov rdi,rcx
+"Romancing SaGa 2 RotS-Win64.exe"+15137C4: 48 83 C1 08           - add rcx,08
+"Romancing SaGa 2 RotS-Win64.exe"+15137C8: 48 83 C2 08           - add rdx,08
+"Romancing SaGa 2 RotS-Win64.exe"+15137CC: E8 3F ED 68 FF        - call ""Romancing SaGa 2 RotS-Win64.exe""+BA2510
+"Romancing SaGa 2 RotS-Win64.exe"+15137D1: 48 8D 53 58           - lea rdx,[rbx+58]
+"Romancing SaGa 2 RotS-Win64.exe"+15137D5: 48 8D 4F 58           - lea rcx,[rdi+58]
+"Romancing SaGa 2 RotS-Win64.exe"+15137D9: E8 32 ED 68 FF        - call ""Romancing SaGa 2 RotS-Win64.exe""+BA2510
+"Romancing SaGa 2 RotS-Win64.exe"+15137DE: 48 8D 93 A8 00 00 00  - lea rdx,[rbx+000000A8]
+"Romancing SaGa 2 RotS-Win64.exe"+15137E5: 48 8D 8F A8 00 00 00  - lea rcx,[rdi+000000A8]
+"Romancing SaGa 2 RotS-Win64.exe"+15137EC: E8 1F ED 68 FF        - call ""Romancing SaGa 2 RotS-Win64.exe""+BA2510
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>67</ID>
+          <Description>"Watermark"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>808080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_od_watermark</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>5</ID>
+      <Description>"Battle control"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : Romancing SaGa 2 RotS-Win64.exe
+  Version: 
+  Date   : 2024-10-27
+  Author : bbfox@https://openchattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_BATTLE_HP,$process,45 89 BD B0 04 00 00) // should be unique
+alloc(newmem,$1000,INJECT_BATTLE_HP)
+
+label(code)
+label(return)
+label(is_keep_LP)
+label(is_keep_BP)
+label(is_min_HP)
+label(i_min_HP)
+label(is_keep_enemy_HP)
+label(i_max_enemy_HP)
+label(i_max_HP)
+
+newmem:
+  cmp qword ptr [r13+304], 0
+  jne to_enemy
+  cmp qword ptr [r13+4B4], 1
+  je to_enemy
+
+  cmp dword ptr [is_keep_LP], 1
+  jne @F
+  push r15
+  mov r15d, [r13+5CC]
+  mov r14d, r15d
+  pop r15
+
+@@:
+  cmp dword ptr [is_keep_BP], 1
+  jne @F
+  push r15
+  mov r15d, [r13+5D0]
+  mov rsi, r15d
+  pop r15
+
+chk_hp:
+  cmp dword ptr [is_min_HP], 1
+  jne set_max_hp
+  cmp r15d, [i_min_HP]
+  jae code
+  mov r15d, [i_min_HP]
+  jmp code
+
+set_max_hp:
+  cmp dword ptr [is_min_HP], 2
+  jne code
+  cmp r15d, [i_max_HP]
+  jbe code
+  mov r15d, [i_max_HP]
+  jmp code
+
+to_enemy:
+  cmp dword ptr [is_keep_enemy_HP], 1
+  jb code
+
+  cmp dword ptr [is_keep_enemy_HP], 1
+  jne @F
+  mov r15d, #1000000
+  jmp code
+
+@@:
+  cmp r15d, [i_max_enemy_HP]
+  jbe code
+  mov r15d, [i_max_enemy_HP]
+  jmp code
+
+
+
+code:
+  mov [r13+000004B0],r15d
+  jmp return
+align 10 cc
+  is_keep_LP:
+  dd 1
+  is_keep_BP:
+  dd 1
+  is_min_HP:
+  dd 1
+  i_min_HP:
+  dd #99999
+  is_keep_enemy_HP:
+  dd 0
+  i_max_enemy_HP:
+  dd #4000
+  i_max_HP:
+  dd 1
+
+
+INJECT_BATTLE_HP:
+  jmp newmem
+  nop 2
+return:
+registersymbol(INJECT_BATTLE_HP)
+registersymbol(is_keep_LP)
+registersymbol(is_keep_BP)
+registersymbol(is_min_HP)
+registersymbol(i_min_HP)
+registersymbol(is_keep_enemy_HP)
+registersymbol(i_max_enemy_HP)
+registersymbol(i_max_HP)
+
+
+[DISABLE]
+
+INJECT_BATTLE_HP:
+  db 45 89 BD B0 04 00 00
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: Romancing SaGa 2 RotS-Win64.exe+13501C6
+
+Romancing SaGa 2 RotS-Win64.exe+135018C: 4C 8B E9              - mov r13,rcx
+Romancing SaGa 2 RotS-Win64.exe+135018F: 8B B1 B8 04 00 00     - mov esi,[rcx+000004B8]
+Romancing SaGa 2 RotS-Win64.exe+1350195: 48 81 C1 B0 04 00 00  - add rcx,000004B0
+Romancing SaGa 2 RotS-Win64.exe+135019C: E8 0F AB FF FF        - call "Romancing SaGa 2 RotS-Win64.exe"+134ACB0
+Romancing SaGa 2 RotS-Win64.exe+13501A1: 41 8B 9D C8 05 00 00  - mov ebx,[r13+000005C8]
+Romancing SaGa 2 RotS-Win64.exe+13501A8: 49 8D 95 98 03 00 00  - lea rdx,[r13+00000398]
+Romancing SaGa 2 RotS-Win64.exe+13501AF: 49 8D 8D C8 05 00 00  - lea rcx,[r13+000005C8]
+Romancing SaGa 2 RotS-Win64.exe+13501B6: E8 F5 AA FF FF        - call "Romancing SaGa 2 RotS-Win64.exe"+134ACB0
+Romancing SaGa 2 RotS-Win64.exe+13501BB: 48 8D 4D 40           - lea rcx,[rbp+40]
+Romancing SaGa 2 RotS-Win64.exe+13501BF: 41 89 9D C8 05 00 00  - mov [r13+000005C8],ebx
+// ---------- INJECTING HERE ----------
+Romancing SaGa 2 RotS-Win64.exe+13501C6: 45 89 BD B0 04 00 00  - mov [r13+000004B0],r15d
+// ---------- DONE INJECTING  ----------
+Romancing SaGa 2 RotS-Win64.exe+13501CD: 45 89 B5 B4 04 00 00  - mov [r13+000004B4],r14d
+Romancing SaGa 2 RotS-Win64.exe+13501D4: 41 89 B5 B8 04 00 00  - mov [r13+000004B8],esi
+Romancing SaGa 2 RotS-Win64.exe+13501DB: E8 A0 A9 FF FF        - call "Romancing SaGa 2 RotS-Win64.exe"+134AB80
+Romancing SaGa 2 RotS-Win64.exe+13501E0: 49 8B CD              - mov rcx,r13
+Romancing SaGa 2 RotS-Win64.exe+13501E3: E8 E8 C4 FF FF        - call "Romancing SaGa 2 RotS-Win64.exe"+134C6D0
+Romancing SaGa 2 RotS-Win64.exe+13501E8: 4C 8D 4D 40           - lea r9,[rbp+40]
+Romancing SaGa 2 RotS-Win64.exe+13501EC: 49 8B D5              - mov rdx,r13
+Romancing SaGa 2 RotS-Win64.exe+13501EF: 4C 8D 85 F0 01 00 00  - lea r8,[rbp+000001F0]
+Romancing SaGa 2 RotS-Win64.exe+13501F6: 48 8B C8              - mov rcx,rax
+Romancing SaGa 2 RotS-Win64.exe+13501F9: E8 42 27 06 00        - call "Romancing SaGa 2 RotS-Win64.exe"+13B2940
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>6</ID>
+          <Description>"Keep LP?"</Description>
+          <DropDownList DisplayValueAsItem="1">0:No
+1:Yes
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>is_keep_LP</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>7</ID>
+          <Description>"Keep BP?"</Description>
+          <DropDownListLink>Keep LP?</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>is_keep_BP</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>8</ID>
+          <Description>"Player HP option"</Description>
+          <DropDownList DisplayValueAsItem="1">0:None
+1:Set min HP
+2:Set max HP
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>is_min_HP</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>9</ID>
+          <Description>"Min. HP"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_min_HP</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>62</ID>
+          <Description>"    Max HP"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_max_HP</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>19</ID>
+          <Description>"Enemy HP option"</Description>
+          <DropDownList DisplayValueAsItem="1">0:No change
+1:Set to 1,000,000
+2:&lt;= assigned HP
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>is_keep_enemy_HP</Address>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>40</ID>
+              <Description>"Assign too low may cause game crash"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>41</ID>
+              <Description>"Because of preemptive attack"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>38</ID>
+              <Description>"Assigned HP"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_max_enemy_HP</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>11</ID>
+      <Description>"Get money"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : Romancing SaGa 2 RotS-Win64.exe
+  Version: 
+  Date   : 2024-10-27
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_MONEY,$process,CC CC CC CC 8B 41 78 C3 CC) // should be unique
+alloc(newmem,$1000,INJECT_GET_MONEY)
+
+label(code)
+label(return)
+label(i_base_mdata_addr)
+
+newmem:
+  cmp qword ptr [i_base_mdata_addr], 0
+  jne code
+  mov [i_base_mdata_addr], rcx
+
+code:
+  mov eax,[rcx+78]
+  ret 
+  int 3 
+  jmp return
+align 10 cc
+  i_base_mdata_addr:
+  dq 0
+
+INJECT_GET_MONEY+04:
+  jmp newmem
+return:
+registersymbol(INJECT_GET_MONEY)
+registersymbol(i_base_mdata_addr)
+[DISABLE]
+
+INJECT_GET_MONEY+04:
+  db 8B 41 78 C3 CC
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: Romancing SaGa 2 RotS-Win64.exe+151EA40
+
+Romancing SaGa 2 RotS-Win64.exe+151EA36: C3        - ret 
+Romancing SaGa 2 RotS-Win64.exe+151EA37: CC        - int 3 
+Romancing SaGa 2 RotS-Win64.exe+151EA38: CC        - int 3 
+Romancing SaGa 2 RotS-Win64.exe+151EA39: CC        - int 3 
+Romancing SaGa 2 RotS-Win64.exe+151EA3A: CC        - int 3 
+Romancing SaGa 2 RotS-Win64.exe+151EA3B: CC        - int 3 
+Romancing SaGa 2 RotS-Win64.exe+151EA3C: CC        - int 3 
+Romancing SaGa 2 RotS-Win64.exe+151EA3D: CC        - int 3 
+Romancing SaGa 2 RotS-Win64.exe+151EA3E: CC        - int 3 
+Romancing SaGa 2 RotS-Win64.exe+151EA3F: CC        - int 3 
+// ---------- INJECTING HERE ----------
+Romancing SaGa 2 RotS-Win64.exe+151EA40: 8B 41 78  - mov eax,[rcx+78]
+// ---------- DONE INJECTING  ----------
+Romancing SaGa 2 RotS-Win64.exe+151EA43: C3        - ret 
+Romancing SaGa 2 RotS-Win64.exe+151EA44: CC        - int 3 
+Romancing SaGa 2 RotS-Win64.exe+151EA45: CC        - int 3 
+Romancing SaGa 2 RotS-Win64.exe+151EA46: CC        - int 3 
+Romancing SaGa 2 RotS-Win64.exe+151EA47: CC        - int 3 
+Romancing SaGa 2 RotS-Win64.exe+151EA48: CC        - int 3 
+Romancing SaGa 2 RotS-Win64.exe+151EA49: CC        - int 3 
+Romancing SaGa 2 RotS-Win64.exe+151EA4A: CC        - int 3 
+Romancing SaGa 2 RotS-Win64.exe+151EA4B: CC        - int 3 
+Romancing SaGa 2 RotS-Win64.exe+151EA4C: CC        - int 3 
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>12</ID>
+          <Description>"money"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_mdata_addr</Address>
+          <Offsets>
+            <Offset>78</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>13</ID>
+          <Description>"??"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>808080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_mdata_addr</Address>
+          <Offsets>
+            <Offset>7C</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>14</ID>
+          <Description>"?? income"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>808080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_mdata_addr</Address>
+          <Offsets>
+            <Offset>80</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>49</ID>
+          <Description>"?? income factor (exclude garden)"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>808080</Color>
+          <VariableType>Float</VariableType>
+          <Address>i_base_mdata_addr</Address>
+          <Offsets>
+            <Offset>88</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>26</ID>
+          <Description>"Era battle counter?"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_mdata_addr</Address>
+          <Offsets>
+            <Offset>60</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>43</ID>
+          <Description>"Battles total"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_mdata_addr</Address>
+          <Offsets>
+            <Offset>64</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>27</ID>
+          <Description>"Battles win"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_mdata_addr</Address>
+          <Offsets>
+            <Offset>68</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>28</ID>
+          <Description>"Battles lose"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_mdata_addr</Address>
+          <Offsets>
+            <Offset>6C</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>29</ID>
+          <Description>"Battles retreat"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_mdata_addr</Address>
+          <Offsets>
+            <Offset>70</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>30</ID>
+          <Description>"Play Hour?"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_mdata_addr</Address>
+          <Offsets>
+            <Offset>C0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>31</ID>
+          <Description>"Play Minutes?"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_mdata_addr</Address>
+          <Offsets>
+            <Offset>C4</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>32</ID>
+          <Description>"Play Seconds?"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_mdata_addr</Address>
+          <Offsets>
+            <Offset>C8</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>44</ID>
+          <Description>"??"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>808080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_mdata_addr</Address>
+          <Offsets>
+            <Offset>A8</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>46</ID>
+          <Description>"Enemy Level exp?"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_mdata_addr</Address>
+          <Offsets>
+            <Offset>AC</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>45</ID>
+          <Description>"Enemy base level?"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_mdata_addr</Address>
+          <Offsets>
+            <Offset>B0</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>37</ID>
+      <Description>"Advanced (choose one; use at your own risk)"</Description>
+      <Options moHideChildren="1"/>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>16</ID>
+          <Description>"(not recommend) Forge: method 1: set all item stock watermark back"</Description>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : Romancing SaGa 2 RotS-Win64.exe
+  Version: 
+  Date   : 2024-10-27
+  Author : bbfox@https://openchattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_SET_ITEM_CNT,$process,49 63 46 18 48 8D 0C 40 4C 8D 3C) // should be unique
+alloc(newmem,$1000,INJECT_SET_ITEM_CNT)
+
+label(code)
+label(return)
+label(i_item_threshold)
+label(i_item_set_to)
+label(i_low_threshold)
+
+newmem:
+  pushfq
+  push r15
+  //mov r15d, [i_item_threshold]
+  //cmp [r14+18], r15d
+  //jb @F
+  //mov r15d, [i_item_set_to]
+  //cmp [r14+18], r15d
+  //jae @F
+  ////mov r15d, [i_low_threshold]
+  ////cmp [r14+18], r15d
+  ////jbe @F
+  ////mov r15d, [i_low_threshold]
+  ////cmp [r14+1C], r15d
+  ////jbe @F
+
+  mov r15d, [r14+1C]
+  mov [r14+18], r15d
+
+@@:
+  pop r15
+  popfq
+
+code:
+  movsxd  rax,dword ptr [r14+18]
+  lea rcx,[rax+rax*2]
+  jmp return
+align 10 cc
+  i_item_threshold:
+  dd 2
+  i_item_set_to:
+  dd 9
+  i_low_threshold: // set this value higher to filter "equipment" items
+  dd 0
+
+
+INJECT_SET_ITEM_CNT:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_SET_ITEM_CNT)
+registersymbol(i_item_threshold)
+registersymbol(i_item_set_to)
+registersymbol(i_low_threshold)
+
+[DISABLE]
+
+INJECT_SET_ITEM_CNT:
+  db 49 63 46 18 48 8D 0C 40
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: Romancing SaGa 2 RotS-Win64.exe+1446694
+
+Romancing SaGa 2 RotS-Win64.exe+144666A: 4C 63 67 18              - movsxd  r12,dword ptr [rdi+18]
+Romancing SaGa 2 RotS-Win64.exe+144666E: 49 C1 E4 05              - shl r12,05
+Romancing SaGa 2 RotS-Win64.exe+1446672: 4D 03 E6                 - add r12,r14
+Romancing SaGa 2 RotS-Win64.exe+1446675: 4D 3B F4                 - cmp r14,r12
+Romancing SaGa 2 RotS-Win64.exe+1446678: 74 77                    - je "Romancing SaGa 2 RotS-Win64.exe"+14466F1
+Romancing SaGa 2 RotS-Win64.exe+144667A: 48 89 6C 24 40           - mov [rsp+40],rbp
+Romancing SaGa 2 RotS-Win64.exe+144667F: 4C 89 7C 24 48           - mov [rsp+48],r15
+Romancing SaGa 2 RotS-Win64.exe+1446684: 0F 1F 40 00              - nop dword ptr [rax+00]
+Romancing SaGa 2 RotS-Win64.exe+1446688: 0F 1F 84 00 00 00 00 00  - nop dword ptr [rax+rax+00000000]
+Romancing SaGa 2 RotS-Win64.exe+1446690: 49 8B 7E 10              - mov rdi,[r14+10]
+// ---------- INJECTING HERE ----------
+Romancing SaGa 2 RotS-Win64.exe+1446694: 49 63 46 18              - movsxd  rax,dword ptr [r14+18]
+// ---------- DONE INJECTING  ----------
+Romancing SaGa 2 RotS-Win64.exe+1446698: 48 8D 0C 40              - lea rcx,[rax+rax*2]
+Romancing SaGa 2 RotS-Win64.exe+144669C: 4C 8D 3C 8F              - lea r15,[rdi+rcx*4]
+Romancing SaGa 2 RotS-Win64.exe+14466A0: 49 3B FF                 - cmp rdi,r15
+Romancing SaGa 2 RotS-Win64.exe+14466A3: 74 39                    - je "Romancing SaGa 2 RotS-Win64.exe"+14466DE
+Romancing SaGa 2 RotS-Win64.exe+14466A5: 48 39 1F                 - cmp [rdi],rbx
+Romancing SaGa 2 RotS-Win64.exe+14466A8: 75 2B                    - jne "Romancing SaGa 2 RotS-Win64.exe"+14466D5
+Romancing SaGa 2 RotS-Win64.exe+14466AA: 48 63 6E 08              - movsxd  rbp,dword ptr [rsi+08]
+Romancing SaGa 2 RotS-Win64.exe+14466AE: 8D 45 01                 - lea eax,[rbp+01]
+Romancing SaGa 2 RotS-Win64.exe+14466B1: 89 46 08                 - mov [rsi+08],eax
+Romancing SaGa 2 RotS-Win64.exe+14466B4: 3B 46 0C                 - cmp eax,[rsi+0C]
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>52</ID>
+              <Description>"(Equipment development): browse item and set # back to watermark"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>36</ID>
+              <Description>"***May cause game crash***"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>39</ID>
+              <Description>"***Save game before use***"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>42</ID>
+              <Description>"***Disable after use***"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>33</ID>
+              <Description>"Readme first!!"</Description>
+              <Color>FF00FF</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+{$lua}
+--NO_ACTIVATE
+if (syntaxcheck) then return end
+if memrec then print(memrec.Description) end
+getLuaEngine().menuItem5.doClick()
+
+local message = [[
+Note: Usage conditions:
+1. This cannot be used for any equippable items.
+2. Preferably used only in the Forge (equipment development) screen.
+
+Usage instructions:
+1. Materials must always be greater than the required amount for development; if they drop to zero, this will not work.
+2. After developing an item, immediately return to the main screen and exit.
+3. You will notice that the materials are restored.
+4. There is a chance the program might crash.
+5. No responsibility will be taken for any issues caused by using this table.
+]]
+getLuaEngine().Close()
+showMessage(message)
+
+
+[DISABLE]
+{$lua}
+getLuaEngine().Close()
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>34</ID>
+              <Description>"請先讀此訊息 (正體中文版)"</Description>
+              <Color>FF00FF</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+{$lua}
+--NO_ACTIVATE
+if (syntaxcheck) then return end
+if memrec then print(memrec.Description) end
+getLuaEngine().menuItem5.doClick()
+
+local message = [[
+注意：使用條件：
+1. 任何可以裝備的道具皆不可行。
+2. 最好只用在裝備開發畫面。
+
+使用方式：
+1. 材料一定要大於開發裝備所需的數量，如果變為0則沒效果。
+2. 開發一種裝備後，馬上開啟主畫面後離開。
+3. 你會發現材料數量會還原。
+4. 有機會程式會崩潰。
+5. 使用本Table發生任何問題一律不負責。
+]]
+getLuaEngine().Close()
+showMessage(message)
+
+
+[DISABLE]
+{$lua}
+getLuaEngine().Close()
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>35</ID>
+              <Description>"このメッセージを先に読んでください。 (日本語)"</Description>
+              <Color>FF00FF</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+{$lua}
+--NO_ACTIVATE
+if (syntaxcheck) then return end
+if memrec then print(memrec.Description) end
+getLuaEngine().menuItem5.doClick()
+
+local message = [[
+注意：使用条件：
+1. 装備可能なアイテムは使用できません。
+2. 装備開発画面でのみ使用することを推奨します。
+
+使用方法：
+1. 材料は必ず開発に必要な数量より多くあること。0になった場合は効果がありません。
+2. 装備を開発した後、すぐにメイン画面を開いてから離れます。
+3. 材料が元に戻っていることに気づくでしょう。
+4. プログラムがクラッシュする可能性があります。
+5. このテーブルを使用して発生した問題については一切責任を負いません。
+]]
+getLuaEngine().Close()
+showMessage(message)
+
+
+[DISABLE]
+{$lua}
+getLuaEngine().Close()
+</AssemblerScript>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>50</ID>
+          <Description>"Forge: method 2: Record &amp; Restore all item stock count"</Description>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : Romancing SaGa 2 RotS-Win64.exe
+  Version: 
+  Date   : 2024-10-27
+  Author : bbfox@https://openchattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_SET_ITEM_CNT_SAVE,$process,49 63 46 18 48 8D 0C 40 4C 8D 3C) // should be unique
+alloc(newmem,$8000,INJECT_SET_ITEM_CNT_SAVE)
+
+label(code)
+label(return)
+label(i_base_items_cnt_addr)
+label(i_base_items_cnt_addr_data)
+label(i_item_loadsave_mode)
+label(i_restore_GE_than)
+label(i_records_total)
+
+newmem:
+  cmp dword ptr [i_item_loadsave_mode], 1
+  je to_restore
+
+to_record:
+  pushfq
+  push rcx
+  push rax
+
+  //push r12
+
+  //mov rcx, i_base_items_cnt_addr
+  xor rax, rax
+loops:
+  mov rcx, i_base_items_cnt_addr
+  lea rcx, [rcx+rax*8]
+
+  cmp qword ptr [rcx], r14
+  je endp
+
+  cmp qword ptr [rcx], 0
+  je save_data
+
+  jmp to_next
+
+save_data:
+  push r14
+
+  mov [rcx], r14
+  lea r14, [r14+18]
+
+  push rcx
+  mov rcx, i_base_items_cnt_addr_data
+  lea rcx, [rcx+rax*4]
+  mov r14d, [r14]
+  mov [rcx], r14d
+  pop rcx
+
+  pop r14
+
+
+  jmp endp
+
+to_next:
+  inc eax
+  cmp eax, #1200
+  je endp
+  jmp loops
+
+endp:
+  //pop r12
+  mov [i_records_total], eax
+
+  pop rax
+  pop rcx
+  popfq
+  jmp code
+
+to_restore:
+  pushfq
+  push rcx
+  push rax
+  push r14
+
+  xor rax, rax
+
+loops_1:
+  mov rcx, i_base_items_cnt_addr
+  lea rcx, [rcx+rax*8]
+  cmp qword ptr [rcx], 0
+  je endp1
+
+  mov r14, [rcx]
+  lea r14, [r14+18]
+
+  mov rcx, i_base_items_cnt_addr_data
+  lea rcx, [rcx+rax*4]
+  mov ecx, [rcx]
+  cmp ecx, [i_restore_GE_than]
+  jb @F
+  cmp [r14], ecx
+  jae @F
+  mov [r14], ecx
+
+@@:
+  inc eax
+  cmp eax, #1200
+  jbe loops_1
+
+endp1:
+  pop r14
+  pop rax
+  pop rcx
+  popfq
+
+
+code:
+  movsxd  rax,dword ptr [r14+18]
+  lea rcx,[rax+rax*2]
+  jmp return
+align 10 cc
+  i_item_loadsave_mode:
+  dd 0
+  i_restore_GE_than:
+  dd 1
+  i_records_total:
+  dd -1
+  i_base_items_cnt_addr:
+  dq 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  i_base_items_cnt_addr_data:
+  dd 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+
+
+INJECT_SET_ITEM_CNT_SAVE:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_SET_ITEM_CNT_SAVE)
+registersymbol(i_base_items_cnt_addr)
+registersymbol(i_base_items_cnt_addr_data)
+registersymbol(i_item_loadsave_mode)
+registersymbol(i_restore_GE_than)
+registersymbol(i_records_total)
+
+[DISABLE]
+
+INJECT_SET_ITEM_CNT_SAVE:
+  db 49 63 46 18 48 8D 0C 40
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: Romancing SaGa 2 RotS-Win64.exe+1446694
+
+Romancing SaGa 2 RotS-Win64.exe+144666A: 4C 63 67 18              - movsxd  r12,dword ptr [rdi+18]
+Romancing SaGa 2 RotS-Win64.exe+144666E: 49 C1 E4 05              - shl r12,05
+Romancing SaGa 2 RotS-Win64.exe+1446672: 4D 03 E6                 - add r12,r14
+Romancing SaGa 2 RotS-Win64.exe+1446675: 4D 3B F4                 - cmp r14,r12
+Romancing SaGa 2 RotS-Win64.exe+1446678: 74 77                    - je "Romancing SaGa 2 RotS-Win64.exe"+14466F1
+Romancing SaGa 2 RotS-Win64.exe+144667A: 48 89 6C 24 40           - mov [rsp+40],rbp
+Romancing SaGa 2 RotS-Win64.exe+144667F: 4C 89 7C 24 48           - mov [rsp+48],r15
+Romancing SaGa 2 RotS-Win64.exe+1446684: 0F 1F 40 00              - nop dword ptr [rax+00]
+Romancing SaGa 2 RotS-Win64.exe+1446688: 0F 1F 84 00 00 00 00 00  - nop dword ptr [rax+rax+00000000]
+Romancing SaGa 2 RotS-Win64.exe+1446690: 49 8B 7E 10              - mov rdi,[r14+10]
+// ---------- INJECTING HERE ----------
+Romancing SaGa 2 RotS-Win64.exe+1446694: 49 63 46 18              - movsxd  rax,dword ptr [r14+18]
+// ---------- DONE INJECTING  ----------
+Romancing SaGa 2 RotS-Win64.exe+1446698: 48 8D 0C 40              - lea rcx,[rax+rax*2]
+Romancing SaGa 2 RotS-Win64.exe+144669C: 4C 8D 3C 8F              - lea r15,[rdi+rcx*4]
+Romancing SaGa 2 RotS-Win64.exe+14466A0: 49 3B FF                 - cmp rdi,r15
+Romancing SaGa 2 RotS-Win64.exe+14466A3: 74 39                    - je "Romancing SaGa 2 RotS-Win64.exe"+14466DE
+Romancing SaGa 2 RotS-Win64.exe+14466A5: 48 39 1F                 - cmp [rdi],rbx
+Romancing SaGa 2 RotS-Win64.exe+14466A8: 75 2B                    - jne "Romancing SaGa 2 RotS-Win64.exe"+14466D5
+Romancing SaGa 2 RotS-Win64.exe+14466AA: 48 63 6E 08              - movsxd  rbp,dword ptr [rsi+08]
+Romancing SaGa 2 RotS-Win64.exe+14466AE: 8D 45 01                 - lea eax,[rbp+01]
+Romancing SaGa 2 RotS-Win64.exe+14466B1: 89 46 08                 - mov [rsi+08],eax
+Romancing SaGa 2 RotS-Win64.exe+14466B4: 3B 46 0C                 - cmp eax,[rsi+0C]
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>53</ID>
+              <Description>"(Equipment development): browse item and set # back to watermark"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>54</ID>
+              <Description>"***May cause game crash***"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>55</ID>
+              <Description>"***Save game before use***"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>56</ID>
+              <Description>"***Disable after use***"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>61</ID>
+              <Description>"***Disable / enable to reset save data***"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>51</ID>
+              <Description>"Mode"</Description>
+              <DropDownList DisplayValueAsItem="1">0:Record (open main menu &amp; close)
+1:Restore (open main menu &amp; close)
+</DropDownList>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_item_loadsave_mode</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>60</ID>
+              <Description>"Restore only when original item stock count &gt;="</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_restore_GE_than</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>64</ID>
+              <Description>"Total records -1 (max 1200)"</Description>
+              <ShowAsSigned>1</ShowAsSigned>
+              <Color>808080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_records_total</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>58</ID>
+              <Description>"Readme first!!"</Description>
+              <Color>FF00FF</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+{$lua}
+--NO_ACTIVATE
+if (syntaxcheck) then return end
+if memrec then print(memrec.Description) end
+getLuaEngine().menuItem5.doClick()
+
+local message = [[
+Note: Usage Conditions:
+1. This cannot be used if the quantity of any equippable item has changed.
+2. It is best to use only in the equipment development screen.
+3. Do not set item quantity to 0, including equipment, as this may cause memory data to refresh and result in errors.
+
+Usage Instructions:
+1. The material must be greater than the quantity required for equipment development; if it becomes 0, it will have no effect.
+2. Set Mode to "0" / [0: Record (open main menu &amp; close)].
+3. Immediately open and then close the main menu. The item quantity data should be saved.
+4. Proceed with equipment development.
+5. If the material becomes 0, it will not be restored.
+6. Set Mode to "1" / [1: Restore (open main menu &amp; close)].
+7. Immediately open and then close the main menu. The item quantity data should be restored.
+8. There is a possibility that the program may crash.
+9. No responsibility is taken for any issues arising from the use of this table.
+]]
+getLuaEngine().Close()
+showMessage(message)
+
+
+[DISABLE]
+{$lua}
+getLuaEngine().Close()
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>57</ID>
+              <Description>"請先讀此訊息 (正體中文版)"</Description>
+              <Color>FF00FF</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+{$lua}
+--NO_ACTIVATE
+if (syntaxcheck) then return end
+if memrec then print(memrec.Description) end
+getLuaEngine().menuItem5.doClick()
+
+local message = [[
+注意：使用條件：
+1. 任何可以裝備的道具數量有變更時皆不可行。
+2. 最好只用在裝備開發畫面。
+3. 最好別把道具數量變成0，包含裝備。因為會造成記憶體中的資料重新整理造成錯誤
+
+使用方式：
+1. 材料一定要大於開發裝備所需的數量，如果變為0則沒效果。
+2. 請先將Mode設為 "0" / [0 : Record (open main menu &amp; close)]
+3. 馬上開啟主畫面後離開。此時道具數量的資料應該會留下來
+4. 進行裝備開發
+5. 材料如果變為0、則不會還原
+6. 請將Mode設為 "1" / [1 : Restore (open main menu &amp; close)]
+7. 馬上開啟主畫面後離開。此時道具數量的資料應該會還原
+8. 有機會程式會當掉。
+9. 使用本Table發生任何問題一律不負責。
+]]
+getLuaEngine().Close()
+showMessage(message)
+
+
+[DISABLE]
+{$lua}
+getLuaEngine().Close()
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>59</ID>
+              <Description>"このメッセージを先に読んでください。 (日本語)"</Description>
+              <Color>FF00FF</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+{$lua}
+--NO_ACTIVATE
+if (syntaxcheck) then return end
+if memrec then print(memrec.Description) end
+getLuaEngine().menuItem5.doClick()
+
+local message = [[
+注意事項：使用条件：
+1. 装備可能なアイテムの数量が変更された場合、この機能は使用できません。
+2. 装備開発画面でのみ使用するのが最適です。
+3. アイテムの数量を0にしないでください（装備も含む）、これによりメモリデータがリフレッシュされ、エラーが発生する可能性があります。
+
+使用方法：
+1. 材料は装備開発に必要な数量より多くなければなりません。0になると効果がありません。
+2. Modeを"0"に設定してください / [0 : Record (open main menu &amp; close)]
+3. すぐにメインメニューを開いてから閉じます。この時、アイテムの数量データが保存されます。
+4. 装備開発を行います。
+5. 材料が0になった場合、復元されません。
+6. Modeを"1"に設定してください / [1 : Restore (open main menu &amp; close)]
+7. すぐにメインメニューを開いてから閉じます。この時、アイテムの数量データが復元されます。
+8. プログラムがクラッシュする可能性があります。
+9. このテーブルの使用により発生したいかなる問題についても責任を負いません。
+]]
+getLuaEngine().Close()
+showMessage(message)
+
+
+[DISABLE]
+{$lua}
+getLuaEngine().Close()
+
+</AssemblerScript>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>25</ID>
+      <Description>"Romancing SaGa 2: Revenge of the Seven  /  https://opencheattables.com  /  CE 7.5+"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <Color>00BB00</Color>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>24</ID>
+          <Description>"_not working"</Description>
+          <Options moHideChildren="1"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>21</ID>
+              <Description>"Sell 1 item and set item #"</Description>
+              <Options moHideChildren="1"/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{ Game   : Romancing SaGa 2 RotS-Win64.exe
+  Version: 
+  Date   : 2024-10-27
+  Author : bbfox2https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_SELL_ITEM_SET_CNT,$process,39 5F 18 0F 8E 7E 00 00 00) // should be unique
+alloc(newmem,$1000,INJECT_SELL_ITEM_SET_CNT)
+
+label(code)
+label(return)
+label(i_set_item_cnt_to)
+
+newmem:
+  push r15
+  mov r15d, [i_set_item_cnt_to]
+  cmp [rdi+18], r15d
+  jae @F
+  mov [rdi+18], r15d
+  mov [rdi+1C], r15d
+
+@@:
+  pop r15
+
+code:
+  cmp [rdi+18],ebx
+  //jng "Romancing SaGa 2 RotS-Win64.exe"+1447970
+  reassemble(INJECT_SELL_ITEM_SET_CNT+3)
+  jmp return
+align 10 cc
+  i_set_item_cnt_to:
+  dd 10
+
+
+INJECT_SELL_ITEM_SET_CNT:
+  jmp newmem
+  nop 4
+return:
+registersymbol(INJECT_SELL_ITEM_SET_CNT)
+registersymbol(i_set_item_cnt_to)
+[DISABLE]
+
+INJECT_SELL_ITEM_SET_CNT:
+  db 39 5F 18 0F 8E 7E 00 00 00
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: Romancing SaGa 2 RotS-Win64.exe+14478E9
+
+Romancing SaGa 2 RotS-Win64.exe+14478C6: 4C 8D 61 10        - lea r12,[rcx+10]
+Romancing SaGa 2 RotS-Win64.exe+14478CA: 66 0F 1F 44 00 00  - nop word ptr [rax+rax+00]
+Romancing SaGa 2 RotS-Win64.exe+14478D0: 48 39 17           - cmp [rdi],rdx
+Romancing SaGa 2 RotS-Win64.exe+14478D3: 74 14              - je "Romancing SaGa 2 RotS-Win64.exe"+14478E9
+Romancing SaGa 2 RotS-Win64.exe+14478D5: 41 FF C6           - inc r14d
+Romancing SaGa 2 RotS-Win64.exe+14478D8: 48 FF C0           - inc rax
+Romancing SaGa 2 RotS-Win64.exe+14478DB: 48 83 C7 20        - add rdi,20
+Romancing SaGa 2 RotS-Win64.exe+14478DF: 49 3B C1           - cmp rax,r9
+Romancing SaGa 2 RotS-Win64.exe+14478E2: 7C EC              - jl "Romancing SaGa 2 RotS-Win64.exe"+14478D0
+Romancing SaGa 2 RotS-Win64.exe+14478E4: E9 05 01 00 00     - jmp "Romancing SaGa 2 RotS-Win64.exe"+14479EE
+// ---------- INJECTING HERE ----------
+Romancing SaGa 2 RotS-Win64.exe+14478E9: 39 5F 18           - cmp [rdi+18],ebx
+// ---------- DONE INJECTING  ----------
+Romancing SaGa 2 RotS-Win64.exe+14478EC: 0F 8E 7E 00 00 00  - jng "Romancing SaGa 2 RotS-Win64.exe"+1447970
+Romancing SaGa 2 RotS-Win64.exe+14478F2: 48 89 6C 24 70     - mov [rsp+70],rbp
+Romancing SaGa 2 RotS-Win64.exe+14478F7: 48 8B EB           - mov rbp,rbx
+Romancing SaGa 2 RotS-Win64.exe+14478FA: 66 0F 1F 44 00 00  - nop word ptr [rax+rax+00]
+Romancing SaGa 2 RotS-Win64.exe+1447900: 4C 8B 4F 10        - mov r9,[rdi+10]
+Romancing SaGa 2 RotS-Win64.exe+1447904: 49 83 3C 29 00     - cmp qword ptr [r9+rbp],00
+Romancing SaGa 2 RotS-Win64.exe+1447909: 75 50              - jne "Romancing SaGa 2 RotS-Win64.exe"+144795B
+Romancing SaGa 2 RotS-Win64.exe+144790B: 8B 4F 18           - mov ecx,[rdi+18]
+Romancing SaGa 2 RotS-Win64.exe+144790E: 8B C1              - mov eax,ecx
+Romancing SaGa 2 RotS-Win64.exe+1447910: 2B C3              - sub eax,ebx
+}
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>23</ID>
+                  <Description>"Warning: Do not use with any equippable item type"</Description>
+                  <Color>8000FF</Color>
+                  <GroupHeader>1</GroupHeader>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>22</ID>
+                  <Description>"Set # to"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>C08000</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>i_set_item_cnt_to</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>47</ID>
+          <Description>"https://altema.jp/romasaga2/"</Description>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>63</ID>
+          <Description>"https://kamikouryaku.com/romancingsaga2r/"</Description>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+  <LuaScript>function onMemRecPostExecute(memoryrecord, newState, succeeded )
+    if memoryrecord.Type == vtAutoAssembler and memoryrecord.Script:find("NO_ACTIVATE") and newState and succeeded then
+        memoryrecord.disableWithoutExecute()
+    end
+end
+
+</LuaScript>
+</CheatTable>

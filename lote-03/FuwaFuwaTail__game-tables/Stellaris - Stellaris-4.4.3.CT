@@ -1,0 +1,2042 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="46">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>5651</ID>
+      <Description>"[X] &lt;== Stellaris v4.4.3"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <Color>FF0000</Color>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>5652</ID>
+          <Description>"-- ! -- All cheats except the console, mod cheat &amp;  race editing require Recifense's script -- ! --"</Description>
+          <Color>0080FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>7207</ID>
+          <Description>"-- ! -- Activate Modded Achievements before main menu (during game startup) if using NAC mods -- ! --"</Description>
+          <Color>0080FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>7205</ID>
+          <Description>"[X] &lt;== Enable Modded Achievements"</Description>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+          <Color>C08000</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : stellaris.exe
+  Version:
+  Date   : 2022-09-23
+  Author : Nameless
+         Updater:  Fuwa
+         Version:  4.4.3
+         Date:     2026-06-20
+
+  This script does blah blah blah
+}
+
+
+//=========================================
+ [ENABLE]
+//=========================================
+define(LUDO,"stellaris.exe")
+
+// To find:
+// CHECKSUM_PATCH    -&gt; search for string "common/achievements.txt", should result in three hits.
+//                   -&gt; some lines below there should be a line with a hash, thats the area where the inject should happen
+//                   -&gt; replace first 85 CO (test eax, eax) BELOW with 31 CO (xor eax, eax)
+// CHECKSUM_WARNING  -&gt; search for string "MATCHMAKING_SERVER_VERSION", there will be multiple hits.
+//                   -&gt; its in the area where right above three strings with the version details are located (in 4.4.3s case: "Pegasus v4.4.3"; "v4.4.3"; ".3")
+//                   -&gt; replace first 85 C0 (test eax, eax) ABOVE with 31 C0 (xor eax, eax)
+// TOOLTIP_PATCH     -&gt; search for string "ACHIEVEMENT_TOOLTIP_CHECKSUM"
+//                   -&gt; replace first 85 CO (test eax, eax) ABOVE with 31 C0 (xor eax, eax)
+
+aobScanModule(CHECKSUM_PATCH,stellaris.exe,E8 F4 3E FE 01 8B F8 85 C0)
+aobScanModule(CHECKSUM_WARNING,stellaris.exe, E8 B4 B5 28 01 85 C0)
+aobScanModule(TOOLTIP_PATCH,stellaris.exe, E8 93 AC 28 01 85 C0)
+
+registersymbol(CHECKSUM_PATCH)
+registersymbol(CHECKSUM_WARNING)
+registersymbol(TOOLTIP_PATCH)
+
+CHECKSUM_PATCH+7:
+  db 31 C0
+
+CHECKSUM_WARNING+5:
+  db 31 C0
+
+TOOLTIP_PATCH+5:
+  db 31 C0
+
+//=========================================
+ [DISABLE]
+//=========================================
+
+CHECKSUM_PATCH+7:
+  db 85 C0
+
+CHECKSUM_WARNING+5:
+  db 85 C0
+
+TOOLTIP_PATCH+5:
+  db 85 C0
+
+unregistersymbol(CHECKSUM_PATCH)
+unregistersymbol(CHECKSUM_WARNING)
+unregistersymbol(TOOLTIP_PATCH)
+
+/*
+
+//=========================================
+// Extra information
+//=========================================
+
+Addresses v 4.4.1 &amp; 4.4.2
+aobScanModule(CHECKSUM_PATCH,stellaris.exe,E8 34 AA FD 01 8B F8 85 C0)
+aobScanModule(CHECKSUM_WARNING,stellaris.exe, E8 24 7C 28 01 85 C0)
+aobScanModule(TOOLTIP_PATCH,stellaris.exe, E8 03 73 28 01 85 C0)
+
+Injection addresses as per Version 4.3.7
+//aobScanModule(CHECKSUM_PATCH,stellaris.exe,E8 74 B5 E7 01 8B F8 85 C0)
+//aobScanModule(CHECKSUM_WARNING,stellaris.exe,75 0D E8 E7 57 B9 01 85 C0)
+//aobScanModule(TOOLTIP_PATCH,stellaris.exe,01 E8 23 94 1D 01 85 C0 0F)
+*/
+
+
+
+//=========================================
+// Extra information
+// left by Nameless
+//=========================================
+/*
+stellaris.exe+B48245 - E8 36220000           - call stellaris.exe+B4A480
+stellaris.exe+B4824A - 48 8B 05 4F1CCC00     - mov rax,[stellaris.exe+1809EA0] { (1E985B2BD30) } &lt;== Ironman Address
+stellaris.exe+B48251 - 48 8B 88 A8070000     - mov rcx,[rax+000007A8] &lt;== First Offset
+stellaris.exe+B48258 - 80 B9 8C000000 00     - cmp byte ptr [rcx+0000008C],00 { 0 } &lt;= Second Offset
+stellaris.exe+B4825F - 74 1B                 - je stellaris.exe+B4827C
+stellaris.exe+B48261 - E8 1A5273FF           - call stellaris.exe+27D480 &lt;= Follow this address to find checksum address
+stellaris.exe+B48266 - 80 78 7B 00           - cmp byte ptr [rax+7B],00 { 0 } &lt;== Starts the checksum check at 100% on game startup
+stellaris.exe+B4826A - 75 0C                 - jne stellaris.exe+B48278
+stellaris.exe+B4826C - 80 78 79 00           - cmp byte ptr [rax+79],00 { 0 } &lt;== Returns back to main menu
+stellaris.exe+B48270 - 74 0A                 - je stellaris.exe+B4827C
+stellaris.exe+B48272 - 80 78 7A 00           - cmp byte ptr [rax+7A],00 { 0 } &lt;== Checks if checksum directories are not modified
+stellaris.exe+B48276 - 74 04                 - je stellaris.exe+B4827C
+stellaris.exe+B48278 - B3 01                 - mov bl,01 { 1 }
+stellaris.exe+B4827A - EB 02                 - jmp stellaris.exe+B4827E
+stellaris.exe+B4827C - 32 DB                 - xor bl,bl
+stellaris.exe+B4827E - 48 C7 44 24 40 0F000000 - mov qword ptr [rsp+40],0000000F { 15 }
+stellaris.exe+B48287 - 48 C7 44 24 38 00000000 - mov qword ptr [rsp+38],00000000 { 0 }
+stellaris.exe+B48290 - C6 44 24 28 00        - mov byte ptr [rsp+28],00 { 0 }
+stellaris.exe+B48295 - 41 B8 0B000000        - mov r8d,0000000B { 11 }
+stellaris.exe+B4829B - 48 8D 15 9E3C8500     - lea rdx,[stellaris.exe+139BF40] { ("achievement") }
+stellaris.exe+B482A2 - 48 8D 4C 24 28        - lea rcx,[rsp+28]
+stellaris.exe+B482A7 - E8 B4F956FF           - call stellaris.exe+B7C60
+stellaris.exe+B482AC - 90                    - nop
+stellaris.exe+B482AD - 48 8D 05 C4929400     - lea rax,[stellaris.exe+1491578] { ("ACHIEVEMENT_ELIGIBLE") }
+
+After following the call address
+stellaris.exe+27D480 - 48 83 EC 28           - sub rsp,28 { 40 }
+stellaris.exe+27D484 - 48 8B 05 F5DB5801     - mov rax,[stellaris.exe+180B080] { (21DD3DC1F20) }
+stellaris.exe+27D48B - 48 85 C0              - test rax,rax
+stellaris.exe+27D48E - 75 5F                 - jne stellaris.exe+27D4EF
+stellaris.exe+27D490 - B9 80000000           - mov ecx,00000080 { 128 }
+stellaris.exe+27D495 - E8 DEB1E900           - call stellaris.exe+1118678
+stellaris.exe+27D49A - 33 C9                 - xor ecx,ecx
+stellaris.exe+27D49C - 48 89 44 24 30        - mov [rsp+30],rax
+stellaris.exe+27D4A1 - 48 89 05 D8DB5801     - mov [stellaris.exe+180B080],rax { (21DD3DC1F20) } &lt;== Checksum Address
+
+Copy dil to [rsi+7A] if you are running NAC mods (0) or not (1) at game-start
+stellaris.exe+27E5AE - 40 88 7E 7A           - mov [rsi+7A],dil
+
+This script sets checksum check for not achievement compatible mods at game-start to 1
+[rax+7A] is the vanilla checksum directories check (Loaded on game-start and default initialized as 1)
+[rax+79] is when returning back to main menu
+[rax+7B] starts the checksum check on game setup
+*/
+{
+// ORIGINAL CODE - INJECTION POINT: stellaris.exe+110570B
+
+stellaris.exe+11056DF: 75 09                 - jne stellaris.exe+11056EA
+stellaris.exe+11056E1: 0F B6 41 4C           - movzx eax,byte ptr [rcx+4C]
+stellaris.exe+11056E5: 38 42 62              - cmp [rdx+62],al
+stellaris.exe+11056E8: 74 0C                 - je stellaris.exe+11056F6
+stellaris.exe+11056EA: E8 31 E6 FF FF        - call stellaris.exe+1103D20
+stellaris.exe+11056EF: 4C 8B 05 7A A2 B0 01  - mov r8,[stellaris.exe+2C0F970]
+stellaris.exe+11056F6: 49 8B 80 18 09 00 00  - mov rax,[r8+00000918]
+stellaris.exe+11056FD: 80 B8 DF 00 00 00 00  - cmp byte ptr [rax+000000DF],00
+stellaris.exe+1105704: 74 1C                 - je stellaris.exe+1105722
+stellaris.exe+1105706: E8 05 AE 15 FF        - call stellaris.exe+260510
+// ---------- INJECTING HERE ----------
+stellaris.exe+110570B: 80 78 7B 00           - cmp byte ptr [rax+7B],00
+// ---------- DONE INJECTING  ----------
+stellaris.exe+110570F: 75 0C                 - jne stellaris.exe+110571D
+stellaris.exe+1105711: 80 78 79 00           - cmp byte ptr [rax+79],00
+stellaris.exe+1105715: 74 0B                 - je stellaris.exe+1105722
+stellaris.exe+1105717: 80 78 7A 00           - cmp byte ptr [rax+7A],00
+stellaris.exe+110571B: 74 05                 - je stellaris.exe+1105722
+stellaris.exe+110571D: 40 B7 01              - mov dil,01
+stellaris.exe+1105720: EB 03                 - jmp stellaris.exe+1105725
+stellaris.exe+1105722: 40 32 FF              - xor dil,dil
+stellaris.exe+1105725: 48 8B 4B 58           - mov rcx,[rbx+58]
+stellaris.exe+1105729: 48 8B 01              - mov rax,[rcx]
+}
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>17371</ID>
+          <Description>"[X] &lt;== Allow Achievements with Console Commands"</Description>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+          <Color>C08000</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : stellaris.exe
+  Version:
+  Date   : 2022-09-23
+  Author : Nameless
+         Updater:  Fuwa
+         Version:  4.4.3
+         Date:     2026-06-20
+
+  This script does blah blah blah
+}
+
+
+//=========================================
+ [ENABLE]
+//=========================================
+define(LUDO,"stellaris.exe")
+
+// To find: Search string "EXECUTED_COMMAND_SUCCESS_CHAT_MESSAGE"
+// Jump to the function that references it (7FF7EF5C3460 in 4.3.7)
+// Two writes disabled: mov byte ptr [rax+FC],1 and mov byte ptr [rax+83],1
+// These only execute when [rbx+178]==0 and r8b!=0 (command succeeded)
+// AOB anchored on: test r8b,r8b + je (45 84 C0 0F 84 2B 03 00 00)
+// If pattern breaks, search "EXECUTED_COMMAND_SUCCESS_CHAT_MESSAGE"
+// and look ~50 bytes above for the two mov byte ptr [rax+??],1 writes
+aobScanModule(CONSOLE_ACH,stellaris.exe,45 84 C0 0F 84 2B 03 00 00 48 8D 05 ?? ?? ?? ?? 48 89 44 24 50)
+
+registersymbol(CONSOLE_ACH)
+
+CONSOLE_ACH+33:
+  db 90 90 90 90 90 90 90
+
+CONSOLE_ACH+3A:
+  db 90 90 90 90 90 90 90
+
+//=========================================
+ [DISABLE]
+//=========================================
+
+CONSOLE_ACH+33:
+  db C6 80 FC 00 00 00 01
+
+CONSOLE_ACH+3A:
+  db C6 80 83 00 00 00 01
+
+unregistersymbol(CONSOLE_ACH)
+
+
+//=========================================
+// Extra information
+//=========================================
+
+/*
+stellaris.exe+B48245 - E8 36220000           - call stellaris.exe+B4A480
+stellaris.exe+B4824A - 48 8B 05 4F1CCC00     - mov rax,[stellaris.exe+1809EA0] { (1E985B2BD30) } &lt;== Ironman Address
+stellaris.exe+B48251 - 48 8B 88 A8070000     - mov rcx,[rax+000007A8] &lt;== First Offset
+stellaris.exe+B48258 - 80 B9 8C000000 00     - cmp byte ptr [rcx+0000008C],00 { 0 } &lt;= Second Offset
+stellaris.exe+B4825F - 74 1B                 - je stellaris.exe+B4827C
+stellaris.exe+B48261 - E8 1A5273FF           - call stellaris.exe+27D480 &lt;= Follow this address to find checksum address
+stellaris.exe+B48266 - 80 78 7B 00           - cmp byte ptr [rax+7B],00 { 0 } &lt;== Starts the checksum check at 100% on game startup
+stellaris.exe+B4826A - 75 0C                 - jne stellaris.exe+B48278
+stellaris.exe+B4826C - 80 78 79 00           - cmp byte ptr [rax+79],00 { 0 } &lt;== Returns back to main menu
+stellaris.exe+B48270 - 74 0A                 - je stellaris.exe+B4827C
+stellaris.exe+B48272 - 80 78 7A 00           - cmp byte ptr [rax+7A],00 { 0 } &lt;== Checks if checksum directories are not modified
+stellaris.exe+B48276 - 74 04                 - je stellaris.exe+B4827C
+stellaris.exe+B48278 - B3 01                 - mov bl,01 { 1 }
+stellaris.exe+B4827A - EB 02                 - jmp stellaris.exe+B4827E
+stellaris.exe+B4827C - 32 DB                 - xor bl,bl
+stellaris.exe+B4827E - 48 C7 44 24 40 0F000000 - mov qword ptr [rsp+40],0000000F { 15 }
+stellaris.exe+B48287 - 48 C7 44 24 38 00000000 - mov qword ptr [rsp+38],00000000 { 0 }
+stellaris.exe+B48290 - C6 44 24 28 00        - mov byte ptr [rsp+28],00 { 0 }
+stellaris.exe+B48295 - 41 B8 0B000000        - mov r8d,0000000B { 11 }
+stellaris.exe+B4829B - 48 8D 15 9E3C8500     - lea rdx,[stellaris.exe+139BF40] { ("achievement") }
+stellaris.exe+B482A2 - 48 8D 4C 24 28        - lea rcx,[rsp+28]
+stellaris.exe+B482A7 - E8 B4F956FF           - call stellaris.exe+B7C60
+stellaris.exe+B482AC - 90                    - nop
+stellaris.exe+B482AD - 48 8D 05 C4929400     - lea rax,[stellaris.exe+1491578] { ("ACHIEVEMENT_ELIGIBLE") }
+
+After following the call address
+stellaris.exe+27D480 - 48 83 EC 28           - sub rsp,28 { 40 }
+stellaris.exe+27D484 - 48 8B 05 F5DB5801     - mov rax,[stellaris.exe+180B080] { (21DD3DC1F20) }
+stellaris.exe+27D48B - 48 85 C0              - test rax,rax
+stellaris.exe+27D48E - 75 5F                 - jne stellaris.exe+27D4EF
+stellaris.exe+27D490 - B9 80000000           - mov ecx,00000080 { 128 }
+stellaris.exe+27D495 - E8 DEB1E900           - call stellaris.exe+1118678
+stellaris.exe+27D49A - 33 C9                 - xor ecx,ecx
+stellaris.exe+27D49C - 48 89 44 24 30        - mov [rsp+30],rax
+stellaris.exe+27D4A1 - 48 89 05 D8DB5801     - mov [stellaris.exe+180B080],rax { (21DD3DC1F20) } &lt;== Checksum Address
+
+Copy dil to [rsi+7A] if you are running NAC mods (0) or not (1) at game-start
+stellaris.exe+27E5AE - 40 88 7E 7A           - mov [rsi+7A],dil
+
+This script sets checksum check for not achievement compatible mods at game-start to 1
+[rax+7A] is the vanilla checksum directories check (Loaded on game-start and default initialized as 1)
+[rax+79] is when returning back to main menu
+[rax+7B] starts the checksum check on game setup
+*/
+{
+// ORIGINAL CODE - INJECTION POINT: stellaris.exe+110570B
+
+stellaris.exe+11056DF: 75 09                 - jne stellaris.exe+11056EA
+stellaris.exe+11056E1: 0F B6 41 4C           - movzx eax,byte ptr [rcx+4C]
+stellaris.exe+11056E5: 38 42 62              - cmp [rdx+62],al
+stellaris.exe+11056E8: 74 0C                 - je stellaris.exe+11056F6
+stellaris.exe+11056EA: E8 31 E6 FF FF        - call stellaris.exe+1103D20
+stellaris.exe+11056EF: 4C 8B 05 7A A2 B0 01  - mov r8,[stellaris.exe+2C0F970]
+stellaris.exe+11056F6: 49 8B 80 18 09 00 00  - mov rax,[r8+00000918]
+stellaris.exe+11056FD: 80 B8 DF 00 00 00 00  - cmp byte ptr [rax+000000DF],00
+stellaris.exe+1105704: 74 1C                 - je stellaris.exe+1105722
+stellaris.exe+1105706: E8 05 AE 15 FF        - call stellaris.exe+260510
+// ---------- INJECTING HERE ----------
+stellaris.exe+110570B: 80 78 7B 00           - cmp byte ptr [rax+7B],00
+// ---------- DONE INJECTING  ----------
+stellaris.exe+110570F: 75 0C                 - jne stellaris.exe+110571D
+stellaris.exe+1105711: 80 78 79 00           - cmp byte ptr [rax+79],00
+stellaris.exe+1105715: 74 0B                 - je stellaris.exe+1105722
+stellaris.exe+1105717: 80 78 7A 00           - cmp byte ptr [rax+7A],00
+stellaris.exe+110571B: 74 05                 - je stellaris.exe+1105722
+stellaris.exe+110571D: 40 B7 01              - mov dil,01
+stellaris.exe+1105720: EB 03                 - jmp stellaris.exe+1105725
+stellaris.exe+1105722: 40 32 FF              - xor dil,dil
+stellaris.exe+1105725: 48 8B 4B 58           - mov rcx,[rbx+58]
+stellaris.exe+1105729: 48 8B 01              - mov rax,[rcx]
+}
+
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>17378</ID>
+              <Description>"-- ! -- Find all the console commands on the wiki -- ! --"</Description>
+              <Color>0080FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>5655</ID>
+              <Description>"http://www.stellariswiki.com/Console_commands"</Description>
+              <Color>4080FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>17365</ID>
+          <Description>"[X] &lt;== Console in Ironman by littleeon"</Description>
+          <Options moHideChildren="1"/>
+          <Color>C08000</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : stellaris.exe
+  Version: 4.3.3
+  Date   : 2022-09-23
+  Author : littleeon
+         Updater:  Fuwa
+         Version:  4.4.3
+         Date:     2026-06-20
+}
+
+[ENABLE]
+{$lua}
+local p7 = {0x48, 0x39, 0xC0, 0x90, 0x90, 0x90, 0x90}
+local p2 = {0x90, 0x90}
+local modBase = getAddress("stellaris.exe")
+local modSize = getModuleSize("stellaris.exe")
+local modEnd = modBase + modSize
+local saved = {}
+
+local function findAll(pattern)
+  local addrs = {}
+  local results = AOBScan(pattern, "+X-C-W")
+  if results then
+    for i = 0, results.Count - 1 do
+      local addr = getAddress(results[i])
+      if addr &gt;= modBase and modEnd &gt; addr then
+        table.insert(addrs, addr)
+      end
+    end
+    results.destroy()
+  end
+  return addrs
+end
+
+local function patch(addr, bytes)
+  local orig = {readBytes(addr, #bytes, true)}
+  table.insert(saved, {addr=addr, orig=orig, size=#bytes})
+  writeBytes(addr, bytes)
+end
+
+-- If this function ever causes actual problems, then the reason is that it overwrites all hits
+-- even non relevant / unrelated functions,
+-- but that might be a problem for the future for anyone interested to make it work again
+-- Console1: cmp [rbx+A9],0 / je
+for _, a in ipairs(findAll("80 BB A9 00 00 00 00 74")) do
+  patch(a, p7)
+end
+
+-- Console2: cmp [rbx+A8],0 / jne
+for _, a in ipairs(findAll("80 BB A8 00 00 00 00 0F 85")) do
+  patch(a, p7)
+end
+
+-- Console3: cmp [rbx+A8],0 / je
+local c3 = findAll("80 BB A8 00 00 00 00 74")
+if #c3 == 0 then
+  local generic = findAll("80 BB ?? 00 00 00 00 74 ?? C6 ?? ?? 00")
+  for _, a in ipairs(generic) do
+    local b = readBytes(a + 2, 1)
+    if b ~= 0xA9 and b ~= 0x48 then
+      table.insert(c3, a)
+    end
+  end
+end
+for _, a in ipairs(c3) do
+  patch(a, p7)
+end
+
+-- Console4: dev mode check
+for _, a in ipairs(findAll("?? 38 ?? ?? ?? 00 00 75 05 ?? 32 ?? EB 03 ?? B7 01")) do
+  patch(a + 7, p2)
+end
+
+-- Store saved bytes globally for disable
+_G.consoleSaved = saved
+
+[DISABLE]
+{$lua}
+if _G.consoleSaved then
+  for _, entry in ipairs(_G.consoleSaved) do
+    writeBytes(entry.addr, entry.orig)
+  end
+  _G.consoleSaved = nil
+end
+{$asm}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>17377</ID>
+          <Description>"Not Updated"</Description>
+          <Options moHideChildren="1"/>
+          <Color>FF80FF</Color>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>17380</ID>
+              <Description>"[X] &lt;== Console in Ironman"</Description>
+              <Options moHideChildren="1"/>
+              <Color>C08000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{ Game   : stellaris.exe
+  Version: 
+  Date   : 2022-09-23
+  Author : Nameless
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(EnableConsole1,stellaris.exe,75 30 49 8B 8E A0 00 00 00) // should be unique
+aobscanmodule(EnableConsole2,stellaris.exe,44 38 A1 DF 00 00 00) // should be unique
+alloc(newmem,$1000,EnableConsole1)
+
+label(ConsoleKey)
+label(ConsoleAvailable)
+label(return_consolekey)
+label(return_consoleavailable)
+
+registersymbol(EnableConsole1)
+registersymbol(EnableConsole2)
+
+newmem:
+
+ConsoleKey:
+  //jne stellaris.exe+1B6D89
+  //jne stellaris.exe+A4389C - 3.6.0
+  mov rcx,[r14+00000090]
+  jmp return_consolekey
+  
+ConsoleAvailable:
+  cmp eax,eax
+  jmp return_consoleavailable
+  
+
+EnableConsole1:
+  jmp ConsoleKey
+  nop 4
+return_consolekey:
+
+EnableConsole2:
+  jmp ConsoleAvailable
+  nop 2
+return_consoleavailable:
+
+
+[DISABLE]
+
+EnableConsole1:
+  db 75 30 49 8B 8E A0 00 00 00
+
+EnableConsole2:
+  db 44 38 A1 DF 00 00 00
+
+unregistersymbol(EnableConsole1 EnableConsole2)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: stellaris.exe+1B6D57
+
+stellaris.exe+1B6D2C: 4C 8B 76 38              - mov r14,[rsi+38]
+stellaris.exe+1B6D30: 41 80 7E 48 00           - cmp byte ptr [r14+48],00
+stellaris.exe+1B6D35: 74 18                    - je stellaris.exe+1B6D4F
+stellaris.exe+1B6D37: 49 8B 8E B8 00 00 00     - mov rcx,[r14+000000B8]
+stellaris.exe+1B6D3E: 48 83 C1 30              - add rcx,30
+stellaris.exe+1B6D42: 48 8B 01                 - mov rax,[rcx]
+stellaris.exe+1B6D45: FF 50 78                 - call qword ptr [rax+78]
+stellaris.exe+1B6D48: 41 C6 46 48 00           - mov byte ptr [r14+48],00
+stellaris.exe+1B6D4D: EB 3A                    - jmp stellaris.exe+1B6D89
+stellaris.exe+1B6D4F: 41 80 BE C8 00 00 00 00  - cmp byte ptr [r14+000000C8],00
+// ---------- INJECTING HERE ----------
+stellaris.exe+1B6D57: 75 30                    - jne stellaris.exe+1B6D89
+// ---------- DONE INJECTING  ----------
+stellaris.exe+1B6D59: 49 8B 8E B8 00 00 00     - mov rcx,[r14+000000B8]
+stellaris.exe+1B6D60: 48 83 C1 30              - add rcx,30
+stellaris.exe+1B6D64: 48 8B 01                 - mov rax,[rcx]
+stellaris.exe+1B6D67: FF 50 70                 - call qword ptr [rax+70]
+stellaris.exe+1B6D6A: 49 8B 86 C0 00 00 00     - mov rax,[r14+000000C0]
+stellaris.exe+1B6D71: 66 C7 40 0A 01 00        - mov word ptr [rax+0A],0001
+stellaris.exe+1B6D77: 49 8B 8E B8 00 00 00     - mov rcx,[r14+000000B8]
+stellaris.exe+1B6D7E: 48 8B 01                 - mov rax,[rcx]
+stellaris.exe+1B6D81: FF 50 58                 - call qword ptr [rax+58]
+stellaris.exe+1B6D84: 41 C6 46 48 01           - mov byte ptr [r14+48],01
+}
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>17381</ID>
+                  <Description>"-- ! -- Find all the console commands on the wiki -- ! --"</Description>
+                  <Color>0080FF</Color>
+                  <GroupHeader>1</GroupHeader>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>17382</ID>
+                  <Description>"http://www.stellariswiki.com/Console_commands"</Description>
+                  <Color>4080FF</Color>
+                  <GroupHeader>1</GroupHeader>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>17353</ID>
+              <Description>"[X] &lt;== Spy progress in a day"</Description>
+              <Color>C08000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{ Game   : stellaris.exe
+  Version: 
+  Date   : 2022-07-19
+  Author : Nameless
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(SpyMission,stellaris.exe,48 29 86 B0 02 00 00) // should be unique
+alloc(newmem,$1000,SpyMission)
+
+label(code)
+label(return)
+
+newmem:
+  push rbx
+  push rcx
+  mov rbx,[rbp+B8]
+  mov rcx,pPlayer
+  mov rcx,[rcx]
+  cmp rcx,rbx
+  jne code
+  mov [rsi+000002B0],rax
+
+
+code:
+  pop rbx
+  pop rcx
+  sub [rsi+000002B0],rax
+
+  jmp return
+
+SpyMission:
+  jmp newmem
+  nop 2
+return:
+registersymbol(SpyMission)
+
+[DISABLE]
+
+SpyMission:
+  db 48 29 86 B0 02 00 00
+
+unregistersymbol(SpyMission)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: stellaris.exe+5B2BC2
+
+stellaris.exe+5B2B8F: 41 80 7F 20 00           - cmp byte ptr [r15+20],00
+stellaris.exe+5B2B94: 0F 84 BC 00 00 00        - je stellaris.exe+5B2C56
+stellaris.exe+5B2B9A: 49 8D 8E E0 00 00 00     - lea rcx,[r14+000000E0]
+stellaris.exe+5B2BA1: E8 FA 71 B1 FF           - call stellaris.exe+C9DA0
+stellaris.exe+5B2BA6: 4C 8D 48 10              - lea r9,[rax+10]
+stellaris.exe+5B2BAA: 4C 8B 05 F7 1B 34 01     - mov r8,[stellaris.exe+18F47A8]
+stellaris.exe+5B2BB1: 48 8D 55 28              - lea rdx,[rbp+28]
+stellaris.exe+5B2BB5: 49 8B 4E 78              - mov rcx,[r14+78]
+stellaris.exe+5B2BB9: E8 B2 43 E4 FF           - call stellaris.exe+3F6F70
+stellaris.exe+5B2BBE: 48 8B 45 28              - mov rax,[rbp+28]
+// ---------- INJECTING HERE ----------
+stellaris.exe+5B2BC2: 49 29 86 A0 02 00 00     - sub [r14+000002A0],rax
+// ---------- DONE INJECTING  ----------
+stellaris.exe+5B2BC9: 49 83 BE A0 02 00 00 00  - cmp qword ptr [r14+000002A0],00
+stellaris.exe+5B2BD1: 7E 0C                    - jle stellaris.exe+5B2BDF
+stellaris.exe+5B2BD3: 41 B7 01                 - mov r15l,01
+stellaris.exe+5B2BD6: 48 8B 75 08              - mov rsi,[rbp+08]
+stellaris.exe+5B2BDA: E9 83 00 00 00           - jmp stellaris.exe+5B2C62
+stellaris.exe+5B2BDF: 41 B7 02                 - mov r15l,02
+stellaris.exe+5B2BE2: 49 89 9E A0 02 00 00     - mov [r14+000002A0],rbx
+stellaris.exe+5B2BE9: 44 8B 85 E0 00 00 00     - mov r8d,[rbp+000000E0]
+stellaris.exe+5B2BF0: 44 2B 85 E8 00 00 00     - sub r8d,[rbp+000000E8]
+stellaris.exe+5B2BF7: 41 FF C0                 - inc r8d
+}
+{
+// ORIGINAL CODE - INJECTION POINT: stellaris.exe+5D751A
+// 3.5.2
+
+stellaris.exe+5D74E7: 41 80 7F 20 00           - cmp byte ptr [r15+20],00
+stellaris.exe+5D74EC: 0F 84 99 00 00 00        - je stellaris.exe+5D758B
+stellaris.exe+5D74F2: 48 8D 8E F0 00 00 00     - lea rcx,[rsi+000000F0]
+stellaris.exe+5D74F9: E8 12 6F BB FF           - call stellaris.exe+18E410
+stellaris.exe+5D74FE: 4C 8D 48 10              - lea r9,[rax+10]
+stellaris.exe+5D7502: 4C 8B 05 EF 86 3A 01     - mov r8,[stellaris.exe+197FBF8]
+stellaris.exe+5D7509: 48 8D 55 28              - lea rdx,[rbp+28]
+stellaris.exe+5D750D: 48 8B 4E 78              - mov rcx,[rsi+78]
+stellaris.exe+5D7511: E8 2A 7E DD FF           - call stellaris.exe+3AF340
+stellaris.exe+5D7516: 48 8B 45 28              - mov rax,[rbp+28]
+// ---------- INJECTING HERE ----------
+stellaris.exe+5D751A: 48 29 86 B0 02 00 00     - sub [rsi+000002B0],rax
+// ---------- DONE INJECTING  ----------
+stellaris.exe+5D7521: 48 83 BE B0 02 00 00 00  - cmp qword ptr [rsi+000002B0],00
+stellaris.exe+5D7529: 7E 09                    - jle stellaris.exe+5D7534
+stellaris.exe+5D752B: 41 B6 01                 - mov r14l,01
+stellaris.exe+5D752E: 4C 8B 65 18              - mov r12,[rbp+18]
+stellaris.exe+5D7532: EB 63                    - jmp stellaris.exe+5D7597
+stellaris.exe+5D7534: 41 B6 02                 - mov r14l,02
+stellaris.exe+5D7537: 48 89 9E B0 02 00 00     - mov [rsi+000002B0],rbx
+stellaris.exe+5D753E: 8B 45 14                 - mov eax,[rbp+14]
+stellaris.exe+5D7541: 89 86 C8 02 00 00        - mov [rsi+000002C8],eax
+stellaris.exe+5D7547: 48 8D 8E F0 00 00 00     - lea rcx,[rsi+000000F0]
+}
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>7317</ID>
+              <Description>"[X] &lt;=================== Pointers ===================="</Description>
+              <Options moHideChildren="1"/>
+              <Color>FF80FF</Color>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>5658</ID>
+                  <Description>"[X] &lt;== Empire ===================="</Description>
+                  <Options moHideChildren="1"/>
+                  <Color>404080</Color>
+                  <GroupHeader>1</GroupHeader>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>5659</ID>
+                      <Description>"Faction Name (&lt;16)"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <Color>0000FF</Color>
+                      <VariableType>String</VariableType>
+                      <Length>16</Length>
+                      <Unicode>0</Unicode>
+                      <CodePage>0</CodePage>
+                      <ZeroTerminate>1</ZeroTerminate>
+                      <Address>pPlayer</Address>
+                      <Offsets>
+                        <Offset>DF0</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>5660</ID>
+                      <Description>"Faction Name (&gt;=16)"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <Color>0000FF</Color>
+                      <VariableType>String</VariableType>
+                      <Length>32</Length>
+                      <Unicode>0</Unicode>
+                      <CodePage>0</CodePage>
+                      <ZeroTerminate>1</ZeroTerminate>
+                      <Address>pPlayer</Address>
+                      <Offsets>
+                        <Offset>0</Offset>
+                        <Offset>DF0</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>5790</ID>
+                      <Description>"Navy Size (x100000) ==&gt;"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FF00FF</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>pPlayer</Address>
+                      <Offsets>
+                        <Offset>2900</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>7352</ID>
+                      <Description>"Starbase Count (x1) ==&gt;"</Description>
+                      <Color>FF00FF</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>pPlayer</Address>
+                      <Offsets>
+                        <Offset>2CE0</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>17352</ID>
+                      <Description>"Starbase Capacity (x100000) ==&gt;"</Description>
+                      <Color>FF00FF</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>pPlayer</Address>
+                      <Offsets>
+                        <Offset>2CE8</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>5770</ID>
+                      <Description>"Empire Size (x1) ==&gt;"</Description>
+                      <Color>FF00FF</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>pPlayer</Address>
+                      <Offsets>
+                        <Offset>2928</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>5663</ID>
+                      <Description>"[X] &lt;== Resources ================"</Description>
+                      <Options moHideChildren="1"/>
+                      <Color>008000</Color>
+                      <GroupHeader>1</GroupHeader>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>7318</ID>
+                          <Description>"Energy (x100000) ==&gt;"</Description>
+                          <ShowAsSigned>1</ShowAsSigned>
+                          <Color>FF00FF</Color>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>pPlayer</Address>
+                          <Offsets>
+                            <Offset>8</Offset>
+                            <Offset>30</Offset>
+                            <Offset>24C0</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>5667</ID>
+                          <Description>"Minerals (x100000) ==&gt;"</Description>
+                          <ShowAsSigned>1</ShowAsSigned>
+                          <Color>FF00FF</Color>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>pPlayer</Address>
+                          <Offsets>
+                            <Offset>10</Offset>
+                            <Offset>30</Offset>
+                            <Offset>24C0</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>5668</ID>
+                          <Description>"Food (x100000) ==&gt;"</Description>
+                          <ShowAsSigned>1</ShowAsSigned>
+                          <Color>FF00FF</Color>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>pPlayer</Address>
+                          <Offsets>
+                            <Offset>18</Offset>
+                            <Offset>30</Offset>
+                            <Offset>24C0</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>5669</ID>
+                          <Description>"Alloys (x100000) ==&gt;"</Description>
+                          <ShowAsSigned>1</ShowAsSigned>
+                          <Color>FF00FF</Color>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>pPlayer</Address>
+                          <Offsets>
+                            <Offset>50</Offset>
+                            <Offset>30</Offset>
+                            <Offset>24C0</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>5765</ID>
+                          <Description>"Consumer Goods (x100000) ==&gt;"</Description>
+                          <ShowAsSigned>1</ShowAsSigned>
+                          <Color>FF00FF</Color>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>pPlayer</Address>
+                          <Offsets>
+                            <Offset>48</Offset>
+                            <Offset>30</Offset>
+                            <Offset>24C0</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>5764</ID>
+                          <Description>"Influence (x100000) ==&gt;"</Description>
+                          <ShowAsSigned>1</ShowAsSigned>
+                          <Color>FF00FF</Color>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>pPlayer</Address>
+                          <Offsets>
+                            <Offset>38</Offset>
+                            <Offset>30</Offset>
+                            <Offset>24C0</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>5671</ID>
+                          <Description>"Unity (x100000) ==&gt;"</Description>
+                          <ShowAsSigned>1</ShowAsSigned>
+                          <Color>FF00FF</Color>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>pPlayer</Address>
+                          <Offsets>
+                            <Offset>40</Offset>
+                            <Offset>30</Offset>
+                            <Offset>24C0</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>7255</ID>
+                          <Description>"Minor Artifacts (x100000) ==&gt;"</Description>
+                          <Color>FF00FF</Color>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>pPlayer</Address>
+                          <Offsets>
+                            <Offset>90</Offset>
+                            <Offset>30</Offset>
+                            <Offset>24C0</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>7229</ID>
+                      <Description>"[X] &lt;== Strategic Resources =========="</Description>
+                      <Options moHideChildren="1"/>
+                      <Color>008080</Color>
+                      <GroupHeader>1</GroupHeader>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>7223</ID>
+                          <Description>"Volatile Motes (x100000) ==&gt;"</Description>
+                          <Color>FF00FF</Color>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>pPlayer</Address>
+                          <Offsets>
+                            <Offset>58</Offset>
+                            <Offset>30</Offset>
+                            <Offset>24C0</Offset>
+                          </Offsets>
+                          <Hotkeys>
+                            <Hotkey>
+                              <Action>Toggle Activation Allow Increase</Action>
+                              <Keys>
+                                <Key>17</Key>
+                                <Key>46</Key>
+                              </Keys>
+                              <ID>0</ID>
+                            </Hotkey>
+                          </Hotkeys>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>7224</ID>
+                          <Description>"Exotic Gases (x100000) ==&gt;"</Description>
+                          <Color>FF00FF</Color>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>pPlayer</Address>
+                          <Offsets>
+                            <Offset>60</Offset>
+                            <Offset>30</Offset>
+                            <Offset>24C0</Offset>
+                          </Offsets>
+                          <Hotkeys>
+                            <Hotkey>
+                              <Action>Toggle Activation Allow Increase</Action>
+                              <Keys>
+                                <Key>17</Key>
+                                <Key>46</Key>
+                              </Keys>
+                              <ID>0</ID>
+                            </Hotkey>
+                          </Hotkeys>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>7225</ID>
+                          <Description>"Rare Crystals (x100000) ==&gt;"</Description>
+                          <Color>FF00FF</Color>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>pPlayer</Address>
+                          <Offsets>
+                            <Offset>68</Offset>
+                            <Offset>30</Offset>
+                            <Offset>24C0</Offset>
+                          </Offsets>
+                          <Hotkeys>
+                            <Hotkey>
+                              <Action>Toggle Activation Allow Increase</Action>
+                              <Keys>
+                                <Key>17</Key>
+                                <Key>46</Key>
+                              </Keys>
+                              <ID>0</ID>
+                            </Hotkey>
+                          </Hotkeys>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>7226</ID>
+                          <Description>"Living Metal (x100000) ==&gt;"</Description>
+                          <Color>FF00FF</Color>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>pPlayer</Address>
+                          <Offsets>
+                            <Offset>70</Offset>
+                            <Offset>30</Offset>
+                            <Offset>24C0</Offset>
+                          </Offsets>
+                          <Hotkeys>
+                            <Hotkey>
+                              <Action>Toggle Activation Allow Increase</Action>
+                              <Keys>
+                                <Key>17</Key>
+                                <Key>46</Key>
+                              </Keys>
+                              <ID>0</ID>
+                            </Hotkey>
+                          </Hotkeys>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>7227</ID>
+                          <Description>"Zro (x100000) ==&gt;"</Description>
+                          <Color>FF00FF</Color>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>pPlayer</Address>
+                          <Offsets>
+                            <Offset>78</Offset>
+                            <Offset>30</Offset>
+                            <Offset>24C0</Offset>
+                          </Offsets>
+                          <Hotkeys>
+                            <Hotkey>
+                              <Action>Toggle Activation Allow Increase</Action>
+                              <Keys>
+                                <Key>17</Key>
+                                <Key>46</Key>
+                              </Keys>
+                              <ID>0</ID>
+                            </Hotkey>
+                          </Hotkeys>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>7228</ID>
+                          <Description>"Dark Matter (x100000) ==&gt;"</Description>
+                          <Color>FF00FF</Color>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>pPlayer</Address>
+                          <Offsets>
+                            <Offset>80</Offset>
+                            <Offset>30</Offset>
+                            <Offset>24C0</Offset>
+                          </Offsets>
+                          <Hotkeys>
+                            <Hotkey>
+                              <Action>Toggle Activation Allow Increase</Action>
+                              <Keys>
+                                <Key>17</Key>
+                                <Key>46</Key>
+                              </Keys>
+                              <ID>0</ID>
+                            </Hotkey>
+                          </Hotkeys>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>7222</ID>
+                          <Description>"Nanites (x100000) ==&gt;"</Description>
+                          <Color>FF00FF</Color>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>pPlayer</Address>
+                          <Offsets>
+                            <Offset>88</Offset>
+                            <Offset>30</Offset>
+                            <Offset>24C0</Offset>
+                          </Offsets>
+                          <Hotkeys>
+                            <Hotkey>
+                              <Action>Toggle Activation Allow Increase</Action>
+                              <Keys>
+                                <Key>17</Key>
+                                <Key>46</Key>
+                              </Keys>
+                              <ID>0</ID>
+                            </Hotkey>
+                          </Hotkeys>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>5687</ID>
+                  <Description>"[X] &lt;== Last Selected Character ========== (Use leaders page (F5))"</Description>
+                  <Options moHideChildren="1"/>
+                  <Color>404080</Color>
+                  <GroupHeader>1</GroupHeader>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>5688</ID>
+                      <Description>"-- ! -- First go to the respective menu. -- ! --"</Description>
+                      <Color>0080FF</Color>
+                      <GroupHeader>1</GroupHeader>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>5689</ID>
+                      <Description>"-- ! -- (The ship or planet they are leading, or the government screen.) -- ! --"</Description>
+                      <Color>0080FF</Color>
+                      <GroupHeader>1</GroupHeader>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>5690</ID>
+                      <Description>"-- ! -- Then hover over and edit the character -- ! --"</Description>
+                      <Color>0080FF</Color>
+                      <GroupHeader>1</GroupHeader>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>5691</ID>
+                      <Description>"Species (&lt;16)"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <Color>0000FF</Color>
+                      <VariableType>String</VariableType>
+                      <Length>16</Length>
+                      <Unicode>0</Unicode>
+                      <CodePage>0</CodePage>
+                      <ZeroTerminate>1</ZeroTerminate>
+                      <Address>pChar</Address>
+                      <Offsets>
+                        <Offset>78</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>5693</ID>
+                      <Description>"Species (&gt;=16)"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <Color>0000FF</Color>
+                      <VariableType>String</VariableType>
+                      <Length>32</Length>
+                      <Unicode>0</Unicode>
+                      <CodePage>0</CodePage>
+                      <ZeroTerminate>1</ZeroTerminate>
+                      <Address>pChar</Address>
+                      <Offsets>
+                        <Offset>0</Offset>
+                        <Offset>78</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>15692</ID>
+                      <Description>"Name (&lt;16)"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <Color>0000FF</Color>
+                      <VariableType>String</VariableType>
+                      <Length>16</Length>
+                      <Unicode>0</Unicode>
+                      <CodePage>0</CodePage>
+                      <ZeroTerminate>1</ZeroTerminate>
+                      <Address>pChar</Address>
+                      <Offsets>
+                        <Offset>0A</Offset>
+                        <Offset>10</Offset>
+                        <Offset>1B0</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>15792</ID>
+                      <Description>"Name (&gt;=16)"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <Color>0000FF</Color>
+                      <VariableType>String</VariableType>
+                      <Length>32</Length>
+                      <Unicode>0</Unicode>
+                      <CodePage>0</CodePage>
+                      <ZeroTerminate>1</ZeroTerminate>
+                      <Address>pChar</Address>
+                      <Offsets>
+                        <Offset>0</Offset>
+                        <Offset>0A</Offset>
+                        <Offset>10</Offset>
+                        <Offset>1B8</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>5695</ID>
+                      <Description>"Age Base (x1) ==&gt;"</Description>
+                      <Color>FF00FF</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>pChar</Address>
+                      <Offsets>
+                        <Offset>D4</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>5788</ID>
+                      <Description>"Current Skill Level (x1) ==&gt;"</Description>
+                      <Color>FF00FF</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>pChar</Address>
+                      <Offsets>
+                        <Offset>C0</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>5696</ID>
+                      <Description>"Current XP (x100.000) ==&gt;"</Description>
+                      <Color>FF00FF</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>pChar</Address>
+                      <Offsets>
+                        <Offset>B8</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>5778</ID>
+                  <Description>"[X] &lt;== Last Selected Planet ============"</Description>
+                  <Options moHideChildren="1"/>
+                  <Color>404080</Color>
+                  <GroupHeader>1</GroupHeader>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>5779</ID>
+                      <Description>"-- ! -- Select planet you wish to edit -- ! --"</Description>
+                      <Color>0080FF</Color>
+                      <GroupHeader>1</GroupHeader>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>5780</ID>
+                      <Description>"Planet Name ID (&lt;16)"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <Color>0000FF</Color>
+                      <VariableType>String</VariableType>
+                      <Length>16</Length>
+                      <Unicode>0</Unicode>
+                      <CodePage>0</CodePage>
+                      <ZeroTerminate>1</ZeroTerminate>
+                      <Address>pPlanet</Address>
+                      <Offsets>
+                        <Offset>238</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>5781</ID>
+                      <Description>"Planet Name ID (&gt;=16)"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <Color>0000FF</Color>
+                      <VariableType>String</VariableType>
+                      <Length>32</Length>
+                      <Unicode>0</Unicode>
+                      <CodePage>0</CodePage>
+                      <ZeroTerminate>1</ZeroTerminate>
+                      <Address>pPlanet</Address>
+                      <Offsets>
+                        <Offset>0</Offset>
+                        <Offset>238</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>5784</ID>
+                      <Description>"Planet Size (x1) ==&gt;"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FF00FF</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>pPlanet</Address>
+                      <Offsets>
+                        <Offset>740</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>5785</ID>
+                      <Description>"Planet Type ==&gt;"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FF00FF</Color>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>pPlanet</Address>
+                      <Offsets>
+                        <Offset>38</Offset>
+                      </Offsets>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>5786</ID>
+                          <Description>"Planet Type (&lt;16)"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <Color>0000FF</Color>
+                          <VariableType>String</VariableType>
+                          <Length>16</Length>
+                          <Unicode>0</Unicode>
+                          <CodePage>0</CodePage>
+                          <ZeroTerminate>1</ZeroTerminate>
+                          <Address>pPlanet</Address>
+                          <Offsets>
+                            <Offset>18</Offset>
+                            <Offset>C8</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>5787</ID>
+                          <Description>"Planet Type (&gt;=16)"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <Color>0000FF</Color>
+                          <VariableType>String</VariableType>
+                          <Length>32</Length>
+                          <Unicode>0</Unicode>
+                          <CodePage>0</CodePage>
+                          <ZeroTerminate>1</ZeroTerminate>
+                          <Address>pPlanet</Address>
+                          <Offsets>
+                            <Offset>0</Offset>
+                            <Offset>18</Offset>
+                            <Offset>C8</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>7321</ID>
+                  <Description>"[X] &lt;== Race Editing/Creation =========="</Description>
+                  <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+                  <Color>404080</Color>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>//=========================================
+// Checking CE version
+//=========================================
+
+{$lua}
+  if(getCEVersion() &lt; 6.7) then
+    ShowMessage('Sorry. CE version should be 6.7 or above')
+  end
+{$asm}
+
+//=========================================
+// Checking Selected Process
+//=========================================
+
+{$lua}
+  if(process == nil) then
+    ShowMessage('No process was selected')
+  elseif (process ~= "stellaris.exe") then
+    ShowMessage('Error. Expected Process = stellaris.exe')
+  end
+{$asm}
+
+//=========================================
+ [ENABLE]
+//=========================================
+
+//=========================================
+// Definitions
+//=========================================
+
+define(LUDO,"stellaris.exe")
+// define(MSPC,"stellaris.exe"+0074C77C)
+{
+if pSpecies is not filled:
+Search in memory for "Biological", should find 2 (all-caps, camel-case) $28 apart apart, $10 before first is the "key"
+Search for "key", should get 6 hits, put addresses to id 0, 1, 2 in a row, find the pointer to the list. Search for the list
+using pointer scan with offset (usually 0, 40 or 0, 0, 40)
+
+Cheat mode, AOB scan for:
+?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? 42 49 4F 4C 4F 47 49 43 41 4C ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? 42 69 6F 6C 6F 67 69 63 61 6C
+
+for ethics and civic points search for "ETHOS_MAX_POINTS" and "GOVERNMENT_CIVIC_POINTS_BASE" respectively, scroll a bit up to find offset.
+These are usually grouped together.
+}
+
+
+{
+== Finding the species code ==
+ Sourced from this file:
+ \Stellaris\common\species_archetypes\00_species_archetypes.txt
+}
+
+//=========================================
+ [DISABLE]
+//=========================================
+
+//============= Scripts End ===============
+</AssemblerScript>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>7322</ID>
+                      <Description>"[X] &lt;== Instructions"</Description>
+                      <Options moHideChildren="1"/>
+                      <Color>0080FF</Color>
+                      <GroupHeader>1</GroupHeader>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>7323</ID>
+                          <Description>"To prevent AI from using super traits, follow instructions:"</Description>
+                          <Color>0080FF</Color>
+                          <GroupHeader>1</GroupHeader>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>7324</ID>
+                          <Description>"1) In race creator:"</Description>
+                          <Color>0080FF</Color>
+                          <GroupHeader>1</GroupHeader>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>7325</ID>
+                              <Description>"Set values back to default before starting a new game"</Description>
+                              <Color>0080FF</Color>
+                              <GroupHeader>1</GroupHeader>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>7326</ID>
+                          <Description>"2) In-game:"</Description>
+                          <Color>0080FF</Color>
+                          <GroupHeader>1</GroupHeader>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>7327</ID>
+                              <Description>"Edit values while paused"</Description>
+                              <Color>0080FF</Color>
+                              <GroupHeader>1</GroupHeader>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>7328</ID>
+                              <Description>"Reset base values to default before unpausing"</Description>
+                              <Color>0080FF</Color>
+                              <GroupHeader>1</GroupHeader>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>7329</ID>
+                          <Description>"3) Traits change between Robot/Organic/Machine."</Description>
+                          <Color>0080FF</Color>
+                          <GroupHeader>1</GroupHeader>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>7330</ID>
+                              <Description>"If you edit traits for more than 1 species type..."</Description>
+                              <Color>0080FF</Color>
+                              <GroupHeader>1</GroupHeader>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>7331</ID>
+                              <Description>"... reset the traits for all species types."</Description>
+                              <Color>0080FF</Color>
+                              <GroupHeader>1</GroupHeader>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>7332</ID>
+                      <Description>"[X] &lt;== Default Values"</Description>
+                      <Options moHideChildren="1"/>
+                      <Color>0080FF</Color>
+                      <GroupHeader>1</GroupHeader>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>7333</ID>
+                          <Description>"Ethic Points ==&gt; 3"</Description>
+                          <Color>0080FF</Color>
+                          <GroupHeader>1</GroupHeader>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>7334</ID>
+                          <Description>"Civic Picks ==&gt; 2"</Description>
+                          <Color>0080FF</Color>
+                          <GroupHeader>1</GroupHeader>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>7335</ID>
+                          <Description>"-- ! -- Robot -- ! --"</Description>
+                          <Color>0080FF</Color>
+                          <GroupHeader>1</GroupHeader>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>7336</ID>
+                              <Description>"Max Trait Points ==&gt; 0"</Description>
+                              <Color>0080FF</Color>
+                              <GroupHeader>1</GroupHeader>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>7337</ID>
+                              <Description>"Max Amount of Traits ==&gt; 4"</Description>
+                              <Color>0080FF</Color>
+                              <GroupHeader>1</GroupHeader>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>7338</ID>
+                          <Description>"-- ! -- Biological -- ! --"</Description>
+                          <Color>0080FF</Color>
+                          <GroupHeader>1</GroupHeader>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>7339</ID>
+                              <Description>"Max Trait Points ==&gt; 2"</Description>
+                              <Color>0080FF</Color>
+                              <GroupHeader>1</GroupHeader>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>7340</ID>
+                              <Description>"Max Amount of Traits ==&gt; 5"</Description>
+                              <Color>0080FF</Color>
+                              <GroupHeader>1</GroupHeader>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>7341</ID>
+                          <Description>"-- ! -- Machine -- ! --"</Description>
+                          <Color>0080FF</Color>
+                          <GroupHeader>1</GroupHeader>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>7342</ID>
+                              <Description>"Max Trait Points ==&gt; 1"</Description>
+                              <Color>0080FF</Color>
+                              <GroupHeader>1</GroupHeader>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>7343</ID>
+                              <Description>"Max Amount of Traits ==&gt; 5"</Description>
+                              <Color>0080FF</Color>
+                              <GroupHeader>1</GroupHeader>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>7350</ID>
+                          <Description>"-- ! -- Lithoid -- ! --"</Description>
+                          <Color>0080FF</Color>
+                          <GroupHeader>1</GroupHeader>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>7351</ID>
+                              <Description>"Inherits from Biological"</Description>
+                              <Color>0080FF</Color>
+                              <GroupHeader>1</GroupHeader>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>7344</ID>
+                      <Description>"Ethic Points"</Description>
+                      <ShowAsSigned>1</ShowAsSigned>
+                      <Color>FF00FF</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>stellaris.exe+02AF3B04</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>7345</ID>
+                      <Description>"Civic Picks"</Description>
+                      <ShowAsSigned>1</ShowAsSigned>
+                      <Color>FF00FF</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>stellaris.exe+02AF3B00</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>7353</ID>
+                      <Description>"Species List"</Description>
+                      <Options moHideChildren="1"/>
+                      <Color>FF0000</Color>
+                      <GroupHeader>1</GroupHeader>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>7354</ID>
+                          <Description>"Species 1"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>"stellaris.exe"+02AF17D8</Address>
+                          <Offsets>
+                            <Offset>0</Offset>
+                            <Offset>0</Offset>
+                            <Offset>40</Offset>
+                          </Offsets>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>7361</ID>
+                              <Description>"Identifier"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>String</VariableType>
+                              <Length>16</Length>
+                              <Unicode>0</Unicode>
+                              <CodePage>0</CodePage>
+                              <ZeroTerminate>1</ZeroTerminate>
+                              <Address>"stellaris.exe"+02AF17D8</Address>
+                              <Offsets>
+                                <Offset>10</Offset>
+                                <Offset>0</Offset>
+                                <Offset>40</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>7362</ID>
+                              <Description>"Archetype"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>String</VariableType>
+                              <Length>16</Length>
+                              <Unicode>0</Unicode>
+                              <CodePage>0</CodePage>
+                              <ZeroTerminate>1</ZeroTerminate>
+                              <Address>"stellaris.exe"+02AF17D8</Address>
+                              <Offsets>
+                                <Offset>38</Offset>
+                                <Offset>0</Offset>
+                                <Offset>40</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>7363</ID>
+                              <Description>"Max Trait Points"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>"stellaris.exe"+02AF17D8</Address>
+                              <Offsets>
+                                <Offset>58</Offset>
+                                <Offset>0</Offset>
+                                <Offset>40</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>7364</ID>
+                              <Description>"Max Amount of Traits"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>"stellaris.exe"+02AF17D8</Address>
+                              <Offsets>
+                                <Offset>5C</Offset>
+                                <Offset>0</Offset>
+                                <Offset>40</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>7381</ID>
+                              <Description>"Using traits from:"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <Color>FF00FF</Color>
+                              <VariableType>String</VariableType>
+                              <Length>16</Length>
+                              <Unicode>0</Unicode>
+                              <CodePage>0</CodePage>
+                              <ZeroTerminate>1</ZeroTerminate>
+                              <Address>"stellaris.exe"+02AF17D8</Address>
+                              <Offsets>
+                                <Offset>A8</Offset>
+                                <Offset>0</Offset>
+                                <Offset>40</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>7355</ID>
+                          <Description>"Species 2"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>"stellaris.exe"+02AF17D8</Address>
+                          <Offsets>
+                            <Offset>0</Offset>
+                            <Offset>8</Offset>
+                            <Offset>40</Offset>
+                          </Offsets>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>7365</ID>
+                              <Description>"Identifier"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>String</VariableType>
+                              <Length>16</Length>
+                              <Unicode>0</Unicode>
+                              <CodePage>0</CodePage>
+                              <ZeroTerminate>1</ZeroTerminate>
+                              <Address>"stellaris.exe"+02AF17D8</Address>
+                              <Offsets>
+                                <Offset>10</Offset>
+                                <Offset>8</Offset>
+                                <Offset>40</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>7366</ID>
+                              <Description>"Archetype"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>String</VariableType>
+                              <Length>16</Length>
+                              <Unicode>0</Unicode>
+                              <CodePage>0</CodePage>
+                              <ZeroTerminate>1</ZeroTerminate>
+                              <Address>"stellaris.exe"+02AF17D8</Address>
+                              <Offsets>
+                                <Offset>38</Offset>
+                                <Offset>8</Offset>
+                                <Offset>40</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>7367</ID>
+                              <Description>"Max Trait Points"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>"stellaris.exe"+02AF17D8</Address>
+                              <Offsets>
+                                <Offset>58</Offset>
+                                <Offset>8</Offset>
+                                <Offset>40</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>7368</ID>
+                              <Description>"Max Amount of Traits"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>"stellaris.exe"+02AF17D8</Address>
+                              <Offsets>
+                                <Offset>5C</Offset>
+                                <Offset>8</Offset>
+                                <Offset>40</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>7382</ID>
+                              <Description>"Using traits from:"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <Color>FF00FF</Color>
+                              <VariableType>String</VariableType>
+                              <Length>16</Length>
+                              <Unicode>0</Unicode>
+                              <CodePage>0</CodePage>
+                              <ZeroTerminate>1</ZeroTerminate>
+                              <Address>"stellaris.exe"+02AF17D8</Address>
+                              <Offsets>
+                                <Offset>A8</Offset>
+                                <Offset>8</Offset>
+                                <Offset>40</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>7357</ID>
+                          <Description>"Species 3"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>"stellaris.exe"+02AF17D8</Address>
+                          <Offsets>
+                            <Offset>0</Offset>
+                            <Offset>10</Offset>
+                            <Offset>40</Offset>
+                          </Offsets>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>7369</ID>
+                              <Description>"Identifier"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>String</VariableType>
+                              <Length>16</Length>
+                              <Unicode>0</Unicode>
+                              <CodePage>0</CodePage>
+                              <ZeroTerminate>1</ZeroTerminate>
+                              <Address>"stellaris.exe"+02AF17D8</Address>
+                              <Offsets>
+                                <Offset>10</Offset>
+                                <Offset>10</Offset>
+                                <Offset>40</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>7370</ID>
+                              <Description>"Archetype"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>String</VariableType>
+                              <Length>16</Length>
+                              <Unicode>0</Unicode>
+                              <CodePage>0</CodePage>
+                              <ZeroTerminate>1</ZeroTerminate>
+                              <Address>"stellaris.exe"+02AF17D8</Address>
+                              <Offsets>
+                                <Offset>38</Offset>
+                                <Offset>10</Offset>
+                                <Offset>40</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>7371</ID>
+                              <Description>"Max Trait Points"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>"stellaris.exe"+02AF17D8</Address>
+                              <Offsets>
+                                <Offset>58</Offset>
+                                <Offset>10</Offset>
+                                <Offset>40</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>7372</ID>
+                              <Description>"Max Amount of Traits"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>"stellaris.exe"+02AF17D8</Address>
+                              <Offsets>
+                                <Offset>5C</Offset>
+                                <Offset>10</Offset>
+                                <Offset>40</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>7383</ID>
+                              <Description>"Using traits from:"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <Color>FF00FF</Color>
+                              <VariableType>String</VariableType>
+                              <Length>16</Length>
+                              <Unicode>0</Unicode>
+                              <CodePage>0</CodePage>
+                              <ZeroTerminate>1</ZeroTerminate>
+                              <Address>"stellaris.exe"+02AF17D8</Address>
+                              <Offsets>
+                                <Offset>A8</Offset>
+                                <Offset>10</Offset>
+                                <Offset>40</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>7358</ID>
+                          <Description>"Species 4"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>"stellaris.exe"+02AF17D8</Address>
+                          <Offsets>
+                            <Offset>0</Offset>
+                            <Offset>18</Offset>
+                            <Offset>40</Offset>
+                          </Offsets>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>7373</ID>
+                              <Description>"Identifier"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>String</VariableType>
+                              <Length>16</Length>
+                              <Unicode>0</Unicode>
+                              <CodePage>0</CodePage>
+                              <ZeroTerminate>1</ZeroTerminate>
+                              <Address>"stellaris.exe"+02AF17D8</Address>
+                              <Offsets>
+                                <Offset>10</Offset>
+                                <Offset>18</Offset>
+                                <Offset>40</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>7374</ID>
+                              <Description>"Archetype"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>String</VariableType>
+                              <Length>16</Length>
+                              <Unicode>0</Unicode>
+                              <CodePage>0</CodePage>
+                              <ZeroTerminate>1</ZeroTerminate>
+                              <Address>"stellaris.exe"+02AF17D8</Address>
+                              <Offsets>
+                                <Offset>38</Offset>
+                                <Offset>18</Offset>
+                                <Offset>40</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>7375</ID>
+                              <Description>"Max Trait Points"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>"stellaris.exe"+02AF17D8</Address>
+                              <Offsets>
+                                <Offset>58</Offset>
+                                <Offset>18</Offset>
+                                <Offset>40</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>7376</ID>
+                              <Description>"Max Amount of Traits"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>"stellaris.exe"+02AF17D8</Address>
+                              <Offsets>
+                                <Offset>5C</Offset>
+                                <Offset>18</Offset>
+                                <Offset>40</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>7384</ID>
+                              <Description>"Using traits from:"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <Color>FF00FF</Color>
+                              <VariableType>String</VariableType>
+                              <Length>16</Length>
+                              <Unicode>0</Unicode>
+                              <CodePage>0</CodePage>
+                              <ZeroTerminate>1</ZeroTerminate>
+                              <Address>"stellaris.exe"+02AF17D8</Address>
+                              <Offsets>
+                                <Offset>A8</Offset>
+                                <Offset>18</Offset>
+                                <Offset>40</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>7359</ID>
+                          <Description>"Species 5"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>"stellaris.exe"+02AF17D8</Address>
+                          <Offsets>
+                            <Offset>0</Offset>
+                            <Offset>20</Offset>
+                            <Offset>40</Offset>
+                          </Offsets>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>7377</ID>
+                              <Description>"Identifier"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>String</VariableType>
+                              <Length>16</Length>
+                              <Unicode>0</Unicode>
+                              <CodePage>0</CodePage>
+                              <ZeroTerminate>1</ZeroTerminate>
+                              <Address>"stellaris.exe"+02AF17D8</Address>
+                              <Offsets>
+                                <Offset>10</Offset>
+                                <Offset>20</Offset>
+                                <Offset>40</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>7378</ID>
+                              <Description>"Archetype"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>String</VariableType>
+                              <Length>16</Length>
+                              <Unicode>0</Unicode>
+                              <CodePage>0</CodePage>
+                              <ZeroTerminate>1</ZeroTerminate>
+                              <Address>"stellaris.exe"+02AF17D8</Address>
+                              <Offsets>
+                                <Offset>38</Offset>
+                                <Offset>20</Offset>
+                                <Offset>40</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>7379</ID>
+                              <Description>"Max Trait Points"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>"stellaris.exe"+02AF17D8</Address>
+                              <Offsets>
+                                <Offset>58</Offset>
+                                <Offset>20</Offset>
+                                <Offset>40</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>7380</ID>
+                              <Description>"Max Amount of Traits"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>"stellaris.exe"+02AF17D8</Address>
+                              <Offsets>
+                                <Offset>5C</Offset>
+                                <Offset>20</Offset>
+                                <Offset>40</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>7385</ID>
+                              <Description>"Using traits from:"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <Color>FF00FF</Color>
+                              <VariableType>String</VariableType>
+                              <Length>16</Length>
+                              <Unicode>0</Unicode>
+                              <CodePage>0</CodePage>
+                              <ZeroTerminate>1</ZeroTerminate>
+                              <Address>"stellaris.exe"+02AF17D8</Address>
+                              <Offsets>
+                                <Offset>A8</Offset>
+                                <Offset>20</Offset>
+                                <Offset>40</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>7360</ID>
+                          <Description>"Species 6"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>"stellaris.exe"+02AF17D8</Address>
+                          <Offsets>
+                            <Offset>0</Offset>
+                            <Offset>28</Offset>
+                            <Offset>40</Offset>
+                          </Offsets>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>7386</ID>
+                              <Description>"Identifier"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>String</VariableType>
+                              <Length>16</Length>
+                              <Unicode>0</Unicode>
+                              <CodePage>0</CodePage>
+                              <ZeroTerminate>1</ZeroTerminate>
+                              <Address>"stellaris.exe"+02AF17D8</Address>
+                              <Offsets>
+                                <Offset>10</Offset>
+                                <Offset>28</Offset>
+                                <Offset>40</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>7387</ID>
+                              <Description>"Archetype"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>String</VariableType>
+                              <Length>16</Length>
+                              <Unicode>0</Unicode>
+                              <CodePage>0</CodePage>
+                              <ZeroTerminate>1</ZeroTerminate>
+                              <Address>"stellaris.exe"+02AF17D8</Address>
+                              <Offsets>
+                                <Offset>38</Offset>
+                                <Offset>28</Offset>
+                                <Offset>40</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>7388</ID>
+                              <Description>"Max Trait Points"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>"stellaris.exe"+02AF17D8</Address>
+                              <Offsets>
+                                <Offset>58</Offset>
+                                <Offset>28</Offset>
+                                <Offset>40</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>7389</ID>
+                              <Description>"Max Amount of Traits"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>"stellaris.exe"+02AF17D8</Address>
+                              <Offsets>
+                                <Offset>5C</Offset>
+                                <Offset>28</Offset>
+                                <Offset>40</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>7390</ID>
+                              <Description>"Using traits from:"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <Color>FF00FF</Color>
+                              <VariableType>String</VariableType>
+                              <Length>16</Length>
+                              <Unicode>0</Unicode>
+                              <CodePage>0</CodePage>
+                              <ZeroTerminate>1</ZeroTerminate>
+                              <Address>"stellaris.exe"+02AF17D8</Address>
+                              <Offsets>
+                                <Offset>A8</Offset>
+                                <Offset>28</Offset>
+                                <Offset>40</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>7356</ID>
+                          <Description>"Species pointer list (for debug)"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>"stellaris.exe"+02AF17D8</Address>
+                          <Offsets>
+                            <Offset>0</Offset>
+                            <Offset>40</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

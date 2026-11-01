@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>4</ID>
+      <Description>"Cheats created by @michal.flaska"</Description>
+      <Color>FFFF00</Color>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>5</ID>
+      <Description>"Enjoy :D"</Description>
+      <Color>FFFF00</Color>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>3</ID>
+      <Description>"SCORE"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <Color>00FFFF</Color>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>0</ID>
+          <Description>"SCORE"</Description>
+          <Color>FF80FF</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>Dxball2.exe+3B1B8</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>6</ID>
+          <Description>"SCORE BOOSTS"</Description>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+          <Color>00FFFF</Color>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>2</ID>
+              <Description>"Score boost from shield blocks"</Description>
+              <Color>FF80FF</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode)
+label(modifiedcode)
+label(exit)
+
+newmem:
+// overwrite score increment
+modifiedcode:
+add dword ptr [Dxball2.exe+3B1B8],3E8 // 3E8 hex = 1000 decimal
+
+originalcode:
+// original: add dword ptr [Dxball2.exe+3B1B8],02
+// skip, handled manually above
+
+exit:
+jmp returnhere
+
+"Dxball2.exe"+A9C1:
+jmp newmem
+nop 2
+returnhere:
+
+[DISABLE]
+dealloc(newmem)
+"Dxball2.exe"+A9C1:
+db 83 05 B8 B1 43 00 02
+// restore: add dword ptr [Dxball2.exe+3B1B8],02
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>1</ID>
+              <Description>"Score boost from normal blocks"</Description>
+              <Color>FF80FF</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode)
+label(modifiedcode)
+label(exit)
+
+newmem:
+// override score addition
+modifiedcode:
+add dword ptr [Dxball2.exe+3B1B8],3E8 // 3E8 hex == 1000 decimal
+
+originalcode:
+// original instruction was: add [Dxball2.exe+3B1B8],eax
+// skip it, handled manually above
+
+exit:
+jmp returnhere
+
+"Dxball2.exe"+ABAF:
+jmp newmem
+nop
+returnhere:
+
+[DISABLE]
+dealloc(newmem)
+"Dxball2.exe"+ABAF:
+db 01 05 B8 B1 43 00
+// original: add [Dxball2.exe+3B1B8],eax
+
+</AssemblerScript>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

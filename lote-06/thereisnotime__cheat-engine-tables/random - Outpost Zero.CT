@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="27">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>31</ID>
+      <Description>"God Mode"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(INJECT_GodMode,SurvivalGame-Win64-Shipping.exe,F3 0F 5C C6 41 0F 2F C0 76) // should be unique
+alloc(newmem,$1000,"SurvivalGame-Win64-Shipping.exe"+1C4191)
+
+label(code)
+label(return)
+
+newmem:
+  cmp [rdi+7C8], 0
+  je code
+  xorps xmm6, xmm6
+code:
+  subss xmm0,xmm6
+  comiss xmm0,xmm8
+  jmp return
+
+INJECT_GodMode:
+  jmp newmem
+  nop
+  nop
+  nop
+return:
+registersymbol(INJECT_GodMode)
+
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+INJECT_GodMode:
+  db F3 0F 5C C6 41 0F 2F C0
+
+unregistersymbol(INJECT_GodMode)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "SurvivalGame-Win64-Shipping.exe"+1C4191
+
+"SurvivalGame-Win64-Shipping.exe"+1C415F: F3 0F 59 CE              -  mulss xmm1,xmm6
+"SurvivalGame-Win64-Shipping.exe"+1C4163: F3 0F 59 CF              -  mulss xmm1,xmm7
+"SurvivalGame-Win64-Shipping.exe"+1C4167: E8 04 D8 00 00           -  call SurvivalGame-Win64-Shipping.exe+1D1970
+"SurvivalGame-Win64-Shipping.exe"+1C416C: 4C 8B B4 24 88 01 00 00  -  mov r14,[rsp+00000188]
+"SurvivalGame-Win64-Shipping.exe"+1C4174: 0F 28 CE                 -  movaps xmm1,xmm6
+"SurvivalGame-Win64-Shipping.exe"+1C4177: F3 0F 59 8B 9C 00 00 00  -  mulss xmm1,[rbx+0000009C]
+"SurvivalGame-Win64-Shipping.exe"+1C417F: F3 0F 5C F1              -  subss xmm6,xmm1
+"SurvivalGame-Win64-Shipping.exe"+1C4183: 41 0F 2F F0              -  comiss xmm6,xmm8
+"SurvivalGame-Win64-Shipping.exe"+1C4187: 76 38                    -  jna SurvivalGame-Win64-Shipping.exe+1C41C1
+"SurvivalGame-Win64-Shipping.exe"+1C4189: F3 0F 10 87 C8 07 00 00  -  movss xmm0,[rdi+000007C8]
+// ---------- INJECTING HERE ----------
+"SurvivalGame-Win64-Shipping.exe"+1C4191: F3 0F 5C C6              -  subss xmm0,xmm6
+"SurvivalGame-Win64-Shipping.exe"+1C4195: 41 0F 2F C0              -  comiss xmm0,xmm8
+// ---------- DONE INJECTING  ----------
+"SurvivalGame-Win64-Shipping.exe"+1C4199: 76 0A                    -  jna SurvivalGame-Win64-Shipping.exe+1C41A5
+"SurvivalGame-Win64-Shipping.exe"+1C419B: F3 0F 11 87 C8 07 00 00  -  movss [rdi+000007C8],xmm0
+"SurvivalGame-Win64-Shipping.exe"+1C41A3: EB 1C                    -  jmp SurvivalGame-Win64-Shipping.exe+1C41C1
+"SurvivalGame-Win64-Shipping.exe"+1C41A5: 0F 28 C6                 -  movaps xmm0,xmm6
+"SurvivalGame-Win64-Shipping.exe"+1C41A8: 44 89 A7 C8 07 00 00     -  mov [rdi+000007C8],r12d
+"SurvivalGame-Win64-Shipping.exe"+1C41AF: 0F 57 05 CA 34 37 02     -  xorps xmm0,[SurvivalGame-Win64-Shipping.exe+2537680]
+"SurvivalGame-Win64-Shipping.exe"+1C41B6: 0F 54 05 B3 34 37 02     -  andps xmm0,[SurvivalGame-Win64-Shipping.exe+2537670]
+"SurvivalGame-Win64-Shipping.exe"+1C41BD: F3 0F 58 C8              -  addss xmm1,xmm0
+"SurvivalGame-Win64-Shipping.exe"+1C41C1: F3 0F 10 05 9B B0 37 02  -  movss xmm0,[SurvivalGame-Win64-Shipping.exe+253F264]
+"SurvivalGame-Win64-Shipping.exe"+1C41C9: F3 0F 5C 83 A0 00 00 00  -  subss xmm0,[rbx+000000A0]
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>30</ID>
+      <Description>"Character"</Description>
+      <Options moHideChildren="1"/>
+      <LastState Value="" RealAddress="00000000"/>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>25</ID>
+          <Description>"Status"</Description>
+          <Options moHideChildren="1"/>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+// STATUS - ENERGY
+aobscanmodule(INJECT_energy,SurvivalGame-Win64-Shipping.exe,F3 0F 10 81 10 09 00 00 0F 29 74 24 30 0F 28 F1 0F) // should be unique
+alloc(newmem_energy,$1000,"SurvivalGame-Win64-Shipping.exe"+1D1B94)
+
+label(code_energy)
+label(ret_energy)
+
+alloc(playerEnergyPtr, 8)
+registersymbol(playerEnergyPtr)
+playerEnergyPtr:
+dq 0
+
+newmem_energy:
+  mov [playerEnergyPtr], rcx
+
+code_energy:
+  movss xmm0,[rcx+00000910]
+  jmp ret_energy
+
+INJECT_energy:
+  jmp newmem_energy
+  nop
+  nop
+  nop
+ret_energy:
+registersymbol(INJECT_energy)
+
+//STATUS - REST
+aobscanmodule(INJECT_StatusRest,SurvivalGame-Win64-Shipping.exe,F3 0F 59 B3 C0 07 00 00) // should be unique
+alloc(newmem_statusrest,$1000,"SurvivalGame-Win64-Shipping.exe"+1C2D7A)
+
+alloc(playerStatusPtr, 8)
+registersymbol(playerStatusPtr)
+playerStatusPtr:
+dq 0
+
+label(code_statusrest)
+label(ret_statusrest)
+
+newmem_statusrest:
+  mov [playerStatusPtr], rbx
+code_statusrest:
+  mulss xmm6,[rbx+000007C0]
+  jmp ret_statusrest
+
+INJECT_StatusRest:
+  jmp newmem_statusrest
+  nop
+  nop
+  nop
+ret_statusrest:
+registersymbol(INJECT_StatusRest)
+
+[DISABLE]
+//code_energy from here till the end of the code_energy will be used to disable the cheat
+INJECT_energy:
+  db F3 0F 10 81 10 09 00 00
+
+unregistersymbol(INJECT_energy)
+unregistersymbol(playerEnergyPtr)
+dealloc(playerEnergyPtr)
+dealloc(newmem_energy)
+
+INJECT_StatusRest:
+  db F3 0F 59 B3 C0 07 00 00
+
+unregistersymbol(INJECT_StatusRest)
+unregistersymbol(playerStatusPtr)
+dealloc(playerStatusPtr)
+dealloc(newmem_statusrest)
+
+{
+// ORIGINAL code_energy - INJECTION POINT: "SurvivalGame-Win64-Shipping.exe"+1D1B94
+
+"SurvivalGame-Win64-Shipping.exe"+1D1B80: 0F 28 74 24 30           -  movaps xmm6,[rsp+30]
+"SurvivalGame-Win64-Shipping.exe"+1D1B85: 48 83 C4 40              -  add rsp,40
+"SurvivalGame-Win64-Shipping.exe"+1D1B89: 5B                       -  pop rbx
+"SurvivalGame-Win64-Shipping.exe"+1D1B8A: C3                       -  ret
+"SurvivalGame-Win64-Shipping.exe"+1D1B8B: CC                       -  int 3
+"SurvivalGame-Win64-Shipping.exe"+1D1B8C: CC                       -  int 3
+"SurvivalGame-Win64-Shipping.exe"+1D1B8D: CC                       -  int 3
+"SurvivalGame-Win64-Shipping.exe"+1D1B8E: CC                       -  int 3
+"SurvivalGame-Win64-Shipping.exe"+1D1B8F: CC                       -  int 3
+"SurvivalGame-Win64-Shipping.exe"+1D1B90: 48 83 EC 48              -  sub rsp,48
+// ---------- INJECTING HERE ----------
+"SurvivalGame-Win64-Shipping.exe"+1D1B94: F3 0F 10 81 10 09 00 00  -  movss xmm0,[rcx+00000910]
+// ---------- DONE INJECTING  ----------
+"SurvivalGame-Win64-Shipping.exe"+1D1B9C: 0F 29 74 24 30           -  movaps [rsp+30],xmm6
+"SurvivalGame-Win64-Shipping.exe"+1D1BA1: 0F 28 F1                 -  movaps xmm6,xmm1
+"SurvivalGame-Win64-Shipping.exe"+1D1BA4: 0F 29 7C 24 20           -  movaps [rsp+20],xmm7
+"SurvivalGame-Win64-Shipping.exe"+1D1BA9: 0F 57 C9                 -  xorps xmm1,xmm1
+"SurvivalGame-Win64-Shipping.exe"+1D1BAC: F3 0F 10 B9 10 09 00 00  -  movss xmm7,[rcx+00000910]
+"SurvivalGame-Win64-Shipping.exe"+1D1BB4: 0F 2F F9                 -  comiss xmm7,xmm1
+"SurvivalGame-Win64-Shipping.exe"+1D1BB7: F3 0F 5D FE              -  minss xmm7,xmm6
+"SurvivalGame-Win64-Shipping.exe"+1D1BBB: 0F 97 C0                 -  seta al
+"SurvivalGame-Win64-Shipping.exe"+1D1BBE: F3 0F 5C C7              -  subss xmm0,xmm7
+"SurvivalGame-Win64-Shipping.exe"+1D1BC2: F3 0F 11 81 10 09 00 00  -  movss [rcx+00000910],xmm0
+}
+
+{
+// ORIGINAL code_statusrest - INJECTION POINT: "SurvivalGame-Win64-Shipping.exe"+1C2D7A
+
+"SurvivalGame-Win64-Shipping.exe"+1C2D5D: 5B                                -  pop rbx
+"SurvivalGame-Win64-Shipping.exe"+1C2D5E: C3                                -  ret
+"SurvivalGame-Win64-Shipping.exe"+1C2D5F: CC                                -  int 3
+"SurvivalGame-Win64-Shipping.exe"+1C2D60: 40 53                             -  push rbx
+"SurvivalGame-Win64-Shipping.exe"+1C2D62: 48 83 EC 30                       -  sub rsp,30
+"SurvivalGame-Win64-Shipping.exe"+1C2D66: 48 8B 01                          -  mov rax,[rcx]
+"SurvivalGame-Win64-Shipping.exe"+1C2D69: 48 8B D9                          -  mov rbx,rcx
+"SurvivalGame-Win64-Shipping.exe"+1C2D6C: 0F 29 74 24 20                    -  movaps [rsp+20],xmm6
+"SurvivalGame-Win64-Shipping.exe"+1C2D71: 0F 28 F1                          -  movaps xmm6,xmm1
+"SurvivalGame-Win64-Shipping.exe"+1C2D74: FF 90 38 01 00 00                 -  call qword ptr [rax+00000138]
+// ---------- INJECTING HERE ----------
+"SurvivalGame-Win64-Shipping.exe"+1C2D7A: F3 0F 59 B3 C0 07 00 00           -  mulss xmm6,[rbx+000007C0]
+// ---------- DONE INJECTING  ----------
+"SurvivalGame-Win64-Shipping.exe"+1C2D82: 48 8B CB                          -  mov rcx,rbx
+"SurvivalGame-Win64-Shipping.exe"+1C2D85: 48 8B 13                          -  mov rdx,[rbx]
+"SurvivalGame-Win64-Shipping.exe"+1C2D88: F3 0F 59 B0 10 09 00 00           -  mulss xmm6,[rax+00000910]
+"SurvivalGame-Win64-Shipping.exe"+1C2D90: 0F 28 CE                          -  movaps xmm1,xmm6
+"SurvivalGame-Win64-Shipping.exe"+1C2D93: 0F 28 74 24 20                    -  movaps xmm6,[rsp+20]
+"SurvivalGame-Win64-Shipping.exe"+1C2D98: 48 83 C4 30                       -  add rsp,30
+"SurvivalGame-Win64-Shipping.exe"+1C2D9C: 5B                                -  pop rbx
+"SurvivalGame-Win64-Shipping.exe"+1C2D9D: 48 FF A2 00 07 00 00              -  jmp qword ptr [rdx+00000700]
+"SurvivalGame-Win64-Shipping.exe"+1C2DA4: CC                                -  int 3
+"SurvivalGame-Win64-Shipping.exe"+1C2DA5: CC                                -  int 3
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>10</ID>
+              <Description>"Refill Energy"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+// Set Energy to the same value as Max_Energy
+{$lua}
+local addList = getAddressList()
+local maxEnergyRecord = addList.getMemoryRecordByDescription("Max_Energy")
+addList.getMemoryRecordByDescription("Energy").value = maxEnergyRecord.value
+{$asm}
+[DISABLE]
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>26</ID>
+              <Description>"Health"</Description>
+              <VariableType>Float</VariableType>
+              <Address>playerStatusPtr</Address>
+              <Offsets>
+                <Offset>7C4</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>2</ID>
+              <Description>"Energy"</Description>
+              <VariableType>Float</VariableType>
+              <Address>playerEnergyPtr</Address>
+              <Offsets>
+                <Offset>910</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>3</ID>
+              <Description>"Max_Energy"</Description>
+              <VariableType>Float</VariableType>
+              <Address>playerEnergyPtr</Address>
+              <Offsets>
+                <Offset>914</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>27</ID>
+              <Description>"Shields"</Description>
+              <VariableType>Float</VariableType>
+              <Address>playerStatusPtr</Address>
+              <Offsets>
+                <Offset>7C8</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>28</ID>
+              <Description>"Armor"</Description>
+              <VariableType>Float</VariableType>
+              <Address>playerStatusPtr</Address>
+              <Offsets>
+                <Offset>7D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>29</ID>
+              <Description>"Insulation"</Description>
+              <VariableType>Float</VariableType>
+              <Address>playerStatusPtr</Address>
+              <Offsets>
+                <Offset>7CC</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

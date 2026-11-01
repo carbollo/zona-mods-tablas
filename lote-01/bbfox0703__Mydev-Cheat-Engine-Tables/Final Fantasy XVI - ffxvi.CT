@@ -1,0 +1,2023 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>19</ID>
+      <Description>"Get XP"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ffxvi.exe
+  Version: 
+  Date   : 2024-09-18
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_XP,$process,8B 00 48 83 C4 20 5B C3 CC CC 40) // should be unique
+alloc(newmem,$100,INJECT_GET_XP)
+
+label(code)
+label(return)
+label(i_xp_addr)
+newmem:
+  mov [i_xp_addr], rax
+
+code:
+  mov eax,[rax]
+  add rsp,20
+  jmp return
+align 10 cc
+  i_xp_addr:
+  dq 0
+
+INJECT_GET_XP:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT_GET_XP)
+registersymbol(i_xp_addr)
+[DISABLE]
+
+INJECT_GET_XP:
+  db 8B 00 48 83 C4 20
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ffxvi.exe+45300E
+
+ffxvi.exe+452FEA: E8 D5 BE FF FF        - call ffxvi.exe+44EEC4
+ffxvi.exe+452FEF: 84 C0                 - test al,al
+ffxvi.exe+452FF1: 74 0B                 - je ffxvi.exe+452FFE
+ffxvi.exe+452FF3: 48 8D 4B 4C           - lea rcx,[rbx+4C]
+ffxvi.exe+452FF7: B8 24 00 00 00        - mov eax,00000024
+ffxvi.exe+452FFC: EB 09                 - jmp ffxvi.exe+453007
+ffxvi.exe+452FFE: 48 8D 4B 44           - lea rcx,[rbx+44]
+ffxvi.exe+453002: B8 1C 00 00 00        - mov eax,0000001C
+ffxvi.exe+453007: 48 85 DB              - test rbx,rbx
+ffxvi.exe+45300A: 48 0F 45 C1           - cmovne rax,rcx
+// ---------- INJECTING HERE ----------
+ffxvi.exe+45300E: 8B 00                 - mov eax,[rax]
+// ---------- DONE INJECTING  ----------
+ffxvi.exe+453010: 48 83 C4 20           - add rsp,20
+ffxvi.exe+453014: 5B                    - pop rbx
+ffxvi.exe+453015: C3                    - ret
+ffxvi.exe+453016: CC                    - int 3
+ffxvi.exe+453017: CC                    - int 3
+ffxvi.exe+453018: 40 53                 - push rbx
+ffxvi.exe+45301A: 48 83 EC 20           - sub rsp,20
+ffxvi.exe+45301E: 48 8B 0D 23 12 3C 01  - mov rcx,[ffxvi.exe+1814248]
+ffxvi.exe+453025: 8B DA                 - mov ebx,edx
+ffxvi.exe+453027: 4C 8B 1D BA 0C 3C 01  - mov r11,[ffxvi.exe+1813CE8]
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>20</ID>
+          <Description>"XP"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_xp_addr</Address>
+          <Offsets>
+            <Offset>0</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>13</ID>
+      <Description>"Get Gil/AP"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ffxvi.exe
+  Version: 
+  Date   : 2024-09-18
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_GIL_AP,$process,8B 42 04 EB F0) // should be unique
+alloc(newmem,$100,INJECT_GET_GIL_AP)
+
+label(code)
+label(return)
+label(i_base_ap_addr)
+label(i_base_gil_addr)
+label(i_base_id2_addr)
+
+newmem:
+  cmp dword ptr [rdx], 1
+  jne @F
+  mov [i_base_gil_addr], rdx
+  jmp code
+@@:
+
+  cmp dword ptr [rdx], 2
+  jne @F
+  mov [i_base_id2_addr], rdx
+  jmp code
+@@:
+
+  cmp dword ptr [rdx], 3
+  jne @F
+  mov [i_base_ap_addr], rdx
+  jmp code
+@@:
+
+code:
+  mov eax,[rdx+04]
+  reassemble(INJECT_GET_GIL_AP+3)
+  //jmp ffxvi.exe+6A96CA
+  jmp return
+align 10 cc
+  i_base_ap_addr:
+  dq 0
+  i_base_gil_addr:
+  dq 0
+  i_base_id2_addr:
+  dq 0
+
+INJECT_GET_GIL_AP:
+  jmp newmem
+return:
+registersymbol(INJECT_GET_GIL_AP)
+registersymbol(i_base_ap_addr)
+registersymbol(i_base_gil_addr)
+registersymbol(i_base_id2_addr)
+[DISABLE]
+
+INJECT_GET_GIL_AP:
+  db 8B 42 04 EB F0
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ffxvi.exe+6A9731
+
+ffxvi.exe+6A9717: 39 3A           - cmp [rdx],edi
+ffxvi.exe+6A9719: 74 16           - je ffxvi.exe+6A9731
+ffxvi.exe+6A971B: 48 83 C2 10     - add rdx,10
+ffxvi.exe+6A971F: 49 3B D0        - cmp rdx,r8
+ffxvi.exe+6A9722: 75 F3           - jne ffxvi.exe+6A9717
+ffxvi.exe+6A9724: 33 C0           - xor eax,eax
+ffxvi.exe+6A9726: 48 8B 5C 24 30  - mov rbx,[rsp+30]
+ffxvi.exe+6A972B: 48 83 C4 20     - add rsp,20
+ffxvi.exe+6A972F: 5F              - pop rdi
+ffxvi.exe+6A9730: C3              - ret
+// ---------- INJECTING HERE ----------
+ffxvi.exe+6A9731: 8B 42 04        - mov eax,[rdx+04]
+// ---------- DONE INJECTING  ----------
+ffxvi.exe+6A9734: EB F0           - jmp ffxvi.exe+6A9726
+ffxvi.exe+6A9736: CC              - int 3
+ffxvi.exe+6A9737: CC              - int 3
+ffxvi.exe+6A9738: 48 89 5C 24 08  - mov [rsp+08],rbx
+ffxvi.exe+6A973D: 57              - push rdi
+ffxvi.exe+6A973E: 48 83 EC 30     - sub rsp,30
+ffxvi.exe+6A9742: 41 8B D8        - mov ebx,r8d
+ffxvi.exe+6A9745: 8B FA           - mov edi,edx
+ffxvi.exe+6A9747: E8 10 F7 FF FF  - call ffxvi.exe+6A8E5C
+ffxvi.exe+6A974C: 4C 8B C8        - mov r9,rax
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>14</ID>
+          <Description>"Gil"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_gil_addr</Address>
+          <Offsets>
+            <Offset>4</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>35</ID>
+          <Description>"Reputation"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_id2_addr</Address>
+          <Offsets>
+            <Offset>4</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>15</ID>
+          <Description>"AP"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_ap_addr</Address>
+          <Offsets>
+            <Offset>4</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>5</ID>
+      <Description>"Menu -&gt; item set item count (item count must &gt;1)"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ffxvi.exe
+  Version: 
+  Date   : 2024-09-18
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_FILL_ITEM,$process,C6 45 C0 00 8B 5C C8 08 8B 4C C8 0C 33 C0) // should be unique
+alloc(newmem,$200)
+
+label(code)
+label(return)
+
+newmem:
+  cmp dword ptr [rax+rcx*8+08], 3
+  jbe code
+
+  cmp dword ptr [rax+rcx*8+0C], 2
+  jb code
+
+  cmp dword ptr [rax+rcx*8+0C], 9
+  ja @F
+
+  mov dword ptr [rax+rcx*8+0C], 9
+  jmp code
+
+@@:
+  cmp dword ptr [rax+rcx*8+0C], 63
+  ja @F
+
+  mov dword ptr [rax+rcx*8+0C], 63
+  jmp code
+
+@@:
+  cmp dword ptr [rax+rcx*8+0C], 3E7
+  ja @F
+
+  mov dword ptr [rax+rcx*8+0C], 3E7
+  jmp code
+
+@@:
+  cmp dword ptr [rax+rcx*8+0C], 1388
+  ja @F
+
+  mov dword ptr [rax+rcx*8+0C], 1388
+  jmp code
+
+code:
+  mov byte ptr [rbp-40],00
+  mov ebx,[rax+rcx*8+08]
+  mov ecx,[rax+rcx*8+0C]
+  xor eax,eax
+  jmp return
+
+INJECT_FILL_ITEM:
+  jmp far newmem
+return:
+registersymbol(INJECT_FILL_ITEM)
+
+[DISABLE]
+
+INJECT_FILL_ITEM:
+  db C6 45 C0 00 8B 5C C8 08 8B 4C C8 0C 33 C0
+
+unregistersymbol(INJECT_FILL_ITEM)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ffxvi.exe+298D58
+
+ffxvi.exe+298D2F: 89 4D E8              - mov [rbp-18],ecx
+ffxvi.exe+298D32: 48 8B 0D 2F B0 57 01  - mov rcx,[ffxvi.exe+1813D68]
+ffxvi.exe+298D39: 8B D6                 - mov edx,esi
+ffxvi.exe+298D3B: E8 E8 00 41 00        - call ffxvi.exe+6A8E28
+ffxvi.exe+298D40: 48 89 45 E0           - mov [rbp-20],rax
+ffxvi.exe+298D44: 41 BC FF FF FF FF     - mov r12d,FFFFFFFF
+ffxvi.exe+298D4A: 44 8B 38              - mov r15d,[rax]
+ffxvi.exe+298D4D: E9 A6 01 00 00        - jmp ffxvi.exe+298EF8
+ffxvi.exe+298D52: 41 8B CF              - mov ecx,r15d
+ffxvi.exe+298D55: 48 03 C9              - add rcx,rcx
+// ---------- INJECTING HERE ----------
+ffxvi.exe+298D58: C6 45 C0 00           - mov byte ptr [rbp-40],00
+// ---------- DONE INJECTING  ----------
+ffxvi.exe+298D5C: 8B 5C C8 08           - mov ebx,[rax+rcx*8+08]
+ffxvi.exe+298D60: 8B 4C C8 0C           - mov ecx,[rax+rcx*8+0C]
+ffxvi.exe+298D64: 33 C0                 - xor eax,eax
+ffxvi.exe+298D66: 3B 5C 85 E8           - cmp ebx,[rbp+rax*4-18]
+ffxvi.exe+298D6A: 75 0B                 - jne ffxvi.exe+298D77
+ffxvi.exe+298D6C: FF C1                 - inc ecx
+ffxvi.exe+298D6E: C6 45 C0 01           - mov byte ptr [rbp-40],01
+ffxvi.exe+298D72: 83 64 85 E8 00        - and dword ptr [rbp+rax*4-18],00
+ffxvi.exe+298D77: 48 FF C0              - inc rax
+ffxvi.exe+298D7A: 48 83 F8 03           - cmp rax,03
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>71</ID>
+      <Description>"================================="</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>4</ID>
+      <Description>"inf. item/ability pt use (count must &gt;1)"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ffxvi.exe
+  Version: 
+  Date   : 2024-09-18
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_INF_ITEM,$process,85 DB 79 07 8B 58 04) // should be unique
+alloc(newmem,$100,INJECT_INF_ITEM)
+
+label(code)
+label(return)
+label(i_last_use_id_addr)
+newmem:
+  mov [i_last_use_id_addr], rax
+
+  cmp ebx, 0
+  jl code
+
+  cmp dword ptr [rax+04], 1
+  je code
+
+  cmp dword ptr [rax], 3 // ability pt
+  jne chk_coco
+
+  cmp dword ptr [rax+04], #3000
+  jae normal_set2
+
+  mov dword ptr [rax+04], #3000
+  jmp normal_set2
+
+chk_coco:
+  cmp dword ptr [rax], 1 // Gil
+  jne normal_set
+
+  cmp dword ptr [rax+04], #10000
+  jae normal_set2
+
+  mov dword ptr [rax+04], #10000
+  jmp normal_set2
+
+normal_set:
+  cmp dword ptr [rax+04], 3E7
+  jbe @F
+  cmp dword ptr [rax+04], 1388
+  jae @F
+  mov dword ptr [rax+04], 1388
+  jmp normal_set2
+
+@@:
+  cmp dword ptr [rax+04], 63
+  jbe @F
+  mov dword ptr [rax+04], 3E7
+  jmp normal_set2
+
+@@:
+  cmp dword ptr [rax+04], A
+  jbe @F
+  mov dword ptr [rax+04], 63
+  jmp normal_set2
+
+@@:
+
+normal_set2:
+  xor ebx, ebx
+
+
+code:
+  test ebx,ebx
+  //jns ffxvi.exe+6A903E
+  jns INJECT_INF_ITEM+B
+  mov ebx,[rax+04]
+  jmp return
+align 10 cc
+  i_last_use_id_addr:
+  dq 0
+
+INJECT_INF_ITEM:
+  jmp newmem
+  nop 2
+return:
+registersymbol(INJECT_INF_ITEM)
+registersymbol(i_last_use_id_addr)
+
+[DISABLE]
+
+INJECT_INF_ITEM:
+  db 85 DB 79 07 8B 58 04
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ffxvi.exe+6A9033
+
+ffxvi.exe+6A9018: 48 85 D2              - test rdx,rdx
+ffxvi.exe+6A901B: 74 2E                 - je ffxvi.exe+6A904B
+ffxvi.exe+6A901D: 48 83 C0 08           - add rax,08
+ffxvi.exe+6A9021: 39 38                 - cmp [rax],edi
+ffxvi.exe+6A9023: 74 0E                 - je ffxvi.exe+6A9033
+ffxvi.exe+6A9025: 48 FF C1              - inc rcx
+ffxvi.exe+6A9028: 48 83 C0 10           - add rax,10
+ffxvi.exe+6A902C: 48 3B CA              - cmp rcx,rdx
+ffxvi.exe+6A902F: 72 F0                 - jb ffxvi.exe+6A9021
+ffxvi.exe+6A9031: EB 18                 - jmp ffxvi.exe+6A904B
+// ---------- INJECTING HERE ----------
+ffxvi.exe+6A9033: 85 DB                 - test ebx,ebx
+// ---------- DONE INJECTING  ----------
+ffxvi.exe+6A9035: 79 07                 - jns ffxvi.exe+6A903E
+ffxvi.exe+6A9037: 8B 58 04              - mov ebx,[rax+04]
+ffxvi.exe+6A903A: 8B CB                 - mov ecx,ebx
+ffxvi.exe+6A903C: EB 03                 - jmp ffxvi.exe+6A9041
+ffxvi.exe+6A903E: 8B 48 04              - mov ecx,[rax+04]
+ffxvi.exe+6A9041: 2B CB                 - sub ecx,ebx
+ffxvi.exe+6A9043: 85 C9                 - test ecx,ecx
+ffxvi.exe+6A9045: 0F 4E CE              - cmovle ecx,esi
+ffxvi.exe+6A9048: 89 48 04              - mov [rax+04],ecx
+ffxvi.exe+6A904B: 48 8B 0D 8E AF 16 01  - mov rcx,[ffxvi.exe+1813FE0]
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>38</ID>
+          <Description>"Last ID"</Description>
+          <DropDownListLink>ID A</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_last_use_id_addr</Address>
+          <Offsets>
+            <Offset>0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>39</ID>
+          <Description>"#"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_last_use_id_addr</Address>
+          <Offsets>
+            <Offset>4</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>23</ID>
+      <Description>"Limit break multiplier"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ffxvi.exe
+  Version: 
+  Date   : 2024-09-19
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_LIMIT_BREAK_MULTI,$process,44 01 4B 48 48 8B CB) // should be unique
+alloc(newmem,$100,INJECT_LIMIT_BREAK_MULTI)
+
+label(code)
+label(return)
+label(vf_lb_multi)
+label(i_min_lb_value)
+
+newmem:
+  cmp r9d, 0
+  jle code
+
+  push r15
+  mov r15d, [i_min_lb_value]
+  cmp dword ptr [rbx+48], r15d
+  jae @F
+
+  mov dword ptr [rbx+48], r15d
+@@:
+  pop r15
+
+  vcvtsi2ss xmm15, xmm15, r9d
+  vmovss xmm14, [vf_lb_multi]
+  vmulss xmm15, xmm14, xmm15
+  vcvtss2si r9d, xmm15
+
+code:
+  add [rbx+48],r9d
+  mov rcx,rbx
+  jmp return
+align 10 cc
+  vf_lb_multi:
+  dd (float)3.3333333333
+  i_min_lb_value:
+  dd #10000
+
+INJECT_LIMIT_BREAK_MULTI:
+  jmp newmem
+  nop 2
+return:
+registersymbol(INJECT_LIMIT_BREAK_MULTI)
+registersymbol(vf_lb_multi)
+registersymbol(i_min_lb_value)
+[DISABLE]
+
+INJECT_LIMIT_BREAK_MULTI:
+  db 44 01 4B 48 48 8B CB
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ffxvi.exe+5DDC2F
+
+ffxvi.exe+5DDC16: 45 84 C0        - test r8b,r8b
+ffxvi.exe+5DDC19: 74 14           - je ffxvi.exe+5DDC2F
+ffxvi.exe+5DDC1B: 8B 4B 18        - mov ecx,[rbx+18]
+ffxvi.exe+5DDC1E: 8B C1           - mov eax,ecx
+ffxvi.exe+5DDC20: C1 E8 02        - shr eax,02
+ffxvi.exe+5DDC23: A8 01           - test al,01
+ffxvi.exe+5DDC25: 74 08           - je ffxvi.exe+5DDC2F
+ffxvi.exe+5DDC27: C1 E9 0A        - shr ecx,0A
+ffxvi.exe+5DDC2A: F6 C1 01        - test cl,01
+ffxvi.exe+5DDC2D: 74 1C           - je ffxvi.exe+5DDC4B
+// ---------- INJECTING HERE ----------
+ffxvi.exe+5DDC2F: 44 01 4B 48     - add [rbx+48],r9d
+// ---------- DONE INJECTING  ----------
+ffxvi.exe+5DDC33: 48 8B CB        - mov rcx,rbx
+ffxvi.exe+5DDC36: E8 59 FF FF FF  - call ffxvi.exe+5DDB94
+ffxvi.exe+5DDC3B: 39 43 48        - cmp [rbx+48],eax
+ffxvi.exe+5DDC3E: 7E 0B           - jle ffxvi.exe+5DDC4B
+ffxvi.exe+5DDC40: 48 8B CB        - mov rcx,rbx
+ffxvi.exe+5DDC43: E8 4C FF FF FF  - call ffxvi.exe+5DDB94
+ffxvi.exe+5DDC48: 89 43 48        - mov [rbx+48],eax
+ffxvi.exe+5DDC4B: 48 83 C4 20     - add rsp,20
+ffxvi.exe+5DDC4F: 5B              - pop rbx
+ffxvi.exe+5DDC50: C3              - ret
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>24</ID>
+          <Description>"Multiplier"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>Float</VariableType>
+          <Address>vf_lb_multi</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>25</ID>
+          <Description>"min. value"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_min_lb_value</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>10</ID>
+      <Description>"Get HP"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ffxvi.exe
+  Version: 
+  Date   : 2024-09-18
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_HP,$process,8B 47 40 89 43 20) // should be unique
+alloc(newmem,$100,INJECT_GET_HP)
+
+label(code)
+label(return)
+label(i_base_hp_addr)
+label(is_reset_hp_addr)
+
+newmem:
+  mov [i_base_hp_addr], rdi
+
+code:
+  mov eax,[rdi+40]
+  mov [rbx+20],eax
+  jmp return
+align 10 cc
+  i_base_hp_addr:
+  dq 0
+  is_reset_hp_addr:
+  dd 0
+
+INJECT_GET_HP:
+  jmp newmem
+  nop
+return:
+registersymbol(is_reset_hp_addr)
+registersymbol(INJECT_GET_HP)
+registersymbol(i_base_hp_addr)
+[DISABLE]
+
+INJECT_GET_HP:
+  db 8B 47 40 89 43 20
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ffxvi.exe+21E8E3
+
+ffxvi.exe+21E8C6: 89 73 18        - mov [rbx+18],esi
+ffxvi.exe+21E8C9: 8B 4B 14        - mov ecx,[rbx+14]
+ffxvi.exe+21E8CC: F6 C1 01        - test cl,01
+ffxvi.exe+21E8CF: 75 0D           - jne ffxvi.exe+21E8DE
+ffxvi.exe+21E8D1: 48 8B 40 10     - mov rax,[rax+10]
+ffxvi.exe+21E8D5: 8B 48 0C        - mov ecx,[rax+0C]
+ffxvi.exe+21E8D8: 89 4B 1C        - mov [rbx+1C],ecx
+ffxvi.exe+21E8DB: 8B 4B 14        - mov ecx,[rbx+14]
+ffxvi.exe+21E8DE: F6 C1 02        - test cl,02
+ffxvi.exe+21E8E1: 75 06           - jne ffxvi.exe+21E8E9
+// ---------- INJECTING HERE ----------
+ffxvi.exe+21E8E3: 8B 47 40        - mov eax,[rdi+40]
+// ---------- DONE INJECTING  ----------
+ffxvi.exe+21E8E6: 89 43 20        - mov [rbx+20],eax
+ffxvi.exe+21E8E9: 48 8B CF        - mov rcx,rdi
+ffxvi.exe+21E8EC: E8 8F EE 3B 00  - call ffxvi.exe+5DD780
+ffxvi.exe+21E8F1: 89 43 24        - mov [rbx+24],eax
+ffxvi.exe+21E8F4: 48 8B CF        - mov rcx,rdi
+ffxvi.exe+21E8F7: 8B 47 50        - mov eax,[rdi+50]
+ffxvi.exe+21E8FA: 89 43 28        - mov [rbx+28],eax
+ffxvi.exe+21E8FD: 8B 47 48        - mov eax,[rdi+48]
+ffxvi.exe+21E900: 89 43 2C        - mov [rbx+2C],eax
+ffxvi.exe+21E903: E8 8C F2 3B 00  - call ffxvi.exe+5DDB94
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>12</ID>
+          <Description>"Usage: enable in status window"</Description>
+          <Color>8000FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>11</ID>
+          <Description>"HP"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_hp_addr</Address>
+          <Offsets>
+            <Offset>40</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>22</ID>
+          <Description>"Limit Break"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_base_hp_addr</Address>
+          <Offsets>
+            <Offset>48</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>16</ID>
+          <Description>"faster kill"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ffxvi.exe
+  Version: 
+  Date   : 2024-09-18
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_1HK,$process,2B 4B 40 49 8B D7) // should be unique
+alloc(newmem,$100,INJECT_1HK)
+
+label(code)
+label(return)
+
+newmem:
+  cmp rbx, [i_base_hp_addr]
+  je code
+
+
+  cmp dword ptr [rbx+40], 1
+  jbe code
+  mov dword ptr [rbx+40], 1
+
+code:
+  sub ecx,[rbx+40]
+  mov rdx,r15
+  jmp return
+align 10 cc
+  vf_mg_multi:
+  dd (float)10
+
+INJECT_1HK:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT_1HK)
+
+[DISABLE]
+
+INJECT_1HK:
+  db 2B 4B 40 49 8B D7
+
+unregistersymbol(INJECT_1HK)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ffxvi.exe+5914C8
+
+ffxvi.exe+59149E: 74 0E                 - je ffxvi.exe+5914AE
+ffxvi.exe+5914A0: 48 8B 05 01 29 28 01  - mov rax,[ffxvi.exe+1813DA8]
+ffxvi.exe+5914A7: C7 40 4C E7 8C 88 3E  - mov [rax+4C],3E888CE7
+ffxvi.exe+5914AE: 8B 4D 88              - mov ecx,[rbp-78]
+ffxvi.exe+5914B1: 85 C9                 - test ecx,ecx
+ffxvi.exe+5914B3: 0F 8E DC 00 00 00     - jng ffxvi.exe+591595
+ffxvi.exe+5914B9: 41 8B 87 C4 00 00 00  - mov eax,[r15+000000C4]
+ffxvi.exe+5914C0: C1 E8 02              - shr eax,02
+ffxvi.exe+5914C3: 40 84 C6              - test sil,al
+ffxvi.exe+5914C6: 74 6D                 - je ffxvi.exe+591535
+// ---------- INJECTING HERE ----------
+ffxvi.exe+5914C8: 2B 4B 40              - sub ecx,[rbx+40]
+// ---------- DONE INJECTING  ----------
+ffxvi.exe+5914CB: 49 8B D7              - mov rdx,r15
+ffxvi.exe+5914CE: 41 8B 87 94 01 00 00  - mov eax,[r15+00000194]
+ffxvi.exe+5914D5: 44 8B C9              - mov r9d,ecx
+ffxvi.exe+5914D8: 45 8B 87 74 01 00 00  - mov r8d,[r15+00000174]
+ffxvi.exe+5914DF: 48 8B 0D A2 28 28 01  - mov rcx,[ffxvi.exe+1813D88]
+ffxvi.exe+5914E6: C1 E8 15              - shr eax,15
+ffxvi.exe+5914E9: 40 22 C6              - and al,sil
+ffxvi.exe+5914EC: 88 44 24 20           - mov [rsp+20],al
+ffxvi.exe+5914F0: E8 DB 5D CC FF        - call ffxvi.exe+2572D0
+ffxvi.exe+5914F5: 48 8B 0D 0C 28 28 01  - mov rcx,[ffxvi.exe+1813D08]
+}
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>17</ID>
+      <Description>"Gil gain: *4 income"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : ffxvi.exe
+  Version: 
+  Date   : 2024-09-18
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_ADD_GIL,$process,03 C6 89 42 04) // should be unique
+alloc(newmem,$200,INJECT_ADD_GIL)
+
+label(code)
+label(return)
+label(i_ig_base_addr)
+label(i_idx)
+
+newmem:
+  cmp dword ptr [rdx], 1
+  je chk1
+  cmp dword ptr [rdx], 3
+  je chk1
+
+  cmp qword ptr [i_ig_base_addr], rdx
+  je chk1
+  cmp qword ptr [i_ig_base_addr+8], rdx
+  je chk1
+  cmp qword ptr [i_ig_base_addr+10], rdx
+  je chk1
+  cmp qword ptr [i_ig_base_addr+18], rdx
+  je chk1
+
+  push r15
+  push r14
+  mov r14d, [i_idx]
+  mov r15, i_ig_base_addr
+  lea r15, [r15+r14d*8]
+  mov [r15], rdx
+  inc dword ptr [i_idx]
+  cmp dword ptr [i_idx], 5
+  jb @F
+  mov dword ptr [i_idx], 0
+@@:
+  pop r14
+  pop r15
+chk1:
+
+  cmp esi, 0
+  jl code
+  vcvtsi2ss xmm15, xmm15, esi
+  vmovss xmm14, [vf_gil_multi]
+  vmulss xmm15, xmm15, xmm14
+  vcvtss2si esi, xmm15
+  jmp code
+
+@@:
+  xor esi, esi
+
+code:
+  add eax,esi
+  mov [rdx+04],eax
+  jmp return
+align 10 cc
+  vf_gil_multi:
+  dd (float)4
+  i_idx:
+  dd 0
+  i_ig_base_addr:
+  dq 0
+  dq 0
+  dq 0
+  dq 0
+  dq 0
+
+INJECT_ADD_GIL:
+  jmp newmem
+return:
+registersymbol(INJECT_ADD_GIL)
+registersymbol(i_ig_base_addr)
+registersymbol(i_idx)
+
+[DISABLE]
+
+INJECT_ADD_GIL:
+  db 03 C6 89 42 04
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ffxvi.exe+6A8F80
+
+ffxvi.exe+6A8F68: 72 27           - jb ffxvi.exe+6A8F91
+ffxvi.exe+6A8F6A: C6 03 01        - mov byte ptr [rbx],01
+ffxvi.exe+6A8F6D: 89 7B 0C        - mov [rbx+0C],edi
+ffxvi.exe+6A8F70: EB 5E           - jmp ffxvi.exe+6A8FD0
+ffxvi.exe+6A8F72: 8B 42 04        - mov eax,[rdx+04]
+ffxvi.exe+6A8F75: 2B F0           - sub esi,eax
+ffxvi.exe+6A8F77: 3B FE           - cmp edi,esi
+ffxvi.exe+6A8F79: 0F 4C F7        - cmovl esi,edi
+ffxvi.exe+6A8F7C: 85 F6           - test esi,esi
+ffxvi.exe+6A8F7E: 7E 07           - jle ffxvi.exe+6A8F87
+// ---------- INJECTING HERE ----------
+ffxvi.exe+6A8F80: 03 C6           - add eax,esi
+// ---------- DONE INJECTING  ----------
+ffxvi.exe+6A8F82: 89 42 04        - mov [rdx+04],eax
+ffxvi.exe+6A8F85: EB 03           - jmp ffxvi.exe+6A8F8A
+ffxvi.exe+6A8F87: C6 03 01        - mov byte ptr [rbx],01
+ffxvi.exe+6A8F8A: 89 73 08        - mov [rbx+08],esi
+ffxvi.exe+6A8F8D: 2B FE           - sub edi,esi
+ffxvi.exe+6A8F8F: EB 30           - jmp ffxvi.exe+6A8FC1
+ffxvi.exe+6A8F91: 3B F7           - cmp esi,edi
+ffxvi.exe+6A8F93: 89 6C 24 20     - mov [rsp+20],ebp
+ffxvi.exe+6A8F97: 8B CF           - mov ecx,edi
+ffxvi.exe+6A8F99: C6 44 24 28 01  - mov byte ptr [rsp+28],01
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>34</ID>
+          <Description>"Data"</Description>
+          <Options moHideChildren="1"/>
+          <Color>808080</Color>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>26</ID>
+              <Description>"ID A"</Description>
+              <DropDownList DisplayValueAsItem="1">1:Gil
+2:Reputation
+3:Ability pt
+5:ポーション / 治療劑
+6:ハイポーション / 高級治療劑
+7:エリクサー / 萬靈藥
+8:ちからの薬 / 力量之藥
+10:英雄の薬 / 英雄之藥
+21:メテオライト / 隕石塊
+101:戦鉱石 / 戰礦石
+102:魔物の牙 / 魔物牙
+103:鉄生糸 / 鐵生絲
+104:丈夫な皮 / 結實皮革
+105:魔法灰 / 魔法灰燼
+301:凍った涙 / 結凍淚水
+302:地竜の鱗 / 地龍鱗片
+303:嵐の目 / 風暴之眼
+1007:古代鉄 / 古代鐵
+</DropDownList>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_ig_base_addr</Address>
+              <Offsets>
+                <Offset>0</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>27</ID>
+                  <Description>"#"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF59AC</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>i_ig_base_addr</Address>
+                  <Offsets>
+                    <Offset>4</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>28</ID>
+              <Description>"ID B"</Description>
+              <DropDownListLink>ID A</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_ig_base_addr+8</Address>
+              <Offsets>
+                <Offset>0</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>29</ID>
+                  <Description>"#"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF59AC</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>i_ig_base_addr+8</Address>
+                  <Offsets>
+                    <Offset>4</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>30</ID>
+              <Description>"ID C"</Description>
+              <DropDownListLink>ID A</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_ig_base_addr+10</Address>
+              <Offsets>
+                <Offset>0</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>31</ID>
+                  <Description>"#"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF59AC</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>i_ig_base_addr+10</Address>
+                  <Offsets>
+                    <Offset>4</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>69</ID>
+              <Description>"ID D"</Description>
+              <DropDownListLink>ID A</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_ig_base_addr+18</Address>
+              <Offsets>
+                <Offset>0</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>70</ID>
+                  <Description>"#"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF59AC</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>i_ig_base_addr+18</Address>
+                  <Offsets>
+                    <Offset>4</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>32</ID>
+              <Description>"ID E"</Description>
+              <DropDownListLink>ID A</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_ig_base_addr+20</Address>
+              <Offsets>
+                <Offset>0</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>33</ID>
+                  <Description>"#"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF59AC</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>i_ig_base_addr+20</Address>
+                  <Offsets>
+                    <Offset>4</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>72</ID>
+      <Description>"================================="</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>44</ID>
+      <Description>"Alt. scripts for above (far jump)"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <Color>FF73B9</Color>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>40</ID>
+          <Description>"inf. item/ability pt use (count must &gt;1)"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ffxvi.exe
+  Version: 
+  Date   : 2024-09-22
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_INF_ITEM,$process,85 DB 79 07 8B 58 04 8B CB EB 03 8B 48 04) // should be unique
+alloc(newmem,$1000)
+
+label(code)
+label(return)
+label(i_last_use_id_addr)
+
+newmem:
+  mov [i_last_use_id_addr], rax
+
+  cmp ebx, 0
+  jl code
+
+  cmp dword ptr [rax+04], 1
+  je code
+
+  cmp dword ptr [rax], 3 // ability pt
+  jne chk_coco
+
+  cmp dword ptr [rax+04], #3000
+  jae normal_set2
+
+  mov dword ptr [rax+04], #3000
+  jmp normal_set2
+
+chk_coco:
+  cmp dword ptr [rax], 1 // Gil
+  jne normal_set
+
+  cmp dword ptr [rax+04], #10000
+  jae normal_set2
+
+  mov dword ptr [rax+04], #10000
+  jmp normal_set2
+
+normal_set:
+  cmp dword ptr [rax+04], 3E7
+  jbe @F
+  cmp dword ptr [rax+04], 1388
+  jae @F
+  mov dword ptr [rax+04], 1388
+  jmp normal_set2
+
+@@:
+  cmp dword ptr [rax+04], 63
+  jbe @F
+  mov dword ptr [rax+04], 3E7
+  jmp normal_set2
+
+@@:
+  cmp dword ptr [rax+04], A
+  jbe @F
+  mov dword ptr [rax+04], 63
+  jmp normal_set2
+
+@@:
+
+normal_set2:
+  xor ebx, ebx
+
+code:
+  test ebx,ebx
+  //jns ffxvi.exe+6A903E
+  jns @F
+  mov ebx,[rax+04]
+  mov ecx,ebx
+  //jmp ffxvi.exe+6A9041
+  jmp return
+@@:
+  mov ecx,[rax+04]
+  jmp return
+align 10 cc
+  i_last_use_id_addr:
+  dq 0
+INJECT_INF_ITEM:
+  jmp far newmem
+return:
+registersymbol(INJECT_INF_ITEM)
+registersymbol(i_last_use_id_addr)
+[DISABLE]
+
+INJECT_INF_ITEM:
+  db 85 DB 79 07 8B 58 04 8B CB EB 03 8B 48 04
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ffxvi.exe+6A9033
+
+ffxvi.exe+6A9018: 48 85 D2              - test rdx,rdx
+ffxvi.exe+6A901B: 74 2E                 - je ffxvi.exe+6A904B
+ffxvi.exe+6A901D: 48 83 C0 08           - add rax,08
+ffxvi.exe+6A9021: 39 38                 - cmp [rax],edi
+ffxvi.exe+6A9023: 74 0E                 - je ffxvi.exe+6A9033
+ffxvi.exe+6A9025: 48 FF C1              - inc rcx
+ffxvi.exe+6A9028: 48 83 C0 10           - add rax,10
+ffxvi.exe+6A902C: 48 3B CA              - cmp rcx,rdx
+ffxvi.exe+6A902F: 72 F0                 - jb ffxvi.exe+6A9021
+ffxvi.exe+6A9031: EB 18                 - jmp ffxvi.exe+6A904B
+// ---------- INJECTING HERE ----------
+ffxvi.exe+6A9033: 85 DB                 - test ebx,ebx
+// ---------- DONE INJECTING  ----------
+ffxvi.exe+6A9035: 79 07                 - jns ffxvi.exe+6A903E
+ffxvi.exe+6A9037: 8B 58 04              - mov ebx,[rax+04]
+ffxvi.exe+6A903A: 8B CB                 - mov ecx,ebx
+ffxvi.exe+6A903C: EB 03                 - jmp ffxvi.exe+6A9041
+ffxvi.exe+6A903E: 8B 48 04              - mov ecx,[rax+04]
+ffxvi.exe+6A9041: 2B CB                 - sub ecx,ebx
+ffxvi.exe+6A9043: 85 C9                 - test ecx,ecx
+ffxvi.exe+6A9045: 0F 4E CE              - cmovle ecx,esi
+ffxvi.exe+6A9048: 89 48 04              - mov [rax+04],ecx
+ffxvi.exe+6A904B: 48 8B 0D 8E AF 16 01  - mov rcx,[ffxvi.exe+1813FE0]
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>42</ID>
+              <Description>"Last ID"</Description>
+              <DropDownListLink>ID A</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_last_use_id_addr</Address>
+              <Offsets>
+                <Offset>0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>43</ID>
+              <Description>"#"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_last_use_id_addr</Address>
+              <Offsets>
+                <Offset>4</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>64</ID>
+          <Description>"Limit break multiplier"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ffxvi.exe
+  Version: 
+  Date   : 2024-09-23
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_LIMIT_BREAK_MULTI,$process,44 01 4B 48 48 8B CB E8 59 FF FF FF 39 43 48) // should be unique
+alloc(newmem,$1000)
+
+label(code)
+label(return)
+label(vf_lb_multi)
+label(i_min_lb_value)
+
+newmem:
+  cmp r9d, 0
+  jle code
+
+  push r15
+  mov r15d, [i_min_lb_value]
+  cmp dword ptr [rbx+48], r15d
+  jae @F
+
+  mov dword ptr [rbx+48], r15d
+@@:
+  pop r15
+
+  vcvtsi2ss xmm15, xmm15, r9d
+  vmovss xmm14, [vf_lb_multi]
+  vmulss xmm15, xmm14, xmm15
+  vcvtss2si r9d, xmm15
+
+code:
+  add [rbx+48],r9d
+  mov rcx,rbx
+  //call ffxvi.exe+5DDB54
+  reassemble(INJECT_LIMIT_BREAK_MULTI+7)
+  cmp [rbx+48],eax
+  jmp return
+align 10 cc
+  vf_lb_multi:
+  dd (float)3.3333333333
+  i_min_lb_value:
+  dd #10000
+
+INJECT_LIMIT_BREAK_MULTI:
+  jmp far newmem
+  nop
+return:
+registersymbol(INJECT_LIMIT_BREAK_MULTI)
+registersymbol(vf_lb_multi)
+registersymbol(i_min_lb_value)
+
+[DISABLE]
+
+INJECT_LIMIT_BREAK_MULTI:
+  db 44 01 4B 48 48 8B CB E8 59 FF FF FF 39 43 48
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ffxvi.exe+5DDBEF
+
+ffxvi.exe+5DDBD6: 45 84 C0        - test r8b,r8b
+ffxvi.exe+5DDBD9: 74 14           - je ffxvi.exe+5DDBEF
+ffxvi.exe+5DDBDB: 8B 4B 18        - mov ecx,[rbx+18]
+ffxvi.exe+5DDBDE: 8B C1           - mov eax,ecx
+ffxvi.exe+5DDBE0: C1 E8 02        - shr eax,02
+ffxvi.exe+5DDBE3: A8 01           - test al,01
+ffxvi.exe+5DDBE5: 74 08           - je ffxvi.exe+5DDBEF
+ffxvi.exe+5DDBE7: C1 E9 0A        - shr ecx,0A
+ffxvi.exe+5DDBEA: F6 C1 01        - test cl,01
+ffxvi.exe+5DDBED: 74 1C           - je ffxvi.exe+5DDC0B
+// ---------- INJECTING HERE ----------
+ffxvi.exe+5DDBEF: 44 01 4B 48     - add [rbx+48],r9d
+// ---------- DONE INJECTING  ----------
+ffxvi.exe+5DDBF3: 48 8B CB        - mov rcx,rbx
+ffxvi.exe+5DDBF6: E8 59 FF FF FF  - call ffxvi.exe+5DDB54
+ffxvi.exe+5DDBFB: 39 43 48        - cmp [rbx+48],eax
+ffxvi.exe+5DDBFE: 7E 0B           - jle ffxvi.exe+5DDC0B
+ffxvi.exe+5DDC00: 48 8B CB        - mov rcx,rbx
+ffxvi.exe+5DDC03: E8 4C FF FF FF  - call ffxvi.exe+5DDB54
+ffxvi.exe+5DDC08: 89 43 48        - mov [rbx+48],eax
+ffxvi.exe+5DDC0B: 48 83 C4 20     - add rsp,20
+ffxvi.exe+5DDC0F: 5B              - pop rbx
+ffxvi.exe+5DDC10: C3              - ret 
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>65</ID>
+              <Description>"Multiplier"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>Float</VariableType>
+              <Address>vf_lb_multi</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>66</ID>
+              <Description>"min. value"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_min_lb_value</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>59</ID>
+          <Description>"Get HP"</Description>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ffxvi.exe
+  Version: 
+  Date   : 2024-09-23
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_HP,$process,F6 C1 02 75 06 8B 47 40 89 43 20 48 8B CF) // should be unique
+alloc(newmem,$1000)
+
+label(code)
+label(return)
+label(i_base_hp_addr)
+label(is_reset_hp_addr)
+
+newmem:
+
+code:
+  test cl,02
+  //jne ffxvi.exe+21E8A9
+  jne @F
+
+  // ********************* code start
+  mov [i_base_hp_addr], rdi
+  // ********************* code end
+
+
+  mov eax,[rdi+40]
+  mov [rbx+20],eax
+@@:
+  mov rcx,rdi
+  jmp return
+align 10 cc
+  i_base_hp_addr:
+  dq 0
+  is_reset_hp_addr:
+  dd 0
+
+INJECT_GET_HP:
+  jmp far newmem
+return:
+registersymbol(INJECT_GET_HP)
+registersymbol(INJECT_GET_HP)
+registersymbol(i_base_hp_addr)
+
+[DISABLE]
+
+INJECT_GET_HP:
+  db F6 C1 02 75 06 8B 47 40 89 43 20 48 8B CF
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ffxvi.exe+21E89E
+
+ffxvi.exe+21E881: 48 85 FF        - test rdi,rdi
+ffxvi.exe+21E884: 74 4F           - je ffxvi.exe+21E8D5
+ffxvi.exe+21E886: 89 73 18        - mov [rbx+18],esi
+ffxvi.exe+21E889: 8B 4B 14        - mov ecx,[rbx+14]
+ffxvi.exe+21E88C: F6 C1 01        - test cl,01
+ffxvi.exe+21E88F: 75 0D           - jne ffxvi.exe+21E89E
+ffxvi.exe+21E891: 48 8B 40 10     - mov rax,[rax+10]
+ffxvi.exe+21E895: 8B 48 0C        - mov ecx,[rax+0C]
+ffxvi.exe+21E898: 89 4B 1C        - mov [rbx+1C],ecx
+ffxvi.exe+21E89B: 8B 4B 14        - mov ecx,[rbx+14]
+// ---------- INJECTING HERE ----------
+ffxvi.exe+21E89E: F6 C1 02        - test cl,02
+// ---------- DONE INJECTING  ----------
+ffxvi.exe+21E8A1: 75 06           - jne ffxvi.exe+21E8A9
+ffxvi.exe+21E8A3: 8B 47 40        - mov eax,[rdi+40]
+ffxvi.exe+21E8A6: 89 43 20        - mov [rbx+20],eax
+ffxvi.exe+21E8A9: 48 8B CF        - mov rcx,rdi
+ffxvi.exe+21E8AC: E8 8F EE 3B 00  - call ffxvi.exe+5DD740
+ffxvi.exe+21E8B1: 89 43 24        - mov [rbx+24],eax
+ffxvi.exe+21E8B4: 48 8B CF        - mov rcx,rdi
+ffxvi.exe+21E8B7: 8B 47 50        - mov eax,[rdi+50]
+ffxvi.exe+21E8BA: 89 43 28        - mov [rbx+28],eax
+ffxvi.exe+21E8BD: 8B 47 48        - mov eax,[rdi+48]
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>60</ID>
+              <Description>"Usage: enable in status window"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>61</ID>
+              <Description>"HP"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_hp_addr</Address>
+              <Offsets>
+                <Offset>40</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>62</ID>
+              <Description>"Limit Break"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_hp_addr</Address>
+              <Offsets>
+                <Offset>48</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>63</ID>
+              <Description>"faster kill"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{ Game   : ffxvi.exe
+  Version: 
+  Date   : 2024-09-23
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_1HK,$process,2B 4B 40 49 8B D7 41 8B 87 94 01 00 00 44 8B C9) // should be unique
+alloc(newmem,$1000)
+
+label(code)
+label(return)
+
+newmem:
+  cmp rbx, [i_base_hp_addr]
+  je code
+
+
+  cmp dword ptr [rbx+40], 1
+  jbe code
+  mov dword ptr [rbx+40], 1
+
+code:
+  sub ecx,[rbx+40]
+  mov rdx,r15
+  mov eax,[r15+00000194]
+  mov r9d,ecx
+  jmp return
+align 10 cc
+  vf_mg_multi:
+  dd (float)10
+
+INJECT_1HK:
+  jmp far newmem
+  nop 2
+return:
+registersymbol(INJECT_1HK)
+
+[DISABLE]
+
+INJECT_1HK:
+  db 2B 4B 40 49 8B D7 41 8B 87 94 01 00 00 44 8B C9
+
+unregistersymbol(INJECT_1HK)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ffxvi.exe+591488
+
+ffxvi.exe+59145E: 74 0E                 - je ffxvi.exe+59146E
+ffxvi.exe+591460: 48 8B 05 41 69 28 01  - mov rax,[ffxvi.exe+1817DA8]
+ffxvi.exe+591467: C7 40 4C E7 8C 88 3E  - mov [rax+4C],3E888CE7
+ffxvi.exe+59146E: 8B 4D 88              - mov ecx,[rbp-78]
+ffxvi.exe+591471: 85 C9                 - test ecx,ecx
+ffxvi.exe+591473: 0F 8E DC 00 00 00     - jng ffxvi.exe+591555
+ffxvi.exe+591479: 41 8B 87 C4 00 00 00  - mov eax,[r15+000000C4]
+ffxvi.exe+591480: C1 E8 02              - shr eax,02
+ffxvi.exe+591483: 40 84 C6              - test sil,al
+ffxvi.exe+591486: 74 6D                 - je ffxvi.exe+5914F5
+// ---------- INJECTING HERE ----------
+ffxvi.exe+591488: 2B 4B 40              - sub ecx,[rbx+40]
+// ---------- DONE INJECTING  ----------
+ffxvi.exe+59148B: 49 8B D7              - mov rdx,r15
+ffxvi.exe+59148E: 41 8B 87 94 01 00 00  - mov eax,[r15+00000194]
+ffxvi.exe+591495: 44 8B C9              - mov r9d,ecx
+ffxvi.exe+591498: 45 8B 87 74 01 00 00  - mov r8d,[r15+00000174]
+ffxvi.exe+59149F: 48 8B 0D E2 68 28 01  - mov rcx,[ffxvi.exe+1817D88]
+ffxvi.exe+5914A6: C1 E8 15              - shr eax,15
+ffxvi.exe+5914A9: 40 22 C6              - and al,sil
+ffxvi.exe+5914AC: 88 44 24 20           - mov [rsp+20],al
+ffxvi.exe+5914B0: E8 DB 5D CC FF        - call ffxvi.exe+257290
+ffxvi.exe+5914B5: 48 8B 0D 4C 68 28 01  - mov rcx,[ffxvi.exe+1817D08]
+}
+</AssemblerScript>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>48</ID>
+          <Description>"Gil gain: *4 income"</Description>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ffxvi.exe
+  Version: 
+  Date   : 2024-09-23
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_ADD_GIL,$process,8B 42 04 2B F0 3B FE 0F 4C F7 85 F6 7E 07) // should be unique
+alloc(newmem,$1000)
+
+label(code)
+label(return)
+label(i_ig_base_addr)
+label(i_idx)
+
+newmem:
+
+code:
+  mov eax,[rdx+04]
+  sub esi,eax
+  cmp edi,esi
+  cmovl esi,edi
+  test esi,esi
+  //jle ffxvi.exe+6A8F2B
+  reassemble(INJECT_ADD_GIL+C)
+
+  // ************************* code start
+  cmp dword ptr [rdx], 1
+  je chk1
+  cmp dword ptr [rdx], 3
+  je chk1
+
+  cmp qword ptr [i_ig_base_addr], rdx
+  je chk1
+  cmp qword ptr [i_ig_base_addr+8], rdx
+  je chk1
+  cmp qword ptr [i_ig_base_addr+10], rdx
+  je chk1
+  cmp qword ptr [i_ig_base_addr+18], rdx
+  je chk1
+  cmp qword ptr [i_ig_base_addr+20], rdx
+  je chk1
+  push r15
+  push r14
+  mov r14d, [i_idx]
+  mov r15, i_ig_base_addr
+  lea r15, [r15+r14d*8]
+  mov [r15], rdx
+  inc dword ptr [i_idx]
+  cmp dword ptr [i_idx], 5
+  jb @F
+  mov dword ptr [i_idx], 0
+@@:
+  pop r14
+  pop r15
+chk1:
+
+  cmp esi, 0
+  jl code1
+  vcvtsi2ss xmm15, xmm15, esi
+  vmovss xmm14, [vf_gil_multi]
+  vmulss xmm15, xmm15, xmm14
+  vcvtss2si esi, xmm15
+  jmp code1
+
+@@:
+  xor esi, esi
+  // ************************* code end
+code1:
+
+
+  jmp return
+align 10 cc
+  vf_gil_multi:
+  dd (float)4
+  i_idx:
+  dd 0
+  i_ig_base_addr:
+  dq 0
+  dq 0
+  dq 0
+  dq 0
+  dq 0
+
+INJECT_ADD_GIL:
+  jmp far newmem
+return:
+registersymbol(INJECT_ADD_GIL)
+registersymbol(i_ig_base_addr)
+registersymbol(i_idx)
+
+[DISABLE]
+
+INJECT_ADD_GIL:
+  db 8B 42 04 2B F0 3B FE 0F 4C F7 85 F6 7E 07
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ffxvi.exe+6A8F16
+
+ffxvi.exe+6A8EF8: 39 2A                 - cmp [rdx],ebp
+ffxvi.exe+6A8EFA: 74 1A                 - je ffxvi.exe+6A8F16
+ffxvi.exe+6A8EFC: 48 83 C2 10           - add rdx,10
+ffxvi.exe+6A8F00: 48 3B D0              - cmp rdx,rax
+ffxvi.exe+6A8F03: 75 F3                 - jne ffxvi.exe+6A8EF8
+ffxvi.exe+6A8F05: 49 81 F9 2C 01 00 00  - cmp r9,0000012C
+ffxvi.exe+6A8F0C: 72 27                 - jb ffxvi.exe+6A8F35
+ffxvi.exe+6A8F0E: C6 03 01              - mov byte ptr [rbx],01
+ffxvi.exe+6A8F11: 89 7B 0C              - mov [rbx+0C],edi
+ffxvi.exe+6A8F14: EB 5E                 - jmp ffxvi.exe+6A8F74
+// ---------- INJECTING HERE ----------
+ffxvi.exe+6A8F16: 8B 42 04              - mov eax,[rdx+04]
+// ---------- DONE INJECTING  ----------
+ffxvi.exe+6A8F19: 2B F0                 - sub esi,eax
+ffxvi.exe+6A8F1B: 3B FE                 - cmp edi,esi
+ffxvi.exe+6A8F1D: 0F 4C F7              - cmovl esi,edi
+ffxvi.exe+6A8F20: 85 F6                 - test esi,esi
+ffxvi.exe+6A8F22: 7E 07                 - jle ffxvi.exe+6A8F2B
+ffxvi.exe+6A8F24: 03 C6                 - add eax,esi
+ffxvi.exe+6A8F26: 89 42 04              - mov [rdx+04],eax
+ffxvi.exe+6A8F29: EB 03                 - jmp ffxvi.exe+6A8F2E
+ffxvi.exe+6A8F2B: C6 03 01              - mov byte ptr [rbx],01
+ffxvi.exe+6A8F2E: 89 73 08              - mov [rbx+08],esi
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>49</ID>
+              <Description>"Data"</Description>
+              <Options moHideChildren="1"/>
+              <Color>808080</Color>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>50</ID>
+                  <Description>"idx"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>808080</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>i_idx</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>51</ID>
+                  <Description>"ID A."</Description>
+                  <DropDownListLink>ID A</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>i_ig_base_addr</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>52</ID>
+                      <Description>"#"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FF59AC</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>i_ig_base_addr</Address>
+                      <Offsets>
+                        <Offset>4</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>53</ID>
+                  <Description>"ID B"</Description>
+                  <DropDownListLink>ID A</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>i_ig_base_addr+8</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>54</ID>
+                      <Description>"#"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FF59AC</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>i_ig_base_addr+8</Address>
+                      <Offsets>
+                        <Offset>4</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>55</ID>
+                  <Description>"ID C"</Description>
+                  <DropDownListLink>ID A</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>i_ig_base_addr+10</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>56</ID>
+                      <Description>"#"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FF59AC</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>i_ig_base_addr+10</Address>
+                      <Offsets>
+                        <Offset>4</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>67</ID>
+                  <Description>"ID D"</Description>
+                  <DropDownListLink>ID A</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>i_ig_base_addr+18</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>68</ID>
+                      <Description>"#"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FF59AC</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>i_ig_base_addr+18</Address>
+                      <Offsets>
+                        <Offset>4</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>57</ID>
+                  <Description>"ID E"</Description>
+                  <DropDownListLink>ID A</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>i_ig_base_addr+20</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>58</ID>
+                      <Description>"#"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FF59AC</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>i_ig_base_addr+20</Address>
+                      <Offsets>
+                        <Offset>4</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>79</ID>
+      <Description>"================================="</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>78</ID>
+      <Description>"Kairos Gate"</Description>
+      <Options moHideChildren="1"/>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>74</ID>
+          <Description>"Get EP/BP"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ffxvi.exe
+  Version: 
+  Date   : 2024-09-28
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_K_GET_EPBP,$process,41 8B 8F 70 01 00 00) // should be unique
+alloc(newmem,$1000,INJECT_K_GET_EPBP)
+
+label(code)
+label(return)
+label(i_base_k_epbp_addr)
+
+newmem:
+  mov, [i_base_k_epbp_addr], r15
+
+code:
+  mov ecx,[r15+00000170]
+  jmp return
+align 10 cc
+  i_base_k_epbp_addr:
+  dq 0
+
+INJECT_K_GET_EPBP:
+  jmp newmem
+  nop 2
+return:
+registersymbol(INJECT_K_GET_EPBP)
+registersymbol(i_base_k_epbp_addr)
+[DISABLE]
+
+INJECT_K_GET_EPBP:
+  db 41 8B 8F 70 01 00 00
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ffxvi.exe+2E09FB
+
+ffxvi.exe+2E09D4: E8 BF 6A D5 FF        - call ffxvi.exe+37498
+ffxvi.exe+2E09D9: 8B D6                 - mov edx,esi
+ffxvi.exe+2E09DB: B9 69 04 00 00        - mov ecx,00000469
+ffxvi.exe+2E09E0: 8B D8                 - mov ebx,eax
+ffxvi.exe+2E09E2: E8 49 BD 92 00        - call ffxvi.exe+C0C730
+ffxvi.exe+2E09E7: 44 8B C7              - mov r8d,edi
+ffxvi.exe+2E09EA: 48 89 44 24 68        - mov [rsp+68],rax
+ffxvi.exe+2E09EF: 8B D6                 - mov edx,esi
+ffxvi.exe+2E09F1: B9 4C 04 00 00        - mov ecx,0000044C
+ffxvi.exe+2E09F6: E8 A5 BD 92 00        - call ffxvi.exe+C0C7A0
+// ---------- INJECTING HERE ----------
+ffxvi.exe+2E09FB: 41 8B 8F 70 01 00 00  - mov ecx,[r15+00000170]
+// ---------- DONE INJECTING  ----------
+ffxvi.exe+2E0A02: 4C 8D A5 A0 00 00 00  - lea r12,[rbp+000000A0]
+ffxvi.exe+2E0A09: 8B 15 41 FA 46 01     - mov edx,[ffxvi.exe+1750450]
+ffxvi.exe+2E0A0F: 4C 8B E8              - mov r13,rax
+ffxvi.exe+2E0A12: 4C 8B 15 6F 33 53 01  - mov r10,[ffxvi.exe+1813D88]
+ffxvi.exe+2E0A19: 41 89 0C 24           - mov [r12],ecx
+ffxvi.exe+2E0A1D: 41 8B 8F 74 01 00 00  - mov ecx,[r15+00000174]
+ffxvi.exe+2E0A24: 89 8D A4 00 00 00     - mov [rbp+000000A4],ecx
+ffxvi.exe+2E0A2A: 89 B5 A8 00 00 00     - mov [rbp+000000A8],esi
+ffxvi.exe+2E0A30: 89 BD AC 00 00 00     - mov [rbp+000000AC],edi
+ffxvi.exe+2E0A36: 89 9D B0 00 00 00     - mov [rbp+000000B0],ebx
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>77</ID>
+              <Description>"Usage: enter any sub screen and return"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>75</ID>
+              <Description>"EP"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_k_epbp_addr</Address>
+              <Offsets>
+                <Offset>170</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>76</ID>
+              <Description>"BP"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_k_epbp_addr</Address>
+              <Offsets>
+                <Offset>174</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>82</ID>
+          <Description>"Battle score multiplier"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ffxvi.exe
+  Version: 
+  Date   : 2024-09-28
+  Author : bbfox@https://opecheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_K_SCORE_MULTI,$process,01 97 60 46 00 00) // should be unique
+alloc(newmem,$1000,INJECT_K_SCORE_MULTI)
+
+label(code)
+label(return)
+label(vf_ksc_multi)
+
+newmem:
+  vmovss xmm14, [vf_ksc_multi]
+  vcvtsi2ss xmm15, xmm15, edx
+  vmulss xmm15, xmm14, xmm15
+  vcvtss2si edx, xmm15
+
+code:
+  add [rdi+00004660],edx
+  jmp return
+align 10 cc
+  vf_ksc_multi:
+  dd (float)2.2
+
+INJECT_K_SCORE_MULTI:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT_K_SCORE_MULTI)
+registersymbol(vf_ksc_multi)
+[DISABLE]
+
+INJECT_K_SCORE_MULTI:
+  db 01 97 60 46 00 00
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ffxvi.exe+257535
+
+ffxvi.exe+257515: 8B C8                 - mov ecx,eax
+ffxvi.exe+257517: B8 1F 85 EB 51        - mov eax,51EB851F
+ffxvi.exe+25751C: 41 0F AF CC           - imul ecx,r12d
+ffxvi.exe+257520: 83 C1 32              - add ecx,32
+ffxvi.exe+257523: F7 E9                 - imul ecx
+ffxvi.exe+257525: C1 FA 05              - sar edx,05
+ffxvi.exe+257528: 8B C2                 - mov eax,edx
+ffxvi.exe+25752A: C1 E8 1F              - shr eax,1F
+ffxvi.exe+25752D: 03 D0                 - add edx,eax
+ffxvi.exe+25752F: 8B 05 1B 8F 4F 01     - mov eax,[ffxvi.exe+1750450]
+// ---------- INJECTING HERE ----------
+ffxvi.exe+257535: 01 97 60 46 00 00     - add [rdi+00004660],edx
+// ---------- DONE INJECTING  ----------
+ffxvi.exe+25753B: 39 87 60 46 00 00     - cmp [rdi+00004660],eax
+ffxvi.exe+257541: 76 06                 - jna ffxvi.exe+257549
+ffxvi.exe+257543: 89 87 60 46 00 00     - mov [rdi+00004660],eax
+ffxvi.exe+257549: 80 BF 6D 46 00 00 00  - cmp byte ptr [rdi+0000466D],00
+ffxvi.exe+257550: 74 13                 - je ffxvi.exe+257565
+ffxvi.exe+257552: 45 84 F6              - test r14b,r14b
+ffxvi.exe+257555: 74 07                 - je ffxvi.exe+25755E
+ffxvi.exe+257557: C6 87 6E 46 00 00 01  - mov byte ptr [rdi+0000466E],01
+ffxvi.exe+25755E: 83 A7 64 46 00 00 00  - and dword ptr [rdi+00004664],00
+ffxvi.exe+257565: 48 8B 4D F0           - mov rcx,[rbp-10]
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>83</ID>
+              <Description>"multiplier"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>Float</VariableType>
+              <Address>vf_ksc_multi</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>18</ID>
+      <Description>"Final Fantasy XVI 1.01  /  https://opencheattables.com  /  CE 7.5+"</Description>
+      <Color>00AE00</Color>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

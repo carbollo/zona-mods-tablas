@@ -1,0 +1,581 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="28">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>1</ID>
+      <Description>"Money Address (Open Spa, may need to do it twice)"</Description>
+      <Options moHideChildren="1"/>
+      <LastState/>
+      <Color>008000</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+LaunchMonoDataCollector()
+{$asm}
+//GameManagerScript:UpdateTavernOrChurchTotalPrice+432 - 48 63 8E B4050000 - movsxd  rcx,dword ptr [rsi+000005B4]
+aobscanregion(money,GameManagerScript:UpdateTavernOrChurchTotalPrice+140,GameManagerScript:UpdateTavernOrChurchTotalPrice+4D0,48 63 8E B4 05 00 00 4C 8B FA 3B C1) // should be unique
+alloc(newmem,$1000,money)
+
+label(code)
+label(return)
+label(MoneyAddy)
+
+newmem:
+
+code:
+  lea rcx,[rsi+000005B4]
+  mov [MoneyAddy],rcx
+  //original code
+  movsxd  rcx,dword ptr [rsi+000005B4]
+  jmp return
+  MoneyAddy:
+
+money:
+  jmp newmem
+  nop
+  nop
+return:
+registersymbol(money)
+registersymbol(MoneyAddy)
+
+[DISABLE]
+
+money:
+  db 48 63 8E B4 05 00 00
+
+unregistersymbol(money)
+unregistersymbol(MoneyAddy)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: 248A051AE32
+
+248A051AE02: 48 83 C4 20                    -  add rsp,20
+248A051AE06: 48 8B C8                       -  mov rcx,rax
+248A051AE09: 83 39 00                       -  cmp dword ptr [rcx],00
+248A051AE0C: 49 BA 60 28 5C 85 48 02 00 00  -  mov r10,00000248855C2860
+248A051AE16: 48 83 EC 20                    -  sub rsp,20
+248A051AE1A: 49 BB 50 55 22 F9 48 02 00 00  -  mov r11,00000248F9225550
+248A051AE24: 41 FF D3                       -  call r11
+248A051AE27: 48 83 C4 20                    -  add rsp,20
+248A051AE2B: 48 8B D0                       -  mov rdx,rax
+248A051AE2E: 48 63 45 84                    -  movsxd  rax,dword ptr [rbp-7C]
+// ---------- INJECTING HERE ----------
+248A051AE32: 48 63 8E B4 05 00 00           -  movsxd  rcx,dword ptr [rsi+000005B4]
+// ---------- DONE INJECTING  ----------
+248A051AE39: 4C 8B FA                       -  mov r15,rdx
+248A051AE3C: 3B C1                          -  cmp eax,ecx
+248A051AE3E: 7F 1D                          -  jg 248A051AE5D
+248A051AE40: 48 8B 86 30 04 00 00           -  mov rax,[rsi+00000430]
+248A051AE47: 48 8B C8                       -  mov rcx,rax
+248A051AE4A: 83 39 00                       -  cmp dword ptr [rcx],00
+248A051AE4D: 48 63 40 18                    -  movsxd  rax,dword ptr [rax+18]
+248A051AE51: 85 C0                          -  test eax,eax
+248A051AE53: 41 0F 9F C6                    -  setg r14l
+248A051AE57: 4D 0F B6 F6                    -  movzx r14,r14l
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>2</ID>
+          <Description>"Money"</Description>
+          <VariableType>4 Bytes</VariableType>
+          <Address>[MoneyAddy]</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>6</ID>
+      <Description>"Highlighted Item (Click chest icon, highlight item, sometimes takes a bit)"</Description>
+      <Options moHideChildren="1"/>
+      <LastState/>
+      <Color>000080</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//GameManagerScript:ShowItemStatsStatic+7e - 48 63 40 50 - movsxd  rax,dword ptr [rax+50]
+aobscan(highlighted,48 63 40 50 89 85 58 FF FF FF) // should be unique
+alloc(newmem,$1000,highlighted)
+
+label(code)
+label(return)
+label(HighlightedAddy)
+
+newmem:
+
+code:
+  movsxd  rax,dword ptr [rax+50]
+  mov [HighlightedAddy],rcx
+  mov [rbp-000000A8],eax
+  jmp return
+  HighlightedAddy:
+
+highlighted:
+  jmp newmem
+  nop
+  nop
+  nop
+  nop
+  nop
+return:
+registersymbol(highlighted)
+registersymbol(HighlightedAddy)
+
+[DISABLE]
+
+highlighted:
+  db 48 63 40 50 89 85 58 FF FF FF
+
+unregistersymbol(highlighted)
+unregistersymbol(HighlightedAddy)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: 161898B04CE
+
+161898B049D: 48 8B F8                       -  mov rdi,rax
+161898B04A0: 48 8B 8D 60 FF FF FF           -  mov rcx,[rbp-000000A0]
+161898B04A7: 48 89 48 10                    -  mov [rax+10],rcx
+161898B04AB: 48 B8 A8 3F 33 83 61 01 00 00  -  mov rax,0000016183333FA8
+161898B04B5: 48 8B 00                       -  mov rax,[rax]
+161898B04B8: 48 89 85 68 FF FF FF           -  mov [rbp-00000098],rax
+161898B04BF: 48 63 85 58 FF FF FF           -  movsxd  rax,dword ptr [rbp-000000A8]
+161898B04C6: 85 C0                          -  test eax,eax
+161898B04C8: 7D 0E                          -  jnl 161898B04D8
+161898B04CA: 48 8B 47 10                    -  mov rax,[rdi+10]
+// ---------- INJECTING HERE ----------
+161898B04CE: 48 63 40 50                    -  movsxd  rax,dword ptr [rax+50]
+161898B04D2: 89 85 58 FF FF FF              -  mov [rbp-000000A8],eax
+// ---------- DONE INJECTING  ----------
+161898B04D8: 48 8B 85 68 FF FF FF           -  mov rax,[rbp-00000098]
+161898B04DF: 48 8B 80 E8 01 00 00           -  mov rax,[rax+000001E8]
+161898B04E6: 48 89 85 48 FF FF FF           -  mov [rbp-000000B8],rax
+161898B04ED: 48 85 FF                       -  test rdi,rdi
+161898B04F0: 0F 84 55 11 00 00              -  je 161898B164B
+161898B04F6: 48 B9 90 25 B6 FC 61 01 00 00  -  mov rcx,00000161FCB62590
+161898B0500: 48 83 EC 20                    -  sub rsp,20
+161898B0504: 49 BB C0 05 CE F0 61 01 00 00  -  mov r11,00000161F0CE05C0
+161898B050E: 41 FF D3                       -  call r11
+161898B0511: 48 83 C4 20                    -  add rsp,20
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>7</ID>
+          <Description>"Item Amount"</Description>
+          <VariableType>4 Bytes</VariableType>
+          <Address>[HighlightedAddy]+50</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>4</ID>
+      <Description>"Crafting doesn't decrease items / Infinite Mana"</Description>
+      <LastState/>
+      <Color>FF0000</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+LaunchMonoDataCollector()
+{$asm}
+//GameManagerScript:TakeMaterial+257 - 2B CA - sub ecx,edx
+aobscan(craft,2B CA 89 48 50) // should be unique
+craft:
+  db 90 90
+registersymbol(craft)
+
+[DISABLE]
+craft:
+  db 2B CA
+unregistersymbol(craft)
+{
+// ORIGINAL CODE - INJECTION POINT: 161898CA807
+
+161898CA7D5: 48 B9 E0 36 D3 F0 61 01 00 00  -  mov rcx,00000161F0D336E0
+161898CA7DF: 48 89 4A 18                    -  mov [rdx+18],rcx
+161898CA7E3: 48 8B C8                       -  mov rcx,rax
+161898CA7E6: 48 83 EC 20                    -  sub rsp,20
+161898CA7EA: 83 38 00                       -  cmp dword ptr [rax],00
+161898CA7ED: 49 BB 40 94 DD F0 61 01 00 00  -  mov r11,00000161F0DD9440
+161898CA7F7: 41 FF D3                       -  call r11
+161898CA7FA: 48 83 C4 20                    -  add rsp,20
+161898CA7FE: 48 63 48 50                    -  movsxd  rcx,dword ptr [rax+50]
+161898CA802: 49 63 54 24 18                 -  movsxd  rdx,dword ptr [r12+18]
+// ---------- INJECTING HERE ----------
+161898CA807: 2B CA                          -  sub ecx,edx
+161898CA809: 89 48 50                       -  mov [rax+50],ecx
+// ---------- DONE INJECTING  ----------
+161898CA80C: 49 8B 87 40 02 00 00           -  mov rax,[r15+00000240]
+161898CA813: 48 8B CD                       -  mov rcx,rbp
+161898CA816: 48 83 C1 98                    -  add rcx,-68
+161898CA81A: 48 8B D0                       -  mov rdx,rax
+161898CA81D: 48 83 EC 20                    -  sub rsp,20
+161898CA821: 83 38 00                       -  cmp dword ptr [rax],00
+161898CA824: 49 BB 00 BC CE F0 61 01 00 00  -  mov r11,00000161F0CEBC00
+161898CA82E: 41 FF D3                       -  call r11
+161898CA831: 48 83 C4 20                    -  add rsp,20
+161898CA835: EB 2E                          -  jmp 161898CA865
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>10</ID>
+      <Description>"Equipping Potions doesn't decrease"</Description>
+      <LastState/>
+      <Color>FF0000</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//CharacterScript:AddConsumables+250 - 2B C6 - sub eax,esi
+aobscan(potions,2B C6 41 89 47 28 85 C0 0F 8F 66) // should be unique
+
+potions:
+  db 90 90
+
+registersymbol(potions)
+
+[DISABLE]
+potions:
+  db 2B C6
+
+unregistersymbol(potions)
+
+{
+// ORIGINAL CODE - INJECTION POINT: 19750700710
+
+197507006EE: 48 83 C4 30                    -  add rsp,30
+197507006F2: 49 8B 4E 10                    -  mov rcx,[r14+10]
+197507006F6: 48 63 49 28                    -  movsxd  rcx,dword ptr [rcx+28]
+197507006FA: 48 8B F0                       -  mov rsi,rax
+197507006FD: 2B F1                          -  sub esi,ecx
+197507006FF: 49 8B 46 10                    -  mov rax,[r14+10]
+19750700703: 48 63 48 28                    -  movsxd  rcx,dword ptr [rax+28]
+19750700707: 03 CE                          -  add ecx,esi
+19750700709: 89 48 28                       -  mov [rax+28],ecx
+1975070070C: 49 63 47 28                    -  movsxd  rax,dword ptr [r15+28]
+// ---------- INJECTING HERE ----------
+19750700710: 2B C6                          -  sub eax,esi
+19750700712: 41 89 47 28                    -  mov [r15+28],eax
+// ---------- DONE INJECTING  ----------
+19750700716: 85 C0                          -  test eax,eax
+19750700718: 0F 8F 66 00 00 00              -  jg 19750700784
+1975070071E: 48 B8 00 60 87 27 97 01 00 00  -  mov rax,0000019727876000
+19750700728: 48 8B 00                       -  mov rax,[rax]
+1975070072B: 48 8B 80 F0 02 00 00           -  mov rax,[rax+000002F0]
+19750700732: 48 8B C8                       -  mov rcx,rax
+19750700735: 49 8B D7                       -  mov rdx,r15
+19750700738: 48 83 EC 20                    -  sub rsp,20
+1975070073C: 83 38 00                       -  cmp dword ptr [rax],00
+1975070073F: 49 BB C6 F3 0A 41 97 01 00 00  -  mov r11,00000197410AF3C6
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>15</ID>
+      <Description>"100% crafting quality"</Description>
+      <LastState/>
+      <Color>FF0000</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//CraftStationScript:GetProcChances+1eb - 48 63 96 8C010000 - movsxd  rdx,dword ptr [rsi+0000018C]
+aobscan(craftquality,48 63 96 8C 01 00 00) // should be unique
+alloc(newmem,$1000,craftquality)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  mov dword ptr [rsi+0000018C],#100
+  movsxd  rdx,dword ptr [rsi+0000018C]
+  jmp return
+
+craftquality:
+  jmp newmem
+  nop
+  nop
+return:
+registersymbol(craftquality)
+
+[DISABLE]
+
+craftquality:
+  db 48 63 96 8C 01 00 00
+
+unregistersymbol(craftquality)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: 1A703B047AB
+
+1A703B04783: 41 FF D3                       -  call r11
+1A703B04786: 48 83 C4 20                    -  add rsp,20
+1A703B0478A: 4C 8B F0                       -  mov r14,rax
+1A703B0478D: 49 63 44 24 14                 -  movsxd  rax,dword ptr [r12+14]
+1A703B04792: 48 63 96 88 01 00 00           -  movsxd  rdx,dword ptr [rsi+00000188]
+1A703B04799: 49 8B CE                       -  mov rcx,r14
+1A703B0479C: 0F AF CA                       -  imul ecx,edx
+1A703B0479F: 03 C1                          -  add eax,ecx
+1A703B047A1: 41 89 44 24 14                 -  mov [r12+14],eax
+1A703B047A6: 49 63 44 24 18                 -  movsxd  rax,dword ptr [r12+18]
+// ---------- INJECTING HERE ----------
+1A703B047AB: 48 63 96 8C 01 00 00           -  movsxd  rdx,dword ptr [rsi+0000018C]
+// ---------- DONE INJECTING  ----------
+1A703B047B2: 49 8B CE                       -  mov rcx,r14
+1A703B047B5: 0F AF CA                       -  imul ecx,edx
+1A703B047B8: 03 C1                          -  add eax,ecx
+1A703B047BA: 41 89 44 24 18                 -  mov [r12+18],eax
+1A703B047BF: 49 8B 8F D8 01 00 00           -  mov rcx,[r15+000001D8]
+1A703B047C6: 48 B8 60 AE 55 03 A7 01 00 00  -  mov rax,000001A70355AE60
+1A703B047D0: 48 8B 00                       -  mov rax,[rax]
+1A703B047D3: 4C 8B F9                       -  mov r15,rcx
+1A703B047D6: 48 85 C0                       -  test rax,rax
+1A703B047D9: 0F 85 59 00 00 00              -  jne 1A703B04838
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>9212</ID>
+      <Description>"No craft time"</Description>
+      <LastState/>
+      <Color>FF0000</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//CraftWindowScript:UpdateResources+67b - 48 63 86 90000000 - movsxd  rax,dword ptr [rsi+00000090]
+aobscan(crafttime,48 63 86 90 00 00 00 48 63) // should be unique
+alloc(newmem,$1000,crafttime)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  mov dword ptr [rsi+00000090],#0
+  movsxd  rax,dword ptr [rsi+00000090]
+  jmp return
+
+crafttime:
+  jmp newmem
+  nop
+  nop
+return:
+registersymbol(crafttime)
+
+[DISABLE]
+
+crafttime:
+  db 48 63 86 90 00 00 00
+
+unregistersymbol(crafttime)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: 1B481C3FF9B
+
+1B481C3FF68: 41 FF D3                       -  call r11
+1B481C3FF6B: 48 83 C4 20                    -  add rsp,20
+1B481C3FF6F: 48 8B C8                       -  mov rcx,rax
+1B481C3FF72: 83 39 00                       -  cmp dword ptr [rcx],00
+1B481C3FF75: 49 BA 90 1F D8 E6 B4 01 00 00  -  mov r10,000001B4E6D81F90
+1B481C3FF7F: 48 83 EC 20                    -  sub rsp,20
+1B481C3FF83: 49 BB 90 8A CE DA B4 01 00 00  -  mov r11,000001B4DACE8A90
+1B481C3FF8D: 41 FF D3                       -  call r11
+1B481C3FF90: 48 83 C4 20                    -  add rsp,20
+1B481C3FF94: 48 89 85 58 FF FF FF           -  mov [rbp-000000A8],rax
+// ---------- INJECTING HERE ----------
+1B481C3FF9B: 48 63 86 90 00 00 00           -  movsxd  rax,dword ptr [rsi+00000090]
+// ---------- DONE INJECTING  ----------
+1B481C3FFA2: 48 63 4F 5C                    -  movsxd  rcx,dword ptr [rdi+5C]
+1B481C3FFA6: 0F AF C1                       -  imul eax,ecx
+1B481C3FFA9: F2 0F 2A C0                    -  cvtsi2sd xmm0,eax
+1B481C3FFAD: F2 0F 5A C0                    -  cvtsd2ss xmm0,xmm0
+1B481C3FFB1: 48 83 EC 20                    -  sub rsp,20
+1B481C3FFB5: 49 BB D0 02 C4 81 B4 01 00 00  -  mov r11,000001B481C402D0
+1B481C3FFBF: 41 FF D3                       -  call r11
+1B481C3FFC2: 48 83 C4 20                    -  add rsp,20
+1B481C3FFC6: 48 8B D0                       -  mov rdx,rax
+1B481C3FFC9: 48 8B 85 58 FF FF FF           -  mov rax,[rbp-000000A8]
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>9211</ID>
+      <Description>"Mood neveer decreases"</Description>
+      <LastState/>
+      <Color>800080</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//CharacterScript:IsMoodLow+c - 48 63 96 44020000 - movsxd  rdx,dword ptr [rsi+00000244]
+aobscan(mood,48 63 96 44 02 00 00 48 8B CE 48 83 EC 20 49 BB) // should be unique
+alloc(newmem,$1000,mood)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  mov [rsi+00000244],#100
+  movsxd  rdx,dword ptr [rsi+00000244]
+  jmp return
+
+mood:
+  jmp newmem
+  nop
+  nop
+return:
+registersymbol(mood)
+
+[DISABLE]
+
+mood:
+  db 48 63 96 44 02 00 00
+
+unregistersymbol(mood)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: 1B481BB153C
+
+1B481BB1526: 00 00                          -  add [rax],al
+1B481BB1528: 00 00                          -  add [rax],al
+1B481BB152A: 00 00                          -  add [rax],al
+1B481BB152C: 00 00                          -  add [rax],al
+1B481BB152E: 00 00                          -  add [rax],al
+1B481BB1530: 55                             -  push rbp
+1B481BB1531: 48 8B EC                       -  mov rbp,rsp
+1B481BB1534: 56                             -  push rsi
+1B481BB1535: 48 83 EC 08                    -  sub rsp,08
+1B481BB1539: 48 8B F1                       -  mov rsi,rcx
+// ---------- INJECTING HERE ----------
+1B481BB153C: 48 63 96 44 02 00 00           -  movsxd  rdx,dword ptr [rsi+00000244]
+// ---------- DONE INJECTING  ----------
+1B481BB1543: 48 8B CE                       -  mov rcx,rsi
+1B481BB1546: 48 83 EC 20                    -  sub rsp,20
+1B481BB154A: 49 BB 90 15 BB 81 B4 01 00 00  -  mov r11,000001B481BB1590
+1B481BB1554: 41 FF D3                       -  call r11
+1B481BB1557: 48 83 C4 20                    -  add rsp,20
+1B481BB155B: 48 8B 75 F8                    -  mov rsi,[rbp-08]
+1B481BB155F: C9                             -  leave 
+1B481BB1560: C3                             -  ret 
+1B481BB1561: 00 00                          -  add [rax],al
+1B481BB1563: 00 00                          -  add [rax],al
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>11</ID>
+      <Description>"Rep Address (Compete in contest)"</Description>
+      <Options moHideChildren="1"/>
+      <LastState/>
+      <Color>800080</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//GameManagerScript:ToStringPlayerProgress+aff - 48 63 87 8C060000 - movsxd  rax,dword ptr [rdi+0000068C]
+aobscanregion(rep,GameManagerScript:ToStringPlayerProgress+1,GameManagerScript:ToStringPlayerProgress+C00,48 63 87 8C 06 00 00) // should be unique
+alloc(newmem,$1000,rep)
+
+label(code)
+label(return)
+label(RepAddy)
+
+newmem:
+
+code:
+  lea rax,[rdi+0000068C]
+  mov [RepAddy],rax
+  //original code
+  movsxd  rax,dword ptr [rdi+0000068C]
+  jmp return
+  RepAddy:
+
+rep:
+  jmp newmem
+  nop
+  nop
+return:
+registersymbol(rep)
+registersymbol(RepAddy)
+
+[DISABLE]
+
+rep:
+  db 48 63 87 8C 06 00 00
+
+unregistersymbol(rep)
+unregistersymbol(RepAddy)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: 197583C9DBF
+
+197583C9D7F: 48 89 85 00 FF FF FF           -  mov [rbp-00000100],rax
+197583C9D86: BA 01 00 00 00                 -  mov edx,00000001
+197583C9D8B: 49 B8 00 91 2E 5A 97 01 00 00  -  mov r8,000001975A2E9100
+197583C9D95: 48 83 EC 20                    -  sub rsp,20
+197583C9D99: 49 BB 00 1D 74 1C 97 01 00 00  -  mov r11,000001971C741D00
+197583C9DA3: 41 FF D3                       -  call r11
+197583C9DA6: 48 83 C4 20                    -  add rsp,20
+197583C9DAA: 48 8B 85 00 FF FF FF           -  mov rax,[rbp-00000100]
+197583C9DB1: 48 89 85 08 FF FF FF           -  mov [rbp-000000F8],rax
+197583C9DB8: 48 89 85 18 FF FF FF           -  mov [rbp-000000E8],rax
+// ---------- INJECTING HERE ----------
+197583C9DBF: 48 63 87 8C 06 00 00           -  movsxd  rax,dword ptr [rdi+0000068C]
+// ---------- DONE INJECTING  ----------
+197583C9DC6: 48 89 85 10 FF FF FF           -  mov [rbp-000000F0],rax
+197583C9DCD: 48 B9 F8 AB 2E 1C 97 01 00 00  -  mov rcx,000001971C2EABF8
+197583C9DD7: 48 83 EC 20                    -  sub rsp,20
+197583C9DDB: 49 BB 50 1C 74 1C 97 01 00 00  -  mov r11,000001971C741C50
+197583C9DE5: 41 FF D3                       -  call r11
+197583C9DE8: 48 83 C4 20                    -  add rsp,20
+197583C9DEC: 4C 8B C0                       -  mov r8,rax
+197583C9DEF: 48 8B 85 10 FF FF FF           -  mov rax,[rbp-000000F0]
+197583C9DF6: 48 8B 8D 08 FF FF FF           -  mov rcx,[rbp-000000F8]
+197583C9DFD: 41 89 40 10                    -  mov [r8+10],eax
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>12</ID>
+          <Description>"Rep Amount"</Description>
+          <VariableType>4 Bytes</VariableType>
+          <Address>[RepAddy]</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>9215</ID>
+      <Description>"Cake-san"</Description>
+      <LastState Value="" RealAddress="00000000"/>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>9214</ID>
+          <Description>"Enable ingame cheat (Activate before loading/starting game eg: Main menu)"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+{$lua}
+LaunchMonoDataCollector()
+{$asm}
+aobscanregion(cheat,CheatsGame:Start,CheatsGame:Start+100,48 63 80 48 02 00 00 85 C0)
+registersymbol(cheat)
+alloc(_cheat,8)
+registersymbol(_cheat)
+_cheat:
+readmem(cheat,6)
+cheat+9:
+db 90 90 90 90 90 90
+[DISABLE]
+cheat+9:
+readmem(_cheat,6)
+dealloc(_cheat)
+unregistersymbol(cheat)
+unregistersymbol(_cheat)
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

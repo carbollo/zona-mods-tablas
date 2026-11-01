@@ -1,0 +1,2476 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="46">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>0</ID>
+      <Description>"Toggle Compact View"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+if syntaxcheck then return end
+
+if not toggleCompactView then
+    function toggleCompactView(sender, forceEnable)
+        local isCompactMode = not (compactViewMenuItem.Caption == 'Compact View Mode')
+        if forceEnable ~= nil then
+            isCompactMode = not forceEnable
+        end
+
+        synchronize(function()
+            compactViewMenuItem.Caption = isCompactMode and 'Compact View Mode' or 'Full View Mode'
+            getMainForm().Splitter1.Visible = isCompactMode
+            getMainForm().Panel4.Visible    = isCompactMode
+            getMainForm().Panel5.Visible    = isCompactMode
+        end)
+    end
+end
+
+if not createCompactViewMenu then
+    function createCompactViewMenu()
+        if isCompactMenuCreated then return end
+
+        synchronize(function()
+            local mainMenu = getMainForm().Menu.Items
+            compactViewMenuItem = createMenuItem(mainMenu)
+            compactViewMenuItem.Caption = 'Compact View Mode'
+            compactViewMenuItem.OnClick = toggleCompactView
+            mainMenu.add(compactViewMenuItem)
+        end)
+
+        isCompactMenuCreated = true
+    end
+end
+
+createCompactViewMenu()
+toggleCompactView(nil, true)
+
+[DISABLE]
+{$lua}
+if toggleCompactView then
+    toggleCompactView(nil, false)
+end
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>50</ID>
+      <Description>"Toggle scripts"</Description>
+      <Color>4080FF</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript Async="1">[ENABLE]
+{$lua}
+if (syntaxcheck) then return end
+synchronize(function()
+  getLuaEngine().menuItem5.doClick()
+  getLuaEngine().Close()
+end)
+
+local enableBattleScripts = {
+  0, -- "Toggle Compact View"
+  1, -- "Get incoming (transport) resources"
+  27, -- "Set min granary resources amount"
+  29, -- "When add res. to storage area: set min amount"
+  31, -- "Build: material no decrease (applied to enemy)"
+  32, -- "inf. catapult stone (engineer built)"
+  35, -- "inf. trebuchet stone (engineer built)"
+  38, -- "Towers HP"
+  47, -- "Selected unit: Million+ HP"
+  60, -- "Enable kill count modification"
+  39, -- "Lookout tower HP"
+  40, -- "Set lookout tower HP"
+  42, -- "Other towers HP"
+  43, -- "Set round tower HP"
+  45, -- "Set perimeter tower HP"
+  46, -- "Set defense tower HP"
+}
+local addressList = getAddressList()
+synchronize(function()
+  for _, id in ipairs(enableBattleScripts) do
+    local memRec = addressList.getMemoryRecordByID(id)
+    if memRec and not memRec.Active then
+      memRec.Active = true
+      sleep(30)
+    end
+    addressList.refresh()
+  end
+end)
+synchronize(function() getLuaEngine().Close() end)
+[DISABLE]
+{$lua}
+if (syntaxcheck) then return end
+synchronize(function()
+  getLuaEngine().menuItem5.doClick()
+  getLuaEngine().Close()
+end)
+
+local disableBattleScripts = {
+  46, -- "Set defense tower HP"
+  45, -- "Set perimeter tower HP"
+  43, -- "Set round tower HP"
+  42, -- "Other towers HP"
+  40, -- "Set lookout tower HP"
+  57, -- "Kill count multiplier, (achi. 100K)"
+  54, -- "Kill count multiplier, (achi. 1M ?)"
+  39, -- "Lookout tower HP"
+  60, -- "Enable kill count modification"
+  47, -- "Selected unit: Million+ HP"
+  38, -- "Towers HP"
+  35, -- "inf. trebuchet stone (engineer built)"
+  32, -- "inf. catapult stone (engineer built)"
+  31, -- "Build: material no decrease (applied to enemy)"
+  29, -- "When add res. to storage area: set min amount"
+  27, -- "Set min granary resources amount"
+  1, -- "Get incoming (transport) resources"
+  0, -- "Toggle Compact View"
+}
+local addressList = getAddressList()
+synchronize(function()
+  for _, id in ipairs(disableBattleScripts) do
+    local memRec = addressList.getMemoryRecordByID(id)
+    if memRec and memRec.Active then
+      memRec.Active = false
+      sleep(30)
+    end
+    addressList.refresh()
+  end
+end)
+synchronize(function() getLuaEngine().Close() end)
+-- Comments:
+-- ID: 0, Description: "Toggle Compact View", Depth: 0
+-- ID: 1, Description: "Get incoming (transport) resources", Depth: 0
+-- ID: 27, Description: "Set min granary resources amount", Depth: 0
+-- ID: 29, Description: "When add res. to storage area: set min amount", Depth: 0
+-- ID: 31, Description: "Build: material no decrease (applied to enemy)", Depth: 0
+-- ID: 32, Description: "inf. catapult stone (engineer built)", Depth: 0
+-- ID: 35, Description: "inf. trebuchet stone (engineer built)", Depth: 0
+-- ID: 38, Description: "Towers HP", Depth: 0
+--   ID: 39, Description: "Lookout tower HP", Depth: 1
+--     ID: 40, Description: "Set lookout tower HP", Depth: 2
+--       ID: 42, Description: "Other towers HP", Depth: 3
+--         ID: 43, Description: "Set round tower HP", Depth: 4
+--         ID: 45, Description: "Set perimeter tower HP", Depth: 4
+--         ID: 46, Description: "Set defense tower HP", Depth: 4
+-- ID: 47, Description: "Selected unit: Million+ HP", Depth: 0
+-- ID: 60, Description: "Enable kill count modification", Depth: 0
+--   ID: 54, Description: "Kill count multiplier, (achi. 1M ?)", Depth: 1
+--   ID: 57, Description: "Kill count multiplier, (achi. 100K)", Depth: 1
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>1</ID>
+      <Description>"Get incoming (transport) resources"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : Stronghold Crusader Definitive Edition.exe
+  Version: 
+  Date   : 2025-07-22
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_RESOURCES,CrusaderDE.dll,42 8B 84 19 34 F0 12 00) // should be unique
+alloc(newmem,$1000,INJECT_GET_RESOURCES)
+
+alloc(INJECT_GET_RESOURCESo, 8)
+
+label(code)
+label(return)
+label(i_res_offset i_res_addr)
+
+INJECT_GET_RESOURCESo:
+  readmem(INJECT_GET_RESOURCES, 8)
+
+newmem:
+
+code:
+  mov eax,[rcx+r11+0012F034]
+  //db 42 8B 84 19
+  //readmem(INJECT_GET_RESOURCES+4, 4)
+
+  push r15
+  push r14
+  xor r14, r14
+
+  //mov r14d, ??????
+  //db 41 be
+  //readmem(INJECT_GET_RESOURCES+4, 4)
+  mov r14d, 12F034
+
+  mov [i_res_offset], r14
+
+  lea r15, [rcx+r11]
+  lea r15, [r15+r14]
+  mov [i_res_addr], r15
+
+  pop r14
+  pop r15
+
+
+  jmp return
+align 10 cc
+  i_res_offset:
+  dd 0
+  dd 0
+  i_res_addr:
+  dq 0
+
+
+INJECT_GET_RESOURCES:
+  jmp newmem
+  nop 3
+return:
+registersymbol(i_res_offset i_res_addr)
+registersymbol(INJECT_GET_RESOURCES)
+registersymbol(INJECT_GET_RESOURCESo)
+
+[DISABLE]
+
+INJECT_GET_RESOURCES:
+  //db 42 8B 84 19 34 F0 12 00
+  readmem(INJECT_GET_RESOURCESo, 8)
+
+unregistersymbol(i_res_offset i_res_addr)
+unregistersymbol(INJECT_GET_RESOURCES)
+dealloc(newmem)
+unregistersymbol(INJECT_GET_RESOURCESo)
+dealloc(INJECT_GET_RESOURCESo)
+
+{
+// ORIGINAL CODE - INJECTION POINT: CrusaderDE.dll+18EB78
+
+CrusaderDE.dll+18EB35: 48 63 05 8C A5 B7 07     - movsxd  rax,dword ptr [CrusaderDE.dll+7D090C8]
+CrusaderDE.dll+18EB3C: 48 69 C8 3C 58 00 00     - imul rcx,rax,0000583C
+CrusaderDE.dll+18EB43: 42 8B 84 19 30 F0 12 00  - mov eax,[rcx+r11+0012F030]
+CrusaderDE.dll+18EB4B: 89 83 A0 05 00 00        - mov [rbx+000005A0],eax
+CrusaderDE.dll+18EB51: 48 63 05 70 A5 B7 07     - movsxd  rax,dword ptr [CrusaderDE.dll+7D090C8]
+CrusaderDE.dll+18EB58: 48 69 C8 3C 58 00 00     - imul rcx,rax,0000583C
+CrusaderDE.dll+18EB5F: 42 8B 84 19 98 F0 12 00  - mov eax,[rcx+r11+0012F098]
+CrusaderDE.dll+18EB67: 89 43 08                 - mov [rbx+08],eax
+CrusaderDE.dll+18EB6A: 48 63 05 57 A5 B7 07     - movsxd  rax,dword ptr [CrusaderDE.dll+7D090C8]
+CrusaderDE.dll+18EB71: 48 69 C8 3C 58 00 00     - imul rcx,rax,0000583C
+// ---------- INJECTING HERE ----------
+CrusaderDE.dll+18EB78: 42 8B 84 19 34 F0 12 00  - mov eax,[rcx+r11+0012F034]
+// ---------- DONE INJECTING  ----------
+CrusaderDE.dll+18EB80: 89 83 A4 05 00 00        - mov [rbx+000005A4],eax
+CrusaderDE.dll+18EB86: 48 63 05 3B A5 B7 07     - movsxd  rax,dword ptr [CrusaderDE.dll+7D090C8]
+CrusaderDE.dll+18EB8D: 48 69 C8 3C 58 00 00     - imul rcx,rax,0000583C
+CrusaderDE.dll+18EB94: 42 8B 84 19 9C F0 12 00  - mov eax,[rcx+r11+0012F09C]
+CrusaderDE.dll+18EB9C: 89 43 0C                 - mov [rbx+0C],eax
+CrusaderDE.dll+18EB9F: 48 63 05 22 A5 B7 07     - movsxd  rax,dword ptr [CrusaderDE.dll+7D090C8]
+CrusaderDE.dll+18EBA6: 48 69 C8 3C 58 00 00     - imul rcx,rax,0000583C
+CrusaderDE.dll+18EBAD: 42 8B 84 19 38 F0 12 00  - mov eax,[rcx+r11+0012F038]
+CrusaderDE.dll+18EBB5: 89 83 A8 05 00 00        - mov [rbx+000005A8],eax
+CrusaderDE.dll+18EBBB: 48 63 05 06 A5 B7 07     - movsxd  rax,dword ptr [CrusaderDE.dll+7D090C8]
+}
+
+
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>2</ID>
+          <Description>"Notice: incoming resources are on-the-fly."</Description>
+          <Color>8000FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>3</ID>
+          <Description>"    Don't set to too high value when game started"</Description>
+          <Color>8000FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>4</ID>
+          <Description>"i.e. if you set wood to a high value, you will never get stone and iron"</Description>
+          <Color>8000FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>5</ID>
+          <Description>"incoming wood"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_res_addr</Address>
+          <Offsets>
+            <Offset>0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>6</ID>
+          <Description>"incoming stone"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_res_addr</Address>
+          <Offsets>
+            <Offset>8</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>7</ID>
+          <Description>"incoming iron"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_res_addr</Address>
+          <Offsets>
+            <Offset>10</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>8</ID>
+          <Description>"incoming Hops / 啤酒花"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_res_addr</Address>
+          <Offsets>
+            <Offset>4</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>9</ID>
+          <Description>"incoming asphalt / 瀝青"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_res_addr</Address>
+          <Offsets>
+            <Offset>14</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>10</ID>
+          <Description>"incoming wheat"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_res_addr</Address>
+          <Offsets>
+            <Offset>1C</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>11</ID>
+          <Description>"incoming bread"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_res_addr</Address>
+          <Offsets>
+            <Offset>20</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>12</ID>
+          <Description>"incoming cheese"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_res_addr</Address>
+          <Offsets>
+            <Offset>24</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>13</ID>
+          <Description>"incoming meat"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_res_addr</Address>
+          <Offsets>
+            <Offset>28</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>14</ID>
+          <Description>"incoming apple"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_res_addr</Address>
+          <Offsets>
+            <Offset>2C</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>15</ID>
+          <Description>"incoming beer"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_res_addr</Address>
+          <Offsets>
+            <Offset>30</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>16</ID>
+          <Description>"incoming coins"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_res_addr</Address>
+          <Offsets>
+            <Offset>34</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>17</ID>
+          <Description>"incoming flour"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_res_addr</Address>
+          <Offsets>
+            <Offset>38</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>18</ID>
+          <Description>"incoming bow"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_res_addr</Address>
+          <Offsets>
+            <Offset>3C</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>19</ID>
+          <Description>"incoming crossbow"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_res_addr</Address>
+          <Offsets>
+            <Offset>40</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>20</ID>
+          <Description>"incoming spear"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_res_addr</Address>
+          <Offsets>
+            <Offset>44</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>21</ID>
+          <Description>"incoming halberd"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_res_addr</Address>
+          <Offsets>
+            <Offset>48</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>22</ID>
+          <Description>"incoming hammer"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_res_addr</Address>
+          <Offsets>
+            <Offset>4C</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>23</ID>
+          <Description>"incoming sword"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_res_addr</Address>
+          <Offsets>
+            <Offset>50</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>24</ID>
+          <Description>"incoming leather armor"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_res_addr</Address>
+          <Offsets>
+            <Offset>54</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>25</ID>
+          <Description>"incoming armor"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_res_addr</Address>
+          <Offsets>
+            <Offset>58</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>26</ID>
+          <Description>"Coins"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_res_addr</Address>
+          <Offsets>
+            <Offset>98</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>27</ID>
+      <Description>"Set min granary resources amount"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : Stronghold Crusader Definitive Edition.exe
+  Version: 
+  Date   : 2025-07-22
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_SET_GRANARY_RES,CrusaderDE.dll,42 8B 94 0F ?? ?? ?? 00 85 D2 0F 45 EA EB ??) // should be unique
+alloc(newmem,$1000,INJECT_SET_GRANARY_RES)
+
+alloc(INJECT_SET_GRANARY_RESo, 8)
+
+label(code)
+label(return)
+label(i_base_gra_res_addr is_lock_gra_res i_player_id)
+
+INJECT_SET_GRANARY_RESo:
+  readmem(INJECT_SET_GRANARY_RES, 8)
+
+newmem:
+
+code:
+  //mov edx,[rdi+r9+0000015C]
+  readmem(INJECT_SET_GRANARY_RES, 8)
+  push r15
+  mov r15d, [i_player_id]
+  cmp dword ptr [rdi+r9+0000001C], r15d
+  pop r15
+  jne code_end
+
+  push r15
+  push r14
+  xor r14, r14
+  db 41 be
+  readmem(INJECT_SET_GRANARY_RES+4, 4)
+
+  lea r15, [rdi+r9]
+  lea r15, [r15+r14]
+  mov [i_base_gra_res_addr], r15
+  cmp dword ptr [is_lock_gra_res], 1
+  jne endp
+  cmp dword ptr [r15], 20
+  jae @F
+  mov dword ptr [r15], 20
+@@:
+  cmp dword ptr [r15+4], 20
+  jae @F
+  mov dword ptr [r15+4], 20
+@@:
+  cmp dword ptr [r15+8], 20
+  jae @F
+  mov dword ptr [r15+8], 20
+@@:
+  cmp dword ptr [r15+C], 20
+  jae @F
+  mov dword ptr [r15+C], 20
+@@:
+
+endp:
+  pop r14
+  pop r15
+
+code_end:
+
+  jmp return
+align 10 cc
+  i_base_gra_res_addr:
+  dq 0
+  is_lock_gra_res:
+  dd 1
+  i_player_id:
+  dd 1
+
+INJECT_SET_GRANARY_RES:
+  jmp newmem
+  nop 3
+return:
+
+registersymbol(i_base_gra_res_addr is_lock_gra_res i_player_id)
+registersymbol(INJECT_SET_GRANARY_RES)
+registersymbol(INJECT_SET_GRANARY_RESo)
+
+[DISABLE]
+
+INJECT_SET_GRANARY_RES:
+  //db 42 8B 94 0F 5C 01 00 00
+  readmem(INJECT_SET_GRANARY_RESo, 8)
+
+unregistersymbol(i_base_gra_res_addr is_lock_gra_res i_player_id)
+unregistersymbol(INJECT_SET_GRANARY_RES)
+dealloc(newmem)
+unregistersymbol(INJECT_SET_GRANARY_RESo)
+dealloc(INJECT_SET_GRANARY_RESo)
+
+{
+// ORIGINAL CODE - INJECTION POINT: CrusaderDE.dll+9DAAE
+
+CrusaderDE.dll+9DA6D: 46 89 44 0F 58              - mov [rdi+r9+58],r8d
+CrusaderDE.dll+9DA72: 4E 89 44 0F 70              - mov [rdi+r9+70],r8
+CrusaderDE.dll+9DA77: 4E 89 44 0F 78              - mov [rdi+r9+78],r8
+CrusaderDE.dll+9DA7C: 4E 89 84 0F 80 00 00 00     - mov [rdi+r9+00000080],r8
+CrusaderDE.dll+9DA84: 4E 89 84 0F 88 00 00 00     - mov [rdi+r9+00000088],r8
+CrusaderDE.dll+9DA8C: 49 69 C6 3C 58 00 00        - imul rax,r14,0000583C
+CrusaderDE.dll+9DA93: 4E 89 84 0F 90 00 00 00     - mov [rdi+r9+00000090],r8
+CrusaderDE.dll+9DA9B: 4E 89 84 0F 98 00 00 00     - mov [rdi+r9+00000098],r8
+CrusaderDE.dll+9DAA3: 66 42 39 AC 38 40 0E 13 00  - cmp [rax+r15+00130E40],bp
+CrusaderDE.dll+9DAAC: 75 0F                       - jne CrusaderDE.dll+9DABD
+// ---------- INJECTING HERE ----------
+CrusaderDE.dll+9DAAE: 42 8B 94 0F 5C 01 00 00     - mov edx,[rdi+r9+0000015C]
+// ---------- DONE INJECTING  ----------
+CrusaderDE.dll+9DAB6: 85 D2                       - test edx,edx
+CrusaderDE.dll+9DAB8: 0F 45 EA                    - cmovne ebp,edx
+CrusaderDE.dll+9DABB: EB 02                       - jmp CrusaderDE.dll+9DABF
+CrusaderDE.dll+9DABD: 8B D5                       - mov edx,ebp
+CrusaderDE.dll+9DABF: 66 46 39 84 38 42 0E 13 00  - cmp [rax+r15+00130E42],r8w
+CrusaderDE.dll+9DAC8: 75 10                       - jne CrusaderDE.dll+9DADA
+CrusaderDE.dll+9DACA: 46 8B A4 0F 60 01 00 00     - mov r12d,[rdi+r9+00000160]
+CrusaderDE.dll+9DAD2: 45 85 E4                    - test r12d,r12d
+CrusaderDE.dll+9DAD5: 74 03                       - je CrusaderDE.dll+9DADA
+CrusaderDE.dll+9DAD7: 41 03 EC                    - add ebp,r12d
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>28</ID>
+          <Description>"Player ID"</Description>
+          <DropDownList DisplayValueAsItem="1">0:Only you have castle?
+1:You &amp; enemies have castle
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_player_id</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>29</ID>
+      <Description>"When add res. to storage area: set min amount"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : Stronghold Crusader Definitive Edition.exe
+  Version: 
+  Date   : 2025-07-22
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_ADD_RES_2_STORAGE_AREA,CrusaderDE.dll,8B 9C 81 34 01 00 00) // should be unique
+alloc(newmem,$1000,INJECT_ADD_RES_2_STORAGE_AREA)
+
+label(code)
+label(return)
+
+newmem:
+  cmp dword ptr [rcx+rax*4+00000134], 40
+  jae code
+  mov dword ptr [rcx+rax*4+00000134], 40
+  xor rdx, rdx
+
+code:
+  mov ebx,[rcx+rax*4+00000134]
+  jmp return
+
+INJECT_ADD_RES_2_STORAGE_AREA:
+  jmp newmem
+  nop 2
+return:
+registersymbol(INJECT_ADD_RES_2_STORAGE_AREA)
+
+[DISABLE]
+
+INJECT_ADD_RES_2_STORAGE_AREA:
+  db 8B 9C 81 34 01 00 00
+
+unregistersymbol(INJECT_ADD_RES_2_STORAGE_AREA)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: CrusaderDE.dll+B1CB3
+
+CrusaderDE.dll+B1C89: 44 2B C8              - sub r9d,eax
+CrusaderDE.dll+B1C8C: 41 8B C1              - mov eax,r9d
+CrusaderDE.dll+B1C8F: C3                    - ret
+CrusaderDE.dll+B1C90: 48 89 5C 24 08        - mov [rsp+08],rbx
+CrusaderDE.dll+B1C95: 4D 63 D8              - movsxd  r11,r8d
+CrusaderDE.dll+B1C98: 4C 8D 81 38 01 00 00  - lea r8,[rcx+00000138]
+CrusaderDE.dll+B1C9F: 4C 63 D2              - movsxd  r10,edx
+CrusaderDE.dll+B1CA2: 49 69 C2 CB 00 00 00  - imul rax,r10,000000CB
+CrusaderDE.dll+B1CA9: 49 69 D2 2C 03 00 00  - imul rdx,r10,0000032C
+CrusaderDE.dll+B1CB0: 49 03 C3              - add rax,r11
+// ---------- INJECTING HERE ----------
+CrusaderDE.dll+B1CB3: 8B 9C 81 34 01 00 00  - mov ebx,[rcx+rax*4+00000134]
+// ---------- DONE INJECTING  ----------
+CrusaderDE.dll+B1CBA: B8 01 00 00 00        - mov eax,00000001
+CrusaderDE.dll+B1CBF: 4C 03 C2              - add r8,rdx
+CrusaderDE.dll+B1CC2: 41 83 38 00           - cmp dword ptr [r8],00
+CrusaderDE.dll+B1CC6: 74 05                 - je CrusaderDE.dll+B1CCD
+CrusaderDE.dll+B1CC8: 49 3B C3              - cmp rax,r11
+CrusaderDE.dll+B1CCB: 75 12                 - jne CrusaderDE.dll+B1CDF
+CrusaderDE.dll+B1CCD: 48 FF C0              - inc rax
+CrusaderDE.dll+B1CD0: 49 83 C0 04           - add r8,04
+CrusaderDE.dll+B1CD4: 48 83 F8 19           - cmp rax,19
+CrusaderDE.dll+B1CD8: 7C E8                 - jl CrusaderDE.dll+B1CC2
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>30</ID>
+          <Description>"Not fully tested; may applied to enemy"</Description>
+          <Color>8000FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>31</ID>
+      <Description>"Build: material no decrease (applied to enemy)"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : Stronghold Crusader Definitive Edition.exe
+  Version: 
+  Date   : 2025-07-22
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_BUILD_MAT_NO_DEC,CrusaderDE.dll,2B D7 89 91 34 01 00 00) // should be unique
+alloc(newmem,$1000,INJECT_BUILD_MAT_NO_DEC)
+
+label(code)
+label(return)
+
+newmem:
+  //cmp dword ptr [rcx+00000014], 1
+  //jne code
+  cmp edi, 0
+  jl code
+  jmp code1
+
+code:
+  sub edx,edi
+code1:
+  mov [rcx+00000134],edx
+  jmp return
+
+INJECT_BUILD_MAT_NO_DEC:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_BUILD_MAT_NO_DEC)
+
+[DISABLE]
+
+INJECT_BUILD_MAT_NO_DEC:
+  db 2B D7 89 91 34 01 00 00
+
+unregistersymbol(INJECT_BUILD_MAT_NO_DEC)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: CrusaderDE.dll+ACAB2
+
+CrusaderDE.dll+ACA8F: 66 44 89 0B              - mov [rbx],r9w
+CrusaderDE.dll+ACA93: 8B 91 34 01 00 00        - mov edx,[rcx+00000134]
+CrusaderDE.dll+ACA99: C7 44 24 24 01 00 00 00  - mov [rsp+24],00000001
+CrusaderDE.dll+ACAA1: 3B D7                    - cmp edx,edi
+CrusaderDE.dll+ACAA3: 7C 2C                    - jl CrusaderDE.dll+ACAD1
+CrusaderDE.dll+ACAA5: 45 85 ED                 - test r13d,r13d
+CrusaderDE.dll+ACAA8: 74 08                    - je CrusaderDE.dll+ACAB2
+CrusaderDE.dll+ACAAA: 66 89 3B                 - mov [rbx],di
+CrusaderDE.dll+ACAAD: 41 8B F9                 - mov edi,r9d
+CrusaderDE.dll+ACAB0: EB 59                    - jmp CrusaderDE.dll+ACB0B
+// ---------- INJECTING HERE ----------
+CrusaderDE.dll+ACAB2: 2B D7                    - sub edx,edi
+// ---------- DONE INJECTING  ----------
+CrusaderDE.dll+ACAB4: 89 91 34 01 00 00        - mov [rcx+00000134],edx
+CrusaderDE.dll+ACABA: 49 69 CE 0F 16 00 00     - imul rcx,r14,0000160F
+CrusaderDE.dll+ACAC1: 49 03 C8                 - add rcx,r8
+CrusaderDE.dll+ACAC4: 41 29 BC 8F 90 F0 12 00  - sub [r15+rcx*4+0012F090],edi
+CrusaderDE.dll+ACACC: 41 8B F9                 - mov edi,r9d
+CrusaderDE.dll+ACACF: EB 25                    - jmp CrusaderDE.dll+ACAF6
+CrusaderDE.dll+ACAD1: 2B FA                    - sub edi,edx
+CrusaderDE.dll+ACAD3: 45 85 ED                 - test r13d,r13d
+CrusaderDE.dll+ACAD6: 74 05                    - je CrusaderDE.dll+ACADD
+CrusaderDE.dll+ACAD8: 66 89 13                 - mov [rbx],dx
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>32</ID>
+      <Description>"inf. catapult stone (engineer built)"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : Stronghold Crusader Definitive Edition.exe
+  Version: 
+  Date   : 2025-07-24
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_INF_CATA_STONE2,CrusaderDE.dll,66 42 89 84 32 BA 09 00 00) // should be unique
+alloc(newmem,$1000,INJECT_INF_CATA_STONE2)
+
+label(code)
+label(return)
+
+newmem:
+  cmp ax, #39
+  jbe code
+  mov ax, 64
+
+code:
+  mov [rdx+r14+000009BA],ax
+  jmp return
+
+INJECT_INF_CATA_STONE2:
+  jmp newmem
+  nop 4
+return:
+registersymbol(INJECT_INF_CATA_STONE2)
+
+[DISABLE]
+
+INJECT_INF_CATA_STONE2:
+  db 66 42 89 84 32 BA 09 00 00
+
+unregistersymbol(INJECT_INF_CATA_STONE2)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: CrusaderDE.dll+14502E
+
+CrusaderDE.dll+144FF0: 48 69 D0 90 04 00 00           - imul rdx,rax,00000490
+CrusaderDE.dll+144FF7: 66 42 83 BC 32 F4 09 00 00 16  - cmp word ptr [rdx+r14+000009F4],16
+CrusaderDE.dll+145001: 0F 84 01 01 00 00              - je CrusaderDE.dll+145108
+CrusaderDE.dll+145007: 66 42 39 BC 32 08 0A 00 00     - cmp [rdx+r14+00000A08],di
+CrusaderDE.dll+145010: 0F 85 F2 00 00 00              - jne CrusaderDE.dll+145108
+CrusaderDE.dll+145016: 42 0F B7 84 32 BA 09 00 00     - movzx eax,word ptr [rdx+r14+000009BA]
+CrusaderDE.dll+14501F: 66 85 C0                       - test ax,ax
+CrusaderDE.dll+145022: 0F 8E A2 00 00 00              - jng CrusaderDE.dll+1450CA
+CrusaderDE.dll+145028: 66 FF C8                       - dec ax
+CrusaderDE.dll+14502B: 45 8B C4                       - mov r8d,r12d
+// ---------- INJECTING HERE ----------
+CrusaderDE.dll+14502E: 66 42 89 84 32 BA 09 00 00     - mov [rdx+r14+000009BA],ax
+// ---------- DONE INJECTING  ----------
+CrusaderDE.dll+145037: 42 0F BF 8C 32 1A 07 00 00     - movsx ecx,word ptr [rdx+r14+0000071A]
+CrusaderDE.dll+145040: 42 0F BF 84 32 18 07 00 00     - movsx eax,word ptr [rdx+r14+00000718]
+CrusaderDE.dll+145049: 46 0F BF 8C 32 16 07 00 00     - movsx r9d,word ptr [rdx+r14+00000716]
+CrusaderDE.dll+145052: 8B D6                          - mov edx,esi
+CrusaderDE.dll+145054: 89 4C 24 28                    - mov [rsp+28],ecx
+CrusaderDE.dll+145058: 49 8B CE                       - mov rcx,r14
+CrusaderDE.dll+14505B: 89 44 24 20                    - mov [rsp+20],eax
+CrusaderDE.dll+14505F: E8 9C 43 03 00                 - call CrusaderDE.dll+179400
+CrusaderDE.dll+145064: 8B 35 FA 15 7C 00              - mov esi,[CrusaderDE.dll+906664]
+CrusaderDE.dll+14506A: E9 F5 01 00 00                 - jmp CrusaderDE.dll+145264
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>33</ID>
+          <Description>"# of stock must &gt; 40"</Description>
+          <Color>8000FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>34</ID>
+          <Description>"Apply to enemy if his stock &gt; 40"</Description>
+          <Color>8000FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>35</ID>
+      <Description>"inf. trebuchet stone (engineer built)"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : Stronghold Crusader Definitive Edition.exe
+  Version: 
+  Date   : 2025-07-24
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_INF_CATA_STONE,CrusaderDE.dll,00 66 42 89 84 32 BA 09 00 00) // should be unique
+alloc(newmem,$1000,INJECT_INF_CATA_STONE)
+
+label(code)
+label(return)
+
+newmem:
+  cmp ax, #39
+  jbe code
+  mov ax, 64
+
+code:
+  mov [rdx+r14+000009BA],ax
+  jmp return
+
+INJECT_INF_CATA_STONE+01:
+  jmp newmem
+  nop 4
+return:
+registersymbol(INJECT_INF_CATA_STONE)
+
+[DISABLE]
+
+INJECT_INF_CATA_STONE+01:
+  db 66 42 89 84 32 BA 09 00 00
+
+unregistersymbol(INJECT_INF_CATA_STONE)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: CrusaderDE.dll+1461B1
+
+CrusaderDE.dll+146170: 48 69 D0 90 04 00 00           - imul rdx,rax,00000490
+CrusaderDE.dll+146177: 66 42 83 BC 32 F4 09 00 00 16  - cmp word ptr [rdx+r14+000009F4],16
+CrusaderDE.dll+146181: 0F 84 0B 01 00 00              - je CrusaderDE.dll+146292
+CrusaderDE.dll+146187: 66 42 39 B4 32 08 0A 00 00     - cmp [rdx+r14+00000A08],si
+CrusaderDE.dll+146190: 0F 85 FC 00 00 00              - jne CrusaderDE.dll+146292
+CrusaderDE.dll+146196: 42 0F B7 84 32 BA 09 00 00     - movzx eax,word ptr [rdx+r14+000009BA]
+CrusaderDE.dll+14619F: 66 85 C0                       - test ax,ax
+CrusaderDE.dll+1461A2: 0F 8E AC 00 00 00              - jng CrusaderDE.dll+146254
+CrusaderDE.dll+1461A8: 66 FF C8                       - dec ax
+CrusaderDE.dll+1461AB: 41 B8 03 00 00 00              - mov r8d,00000003
+// ---------- INJECTING HERE ----------
+CrusaderDE.dll+1461B1: 66 42 89 84 32 BA 09 00 00     - mov [rdx+r14+000009BA],ax
+// ---------- DONE INJECTING  ----------
+CrusaderDE.dll+1461BA: 42 0F BF 8C 32 1A 07 00 00     - movsx ecx,word ptr [rdx+r14+0000071A]
+CrusaderDE.dll+1461C3: 42 0F BF 84 32 18 07 00 00     - movsx eax,word ptr [rdx+r14+00000718]
+CrusaderDE.dll+1461CC: 46 0F BF 8C 32 16 07 00 00     - movsx r9d,word ptr [rdx+r14+00000716]
+CrusaderDE.dll+1461D5: 8B D5                          - mov edx,ebp
+CrusaderDE.dll+1461D7: 89 4C 24 28                    - mov [rsp+28],ecx
+CrusaderDE.dll+1461DB: 4C 8D 35 2E 6E B1 05           - lea r14,[CrusaderDE.dll+5C5D010]
+CrusaderDE.dll+1461E2: 49 8B CE                       - mov rcx,r14
+CrusaderDE.dll+1461E5: 89 44 24 20                    - mov [rsp+20],eax
+CrusaderDE.dll+1461E9: E8 12 32 03 00                 - call CrusaderDE.dll+179400
+CrusaderDE.dll+1461EE: 8B 2D 70 04 7C 00              - mov ebp,[CrusaderDE.dll+906664]
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>36</ID>
+          <Description>"# of stock must &gt; 40"</Description>
+          <Color>8000FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>37</ID>
+          <Description>"Apply to enemy if his stock &gt; 40"</Description>
+          <Color>8000FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>38</ID>
+      <Description>"Towers HP"</Description>
+      <Options moHideChildren="1" moActivateChildrenAsWell="1" moDeactivateChildrenAsWell="1"/>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>39</ID>
+          <Description>"Lookout tower HP"</Description>
+          <Options moHideChildren="1" moActivateChildrenAsWell="1" moDeactivateChildrenAsWell="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+{$asm}
+// asm code here
+{$lua}
+if syntaxcheck then return end
+clearLuaLog()
+local list = AOBScanModuleN("CrusaderDE.dll", "41 0F BF 84 2A 20 01 00 00", 2)
+
+if list and list[1] then
+    unregisterSymbol("INJECT_WATCH_TOWER")
+    registerSymbol("INJECT_WATCH_TOWER", list[1])
+end
+
+
+closeLuaEngine()
+[DISABLE]
+{$asm}
+// asm code here
+{$lua}
+if syntaxcheck then return end
+unregisterSymbol("INJECT_WATCH_TOWER")
+
+
+closeLuaEngine()
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>40</ID>
+              <Description>"Set lookout tower HP"</Description>
+              <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{ Game   : Stronghold Crusader Definitive Edition.exe
+  Version:
+  Date   : 2025-07-27
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+alloc(newmem,$1000,INJECT_WATCH_TOWER)
+
+label(code)
+label(return i_tplayer_id)
+
+newmem:
+  cmp dword ptr [i_tplayer_id], -1
+  je to_enemy
+  push r15
+  mov r15d, [i_tplayer_id]
+  cmp dword ptr [r10+rbp+0000001C], r15d
+  pop r15
+  jne to_enemy
+
+  mov ax, [r10+rbp+00000122]
+  mov [r10+rbp+00000120], ax
+  jmp code
+
+to_enemy:
+  cmp word ptr [r10+rbp+00000120], 1
+  jbe code
+  mov word ptr [r10+rbp+00000120], 1
+
+
+code:
+  movsx eax,word ptr [r10+rbp+00000120]
+  jmp return
+align 10 cc
+  i_tplayer_id:
+  dd 1
+
+INJECT_WATCH_TOWER:
+  jmp newmem
+  nop 4
+return:
+registersymbol(i_tplayer_id)
+
+[DISABLE]
+
+INJECT_WATCH_TOWER:
+  db 41 0F BF 84 2A 20 01 00 00
+
+unregistersymbol(i_tplayer_id)
+
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: CrusaderDE.dll+A43F6
+
+CrusaderDE.dll+A43C2: 48 63 C7                    - movsxd  rax,edi
+CrusaderDE.dll+A43C5: 48 69 C8 2C 03 00 00        - imul rcx,rax,0000032C
+CrusaderDE.dll+A43CC: C7 44 29 58 89 00 00 00     - mov [rcx+rbp+58],00000089
+CrusaderDE.dll+A43D4: 44 89 6C 29 30              - mov [rcx+rbp+30],r13d
+CrusaderDE.dll+A43D9: 48 63 C7                    - movsxd  rax,edi
+CrusaderDE.dll+A43DC: 0F 57 C0                    - xorps xmm0,xmm0
+CrusaderDE.dll+A43DF: 4C 69 D0 2C 03 00 00        - imul r10,rax,0000032C
+CrusaderDE.dll+A43E6: 0F 11 44 24 20              - movups [rsp+20],xmm0
+CrusaderDE.dll+A43EB: 0F 11 44 24 30              - movups [rsp+30],xmm0
+CrusaderDE.dll+A43F0: 41 B9 09 00 00 00           - mov r9d,00000009
+// ---------- INJECTING HERE ----------
+CrusaderDE.dll+A43F6: 41 0F BF 84 2A 20 01 00 00  - movsx eax,word ptr [r10+rbp+00000120]
+// ---------- DONE INJECTING  ----------
+CrusaderDE.dll+A43FF: 41 0F BF 8C 2A 22 01 00 00  - movsx ecx,word ptr [r10+rbp+00000122]
+CrusaderDE.dll+A4408: 8D 04 C0                    - lea eax,[rax+rax*8]
+CrusaderDE.dll+A440B: 99                          - cdq
+CrusaderDE.dll+A440C: F7 F9                       - idiv ecx
+CrusaderDE.dll+A440E: 44 2B C8                    - sub r9d,eax
+CrusaderDE.dll+A4411: 41 83 F9 08                 - cmp r9d,08
+CrusaderDE.dll+A4415: 7E 08                       - jle CrusaderDE.dll+A441F
+CrusaderDE.dll+A4417: 41 B9 08 00 00 00           - mov r9d,00000008
+CrusaderDE.dll+A441D: EB 0B                       - jmp CrusaderDE.dll+A442A
+CrusaderDE.dll+A441F: 45 85 C9                    - test r9d,r9d
+}
+
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>41</ID>
+                  <Description>"Player ID"</Description>
+                  <DropDownList DisplayValueAsItem="1">-1:All weak
+0:Only you have castle?
+1:You &amp; enemies have castle?
+</DropDownList>
+                  <ShowAsSigned>1</ShowAsSigned>
+                  <Color>C08000</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>i_tplayer_id</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>42</ID>
+                  <Description>"Other towers HP"</Description>
+                  <Options moHideChildren="1" moActivateChildrenAsWell="1" moDeactivateChildrenAsWell="1"/>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+{$asm}
+// asm code here
+{$lua}
+if syntaxcheck then return end
+clearLuaLog()
+local list = AOBScanModuleN("CrusaderDE.dll", "41 0F BF 84 32 20 01 00 00", 3)
+
+if list and list[3] then
+    unregisterSymbol("INJECT_ROUND_TOWER")
+    registerSymbol("INJECT_ROUND_TOWER", list[3])
+end
+
+if list and list[2] then
+    unregisterSymbol("INJECT_DEFENSE_TOWER")
+    registerSymbol("INJECT_DEFENSE_TOWER", list[2])
+end
+
+if list and list[1] then
+    unregisterSymbol("INJECT_PERIMETER_TOWER")
+    registerSymbol("INJECT_PERIMETER_TOWER", list[1])
+end
+
+
+closeLuaEngine()
+[DISABLE]
+{$asm}
+// asm code here
+{$lua}
+if syntaxcheck then return end
+unregisterSymbol("INJECT_ROUND_TOWER")
+unregisterSymbol("INJECT_PERIMETER_TOWER")
+unregisterSymbol("INJECT_DEFENSE_TOWER")
+closeLuaEngine()
+</AssemblerScript>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>43</ID>
+                      <Description>"Set round tower HP"</Description>
+                      <Options moHideChildren="1"/>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>{ Game   : Stronghold Crusader Definitive Edition.exe
+  Version: 
+  Date   : 2025-07-27
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+alloc(newmem,$1000,INJECT_ROUND_TOWER)
+
+label(code)
+label(return is_set_enemy_rtower_hp)
+
+newmem:
+
+  cmp dword ptr [i_tplayer_id], -1
+  je to_enemy
+  push r15
+  mov r15d, [i_tplayer_id]
+  cmp dword ptr [r10+rsi+0000001C], r15d
+  pop r15
+  jne to_enemy
+
+  mov ax, [r10+rsi+00000122]
+  mov [r10+rsi+00000120], ax
+  jmp code
+
+to_enemy:
+  cmp dword ptr [is_set_enemy_rtower_hp], 1
+  jne code
+  cmp word ptr [r10+rsi+00000120], 2
+  jbe code
+  mov word ptr [r10+rsi+00000120], 2
+
+code:
+  movsx eax,word ptr [r10+rsi+00000120]
+  jmp return
+align 10 cc
+  is_set_enemy_rtower_hp:
+  dd 1
+
+registersymbol(is_set_enemy_rtower_hp)
+
+INJECT_ROUND_TOWER:
+  jmp newmem
+  nop 4
+return:
+
+[DISABLE]
+
+INJECT_ROUND_TOWER:
+  db 41 0F BF 84 32 20 01 00 00
+
+unregistersymbol(is_set_enemy_rtower_hp)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: CrusaderDE.dll+A51D1
+
+CrusaderDE.dll+A519E: 48 63 C3                    - movsxd  rax,ebx
+CrusaderDE.dll+A51A1: 48 69 C8 2C 03 00 00        - imul rcx,rax,0000032C
+CrusaderDE.dll+A51A8: C7 44 31 58 5A 00 00 00     - mov [rcx+rsi+58],0000005A
+CrusaderDE.dll+A51B0: 89 7C 31 30                 - mov [rcx+rsi+30],edi
+CrusaderDE.dll+A51B4: 48 63 C3                    - movsxd  rax,ebx
+CrusaderDE.dll+A51B7: 0F 57 C0                    - xorps xmm0,xmm0
+CrusaderDE.dll+A51BA: 4C 69 D0 2C 03 00 00        - imul r10,rax,0000032C
+CrusaderDE.dll+A51C1: 0F 11 44 24 20              - movups [rsp+20],xmm0
+CrusaderDE.dll+A51C6: 0F 11 44 24 30              - movups [rsp+30],xmm0
+CrusaderDE.dll+A51CB: 41 B9 09 00 00 00           - mov r9d,00000009
+// ---------- INJECTING HERE ----------
+CrusaderDE.dll+A51D1: 41 0F BF 84 32 20 01 00 00  - movsx eax,word ptr [r10+rsi+00000120]
+// ---------- DONE INJECTING  ----------
+CrusaderDE.dll+A51DA: 41 0F BF 8C 32 22 01 00 00  - movsx ecx,word ptr [r10+rsi+00000122]
+CrusaderDE.dll+A51E3: 8D 04 C0                    - lea eax,[rax+rax*8]
+CrusaderDE.dll+A51E6: 99                          - cdq 
+CrusaderDE.dll+A51E7: F7 F9                       - idiv ecx
+CrusaderDE.dll+A51E9: 44 2B C8                    - sub r9d,eax
+CrusaderDE.dll+A51EC: 41 83 F9 08                 - cmp r9d,08
+CrusaderDE.dll+A51F0: 7E 08                       - jle CrusaderDE.dll+A51FA
+CrusaderDE.dll+A51F2: 41 B9 08 00 00 00           - mov r9d,00000008
+CrusaderDE.dll+A51F8: EB 0B                       - jmp CrusaderDE.dll+A5205
+CrusaderDE.dll+A51FA: 45 85 C9                    - test r9d,r9d
+}
+</AssemblerScript>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>44</ID>
+                          <Description>"Also set enemy's"</Description>
+                          <DropDownList DisplayValueAsItem="1">0:No
+1:Yes
+</DropDownList>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <Color>C08000</Color>
+                          <VariableType>4 Bytes</VariableType>
+                          <Address>is_set_enemy_rtower_hp</Address>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>45</ID>
+                      <Description>"Set perimeter tower HP"</Description>
+                      <Options moHideChildren="1"/>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>{ Game   : Stronghold Crusader Definitive Edition.exe
+  Version: 
+  Date   : 2025-07-27
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+alloc(newmem,$1000,INJECT_PERIMETER_TOWER)
+
+label(code)
+label(return)
+
+newmem:
+  cmp dword ptr [i_tplayer_id], -1
+  je to_enemy
+  push r15
+  mov r15d, [i_tplayer_id]
+  cmp dword ptr [r10+rsi+0000001C], r15d
+  pop r15
+  jne to_enemy
+
+  mov ax, [r10+rsi+00000122]
+  mov [r10+rsi+00000120], ax
+  jmp code
+
+to_enemy:
+  cmp word ptr [r10+rsi+00000120], 1
+  jbe code
+  mov word ptr [r10+rsi+00000120], 1
+
+code:
+  movsx eax,word ptr [r10+rsi+00000120]
+  jmp return
+align 10 cc
+
+INJECT_PERIMETER_TOWER:
+  jmp newmem
+  nop 4
+return:
+
+[DISABLE]
+
+INJECT_PERIMETER_TOWER:
+  db 41 0F BF 84 32 20 01 00 00
+
+dealloc(newmem)
+
+</AssemblerScript>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>46</ID>
+                      <Description>"Set defense tower HP"</Description>
+                      <Options moHideChildren="1"/>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>{ Game   : Stronghold Crusader Definitive Edition.exe
+  Version: 
+  Date   : 2025-07-27
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+alloc(newmem,$1000,INJECT_DEFENSE_TOWER)
+
+label(code)
+label(return)
+
+newmem:
+  cmp dword ptr [i_tplayer_id], -1
+  je to_enemy
+  push r15
+  mov r15d, [i_tplayer_id]
+  cmp dword ptr [r10+rsi+0000001C], r15d
+  pop r15
+  jne to_enemy
+
+  mov ax, [r10+rsi+00000122]
+  mov [r10+rsi+00000120], ax
+  jmp code
+
+to_enemy:
+  cmp word ptr [r10+rsi+00000120], 1
+  jbe code
+  mov word ptr [r10+rsi+00000120], 1
+
+code:
+  movsx eax,word ptr [r10+rsi+00000120]
+  jmp return
+align 10 cc
+
+INJECT_DEFENSE_TOWER:
+  jmp newmem
+  nop 4
+return:
+
+[DISABLE]
+
+INJECT_DEFENSE_TOWER:
+  db 41 0F BF 84 32 20 01 00 00
+
+dealloc(newmem)
+</AssemblerScript>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>47</ID>
+      <Description>"Selected unit: Million+ HP"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : Stronghold Crusader Definitive Edition.exe
+  Version: 
+  Date   : 2025-07-31
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_HUGE_HP,CrusaderDE.dll,0F BF 8B AC 00 00 00) // should be unique
+alloc(newmem,$1000,INJECT_HUGE_HP)
+
+label(code)
+label(return i_target_hp)
+
+newmem:
+  push r15d
+  mov r15d, [i_target_hp]
+  mov dword ptr [rbx+0000012C], r15d
+  mov dword ptr [rbx+00000128], r15d
+  pop r15d
+
+code:
+  movsx ecx,word ptr [rbx+000000AC]
+  jmp return
+ALIGN 10 CC
+  i_target_hp:
+  dd #100000000
+
+INJECT_HUGE_HP:
+  jmp newmem
+  nop 2
+return:
+registersymbol(INJECT_HUGE_HP i_target_hp)
+
+[DISABLE]
+
+INJECT_HUGE_HP:
+  db 0F BF 8B AC 00 00 00
+
+unregistersymbol(INJECT_HUGE_HP i_target_hp)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: CrusaderDE.dll+10FEF9
+
+CrusaderDE.dll+10FED8: 75 44                 - jne CrusaderDE.dll+10FF1E
+CrusaderDE.dll+10FEDA: 66 83 3B 00           - cmp word ptr [rbx],00
+CrusaderDE.dll+10FEDE: 75 3E                 - jne CrusaderDE.dll+10FF1E
+CrusaderDE.dll+10FEE0: 0F BF 83 12 FE FF FF  - movsx eax,word ptr [rbx-000001EE]
+CrusaderDE.dll+10FEE7: 41 3B C7              - cmp eax,r15d
+CrusaderDE.dll+10FEEA: 75 32                 - jne CrusaderDE.dll+10FF1E
+CrusaderDE.dll+10FEEC: 45 8B C4              - mov r8d,r12d
+CrusaderDE.dll+10FEEF: 8B D7                 - mov edx,edi
+CrusaderDE.dll+10FEF1: 49 8B CD              - mov rcx,r13
+CrusaderDE.dll+10FEF4: E8 E7 FD FF FF        - call CrusaderDE.dll+10FCE0
+// ---------- INJECTING HERE ----------
+CrusaderDE.dll+10FEF9: 0F BF 8B AC 00 00 00  - movsx ecx,word ptr [rbx+000000AC]
+// ---------- DONE INJECTING  ----------
+CrusaderDE.dll+10FF00: 0F BF 43 34           - movsx eax,word ptr [rbx+34]
+CrusaderDE.dll+10FF04: 44 8B 0D 05 D1 B4 05  - mov r9d,[CrusaderDE.dll+5C5D010]
+CrusaderDE.dll+10FF0B: 44 03 F0              - add r14d,eax
+CrusaderDE.dll+10FF0E: 3B CE                 - cmp ecx,esi
+CrusaderDE.dll+10FF10: 8B C1                 - mov eax,ecx
+CrusaderDE.dll+10FF12: 0F 4D C6              - cmovge eax,esi
+CrusaderDE.dll+10FF15: 3B CD                 - cmp ecx,ebp
+CrusaderDE.dll+10FF17: 8B F0                 - mov esi,eax
+CrusaderDE.dll+10FF19: 0F 4E CD              - cmovle ecx,ebp
+CrusaderDE.dll+10FF1C: 8B E9                 - mov ebp,ecx
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>48</ID>
+          <Description>"Controllable unit only"</Description>
+          <Color>8000FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>51</ID>
+          <Description>"Target HP"</Description>
+          <DropDownList DisplayValueAsItem="1">1000000:1M
+5000000:5M
+10000000:10M
+100000000:100M (display error)
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_target_hp</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>60</ID>
+      <Description>"Enable kill count modification"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$asm}
+{
+define(ResourceManagerClearItemCountsProc, "ResourceManager.ClearItemCounts")
+
+registersymbol(ResourceManagerClearItemCountsProc)
+}
+
+{$lua}
+if syntaxcheck then return end
+-- 📏 SafeMonoDestroy: Clean up all Mono-related state
+if _G.SafeMonoDestroy == nil then
+  _G.SafeMonoDestroy = function()
+    print("🪚 SafeMonoDestroy: Begin cleanup...")
+
+    -- 1. Stop symbol enumeration thread if running
+    if monoSymbolEnum then
+      print("🚬 Terminating monoSymbolEnum thread...")
+      pcall(function()
+        monoSymbolEnum.terminate()
+        if not monoSymbolEnum.waitfor(3000) then
+          print("⚠ Timeout: monoSymbolEnum didn't terminate in time")
+        end
+        monoSymbolEnum.destroy()
+        monoSymbolEnum = nil
+      end)
+    end
+
+    -- 2. Stop progressbar timer
+    if monoSymbolList and monoSymbolList.progressbar then
+      monoSymbolList.progressbar.OnTimer = nil
+    end
+
+    -- 3. Unlock pipe (try unlock even if uncertain)
+    print("🔓 Attempting to unlock pipe...")
+    pcall(function()
+      if monopipe and monopipe.unlock then
+        monopipe.unlock()
+      end
+    end)
+
+    -- 4. Delay before destroy to let MonoCollector finish its work
+    print("⌛ Waiting before destroy (sleep 250ms)...")
+    sleep(250)  -- let it flush pipe state
+
+    -- 5. Destroy main pipe
+    local t0 = os.clock()
+    print(string.format("🚨 Destroying monopipe，This may take several minutes (or longer)👺👺👺... [Start: %.3fs]", t0))
+
+    pcall(function()
+      if monopipe then
+        monopipe.destroy()
+        monopipe = nil
+      end
+    end)
+
+    local t1 = os.clock()
+    print(string.format("👻 monopipe.destroy() completed [End: %.3fs | Duration: %.3fs]", t1, t1 - t0))
+
+
+    -- 6. Destroy symbol list
+    if monoSymbolList then
+      monoSymbolList.destroy()
+      monoSymbolList = nil
+    end
+
+    -- 7. Destroy event pipe if exists
+    if monoeventpipe then
+      monoeventpipe.destroy()
+      monoeventpipe = nil
+    end
+
+    print("👻 SafeMonoDestroy: Cleanup complete.")
+  end
+end
+
+-- 📏 Register symbol by parameter type array (exact match)
+if _G.mono_registerSymbolEx == nil then
+  _G.mono_registerSymbolEx = function(symbolname, namespace, classname, methodname, paramTypes)
+    local cls = mono_findClass(namespace, classname)
+    if not cls then
+      print(string.format("💔 Error: Class not found - %s.%s", namespace, classname))
+      return
+    end
+
+    local methods = mono_class_enumMethods(cls)
+    for _, m in ipairs(methods) do
+      if m.name == methodname then
+        local p = mono_method_get_parameters(m.method)
+        local matched = true
+
+        if #p.parameters ~= #paramTypes then
+          matched = false
+        else
+          for i = 1, #paramTypes do
+            if not string.find(p.parameters[i].typename, paramTypes[i], 1, true) then
+              matched = false
+              break
+            end
+          end
+        end
+
+        if matched then
+          local addr = mono_compile_method(m.method)
+          if addr == 0 then
+            print("💔 Error: Method found but failed to compile.")
+            return
+          end
+          registerSymbol(symbolname, addr)
+          print(string.format("🪧 Symbol registered: %s = %X", symbolname, addr))
+          return
+        end
+      end
+    end
+
+    print(string.format("💔 Error: No matching method found - %s.%s.%s", namespace, classname, methodname))
+  end
+end
+
+-- 📏 Register symbol by partial signature match (overload-safe, with excludes and match info)
+if _G.mono_registerSymbolBySignatureMatch == nil then
+  _G.mono_registerSymbolBySignatureMatch = function(symbolname, namespace, classname, methodname, sigContains, sigExcludes)
+    local cls = mono_findClass(namespace, classname)
+    if not cls then
+      print(string.format("💔 Error: Class not found - %s.%s", namespace, classname))
+      return
+    end
+
+    local methods = mono_class_enumMethods(cls)
+    if not methods then
+      print(string.format("💔 Error: No methods found in %s.%s", namespace, classname))
+      return
+    end
+
+    for _, m in ipairs(methods) do
+      if m.name == methodname then
+        local sig = mono_method_getSignature(m.method)
+        local matched = true
+
+        -- Check required substrings
+        for _, kw in ipairs(sigContains) do
+          if not string.find(sig, kw, 1, true) then
+            matched = false
+            break
+          end
+        end
+
+        -- Check excluded substrings (if given)
+        if matched and sigExcludes then
+          for _, ex in ipairs(sigExcludes) do
+            if string.find(sig, ex, 1, true) then
+              matched = false
+              break
+            end
+          end
+        end
+
+        if matched then
+          local addr = mono_compile_method(m.method)
+          if addr == 0 then
+            print("💔 Error: Signature matched but failed to compile method.")
+            return
+          end
+          registerSymbol(symbolname, addr)
+          print(string.format("🪧 Symbol registered: %s = %X", symbolname, addr))
+          print(string.format("🔎 Matched Signature: %s", sig))
+          return
+        end
+      end
+    end
+
+    print(string.format("💔 Error: No matching signature found - %s.%s.%s", namespace, classname, methodname))
+  end
+end
+
+
+-- 📏 Register symbol by simple method name (first match)
+if _G.mono_registerSymbol == nil then
+  _G.mono_registerSymbol = function(symbolname, namespace, classname, methodname)
+    local m = mono_findMethod(namespace, classname, methodname)
+    if m == nil or m == 0 then
+      print(string.format("💔 Error: Method not found - %s.%s.%s", namespace, classname, methodname))
+      return
+    end
+
+    local addr = mono_compile_method(m)
+    if addr == 0 then
+      print(string.format("💔 Error: Could not compile method - %s.%s.%s", namespace, classname, methodname))
+      return
+    end
+
+    registerSymbol(symbolname, addr)
+    print(string.format("🪧 Symbol registered: %s = %X", symbolname, addr))
+  end
+end
+
+-- 🌀 Attach Mono if needed
+local pid = getOpenedProcessID()
+if pid == 0 then
+  print("⚠ Warning: No process is currently open.")
+  return
+end
+
+if _G.lastMonoPID == nil then _G.lastMonoPID = -1 end
+
+if monopipe == nil or _G.lastMonoPID ~= pid then
+  if monopipe ~= nil then
+    pcall(_G.SafeMonoDestroy)
+  end
+  pcall(LaunchMonoDataCollector)
+  _G.lastMonoPID = pid
+end
+
+-- ⚡ Example usage - Register Mono methods to CE symbol table
+-- These functions compile (JIT) a Mono method and register it as a CE symbol
+
+-- 🔹 1. mono_registerSymbol(symbolname, namespace, classname, methodname)
+-- Description: Registers the first matched method with given name.
+-- ⚠ Use this only when there's no overload (or you're fine with the first one).
+-- Params:
+--   symbolname: The name you want to register (used in CE as a label)
+--   namespace:  Mono namespace of the class (can be "" if none)
+--   classname:  Class name that contains the method
+--   methodname: Method name to find (first match will be used)
+-- Example:
+
+--_G.mono_registerSymbol("MyAttack", "Game.Logic", "BattleManager", "Attack")
+--_G.mono_registerSymbol("UseAbility_Any", "Elin", "Chara", "UseAbility")
+
+
+-- 🔹 2. mono_registerSymbolEx(symbolname, namespace, classname, methodname, paramTypes)
+-- Description: Registers a method that exactly matches the provided parameter types.
+-- Use this when there are multiple overloads of a method.
+-- Params:
+--   symbolname: The name to register
+--   namespace:  Mono namespace
+--   classname:  Class name
+--   methodname: Method name (exact match)
+--   paramTypes: Array of expected parameter type strings (must match count &amp; order)
+--               These are matched using `string.find`, so partial match is allowed.
+-- Example:
+--   UseAbility(string idAct, Card tc, Point pos, bool pt)
+
+--[[
+_G.mono_registerSymbolEx("UseAbility_Exact", "Elin", "Chara", "UseAbility", {
+  "System.String", "Card", "Point", "System.Boolean"
+})
+--]]
+
+
+-- 🔹 3. mono_registerSymbolBySignatureMatch(symbolname, namespace, classname, methodname, sigContains, sigExcludes)
+-- Description: Registers the method whose signature contains all given substrings.
+-- Flexible, and suitable when exact type names vary or signature format is uncertain.
+-- Params:
+--   symbolname: The symbol name to register
+--   namespace:  Mono namespace
+--   classname:  Class name
+--   methodname: Method name (will scan all overloads)
+--   sigContains: Array of strings that should all appear in the method signature
+--                e.g., { "Act", "Card", "Point", "bool" }
+--   sigExcludes: Signatures to exclude
+-- Example:
+--   Will match method like: UseAbility(Act a, Card tc, Point pos, bool pt)
+
+--[[
+_G.mono_registerSymbolBySignatureMatch("UseAbility_Act", "Elin", "Chara", "UseAbility", {
+  "Act", "Card", "Point", "bool"
+})
+
+_G.mono_registerSymbolBySignatureMatch("GetItemCount_Item", "Assembly-CSharp", "ItemStorage", "GetItemCount",
+  {"Item"},      -- sigContains
+  {"List"}       -- sigExcludes
+)
+
+Signatures above:
+System.Collections.Generic.List&lt;Item&gt; 
+Item 
+
+** Both have "Item" but first one have "List"
+--]]
+
+--[[
+
+Type Mapping (for overload filtering)
+-------------------------------------
+String      System.String        C#: string
+int         System.Int32         C#: int
+float       System.Single        C#: float
+bool        System.Boolean       C#: bool
+Vector3     UnityEngine.Vector3
+Color       UnityEngine.Color
+Point       (Game defined)
+Card        (Game defined)
+Act         (Game defined)
+
+--]]
+[DISABLE]
+{$lua}
+if syntaxcheck then return end
+--pcall(_G.SafeMonoDestroy)
+{$asm}
+//unregistersymbol(*)
+
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>61</ID>
+          <Description>"Enable after kill a enemy"</Description>
+          <Color>8000FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>54</ID>
+          <Description>"Kill count multiplier, (achi. 1M ?)"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript Async="1">{ Game   : Stronghold Crusader Definitive Edition.exe
+  Version: 
+  Date   : 2025-08-06
+  Author : bbfox@https://openchattables.com
+}
+
+[ENABLE]
+
+//aobscan(INJECT_KILL_CNT_MULTI1,03 C6 41 89 47 10 49 63 57 10 48 B9 ?? ?? ?? ?? ?? ?? ?? ?? 48 8D 64 24 00) // should be unique
+aobscanregion(INJECT_KILL_CNT_MULTI1, Platform_Achievements:addStat+50, Platform_Achievements:addStat+90, 03 C6 41 89 47 10)
+alloc(newmem,$1000,INJECT_KILL_CNT_MULTI1)
+
+label(code)
+label(return vf_kill_cnt_multi1 i_base_kill_cnt1)
+
+newmem:
+  mov [i_base_kill_cnt1], r15
+  cmp eax, #1000000
+  jae @F
+  cmp eax, #999970
+  jae code
+
+  cmp eax, #100000
+  jae @F
+  cmp eax, #99970
+  jae code
+
+@@:
+  vmovss xmm14, [vf_kill_cnt_multi1]
+  vcvtsi2ss xmm15, xmm15, esi
+  vmulss xmm13, xmm14, xmm15
+  vcvtss2si esi, xmm13
+
+code:
+  add eax,esi
+  mov [r15+10],eax
+  jmp return
+align 10 cc
+  i_base_kill_cnt1:
+  dq 0
+  vf_kill_cnt_multi1:
+  dd (float)10
+
+INJECT_KILL_CNT_MULTI1:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT_KILL_CNT_MULTI1 vf_kill_cnt_multi1 i_base_kill_cnt1)
+
+[DISABLE]
+
+INJECT_KILL_CNT_MULTI1:
+  db 03 C6 41 89 47 10
+
+unregistersymbol(INJECT_KILL_CNT_MULTI1 vf_kill_cnt_multi1 i_base_kill_cnt1)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: 25E8246947D
+
+25E82469455: 83 FF 03                       - cmp edi,03
+25E82469458: 0F 83 D5 00 00 00              - jae 25E82469533
+25E8246945E: 48 8B C7                       - mov rax,rdi
+25E82469461: 48 C1 E0 03                    - shl rax,03
+25E82469465: 8B C8                          - mov ecx,eax
+25E82469467: 48 B8 80 95 46 82 5E 02 00 00  - mov rax,0000025E82469580
+25E82469471: 48 03 C1                       - add rax,rcx
+25E82469474: 48 8B 00                       - mov rax,[rax]
+25E82469477: FF E0                          - jmp rax
+25E82469479: 49 63 47 10                    - movsxd  rax,dword ptr [r15+10]
+// ---------- INJECTING HERE ----------
+25E8246947D: 03 C6                          - add eax,esi
+// ---------- DONE INJECTING  ----------
+25E8246947F: 41 89 47 10                    - mov [r15+10],eax
+25E82469483: 49 63 57 10                    - movsxd  rdx,dword ptr [r15+10]
+25E82469487: 48 B9 C0 21 27 B0 5E 02 00 00  - mov rcx,0000025EB02721C0
+25E82469491: 48 8D 64 24 00                 - lea rsp,[rsp+00]
+25E82469496: 49 BB A0 95 46 82 5E 02 00 00  - mov r11,0000025E824695A0
+25E824694A0: 41 FF D3                       - call r11
+25E824694A3: 66 66 90                       - nop 3
+25E824694A6: 49 BB 50 70 FC DE 5E 02 00 00  - mov r11,0000025EDEFC7050
+25E824694B0: 41 FF D3                       - call r11
+25E824694B3: E9 7B 00 00 00                 - jmp 25E82469533
+}
+
+
+{
+// ORIGINAL CODE - INJECTION POINT: Platform_Achievements:addStat+5d
+
+Platform_Achievements:addStat+35: 83 FF 03                       - cmp edi,03
+Platform_Achievements:addStat+38: 0F 83 D5 00 00 00              - jae Platform_Achievements:addStat+113
+Platform_Achievements:addStat+3e: 48 8B C7                       - mov rax,rdi
+Platform_Achievements:addStat+41: 48 C1 E0 03                    - shl rax,03
+Platform_Achievements:addStat+45: 8B C8                          - mov ecx,eax
+Platform_Achievements:addStat+47: 48 B8 E0 5B D3 7A B6 01 00 00  - mov rax,000001B67AD35BE0
+Platform_Achievements:addStat+51: 48 03 C1                       - add rax,rcx
+Platform_Achievements:addStat+54: 48 8B 00                       - mov rax,[rax]
+Platform_Achievements:addStat+57: FF E0                          - jmp rax
+Platform_Achievements:addStat+59: 49 63 47 10                    - movsxd  rax,dword ptr [r15+10]
+// ---------- INJECTING HERE ----------
+Platform_Achievements:addStat+5d: 03 C6                          - add eax,esi
+// ---------- DONE INJECTING  ----------
+Platform_Achievements:addStat+5f: 41 89 47 10                    - mov [r15+10],eax
+Platform_Achievements:addStat+63: 49 63 57 10                    - movsxd  rdx,dword ptr [r15+10]
+Platform_Achievements:addStat+67: 48 B9 00 92 E8 9A B6 01 00 00  - mov rcx,000001B69AE89200
+Platform_Achievements:addStat+71: 48 8D 64 24 00                 - lea rsp,[rsp+00]
+Platform_Achievements:addStat+76: 49 BB 00 5C D3 7A B6 01 00 00  - mov r11,Steamworks.SteamUserStats:SetStat
+Platform_Achievements:addStat+80: 41 FF D3                       - call r11
+Platform_Achievements:addStat+83: 66 66 90                       - nop 3
+Platform_Achievements:addStat+86: 49 BB 50 70 E8 E5 B6 01 00 00  - mov r11,Steamworks.SteamUserStats:StoreStats
+Platform_Achievements:addStat+90: 41 FF D3                       - call r11
+Platform_Achievements:addStat+93: E9 7B 00 00 00                 - jmp Platform_Achievements:addStat+113
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>55</ID>
+              <Description>"Count"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_kill_cnt1</Address>
+              <Offsets>
+                <Offset>10</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>56</ID>
+              <Description>"multiplier"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>Float</VariableType>
+              <Address>vf_kill_cnt_multi1</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>57</ID>
+          <Description>"Kill count multiplier, (achi. 100K)"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript Async="1">{ Game   : Stronghold Crusader Definitive Edition.exe
+  Version: 
+  Date   : 2025-08-06
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscan(INJECT_KILL_CNT_MULTI2,03 45 E8 89 47 18 48 8B CF 48 8D 64 24 00) // should be unique
+alloc(newmem,$1000)
+
+label(code)
+label(return vf_kill_cnt_multi2 i_base_kill_cnt2)
+
+newmem:
+  cmp dword ptr [rdi+10], #42
+  jne code
+  mov [i_base_kill_cnt2], rdi
+
+  cmp eax, #1000000
+  jae @F
+  cmp eax, #999970
+  jae code
+
+  cmp eax, #100000
+  jae @F
+  cmp eax, #99970
+  jae code
+
+@@:
+  vmovss xmm14, [vf_kill_cnt_multi2]
+  mov ecx, [rbp-18]
+  vcvtsi2ss xmm15, xmm15, ecx
+  vmulss xmm13, xmm14, xmm15
+  vcvtss2si ecx, xmm13
+  mov [rbp-18], ecx
+
+code:
+  add eax,[rbp-18]
+  mov [rdi+18],eax
+  mov rcx,rdi
+  lea rsp,[rsp+00]
+  jmp return
+align 10 cc
+  i_base_kill_cnt2:
+  dq 0
+  vf_kill_cnt_multi2:
+  dd (float)10
+
+
+INJECT_KILL_CNT_MULTI2:
+  jmp far newmem
+return:
+registersymbol(INJECT_KILL_CNT_MULTI2 vf_kill_cnt_multi2 i_base_kill_cnt2)
+
+[DISABLE]
+
+INJECT_KILL_CNT_MULTI2:
+  db 03 45 E8 89 47 18 48 8B CF 48 8D 64 24 00
+
+unregistersymbol(INJECT_KILL_CNT_MULTI2 vf_kill_cnt_multi2 i_base_kill_cnt2)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: 25DD3758D97
+
+25DD3758D71: 48 8B EC                       - mov rbp,rsp
+25DD3758D74: 48 83 EC 40                    - sub rsp,40
+25DD3758D78: 48 89 7D F0                    - mov [rbp-10],rdi
+25DD3758D7C: 4C 89 7D F8                    - mov [rbp-08],r15
+25DD3758D80: 48 8B F9                       - mov rdi,rcx
+25DD3758D83: 48 89 55 E8                    - mov [rbp-18],rdx
+25DD3758D87: 0F B6 47 14                    - movzx eax,byte ptr [rdi+14]
+25DD3758D8B: 85 C0                          - test eax,eax
+25DD3758D8D: 0F 85 60 00 00 00              - jne 25DD3758DF3
+25DD3758D93: 48 63 47 18                    - movsxd  rax,dword ptr [rdi+18]
+// ---------- INJECTING HERE ----------
+25DD3758D97: 03 45 E8                       - add eax,[rbp-18]
+// ---------- DONE INJECTING  ----------
+25DD3758D9A: 89 47 18                       - mov [rdi+18],eax
+25DD3758D9D: 48 8B CF                       - mov rcx,rdi
+25DD3758DA0: 48 8D 64 24 00                 - lea rsp,[rsp+00]
+25DD3758DA5: 90                             - nop 
+25DD3758DA6: 49 BB 20 73 FC DE 5E 02 00 00  - mov r11,0000025EDEFC7320
+25DD3758DB0: 41 FF D3                       - call r11
+25DD3758DB3: 4C 8B F8                       - mov r15,rax
+25DD3758DB6: 85 C0                          - test eax,eax
+25DD3758DB8: 0F 8E 35 00 00 00              - jng 25DD3758DF3
+25DD3758DBE: 48 63 47 18                    - movsxd  rax,dword ptr [rdi+18]
+}
+
+{
+// ORIGINAL CODE - INJECTION POINT: AchievementsCommon+AchievementStatus:AddValue+27
+
+AchievementsCommon+AchievementStatus:AddValue+1: 48 8B EC                       - mov rbp,rsp
+AchievementsCommon+AchievementStatus:AddValue+4: 48 83 EC 40                    - sub rsp,40
+AchievementsCommon+AchievementStatus:AddValue+8: 48 89 7D F0                    - mov [rbp-10],rdi
+AchievementsCommon+AchievementStatus:AddValue+c: 4C 89 7D F8                    - mov [rbp-08],r15
+AchievementsCommon+AchievementStatus:AddValue+10: 48 8B F9                       - mov rdi,rcx
+AchievementsCommon+AchievementStatus:AddValue+13: 48 89 55 E8                    - mov [rbp-18],rdx
+AchievementsCommon+AchievementStatus:AddValue+17: 0F B6 47 14                    - movzx eax,byte ptr [rdi+14]
+AchievementsCommon+AchievementStatus:AddValue+1b: 85 C0                          - test eax,eax
+AchievementsCommon+AchievementStatus:AddValue+1d: 0F 85 60 00 00 00              - jne AchievementsCommon+AchievementStatus:AddValue+83
+AchievementsCommon+AchievementStatus:AddValue+23: 48 63 47 18                    - movsxd  rax,dword ptr [rdi+18]
+// ---------- INJECTING HERE ----------
+AchievementsCommon+AchievementStatus:AddValue+27: 03 45 E8                       - add eax,[rbp-18]
+// ---------- DONE INJECTING  ----------
+AchievementsCommon+AchievementStatus:AddValue+2a: 89 47 18                       - mov [rdi+18],eax
+AchievementsCommon+AchievementStatus:AddValue+2d: 48 8B CF                       - mov rcx,rdi
+AchievementsCommon+AchievementStatus:AddValue+30: 48 8D 64 24 00                 - lea rsp,[rsp+00]
+AchievementsCommon+AchievementStatus:AddValue+35: 90                             - nop
+AchievementsCommon+AchievementStatus:AddValue+36: 49 BB 20 73 E8 E5 B6 01 00 00  - mov r11,AchievementsCommon+AchievementStatus:GetMaxAchievementValue
+AchievementsCommon+AchievementStatus:AddValue+40: 41 FF D3                       - call r11
+AchievementsCommon+AchievementStatus:AddValue+43: 4C 8B F8                       - mov r15,rax
+AchievementsCommon+AchievementStatus:AddValue+46: 85 C0                          - test eax,eax
+AchievementsCommon+AchievementStatus:AddValue+48: 0F 8E 35 00 00 00              - jng AchievementsCommon+AchievementStatus:AddValue+83
+AchievementsCommon+AchievementStatus:AddValue+4e: 48 63 47 18                    - movsxd  rax,dword ptr [rdi+18]
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>58</ID>
+              <Description>"Count"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_kill_cnt2</Address>
+              <Offsets>
+                <Offset>18</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>59</ID>
+              <Description>"multiplier"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>Float</VariableType>
+              <Address>vf_kill_cnt_multi1</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>49</ID>
+      <Description>"Stronghold Crusader: Definitive Edition  /  https://opencheattables.com"</Description>
+      <Color>009700</Color>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+  <LuaScript>--[[
+[ENABLE]
+{$lua}
+if syntaxcheck then return end
+]]--
+-- **デバッグモードの設定 (デフォルト: 無効)**
+local debugMode = false
+
+-- AOBScanModule関数
+if not AOBScanModule then
+    function AOBScanModule(moduleName, signature, scanOptions)
+        local baseAddr = nil
+        local maxAddr = 0
+        local modList
+
+        synchronize(function()
+            modList = enumModules()
+        end)
+
+        for _, mod in ipairs(modList) do
+            if string.lower(mod.Name) == string.lower(moduleName) then
+                baseAddr = mod.Address
+                maxAddr = baseAddr + mod.Size
+                break
+            end
+        end
+
+        if not baseAddr then
+            if debugMode then print("❗ Error: Module " .. moduleName .. " not found!") end
+            return nil
+        end
+
+        if debugMode then
+            print(string.format("✔️ %s Base Address: 0x%X", moduleName, baseAddr))
+            print(string.format("🔬 Scanning Range: 0x%X - 0x%X", baseAddr, maxAddr))
+        end
+
+        local ms = createMemScan()
+
+        synchronize(function()
+            ms.firstScan(
+                soExactValue,
+                vtByteArray,
+                nil,
+                signature,
+                nil,
+                baseAddr,
+                maxAddr,
+                scanOptions or "+X+R",
+                fsmNotAligned,
+                "1",
+                true,
+                true,
+                false,
+                false
+            )
+        end)
+
+        ms.waitTillDone()
+
+        local results = createFoundList(ms)
+        results.initialize()
+
+        local addr
+        synchronize(function()
+            if results.getCount() &gt; 0 then
+                addr = results[0]
+            end
+        end)
+
+        if addr then
+            if debugMode then print("🔦 AOB found at: 0x" .. addr) end
+        else
+            if debugMode then print("💔 AOB not found in " .. moduleName) end
+        end
+
+        results.destroy()
+        ms.destroy()
+        return addr
+    end
+end
+
+registerLuaFunctionHighlight('AOBScanModule')
+
+--[[
+test AOBScanModule()
+local aob_addr_str = AOBScanModule("???.exe", "48 8B 05 ?? ?? ?? ?? 33 ED 48 8B 88", "+X+R")
+if aob_addr_str then
+    print("🔦 Final AOB Address: 0x" .. aob_addr_str)
+else
+    print("💔 AOB not found in ???.exe")
+end
+]]--
+
+if not AOBScanModuleN then
+    function AOBScanModuleN(moduleName, signature, maxResults, scanOptions)
+        local baseAddr = nil
+        local maxAddr = 0
+        local modList
+
+        synchronize(function()
+            modList = enumModules()
+        end)
+
+        for _, mod in ipairs(modList) do
+            if string.lower(mod.Name) == string.lower(moduleName) then
+                baseAddr = mod.Address
+                maxAddr = baseAddr + mod.Size
+                break
+            end
+        end
+
+        if not baseAddr then
+            if debugMode then print("❗ Error: Module " .. moduleName .. " not found!") end
+            return nil
+        end
+
+        if debugMode then
+            print(string.format("✔️ %s Base Address: 0x%X", moduleName, baseAddr))
+            print(string.format("🔬 Scanning Range: 0x%X - 0x%X", baseAddr, maxAddr))
+        end
+
+        local ms = createMemScan()
+
+        synchronize(function()
+            ms.firstScan(
+                soExactValue,
+                vtByteArray,
+                nil,
+                signature,
+                nil,
+                baseAddr,
+                maxAddr,
+                scanOptions or "+X+R",
+                fsmNotAligned,
+                "1",
+                true,
+                true,
+                false,
+                false
+            )
+        end)
+
+        ms.waitTillDone()
+
+        local results = createFoundList(ms)
+        results.initialize()
+
+        local addrs = {}
+        synchronize(function()
+            local count = results.getCount()
+            for i = 0, math.min(maxResults - 1, count - 1) do
+                table.insert(addrs, results[i])
+                if debugMode then
+                    print(string.format("🔦 AOB[%d] found at: 0x%s", i + 1, results[i]))
+                end
+            end
+        end)
+
+        if #addrs == 0 and debugMode then
+            print("💔 AOB not found in " .. moduleName)
+        end
+
+        results.destroy()
+        ms.destroy()
+
+        return addrs
+    end
+end
+
+registerLuaFunctionHighlight('AOBScanModuleN')
+
+
+-- 搜尋並取出最多5筆結果
+--[[
+local list = AOBScanModuleN("GameModule.exe", "12 34 56 ?? 78", 5)
+
+if list then
+    for i, addr in ipairs(list) do
+        print(string.format("地址 %d: 0x%s", i, addr))
+    end
+end
+]]--
+
+
+-- Lua scripts that table checkbox will not be checked with "NO_ACTIVATE" in comment/script body
+if not onMemRecPostExecute then
+    function onMemRecPostExecute(memoryrecord, newState, succeeded)
+        if memoryrecord.Type == vtAutoAssembler and memoryrecord.Script:find("NO_ACTIVATE") and newState and succeeded then
+            synchronize(function()
+                memoryrecord.disableWithoutExecute()
+            end)
+        end
+    end
+end
+
+-- Memory record IDs now allowed to be 'locked'
+IDs = {999999, 9999999}
+
+-- Determine event trigger sequence
+if not contains then
+    function contains(table, val)
+       for i = 1, #table do
+          if table[i] == val then
+             return true
+          end
+       end
+       return false
+    end
+end
+
+if not onMemRecPreExecute then
+    function onMemRecPreExecute(memoryrecord, newstate)
+        if contains(IDs, memoryrecord.ID) and newstate then
+            synchronize(function()
+                if not memoryrecord.OnActivate then
+                    memoryrecord.OnActivate = function(memoryrecord, before, currentstate)
+                        return false
+                    end
+                end
+            end)
+        end
+    end
+end
+
+-- Utility Functions
+-- Clear lua engine log
+if not clearLuaLog then
+    function clearLuaLog()
+        synchronize(function()
+          getLuaEngine().MenuItem5.doClick()
+        end)
+    end
+end
+registerLuaFunctionHighlight('clearLuaLog')
+
+-- Close lua engine log
+if not closeLuaEngine then
+    function closeLuaEngine()
+        synchronize(function()
+          getLuaEngine().Close()
+        end)
+    end
+end
+registerLuaFunctionHighlight('closeLuaEngine')
+
+-- Clear lua engine log &amp; close lua engine
+if not closeLuaEngine2 then
+    function closeLuaEngine2()
+        synchronize(function()
+          getLuaEngine().MenuItem5.doClick()
+          getLuaEngine().Close()
+        end)
+    end
+end
+registerLuaFunctionHighlight('closeLuaEngine2')
+
+if not getProcessNameFromPID then
+	function getProcessNameFromPID(pid)
+	  local sl = createStringList()
+	  getProcessList(sl)
+	  local hexPid = string.format("%X", pid):upper()
+
+	  for i = 0, sl.Count - 1 do
+		local entry = sl[i]
+		local hexid, name = entry:match("^(%x+)%-(.+)$")
+		if hexid and name then
+		  if tonumber(hexid, 16) == pid then
+			return name
+		  end
+		end
+	  end
+	  return "(unknown)"
+	end
+end
+registerLuaFunctionHighlight('getProcessNameFromPID')
+
+if not printProcessInfo then
+	function printProcessInfo()
+	  local pid = getOpenedProcessID()
+	  local name = getProcessNameFromPID(pid)
+	  print(string.format("📎 Attached to process: %s (PID: %d / 0x%X)", name, pid, pid))
+	end
+end
+registerLuaFunctionHighlight('printProcessInfo')
+
+if not dumpProcessListAndFindPID then
+	function dumpProcessListAndFindPID()
+	  local pid = getOpenedProcessID()
+	  print(string.format("💭 Current PID: %d / 0x%X", pid, pid))
+
+	  local sl = createStringList()
+	  getProcessList(sl)
+
+	  print("🧾 Dumping process list:")
+	  for i = 0, sl.Count - 1 do
+		local entry = sl[i]
+		print(string.format("[%d] %s", i, entry))
+
+		-- 嘗試解析並比對 PID
+		local name, hexid = entry:match("(.+)%-(%x+)$")
+		if name and hexid then
+		  local parsed = tonumber(hexid, 16)
+		  if parsed == pid then
+			print("🔦 Match found in process list:")
+			print(string.format("Name: %s | PID: %s (0x%s)", name, parsed, hexid))
+		  end
+		end
+	  end
+	end
+end
+registerLuaFunctionHighlight('dumpProcessListAndFindPID')
+
+if not toHex32 then
+	function toHex32(num)
+		local hexstr = "0123456789ABCDEF"
+		local result = ""
+		if num &lt; 0 then
+			num = (num + (1 &lt;&lt; 32)) % (1 &lt;&lt; 32) -- 轉成32-bit補數
+		end
+		for i = 1, 8 do -- 32-bit 一共8個hex位
+			local n = num &amp; 0xF -- 取最低4 bit
+			result = hexstr:sub(n + 1, n + 1) .. result
+			num = num &gt;&gt; 4 -- 右移4 bit
+		end
+		return result
+	end
+end
+registerLuaFunctionHighlight('toHex32')
+
+if not toHex then
+	function toHex(num)
+		local hexstr = "0123456789ABCDEF"
+		local result = ""
+		if num &lt; 0 then
+			num = (num + (1 &lt;&lt; 64)) % (1 &lt;&lt; 64)  -- 轉成64-bit補數
+		end
+		for i = 1, 16 do -- 每4 bit 一個 hex字，64-bit總共16個hex位
+			local n = num &amp; 0xF -- 取最低4bit
+			result = hexstr:sub(n + 1, n + 1) .. result
+			num = num &gt;&gt; 4 -- 右移4bit
+		end
+		return result
+	end
+end	
+registerLuaFunctionHighlight('toHex')
+
+synchronize(function() AddressList.Header.OnSectionClick = nil end)
+--[[
+[DISABLE]
+{$lua}
+
+if AOBScanModule then
+    AOBScanModule = nil
+end
+if onMemRecPostExecute then
+    onMemRecPostExecute = nil
+end
+if onMemRecPreExecute then
+    onMemRecPreExecute = nil
+end
+if clearLuaLog then
+    clearLuaLog = nil
+end
+if closeLuaEngine then
+    closeLuaEngine = nil
+end
+if closeLuaEngine2 then
+    closeLuaEngine2 = nil
+end
+]]--
+</LuaScript>
+</CheatTable>

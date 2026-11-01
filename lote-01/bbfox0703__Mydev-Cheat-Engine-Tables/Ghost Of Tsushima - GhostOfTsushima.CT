@@ -1,0 +1,549 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="46">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>2</ID>
+      <Description>"Resolve no decrease when use/hit"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : GhostOfTsushima.exe
+  Version: 
+  Date   : 2024-05-17
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_SET_EN,$process,F3 0F 58 CE 0F 28 C2) // should be unique
+alloc(newmem,$1000,INJECT_SET_EN)
+
+label(code)
+label(return)
+label(i_base_data_addr)
+label(is_raise_en)
+
+newmem:
+  mov [i_base_data_addr], rbx
+  vmovss xmm15, [vf_0]
+  vucomiss xmm6, xmm15
+  jae code
+  cmp dword ptr [is_raise_en], 1
+  jne @F
+
+  vmovss xmm15, [vf_01]
+  vmulss xmm6, xmm6, xmm15
+
+code:
+  addss xmm1,xmm6
+  movaps xmm0,xmm2
+  jmp return
+align 10 cc
+  i_base_data_addr:
+  dq 0
+  is_raise_en:
+  dd 1
+  vf_0:
+  dd 0
+  vf_01:
+  dd (float)-1
+  dd 0 0 0
+
+
+INJECT_SET_EN:
+  jmp newmem
+  nop 2
+return:
+registersymbol(INJECT_SET_EN)
+registersymbol(i_base_data_addr)
+registersymbol(is_raise_en)
+
+[DISABLE]
+
+INJECT_SET_EN:
+  db F3 0F 58 CE 0F 28 C2
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GhostOfTsushima.exe+90EDE4
+
+GhostOfTsushima.exe+90EDAC: 48 8D 0D 3D 3A 4D 01     - lea rcx,[GhostOfTsushima.exe+1DE27F0]
+GhostOfTsushima.exe+90EDB3: E8 48 BA C3 FF           - call GhostOfTsushima.exe+54A800
+GhostOfTsushima.exe+90EDB8: 48 8D 4C 24 40           - lea rcx,[rsp+40]
+GhostOfTsushima.exe+90EDBD: F3 0F 59 70 08           - mulss xmm6,[rax+08]
+GhostOfTsushima.exe+90EDC2: E8 79 D3 BC FF           - call GhostOfTsushima.exe+4DC140
+GhostOfTsushima.exe+90EDC7: 48 8D 4C 24 30           - lea rcx,[rsp+30]
+GhostOfTsushima.exe+90EDCC: E8 6F D3 BC FF           - call GhostOfTsushima.exe+4DC140
+GhostOfTsushima.exe+90EDD1: F3 0F 10 93 A4 43 00 00  - movss xmm2,[rbx+000043A4]
+GhostOfTsushima.exe+90EDD9: 48 8B BC 24 90 00 00 00  - mov rdi,[rsp+00000090]
+GhostOfTsushima.exe+90EDE1: 0F 28 CA                 - movaps xmm1,xmm2
+// ---------- INJECTING HERE ----------
+GhostOfTsushima.exe+90EDE4: F3 0F 58 CE              - addss xmm1,xmm6
+// ---------- DONE INJECTING  ----------
+GhostOfTsushima.exe+90EDE8: 0F 28 C2                 - movaps xmm0,xmm2
+GhostOfTsushima.exe+90EDEB: F3 41 0F 5F C0           - maxss xmm0,xmm8
+GhostOfTsushima.exe+90EDF0: 44 0F 28 44 24 50        - movaps xmm8,[rsp+50]
+GhostOfTsushima.exe+90EDF6: 0F 2F CF                 - comiss xmm1,xmm7
+GhostOfTsushima.exe+90EDF9: 73 05                    - jae GhostOfTsushima.exe+90EE00
+GhostOfTsushima.exe+90EDFB: 0F 57 C9                 - xorps xmm1,xmm1
+GhostOfTsushima.exe+90EDFE: EB 08                    - jmp GhostOfTsushima.exe+90EE08
+GhostOfTsushima.exe+90EE00: 0F 2F C8                 - comiss xmm1,xmm0
+GhostOfTsushima.exe+90EE03: 76 03                    - jna GhostOfTsushima.exe+90EE08
+GhostOfTsushima.exe+90EE05: 0F 28 C8                 - movaps xmm1,xmm0
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>14</ID>
+          <Description>"Usage: enter battle"</Description>
+          <Color>8000FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>26</ID>
+          <Description>"Enabled?"</Description>
+          <DropDownList DisplayValueAsItem="1">0:No
+1:Yes
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>is_raise_en</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>22</ID>
+          <Description>"Fast get data &amp; HP option"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : GhostOfTsushima.exe
+  Version: 
+  Date   : 2024-05-18
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_EN2,$process,45 0F 57 C9 48 85 FF) // should be unique
+alloc(newmem,$1000,INJECT_GET_EN2)
+
+label(code)
+label(return)
+label(i_is_keep_hp)
+
+newmem:
+  test rdi,rdi
+  jz code
+  //cmp qword ptr [i_base_data_addr], 0
+  //jne code
+  mov [i_base_data_addr], rdi
+  cmp dword ptr [i_is_keep_hp], 1
+  jne @F
+  push r15
+  mov r15d, [rdi+00001970]
+  mov [rdi+00001974], r15d
+  pop r15
+
+code:
+  xorps xmm9,xmm9
+  test rdi,rdi
+  jmp return
+align 10 cc
+  i_is_keep_hp:
+  dd 0
+
+INJECT_GET_EN2:
+  jmp newmem
+  nop 2
+return:
+registersymbol(INJECT_GET_EN2)
+registersymbol(i_is_keep_hp)
+
+[DISABLE]
+
+INJECT_GET_EN2:
+  db 45 0F 57 C9 48 85 FF
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GhostOfTsushima.exe+5A6C47
+
+GhostOfTsushima.exe+5A6C13: F3 0F 10 0D 9D 41 B6 00     - movss xmm1,[GhostOfTsushima.exe+110ADB8]
+GhostOfTsushima.exe+5A6C1B: F3 0F E6 C0                 - cvtdq2pd xmm0,xmm0
+GhostOfTsushima.exe+5A6C1F: F2 0F 59 05 A1 2E B6 00     - mulsd xmm0,[GhostOfTsushima.exe+1109AC8]
+GhostOfTsushima.exe+5A6C27: 66 0F 5A C0                 - cvtpd2ps xmm0,xmm0
+GhostOfTsushima.exe+5A6C2B: E8 3C 94 76 00              - call GhostOfTsushima.exe+D1006C
+GhostOfTsushima.exe+5A6C30: 0F 28 D0                    - movaps xmm2,xmm0
+GhostOfTsushima.exe+5A6C33: BA 23 C4 FE 03              - mov edx,03FEC423
+GhostOfTsushima.exe+5A6C38: 48 8B CB                    - mov rcx,rbx
+GhostOfTsushima.exe+5A6C3B: E8 C0 D1 FF FF              - call GhostOfTsushima.exe+5A3E00
+GhostOfTsushima.exe+5A6C40: 48 8B 3D 29 9C F1 02        - mov rdi,[GhostOfTsushima.exe+34C0870]
+// ---------- INJECTING HERE ----------
+GhostOfTsushima.exe+5A6C47: 45 0F 57 C9                 - xorps xmm9,xmm9
+// ---------- DONE INJECTING  ----------
+GhostOfTsushima.exe+5A6C4B: 48 85 FF                    - test rdi,rdi
+GhostOfTsushima.exe+5A6C4E: 0F 84 F0 00 00 00           - je GhostOfTsushima.exe+5A6D44
+GhostOfTsushima.exe+5A6C54: F3 44 0F 10 87 70 19 00 00  - movss xmm8,[rdi+00001970]
+GhostOfTsushima.exe+5A6C5D: F3 0F 10 97 74 19 00 00     - movss xmm2,[rdi+00001974]
+GhostOfTsushima.exe+5A6C65: 41 0F 28 C0                 - movaps xmm0,xmm8
+GhostOfTsushima.exe+5A6C69: 0F 54 05 00 D2 DE 00        - andps xmm0,[GhostOfTsushima.exe+1393E70]
+GhostOfTsushima.exe+5A6C70: 0F 2F 05 81 85 B4 00        - comiss xmm0,[GhostOfTsushima.D3D12SDKVersion+46C8]
+GhostOfTsushima.exe+5A6C77: 73 05                       - jae GhostOfTsushima.exe+5A6C7E
+GhostOfTsushima.exe+5A6C79: 0F 57 F6                    - xorps xmm6,xmm6
+GhostOfTsushima.exe+5A6C7C: EB 0C                       - jmp GhostOfTsushima.exe+5A6C8A
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>23</ID>
+              <Description>"Disable when get data,"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>24</ID>
+              <Description>"in case if you just want to get resolve value"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>25</ID>
+              <Description>"Keep high HP? (not god mode)"</Description>
+              <DropDownList DisplayValueAsItem="1">0:No
+1:Yes
+</DropDownList>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_is_keep_hp</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>4</ID>
+          <Description>"Resolve"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>Float</VariableType>
+          <Address>i_base_data_addr</Address>
+          <Offsets>
+            <Offset>43A4</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>7</ID>
+          <Description>"Max HP"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>Float</VariableType>
+          <Address>i_base_data_addr</Address>
+          <Offsets>
+            <Offset>1970</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>8</ID>
+          <Description>"Cur. HP"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>Float</VariableType>
+          <Address>i_base_data_addr</Address>
+          <Offsets>
+            <Offset>1974</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>28</ID>
+      <Description>"Fast ghost mode"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : GhostOfTsushima.exe
+  Version: 
+  Date   : 2024-05-24
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_FASTER_GHOST_MODE,$process,8B 50 04 FF C2 45 33 C9 45 33 C0 48 8B CD) // should be unique
+alloc(newmem,$1000,INJECT_FASTER_GHOST_MODE)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  mov edx,[rax+04]
+
+  //
+  cmp edx, 4
+  ja @F
+  mov edx, 4
+  jmp next_code
+
+@@:
+  mov edx, 6
+next_code:
+  inc edx
+  jmp return
+
+INJECT_FASTER_GHOST_MODE:
+  jmp newmem
+return:
+registersymbol(INJECT_FASTER_GHOST_MODE)
+
+[DISABLE]
+
+INJECT_FASTER_GHOST_MODE:
+  db 8B 50 04 FF C2
+
+unregistersymbol(INJECT_FASTER_GHOST_MODE)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GhostOfTsushima.exe+B51943
+
+GhostOfTsushima.exe+B51920: EB 24                 - jmp GhostOfTsushima.exe+B51946
+GhostOfTsushima.exe+B51922: 48 8B 45 48           - mov rax,[rbp+48]
+GhostOfTsushima.exe+B51926: 48 8B 48 38           - mov rcx,[rax+38]
+GhostOfTsushima.exe+B5192A: E8 51 3B DC FF        - call GhostOfTsushima.exe+915480
+GhostOfTsushima.exe+B5192F: 84 C0                 - test al,al
+GhostOfTsushima.exe+B51931: 75 04                 - jne GhostOfTsushima.exe+B51937
+GhostOfTsushima.exe+B51933: 33 D2                 - xor edx,edx
+GhostOfTsushima.exe+B51935: EB 0F                 - jmp GhostOfTsushima.exe+B51946
+GhostOfTsushima.exe+B51937: 48 8D 0D 2A 54 18 01  - lea rcx,[GhostOfTsushima.exe+1CD6D68]
+GhostOfTsushima.exe+B5193E: E8 BD 67 9C FF        - call GhostOfTsushima.exe+518100
+// ---------- INJECTING HERE ----------
+GhostOfTsushima.exe+B51943: 8B 50 04              - mov edx,[rax+04]
+// ---------- DONE INJECTING  ----------
+GhostOfTsushima.exe+B51946: FF C2                 - inc edx
+GhostOfTsushima.exe+B51948: 45 33 C9              - xor r9d,r9d
+GhostOfTsushima.exe+B5194B: 45 33 C0              - xor r8d,r8d
+GhostOfTsushima.exe+B5194E: 48 8B CD              - mov rcx,rbp
+GhostOfTsushima.exe+B51951: E8 7A 05 00 00        - call GhostOfTsushima.exe+B51ED0
+GhostOfTsushima.exe+B51956: 8B 9E 84 3E 00 00     - mov ebx,[rsi+00003E84]
+GhostOfTsushima.exe+B5195C: 48 8D 4C 24 30        - lea rcx,[rsp+30]
+GhostOfTsushima.exe+B51961: 33 D2                 - xor edx,edx
+GhostOfTsushima.exe+B51963: E8 58 FF FD FF        - call GhostOfTsushima.exe+B318C0
+GhostOfTsushima.exe+B51968: 4C 8B C8              - mov r9,rax
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>13</ID>
+      <Description>"Set materials count"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : GhostOfTsushima.exe
+  Version: 
+  Date   : 2024-05-17
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_SET_ITEM_CNT,$process,8B 5C A8 08 EB 03) // should be unique
+alloc(newmem,$1000,INJECT_SET_ITEM_CNT)
+
+label(code)
+label(return)
+label(i_item_min_cnt)
+label(i_item_set_to)
+
+newmem:
+  push r15
+  mov r15d, [i_item_min_cnt]
+  cmp [rax+rbp*4+08], r15d
+  jb endp
+
+  mov r15d, [i_item_set_to]
+  cmp [rax+rbp*4+08], r15d
+  jae endp
+  mov [rax+rbp*4+08], r15d
+
+endp:
+  pop r15
+
+code:
+  mov ebx,[rax+rbp*4+08]
+  //jmp GhostOfTsushima.exe+910003
+  reassemble(INJECT_SET_ITEM_CNT+4)
+  jmp return
+align 10 cc
+  i_item_min_cnt:
+  dd 2
+  i_item_set_to:
+  dd #302
+
+INJECT_SET_ITEM_CNT:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT_SET_ITEM_CNT)
+registersymbol(i_item_min_cnt)
+registersymbol(i_item_set_to)
+[DISABLE]
+
+INJECT_SET_ITEM_CNT:
+  db 8B 5C A8 08 EB 03
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GhostOfTsushima.exe+90FFFA
+
+GhostOfTsushima.exe+90FFD4: 33 DB                 - xor ebx,ebx
+GhostOfTsushima.exe+90FFD6: 41 8B F8              - mov edi,r8d
+GhostOfTsushima.exe+90FFD9: 48 8B F1              - mov rsi,rcx
+GhostOfTsushima.exe+90FFDC: 41 F7 C0 FC FF FF FF  - test r8d,FFFFFFFC
+GhostOfTsushima.exe+90FFE3: 75 1B                 - jne GhostOfTsushima.exe+910000
+GhostOfTsushima.exe+90FFE5: 41 83 F8 01           - cmp r8d,01
+GhostOfTsushima.exe+90FFE9: 74 15                 - je GhostOfTsushima.exe+910000
+GhostOfTsushima.exe+90FFEB: 48 8D 0D 86 6D 3C 01  - lea rcx,[GhostOfTsushima.exe+1CD6D78]
+GhostOfTsushima.exe+90FFF2: 48 63 EA              - movsxd  rbp,edx
+GhostOfTsushima.exe+90FFF5: E8 26 7F C0 FF        - call GhostOfTsushima.exe+517F20
+// ---------- INJECTING HERE ----------
+GhostOfTsushima.exe+90FFFA: 8B 5C A8 08           - mov ebx,[rax+rbp*4+08]
+// ---------- DONE INJECTING  ----------
+GhostOfTsushima.exe+90FFFE: EB 03                 - jmp GhostOfTsushima.exe+910003
+GhostOfTsushima.exe+910000: 48 63 EA              - movsxd  rbp,edx
+GhostOfTsushima.exe+910003: 48 8B CE              - mov rcx,rsi
+GhostOfTsushima.exe+910006: E8 F5 BE F5 FF        - call GhostOfTsushima.exe+86BF00
+GhostOfTsushima.exe+91000B: 0F 57 C0              - xorps xmm0,xmm0
+GhostOfTsushima.exe+91000E: 0F 2E 86 B8 45 00 00  - ucomiss xmm0,[rsi+000045B8]
+GhostOfTsushima.exe+910015: 74 2B                 - je GhostOfTsushima.exe+910042
+GhostOfTsushima.exe+910017: 8D 47 FF              - lea eax,[rdi-01]
+GhostOfTsushima.exe+91001A: A9 FD FF FF FF        - test eax,FFFFFFFD
+GhostOfTsushima.exe+91001F: 74 0E                 - je GhostOfTsushima.exe+91002F
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>17</ID>
+          <Description>"Usage: browse material tab"</Description>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>15</ID>
+          <Description>"Material count must &gt;="</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_item_min_cnt</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>16</ID>
+          <Description>"Set to"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_item_set_to</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>19</ID>
+      <Description>"Reset used skill pt."</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : GhostOfTsushima.exe
+  Version: 
+  Date   : 2024-05-18
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_SET_SKPT,$process,74 04 8B 44 A8 58) // should be unique
+alloc(newmem,$1000,INJECT_SET_SKPT)
+
+label(code)
+label(return)
+
+newmem:
+  push r15
+  mov r15, 8
+  cmp r14, r15
+  jne @F
+  mov dword ptr [rax+rbp*4+58], 0
+
+@@:
+  pop r15
+
+code:
+  //je GhostOfTsushima.exe+50C7D2
+  reassemble(INJECT_SET_SKPT)
+  mov eax,[rax+rbp*4+58]
+  jmp return
+
+INJECT_SET_SKPT:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT_SET_SKPT)
+
+[DISABLE]
+
+INJECT_SET_SKPT:
+  db 74 04 8B 44 A8 58
+
+unregistersymbol(INJECT_SET_SKPT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GhostOfTsushima.exe+50C7CC
+
+GhostOfTsushima.exe+50C7AC: 44 8B E0                 - mov r12d,eax
+GhostOfTsushima.exe+50C7AF: E8 BC B7 00 00           - call GhostOfTsushima.exe+517F70
+GhostOfTsushima.exe+50C7B4: 48 85 C0                 - test rax,rax
+GhostOfTsushima.exe+50C7B7: 75 04                    - jne GhostOfTsushima.exe+50C7BD
+GhostOfTsushima.exe+50C7B9: 33 FF                    - xor edi,edi
+GhostOfTsushima.exe+50C7BB: EB 04                    - jmp GhostOfTsushima.exe+50C7C1
+GhostOfTsushima.exe+50C7BD: 8B 7C A8 20              - mov edi,[rax+rbp*4+20]
+GhostOfTsushima.exe+50C7C1: 48 8B CE                 - mov rcx,rsi
+GhostOfTsushima.exe+50C7C4: E8 A7 B7 00 00           - call GhostOfTsushima.exe+517F70
+GhostOfTsushima.exe+50C7C9: 48 85 C0                 - test rax,rax
+// ---------- INJECTING HERE ----------
+GhostOfTsushima.exe+50C7CC: 74 04                    - je GhostOfTsushima.exe+50C7D2
+// ---------- DONE INJECTING  ----------
+GhostOfTsushima.exe+50C7CE: 8B 44 A8 58              - mov eax,[rax+rbp*4+58]
+GhostOfTsushima.exe+50C7D2: 2B F8                    - sub edi,eax
+GhostOfTsushima.exe+50C7D4: 41 03 FC                 - add edi,r12d
+GhostOfTsushima.exe+50C7D7: 43 39 BC 2E 90 00 00 00  - cmp [r14+r13+00000090],edi
+GhostOfTsushima.exe+50C7DF: 74 0B                    - je GhostOfTsushima.exe+50C7EC
+GhostOfTsushima.exe+50C7E1: 43 89 BC 2E 90 00 00 00  - mov [r14+r13+00000090],edi
+GhostOfTsushima.exe+50C7E9: 41 B7 01                 - mov r15b,01
+GhostOfTsushima.exe+50C7EC: FF C3                    - inc ebx
+GhostOfTsushima.exe+50C7EE: 83 FB 0E                 - cmp ebx,0E
+GhostOfTsushima.exe+50C7F1: 75 9D                    - jne GhostOfTsushima.exe+50C790
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>20</ID>
+          <Description>"Usage: open menu twice"</Description>
+          <Color>8000FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>21</ID>
+          <Description>"Warning: not sure if there will be any side effect (i.e. trophies)"</Description>
+          <Color>8000FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>18</ID>
+      <Description>"Ghost Of Tsushima v1053.7.0809.1937  /  https://opencheattables.com"</Description>
+      <Color>00AE57</Color>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

@@ -1,0 +1,4358 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="46">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>0</ID>
+      <Description>"Toggle Compact View"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+if syntaxcheck then return end
+
+if not toggleCompactView then
+    function toggleCompactView(sender, forceEnable)
+        local isCompactMode = not (compactViewMenuItem.Caption == 'Compact View Mode')
+        if forceEnable ~= nil then
+            isCompactMode = not forceEnable
+        end
+
+        synchronize(function()
+            compactViewMenuItem.Caption = isCompactMode and 'Compact View Mode' or 'Full View Mode'
+            getMainForm().Splitter1.Visible = isCompactMode
+            getMainForm().Panel4.Visible    = isCompactMode
+            getMainForm().Panel5.Visible    = isCompactMode
+        end)
+    end
+end
+
+if not createCompactViewMenu then
+    function createCompactViewMenu()
+        if isCompactMenuCreated then return end
+
+        synchronize(function()
+            local mainMenu = getMainForm().Menu.Items
+            compactViewMenuItem = createMenuItem(mainMenu)
+            compactViewMenuItem.Caption = 'Compact View Mode'
+            compactViewMenuItem.OnClick = toggleCompactView
+            mainMenu.add(compactViewMenuItem)
+        end)
+
+        isCompactMenuCreated = true
+    end
+end
+
+createCompactViewMenu()
+toggleCompactView(nil, true)
+
+[DISABLE]
+{$lua}
+if toggleCompactView then
+    toggleCompactView(nil, false)
+end
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>1</ID>
+      <Description>"Toggle scripts (auto-attach)"</Description>
+      <Color>4080FF</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript Async="1">[ENABLE]
+{$lua}
+if (syntaxcheck) then return end
+synchronize(function()
+  getLuaEngine().menuItem5.doClick()
+  getLuaEngine().Close()
+end)
+
+-- attach process
+local processName = "SRWV.exe"
+local pid = getProcessIDFromProcessName(processName)
+if pid ~= nil and pid &gt; 0 then
+  local currentPid = getOpenedProcessID() or 0
+  if currentPid ~= pid then
+    openProcess(processName)
+    print("Attached to: " .. processName)
+    Sleep(333)
+  else
+    print("Already attached to: " .. processName)
+  end
+end
+synchronize(function()
+  getLuaEngine().Close()
+end)
+
+local enableBattleScripts = {
+  0, -- "Toggle Compact View"
+  2, -- "Static values"
+  10, -- "Get char stats"
+  53, -- "Get robot status"
+  72, -- "Battle: inf. EN when use EN weapon"
+  73, -- "Full EN before action"
+  84, -- "Battle: inf. SP after use"
+  85, -- "Map: add move range"
+  87, -- "Map: add weapon range"
+  89, -- "ammo no decrease (incl. enemy)"
+  90, -- "Keep min skill stock before use in skill program"
+  91, -- "All robots, ships have 4 slots"
+  54, -- "Enable in upgrade menu"
+  80, -- "Battle / defend: full HP before enter battle (animation)"
+  255, -- "Battle / attack: full HP before enter battle (animation)"
+}
+local addressList = getAddressList()
+synchronize(function()
+  for _, id in ipairs(enableBattleScripts) do
+    local memRec = addressList.getMemoryRecordByID(id)
+    if memRec and not memRec.Active then
+      memRec.Active = true
+      sleep(30)
+    end
+    addressList.refresh()
+  end
+end)
+synchronize(function() getLuaEngine().Close() end)
+[DISABLE]
+{$lua}
+if (syntaxcheck) then return end
+synchronize(function()
+  getLuaEngine().menuItem5.doClick()
+  getLuaEngine().Close()
+end)
+
+local disableBattleScripts = {
+  255, -- "Battle / attack: full HP before enter battle (animation)"
+  243, -- "Trait 30"
+  238, -- "Trait 29"
+  233, -- "Trait 28"
+  228, -- "Trait 27"
+  223, -- "Trait 26"
+  218, -- "Trait 25"
+  213, -- "Trait 24"
+  208, -- "Trait 23"
+  203, -- "Trait 22"
+  198, -- "Trait 21"
+  192, -- "Trait 20"
+  187, -- "Trait 19"
+  182, -- "Trait 18"
+  177, -- "Trait 17"
+  172, -- "Trait 16"
+  167, -- "Trait 15"
+  162, -- "Trait 14"
+  157, -- "Trait 13"
+  152, -- "Trait 12"
+  147, -- "Trait 11"
+  141, -- "Trait 10"
+  136, -- "Trait 09"
+  131, -- "Trait 08"
+  126, -- "Trait 07"
+  121, -- "Trait 06"
+  116, -- "Trait 05"
+  111, -- "Trait 04"
+  106, -- "Trait 03"
+  101, -- "Trait 02"
+  96, -- "Trait 01"
+  49, -- "#6"
+  45, -- "#5"
+  41, -- "#4"
+  37, -- "ID"
+  33, -- "#2"
+  29, -- "#1"
+  197, -- "21-30"
+  146, -- "11-20"
+  95, -- "01-10"
+  80, -- "Battle / defend: full HP before enter battle (animation)"
+  78, -- "Enable criteria #3?"
+  76, -- "Enable criteria #2?"
+  74, -- "Enable criteria #1?"
+  62, -- "機体改造度 / Upgrade Level"
+  54, -- "Enable in upgrade menu"
+  28, -- "精神コマンド / Spirit Commands+"
+  248, -- "Super Robot Wars V  /  https://opencheattables.com  /  CE 7.6"
+  92, -- "Get char skill data"
+  91, -- "All robots, ships have 4 slots"
+  90, -- "Keep min skill stock before use in skill program"
+  89, -- "ammo no decrease (incl. enemy)"
+  87, -- "Map: add weapon range"
+  85, -- "Map: add move range"
+  84, -- "Battle: inf. SP after use"
+  73, -- "Full EN before action"
+  72, -- "Battle: inf. EN when use EN weapon"
+  53, -- "Get robot status"
+  10, -- "Get char stats"
+  2, -- "Static values"
+  0, -- "Toggle Compact View"
+}
+local addressList = getAddressList()
+synchronize(function()
+  for _, id in ipairs(disableBattleScripts) do
+    local memRec = addressList.getMemoryRecordByID(id)
+    if memRec and memRec.Active then
+      memRec.Active = false
+      sleep(30)
+    end
+    addressList.refresh()
+  end
+end)
+synchronize(function() getLuaEngine().Close() end)
+-- Comments:
+-- ID: 0, Description: "Toggle Compact View", Depth: 0
+-- ID: 2, Description: "Static values", Depth: 0
+-- ID: 10, Description: "Get char stats", Depth: 0
+--   ID: 28, Description: "精神コマンド / Spirit Commands+", Depth: 1
+--     ID: 29, Description: "#1", Depth: 2
+--     ID: 33, Description: "#2", Depth: 2
+--     ID: 37, Description: "ID", Depth: 2
+--     ID: 41, Description: "#4", Depth: 2
+--     ID: 45, Description: "#5", Depth: 2
+--     ID: 49, Description: "#6", Depth: 2
+-- ID: 53, Description: "Get robot status", Depth: 0
+--   ID: 54, Description: "Enable in upgrade menu", Depth: 1
+--   ID: 62, Description: "機体改造度 / Upgrade Level", Depth: 1
+-- ID: 72, Description: "Battle: inf. EN when use EN weapon", Depth: 0
+-- ID: 73, Description: "Full EN before action", Depth: 0
+--   ID: 74, Description: "Enable criteria #1?", Depth: 1
+--   ID: 76, Description: "Enable criteria #2?", Depth: 1
+--   ID: 78, Description: "Enable criteria #3?", Depth: 1
+--   ID: 80, Description: "Battle / defend: full HP before enter battle (animation)", Depth: 1
+--     ID: 255, Description: "Battle / attack: full HP before enter battle (animation)", Depth: 2
+-- ID: 84, Description: "Battle: inf. SP after use", Depth: 0
+-- ID: 85, Description: "Map: add move range", Depth: 0
+-- ID: 87, Description: "Map: add weapon range", Depth: 0
+-- ID: 89, Description: "ammo no decrease (incl. enemy)", Depth: 0
+-- ID: 90, Description: "Keep min skill stock before use in skill program", Depth: 0
+-- ID: 91, Description: "All robots, ships have 4 slots", Depth: 0
+-- ID: 92, Description: "Get char skill data", Depth: 0
+--   ID: 95, Description: "01-10", Depth: 1
+--     ID: 96, Description: "Trait 01", Depth: 2
+--     ID: 101, Description: "Trait 02", Depth: 2
+--     ID: 106, Description: "Trait 03", Depth: 2
+--     ID: 111, Description: "Trait 04", Depth: 2
+--     ID: 116, Description: "Trait 05", Depth: 2
+--     ID: 121, Description: "Trait 06", Depth: 2
+--     ID: 126, Description: "Trait 07", Depth: 2
+--     ID: 131, Description: "Trait 08", Depth: 2
+--     ID: 136, Description: "Trait 09", Depth: 2
+--     ID: 141, Description: "Trait 10", Depth: 2
+--   ID: 146, Description: "11-20", Depth: 1
+--     ID: 147, Description: "Trait 11", Depth: 2
+--     ID: 152, Description: "Trait 12", Depth: 2
+--     ID: 157, Description: "Trait 13", Depth: 2
+--     ID: 162, Description: "Trait 14", Depth: 2
+--     ID: 167, Description: "Trait 15", Depth: 2
+--     ID: 172, Description: "Trait 16", Depth: 2
+--     ID: 177, Description: "Trait 17", Depth: 2
+--     ID: 182, Description: "Trait 18", Depth: 2
+--     ID: 187, Description: "Trait 19", Depth: 2
+--     ID: 192, Description: "Trait 20", Depth: 2
+--   ID: 197, Description: "21-30", Depth: 1
+--     ID: 198, Description: "Trait 21", Depth: 2
+--     ID: 203, Description: "Trait 22", Depth: 2
+--     ID: 208, Description: "Trait 23", Depth: 2
+--     ID: 213, Description: "Trait 24", Depth: 2
+--     ID: 218, Description: "Trait 25", Depth: 2
+--     ID: 223, Description: "Trait 26", Depth: 2
+--     ID: 228, Description: "Trait 27", Depth: 2
+--     ID: 233, Description: "Trait 28", Depth: 2
+--     ID: 238, Description: "Trait 29", Depth: 2
+--     ID: 243, Description: "Trait 30", Depth: 2
+-- ID: 248, Description: "Super Robot Wars V  /  https://opencheattables.com  /  CE 7.6", Depth: 0
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>2</ID>
+      <Description>"Static values"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+if syntaxcheck then return end
+if memrec then print(memrec.Description) end
+
+closeLuaEngine2()
+
+  local AOBs = {
+    {name = "money", ["aob"]="8B 15 ?? ?? ?? ?? B8 FF E0 F5 05 3B D0", ["pos"]= 2,  ["aoblen"]=6 , ["symbol"]="money_base"},
+  }
+
+  local module_name = 'SRWV.exe'
+
+  for _, entry in ipairs(AOBs) do
+    local aob_addr_str = AOBScanModule(module_name, entry.aob, '+X-C-W')
+
+    if aob_addr_str then
+      local aob_addr_val = tonumber(aob_addr_str, 16)
+      local offset_addr = aob_addr_val + entry.pos
+      local relative_offset = readInteger(offset_addr)
+      local final_addr = relative_offset + aob_addr_val + entry.aoblen
+
+      registerSymbol(entry.symbol, final_addr)
+      print(string.format("%s registered at: %08X", entry.name, final_addr))
+    else
+      print(string.format("Warning: AOB scan failed for %s", entry.name))
+    end
+  end
+closeLuaEngine()
+
+{$asm}
+[DISABLE]
+{$lua}
+if syntaxcheck then return end
+local disable_array = {"vkey_base", "core_shard_base", "difficult_base", "cole_base", "gems_base","sp_base", "item_serial_base", "puni_lv_base", "puni_data_base", "weather_base", "minutes_base"}
+local a_len = #(disable_array)
+local i = 0
+for i = 1, a_len do
+  unregisterSymbol(disable_array[i])
+end
+
+closeLuaEngine()
+
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>3</ID>
+          <Description>"Fund"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>money_base</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>4</ID>
+          <Description>"Fund watermark?"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>money_base+4</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>5</ID>
+          <Description>"TacP."</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>money_base+18</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>6</ID>
+          <Description>"TacP. watermark?"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>money_base+1C</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>7</ID>
+          <Description>"Laps cleared"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>Byte</VariableType>
+          <Address>money_base+DB</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>8</ID>
+          <Description>"SR"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>Byte</VariableType>
+          <Address>money_base+DC</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>9</ID>
+          <Description>"Upgrades up to Lv 15?"</Description>
+          <DropDownListLink>YesNo</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>money_base+DE</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>10</ID>
+      <Description>"Get char stats"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : SRWV.EXE
+  Version: 
+  Date   : 2026-01-26
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_BATT_GET_CHAR_STATS,$process,0F BF 40 58 C3) // should be unique
+alloc(newmem,$1000,INJECT_BATT_GET_CHAR_STATS)
+
+label(code)
+label(return i_batt_base_char_stat_addr)
+
+newmem:
+  mov [i_batt_base_char_stat_addr], rax
+
+code:
+  movsx eax,word ptr [rax+58]
+  ret 
+  jmp return
+  align 10 cc
+  i_batt_base_char_stat_addr:
+  dq 0
+
+INJECT_BATT_GET_CHAR_STATS:
+  jmp newmem
+return:
+registersymbol(INJECT_BATT_GET_CHAR_STATS i_batt_base_char_stat_addr)
+
+[DISABLE]
+
+INJECT_BATT_GET_CHAR_STATS:
+  db 0F BF 40 58 C3
+
+unregistersymbol(INJECT_BATT_GET_CHAR_STATS i_batt_base_char_stat_addr)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: SRWV.EXE+3DD914
+
+SRWV.EXE+3DD8F6: BB 32 00 00 00        - mov ebx,00000032
+SRWV.EXE+3DD8FB: 48 8B 74 24 38        - mov rsi,[rsp+38]
+SRWV.EXE+3DD900: 0F B7 C3              - movzx eax,bx
+SRWV.EXE+3DD903: 48 8B 5C 24 30        - mov rbx,[rsp+30]
+SRWV.EXE+3DD908: 48 83 C4 20           - add rsp,20
+SRWV.EXE+3DD90C: 5F                    - pop rdi
+SRWV.EXE+3DD90D: C3                    - ret 
+SRWV.EXE+3DD90E: CC                    - int 3 
+SRWV.EXE+3DD90F: CC                    - int 3 
+SRWV.EXE+3DD910: 48 8B 41 08           - mov rax,[rcx+08]
+// ---------- INJECTING HERE ----------
+SRWV.EXE+3DD914: 0F BF 40 58           - movsx eax,word ptr [rax+58]
+// ---------- DONE INJECTING  ----------
+SRWV.EXE+3DD918: C3                    - ret 
+SRWV.EXE+3DD919: CC                    - int 3 
+SRWV.EXE+3DD91A: CC                    - int 3 
+SRWV.EXE+3DD91B: CC                    - int 3 
+SRWV.EXE+3DD91C: CC                    - int 3 
+SRWV.EXE+3DD91D: CC                    - int 3 
+SRWV.EXE+3DD91E: CC                    - int 3 
+SRWV.EXE+3DD91F: CC                    - int 3 
+SRWV.EXE+3DD920: 40 55                 - push rbp
+SRWV.EXE+3DD922: 48 81 EC 80 00 00 00  - sub rsp,00000080
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>11</ID>
+          <Description>"Base"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>808080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_batt_base_char_stat_addr</Address>
+          <Offsets>
+            <Offset>0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>12</ID>
+          <Description>"Short Name?"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>String</VariableType>
+          <Length>30</Length>
+          <Unicode>0</Unicode>
+          <CodePage>0</CodePage>
+          <ZeroTerminate>1</ZeroTerminate>
+          <Address>i_batt_base_char_stat_addr</Address>
+          <Offsets>
+            <Offset>0</Offset>
+            <Offset>0</Offset>
+            <Offset>20</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>13</ID>
+          <Description>"First Name?"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>String</VariableType>
+          <Length>30</Length>
+          <Unicode>0</Unicode>
+          <CodePage>0</CodePage>
+          <ZeroTerminate>1</ZeroTerminate>
+          <Address>i_batt_base_char_stat_addr</Address>
+          <Offsets>
+            <Offset>0</Offset>
+            <Offset>8</Offset>
+            <Offset>20</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>14</ID>
+          <Description>"Last Name?"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>String</VariableType>
+          <Length>30</Length>
+          <Unicode>0</Unicode>
+          <CodePage>0</CodePage>
+          <ZeroTerminate>1</ZeroTerminate>
+          <Address>i_batt_base_char_stat_addr</Address>
+          <Offsets>
+            <Offset>0</Offset>
+            <Offset>10</Offset>
+            <Offset>20</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>15</ID>
+          <Description>"格闘 / Melee"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_batt_base_char_stat_addr</Address>
+          <Offsets>
+            <Offset>3A</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>16</ID>
+          <Description>"射撃 / Ranged"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_batt_base_char_stat_addr</Address>
+          <Offsets>
+            <Offset>3C</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>17</ID>
+          <Description>"回避 / Evasion"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_batt_base_char_stat_addr</Address>
+          <Offsets>
+            <Offset>3E</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>18</ID>
+          <Description>"命中 / Accuracy"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_batt_base_char_stat_addr</Address>
+          <Offsets>
+            <Offset>40</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>19</ID>
+          <Description>"防御 / Defense"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_batt_base_char_stat_addr</Address>
+          <Offsets>
+            <Offset>42</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>20</ID>
+          <Description>"技量 / Skill"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_batt_base_char_stat_addr</Address>
+          <Offsets>
+            <Offset>44</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>21</ID>
+          <Description>"SP"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_batt_base_char_stat_addr</Address>
+          <Offsets>
+            <Offset>58</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>22</ID>
+          <Description>"Max SP"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_batt_base_char_stat_addr</Address>
+          <Offsets>
+            <Offset>38</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>23</ID>
+          <Description>"気力 / Focus"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_batt_base_char_stat_addr</Address>
+          <Offsets>
+            <Offset>5A</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>24</ID>
+          <Description>"EXP"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_batt_base_char_stat_addr</Address>
+          <Offsets>
+            <Offset>5C</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>25</ID>
+          <Description>"Score"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_batt_base_char_stat_addr</Address>
+          <Offsets>
+            <Offset>5E</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>26</ID>
+          <Description>"Criteria 1 (0x1B)"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>808080</Color>
+          <VariableType>Byte</VariableType>
+          <Address>i_batt_base_char_stat_addr</Address>
+          <Offsets>
+            <Offset>1B</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>27</ID>
+          <Description>"Criteria 2 (0x8E)"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>808080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_batt_base_char_stat_addr</Address>
+          <Offsets>
+            <Offset>8E</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>28</ID>
+          <Description>"精神コマンド / Spirit Commands+"</Description>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>29</ID>
+              <Description>"#1"</Description>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>30</ID>
+                  <Description>"ID"</Description>
+                  <DropDownListLink>SpCmds</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Byte</VariableType>
+                  <Address>i_batt_base_char_stat_addr</Address>
+                  <Offsets>
+                    <Offset>6E</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>31</ID>
+                  <Description>"Unlock Lv?"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Byte</VariableType>
+                  <Address>i_batt_base_char_stat_addr</Address>
+                  <Offsets>
+                    <Offset>6F</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>32</ID>
+                  <Description>"SP needed"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Byte</VariableType>
+                  <Address>i_batt_base_char_stat_addr</Address>
+                  <Offsets>
+                    <Offset>70</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>33</ID>
+              <Description>"#2"</Description>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>34</ID>
+                  <Description>"ID"</Description>
+                  <DropDownListLink>SpCmds</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Byte</VariableType>
+                  <Address>i_batt_base_char_stat_addr</Address>
+                  <Offsets>
+                    <Offset>76</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>35</ID>
+                  <Description>"Unlock Lv?"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Byte</VariableType>
+                  <Address>i_batt_base_char_stat_addr</Address>
+                  <Offsets>
+                    <Offset>77</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>36</ID>
+                  <Description>"SP needed"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Byte</VariableType>
+                  <Address>i_batt_base_char_stat_addr</Address>
+                  <Offsets>
+                    <Offset>78</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>37</ID>
+              <Description>"ID"</Description>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>38</ID>
+                  <Description>"cmd"</Description>
+                  <DropDownListLink>SpCmds</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Byte</VariableType>
+                  <Address>i_batt_base_char_stat_addr</Address>
+                  <Offsets>
+                    <Offset>7E</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>39</ID>
+                  <Description>"Unlock Lv?"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Byte</VariableType>
+                  <Address>i_batt_base_char_stat_addr</Address>
+                  <Offsets>
+                    <Offset>7F</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>40</ID>
+                  <Description>"SP needed"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Byte</VariableType>
+                  <Address>i_batt_base_char_stat_addr</Address>
+                  <Offsets>
+                    <Offset>80</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>41</ID>
+              <Description>"#4"</Description>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>42</ID>
+                  <Description>"ID"</Description>
+                  <DropDownListLink>SpCmds</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Byte</VariableType>
+                  <Address>i_batt_base_char_stat_addr</Address>
+                  <Offsets>
+                    <Offset>86</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>43</ID>
+                  <Description>"Unlock Lv?"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Byte</VariableType>
+                  <Address>i_batt_base_char_stat_addr</Address>
+                  <Offsets>
+                    <Offset>87</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>44</ID>
+                  <Description>"SP needed"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Byte</VariableType>
+                  <Address>i_batt_base_char_stat_addr</Address>
+                  <Offsets>
+                    <Offset>88</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>45</ID>
+              <Description>"#5"</Description>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>46</ID>
+                  <Description>"ID"</Description>
+                  <DropDownListLink>SpCmds</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Byte</VariableType>
+                  <Address>i_batt_base_char_stat_addr</Address>
+                  <Offsets>
+                    <Offset>8E</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>47</ID>
+                  <Description>"Unlock Lv?"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Byte</VariableType>
+                  <Address>i_batt_base_char_stat_addr</Address>
+                  <Offsets>
+                    <Offset>8F</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>48</ID>
+                  <Description>"SP needed"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Byte</VariableType>
+                  <Address>i_batt_base_char_stat_addr</Address>
+                  <Offsets>
+                    <Offset>90</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>49</ID>
+              <Description>"#6"</Description>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>50</ID>
+                  <Description>"ID"</Description>
+                  <DropDownListLink>SpCmds</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Byte</VariableType>
+                  <Address>i_batt_base_char_stat_addr</Address>
+                  <Offsets>
+                    <Offset>96</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>51</ID>
+                  <Description>"Unlock Lv?"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Byte</VariableType>
+                  <Address>i_batt_base_char_stat_addr</Address>
+                  <Offsets>
+                    <Offset>97</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>52</ID>
+                  <Description>"SP needed"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Byte</VariableType>
+                  <Address>i_batt_base_char_stat_addr</Address>
+                  <Offsets>
+                    <Offset>98</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>53</ID>
+      <Description>"Get robot status"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : SRWV.EXE
+  Version: 
+  Date   : 2026-01-26
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_BATT_GET_ROBOT_STATS,$process,0F BF 41 4E C3) // should be unique
+alloc(newmem,$1000,INJECT_BATT_GET_ROBOT_STATS)
+
+label(code)
+label(return i_batt_base_robot_stats_addr is_auto_refill)
+
+newmem:
+  mov [i_batt_base_robot_stats_addr], rcx
+  test rcx, rcx
+  jz code
+
+  cmp dword ptr [is_auto_refill], 1
+  jne code
+
+  cmp byte ptr [rcx+24], 1
+  je code
+  cmp dword ptr [rcx+3C], 0
+  je to_refill
+  cmp byte ptr [rcx+80], 1
+  je to_refill
+  jmp code
+
+to_refill:
+  mov eax, [rcx+44]
+  mov [rcx+48], eax
+  movzx eax, word ptr [rcx+4C]
+  mov [rcx+4E], ax
+
+
+code:
+  movsx eax,word ptr [rcx+4E]
+  ret 
+  jmp return
+  align 10 cc
+  i_batt_base_robot_stats_addr:
+  dq 0
+  is_auto_refill:
+  dd 0
+
+INJECT_BATT_GET_ROBOT_STATS:
+  jmp newmem
+return:
+registersymbol(INJECT_BATT_GET_ROBOT_STATS i_batt_base_robot_stats_addr is_auto_refill)
+
+[DISABLE]
+
+INJECT_BATT_GET_ROBOT_STATS:
+  db 0F BF 41 4E C3
+
+unregistersymbol(INJECT_BATT_GET_ROBOT_STATS i_batt_base_robot_stats_addr is_auto_refill)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: SRWV.EXE+3E1528
+
+SRWV.EXE+3E1510: 48 8B 41 08  - mov rax,[rcx+08]
+SRWV.EXE+3E1514: 48 8B 48 08  - mov rcx,[rax+08]
+SRWV.EXE+3E1518: 8B 41 44     - mov eax,[rcx+44]
+SRWV.EXE+3E151B: C3           - ret 
+SRWV.EXE+3E151C: CC           - int 3 
+SRWV.EXE+3E151D: CC           - int 3 
+SRWV.EXE+3E151E: CC           - int 3 
+SRWV.EXE+3E151F: CC           - int 3 
+SRWV.EXE+3E1520: 48 8B 41 08  - mov rax,[rcx+08]
+SRWV.EXE+3E1524: 48 8B 48 08  - mov rcx,[rax+08]
+// ---------- INJECTING HERE ----------
+SRWV.EXE+3E1528: 0F BF 41 4E  - movsx eax,word ptr [rcx+4E]
+// ---------- DONE INJECTING  ----------
+SRWV.EXE+3E152C: C3           - ret 
+SRWV.EXE+3E152D: CC           - int 3 
+SRWV.EXE+3E152E: CC           - int 3 
+SRWV.EXE+3E152F: CC           - int 3 
+SRWV.EXE+3E1530: 48 8B 41 08  - mov rax,[rcx+08]
+SRWV.EXE+3E1534: 48 8B 48 08  - mov rcx,[rax+08]
+SRWV.EXE+3E1538: 8B 41 48     - mov eax,[rcx+48]
+SRWV.EXE+3E153B: C3           - ret 
+SRWV.EXE+3E153C: CC           - int 3 
+SRWV.EXE+3E153D: CC           - int 3 
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>54</ID>
+          <Description>"Enable in upgrade menu"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : SRWV.EXE
+  Version: 
+  Date   : 2026-01-27
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_BATT_GET_ROBOT_STATS2,SRWV.EXE,8B 41 44 C3 CC CC CC CC 48) // should be unique
+alloc(newmem,$1000,INJECT_BATT_GET_ROBOT_STATS2)
+
+label(code)
+label(return)
+
+newmem:
+  mov [i_batt_base_robot_stats_addr], rcx
+
+code:
+  mov eax,[rcx+44]
+  ret 
+  int 3 
+  jmp return
+
+INJECT_BATT_GET_ROBOT_STATS2:
+  jmp newmem
+return:
+registersymbol(INJECT_BATT_GET_ROBOT_STATS2)
+
+[DISABLE]
+
+INJECT_BATT_GET_ROBOT_STATS2:
+  db 8B 41 44 C3 CC
+
+unregistersymbol(INJECT_BATT_GET_ROBOT_STATS2)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: SRWV.EXE+3E1518
+
+SRWV.EXE+3E14FF: CC              - int 3 
+SRWV.EXE+3E1500: 48 8B 41 08     - mov rax,[rcx+08]
+SRWV.EXE+3E1504: 48 8B 48 08     - mov rcx,[rax+08]
+SRWV.EXE+3E1508: 0F BF 41 4C     - movsx eax,word ptr [rcx+4C]
+SRWV.EXE+3E150C: C3              - ret 
+SRWV.EXE+3E150D: CC              - int 3 
+SRWV.EXE+3E150E: CC              - int 3 
+SRWV.EXE+3E150F: CC              - int 3 
+SRWV.EXE+3E1510: 48 8B 41 08     - mov rax,[rcx+08]
+SRWV.EXE+3E1514: 48 8B 48 08     - mov rcx,[rax+08]
+// ---------- INJECTING HERE ----------
+SRWV.EXE+3E1518: 8B 41 44        - mov eax,[rcx+44]
+// ---------- DONE INJECTING  ----------
+SRWV.EXE+3E151B: C3              - ret 
+SRWV.EXE+3E151C: CC              - int 3 
+SRWV.EXE+3E151D: CC              - int 3 
+SRWV.EXE+3E151E: CC              - int 3 
+SRWV.EXE+3E151F: CC              - int 3 
+SRWV.EXE+3E1520: 48 8B 41 08     - mov rax,[rcx+08]
+SRWV.EXE+3E1524: 48 8B 48 08     - mov rcx,[rax+08]
+INJECT_BATT_GET_ROBOT_STATS: E9 D3 EA BF FF  - jmp 7FF661F20000
+SRWV.EXE+3E152D: CC              - int 3 
+SRWV.EXE+3E152E: CC              - int 3 
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>256</ID>
+          <Description>"Auto fill HP/EN?"</Description>
+          <DropDownListLink>YesNo</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>is_auto_refill</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>55</ID>
+          <Description>"HP"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_batt_base_robot_stats_addr</Address>
+          <Offsets>
+            <Offset>48</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>56</ID>
+          <Description>"Max HP"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_batt_base_robot_stats_addr</Address>
+          <Offsets>
+            <Offset>44</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>57</ID>
+          <Description>"EN"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_batt_base_robot_stats_addr</Address>
+          <Offsets>
+            <Offset>4E</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>58</ID>
+          <Description>"Max EN"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_batt_base_robot_stats_addr</Address>
+          <Offsets>
+            <Offset>4C</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>59</ID>
+          <Description>"裝甲值 / Armor"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_batt_base_robot_stats_addr</Address>
+          <Offsets>
+            <Offset>2A</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>60</ID>
+          <Description>"運動性 / Mobility"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_batt_base_robot_stats_addr</Address>
+          <Offsets>
+            <Offset>28</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>61</ID>
+          <Description>"照準值 / Sight"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_batt_base_robot_stats_addr</Address>
+          <Offsets>
+            <Offset>26</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>62</ID>
+          <Description>"機体改造度 / Upgrade Level"</Description>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>63</ID>
+              <Description>"HP"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>Binary</VariableType>
+              <BitStart>4</BitStart>
+              <BitLength>4</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>i_batt_base_robot_stats_addr</Address>
+              <Offsets>
+                <Offset>81</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>64</ID>
+              <Description>"EN"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>Binary</VariableType>
+              <BitStart>0</BitStart>
+              <BitLength>4</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>i_batt_base_robot_stats_addr</Address>
+              <Offsets>
+                <Offset>82</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>65</ID>
+              <Description>"裝甲值 / Armor"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>Binary</VariableType>
+              <BitStart>4</BitStart>
+              <BitLength>4</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>i_batt_base_robot_stats_addr</Address>
+              <Offsets>
+                <Offset>83</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>66</ID>
+              <Description>"運動性 / Mobility"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>Binary</VariableType>
+              <BitStart>0</BitStart>
+              <BitLength>4</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>i_batt_base_robot_stats_addr</Address>
+              <Offsets>
+                <Offset>83</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>67</ID>
+              <Description>"照準值 / Sight"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>Binary</VariableType>
+              <BitStart>4</BitStart>
+              <BitLength>4</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>i_batt_base_robot_stats_addr</Address>
+              <Offsets>
+                <Offset>82</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>68</ID>
+              <Description>"武器:Rank / Weapon Rank"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>Binary</VariableType>
+              <BitStart>0</BitStart>
+              <BitLength>4</BitLength>
+              <ShowAsBinary>0</ShowAsBinary>
+              <Address>i_batt_base_robot_stats_addr</Address>
+              <Offsets>
+                <Offset>2D</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>69</ID>
+          <Description>"Criteria 1 value (0x24)"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>808080</Color>
+          <VariableType>Byte</VariableType>
+          <Address>i_batt_base_robot_stats_addr</Address>
+          <Offsets>
+            <Offset>24</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>70</ID>
+          <Description>"Criteria 2 value  (0x3C)"</Description>
+          <ShowAsSigned>1</ShowAsSigned>
+          <Color>808080</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_batt_base_robot_stats_addr</Address>
+          <Offsets>
+            <Offset>3C</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>71</ID>
+          <Description>"Criteria 3 value  (0x80)"</Description>
+          <ShowAsSigned>1</ShowAsSigned>
+          <Color>808080</Color>
+          <VariableType>Byte</VariableType>
+          <Address>i_batt_base_robot_stats_addr</Address>
+          <Offsets>
+            <Offset>80</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>72</ID>
+      <Description>"Battle: inf. EN when use EN weapon"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : SRWV.EXE
+  Version: 
+  Date   : 2026-01-26
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_BATT_INF_EN_WEAPON,$process,66 41 89 50 4E C3 33) // should be unique
+alloc(newmem,$1000,INJECT_BATT_INF_EN_WEAPON)
+
+label(code)
+label(return)
+
+newmem:
+  cmp byte ptr [r8+24], 1
+  je code
+  cmp dword ptr [r8+3C], 0
+  je @F
+  cmp byte ptr [r8+80], 1
+  je @F
+  jmp code
+
+@@:
+  mov dx, [r8+4C]
+
+code:
+  mov [r8+4E],dx
+  jmp return
+
+INJECT_BATT_INF_EN_WEAPON:
+  jmp newmem
+return:
+registersymbol(INJECT_BATT_INF_EN_WEAPON)
+
+[DISABLE]
+
+INJECT_BATT_INF_EN_WEAPON:
+  db 66 41 89 50 4E
+
+unregistersymbol(INJECT_BATT_INF_EN_WEAPON)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: SRWV.EXE+3E0479
+
+SRWV.EXE+3E045E: 5B              - pop rbx
+SRWV.EXE+3E045F: C3              - ret 
+SRWV.EXE+3E0460: 48 8B 49 08     - mov rcx,[rcx+08]
+SRWV.EXE+3E0464: 8B C2           - mov eax,edx
+SRWV.EXE+3E0466: 4C 8B 41 08     - mov r8,[rcx+08]
+SRWV.EXE+3E046A: 41 0F BF 50 4E  - movsx edx,word ptr [r8+4E]
+SRWV.EXE+3E046F: 3B D0           - cmp edx,eax
+SRWV.EXE+3E0471: 44 8B CA        - mov r9d,edx
+SRWV.EXE+3E0474: 78 09           - js SRWV.EXE+3E047F
+SRWV.EXE+3E0476: 66 2B D0        - sub dx,ax
+// ---------- INJECTING HERE ----------
+SRWV.EXE+3E0479: 66 41 89 50 4E  - mov [r8+4E],dx
+// ---------- DONE INJECTING  ----------
+SRWV.EXE+3E047E: C3              - ret 
+SRWV.EXE+3E047F: 33 C0           - xor eax,eax
+SRWV.EXE+3E0481: 66 41 89 40 4E  - mov [r8+4E],ax
+SRWV.EXE+3E0486: 41 8B C1        - mov eax,r9d
+SRWV.EXE+3E0489: C3              - ret 
+SRWV.EXE+3E048A: CC              - int 3 
+SRWV.EXE+3E048B: CC              - int 3 
+SRWV.EXE+3E048C: CC              - int 3 
+SRWV.EXE+3E048D: CC              - int 3 
+SRWV.EXE+3E048E: CC              - int 3 
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>73</ID>
+      <Description>"Full EN before action"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : SRWV.EXE
+  Version: 
+  Date   : 2026-01-27
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_Full_EN_BEFORE_ACT,$process,41 0F BF 50 4E 3B) // should be unique
+alloc(newmem,$1000,INJECT_Full_EN_BEFORE_ACT)
+
+label(code)
+label(return)
+label(i_crit1_value i_crit2_value i_crit3_value is_enabled_en_before_act)
+label(is_usp_crit_1 is_usp_crit_2 is_usp_crit_3)
+
+newmem:
+  cmp dword ptr [is_enabled_en_before_act], 1
+  jne code
+
+  cmp dword ptr [is_usp_crit_1], 1
+  jne @F
+  mov dl, byte ptr [i_crit1_value]
+  cmp byte ptr [r8+24], dl
+  je code
+
+@@:
+  cmp dword ptr [is_usp_crit_2], 1
+  jne @F
+  mov edx, dword ptr [i_crit2_value]
+  cmp dword ptr [r8+3C], edx //-1 = enemy?
+  je set_sp
+
+@@:
+  cmp dword ptr [is_usp_crit_3], 1
+  jne code
+  mov dl, byte ptr [i_crit3_value]
+  cmp byte ptr [r8+80], dl
+  je set_sp
+  jmp code
+
+set_sp:
+  movzx edx, word ptr [r8+4C]
+  mov [r8+4E], dx
+  jmp return
+
+code:
+  movsx edx,word ptr [r8+4E]
+  jmp return
+  align 10 cc
+  is_enabled_en_before_act:
+  dd 1
+  is_usp_crit_1:
+  dd 1
+  is_usp_crit_2:
+  dd 1
+  is_usp_crit_3:
+  dd 1
+  align 10 cc
+  i_crit1_value:
+  db 1 0 0 0
+  i_crit2_value:
+  dd 0
+  i_crit3_value:
+  db 1 0 0 0
+
+INJECT_Full_EN_BEFORE_ACT:
+  jmp newmem
+return:
+registersymbol(INJECT_Full_EN_BEFORE_ACT)
+registersymbol(i_crit1_value i_crit2_value i_crit3_value is_enabled_en_before_act)
+registersymbol(is_usp_crit_1 is_usp_crit_2 is_usp_crit_3)
+
+[DISABLE]
+
+INJECT_Full_EN_BEFORE_ACT:
+  db 41 0F BF 50 4E
+
+unregistersymbol(INJECT_Full_EN_BEFORE_ACT)
+unregistersymbol(i_crit1_value i_crit2_value i_crit3_value is_enabled_en_before_act)
+unregistersymbol(is_usp_crit_1 is_usp_crit_2 is_usp_crit_3)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: SRWV.EXE+3E046A
+
+INJECT_INF_AMMOS: 0F 1F 40 00     - nop dword ptr [rax+00]
+SRWV.EXE+3E044F: 66 44 39 0B     - cmp [rbx],r9w
+SRWV.EXE+3E0453: 66 0F 43 C2     - cmovae ax,dx
+SRWV.EXE+3E0457: 66 89 03        - mov [rbx],ax
+SRWV.EXE+3E045A: 48 83 C4 20     - add rsp,20
+SRWV.EXE+3E045E: 5B              - pop rbx
+SRWV.EXE+3E045F: C3              - ret 
+SRWV.EXE+3E0460: 48 8B 49 08     - mov rcx,[rcx+08]
+SRWV.EXE+3E0464: 8B C2           - mov eax,edx
+SRWV.EXE+3E0466: 4C 8B 41 08     - mov r8,[rcx+08]
+// ---------- INJECTING HERE ----------
+SRWV.EXE+3E046A: 41 0F BF 50 4E  - movsx edx,word ptr [r8+4E]
+// ---------- DONE INJECTING  ----------
+SRWV.EXE+3E046F: 3B D0           - cmp edx,eax
+SRWV.EXE+3E0471: 44 8B CA        - mov r9d,edx
+SRWV.EXE+3E0474: 78 09           - js SRWV.EXE+3E047F
+SRWV.EXE+3E0476: 66 2B D0        - sub dx,ax
+SRWV.EXE+3E0479: 66 41 89 50 4E  - mov [r8+4E],dx
+SRWV.EXE+3E047E: C3              - ret 
+SRWV.EXE+3E047F: 33 C0           - xor eax,eax
+SRWV.EXE+3E0481: 66 41 89 40 4E  - mov [r8+4E],ax
+SRWV.EXE+3E0486: 41 8B C1        - mov eax,r9d
+SRWV.EXE+3E0489: C3              - ret 
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>253</ID>
+          <Description>"Enabled?"</Description>
+          <DropDownListLink>YesNo</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>is_enabled_en_before_act</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>74</ID>
+          <Description>"Enable criteria #1?"</Description>
+          <DropDownListLink>YesNo</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>is_usp_crit_1</Address>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>75</ID>
+              <Description>"Skip if byte 0x24 ="</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>Byte</VariableType>
+              <Address>i_crit1_value</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>76</ID>
+          <Description>"Enable criteria #2?"</Description>
+          <DropDownListLink>YesNo</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>is_usp_crit_2</Address>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>77</ID>
+              <Description>"Set HP if 4 bytes 0x3C ="</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_crit2_value</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>78</ID>
+          <Description>"Enable criteria #3?"</Description>
+          <DropDownListLink>YesNo</DropDownListLink>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>is_usp_crit_3</Address>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>79</ID>
+              <Description>"Set HP if byte 0x80 ="</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>Byte</VariableType>
+              <Address>i_crit3_value</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>80</ID>
+          <Description>"Battle / defend: full HP before enter battle (animation)"</Description>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : SRWV.EXE
+  Version:
+  Date   : 2026-01-27
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_BATT_HP_FULL,$process,8B 41 48 89 83 24 03 00 00 ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? 8B 41 48) // should be unique
+alloc(newmem,$1000,INJECT_BATT_HP_FULL)
+
+label(code)
+label(return)
+label(is_uhp_crit_1 is_uhp_crit_2 is_uhp_crit_3)
+
+newmem:
+  cmp dword ptr [is_uhp_crit_1], 1
+  jne @F
+  mov al, byte ptr [i_crit1_value]
+  cmp byte ptr [rcx+24], al
+  je code
+
+@@:
+  cmp dword ptr [is_uhp_crit_2], 1
+  jne @F
+  mov eax, [i_crit2_value]
+  cmp dword ptr [rcx+3C], eax //-1 = enemy?
+  je set_hp
+
+@@:
+  cmp dword ptr [is_uhp_crit_3], 1
+  jne code
+  mov al, byte ptr [i_crit3_value]
+  cmp byte ptr [rcx+80], al
+  je set_hp
+  jmp code
+
+set_hp:
+  mov eax, [rcx+44]
+  mov [rcx+48], eax
+
+code:
+  mov eax,[rcx+48]
+  mov [rbx+00000324],eax
+  jmp return
+  align 10 cc
+  is_uhp_crit_1:
+  dd 1
+  is_uhp_crit_2:
+  dd 1
+  is_uhp_crit_3:
+  dd 1
+
+INJECT_BATT_HP_FULL:
+  jmp newmem
+  nop 4
+return:
+registersymbol(INJECT_BATT_HP_FULL)
+registersymbol(is_uhp_crit_1 is_uhp_crit_2 is_uhp_crit_3)
+[DISABLE]
+
+INJECT_BATT_HP_FULL:
+  db 8B 41 48 89 83 24 03 00 00
+
+unregistersymbol(INJECT_BATT_HP_FULL)
+unregistersymbol(is_uhp_crit_1 is_uhp_crit_2 is_uhp_crit_3)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: SRWV.EXE+3C3B56
+
+SRWV.EXE+3C3B21: 85 C0                    - test eax,eax
+SRWV.EXE+3C3B23: 0F 89 F7 00 00 00        - jns SRWV.EXE+3C3C20
+SRWV.EXE+3C3B29: 48 69 DA 40 03 00 00     - imul rbx,rdx,00000340
+SRWV.EXE+3C3B30: 49 03 9E 50 01 00 00     - add rbx,[r14+00000150]
+SRWV.EXE+3C3B37: 4D 89 84 D6 F0 05 00 00  - mov [r14+rdx*8+000005F0],r8
+SRWV.EXE+3C3B3F: 41 FF 86 E8 05 00 00     - inc [r14+000005E8]
+SRWV.EXE+3C3B46: 49 8B 48 08              - mov rcx,[r8+08]
+SRWV.EXE+3C3B4A: 49 8B 10                 - mov rdx,[r8]
+SRWV.EXE+3C3B4D: 8B 41 44                 - mov eax,[rcx+44]
+SRWV.EXE+3C3B50: 89 83 20 03 00 00        - mov [rbx+00000320],eax
+// ---------- INJECTING HERE ----------
+SRWV.EXE+3C3B56: 8B 41 48                 - mov eax,[rcx+48]
+// ---------- DONE INJECTING  ----------
+SRWV.EXE+3C3B59: 89 83 24 03 00 00        - mov [rbx+00000324],eax
+SRWV.EXE+3C3B5F: 0F B7 41 4C              - movzx eax,word ptr [rcx+4C]
+SRWV.EXE+3C3B63: 66 89 83 28 03 00 00     - mov [rbx+00000328],ax
+SRWV.EXE+3C3B6A: 0F B7 41 4E              - movzx eax,word ptr [rcx+4E]
+SRWV.EXE+3C3B6E: 66 89 83 2A 03 00 00     - mov [rbx+0000032A],ax
+SRWV.EXE+3C3B75: 0F B7 42 4A              - movzx eax,word ptr [rdx+4A]
+SRWV.EXE+3C3B79: 66 89 83 2C 03 00 00     - mov [rbx+0000032C],ax
+SRWV.EXE+3C3B80: 66 89 B3 2E 03 00 00     - mov [rbx+0000032E],si
+SRWV.EXE+3C3B87: 48 8B 4F 10              - mov rcx,[rdi+10]
+SRWV.EXE+3C3B8B: E8 A0 12 03 00           - call SRWV.EXE+3F4E30
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>255</ID>
+              <Description>"Battle / attack: full HP before enter battle (animation)"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{ Game   : SRWV.EXE
+  Version: 
+  Date   : 2026-01-28
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_BATT_HP_FULL_ATK,$process,8B 41 48 89 83 24 03 00 ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? 0F B7 41 4C) // should be unique
+alloc(newmem,$1000,INJECT_BATT_HP_FULL_ATK)
+
+label(code)
+label(return)
+
+newmem:
+  cmp dword ptr [is_uhp_crit_1], 1
+  jne @F
+  mov al, byte ptr [i_crit1_value]
+  cmp byte ptr [rcx+24], al
+  je code
+
+@@:
+  cmp dword ptr [is_uhp_crit_2], 1
+  jne @F
+  mov eax, [i_crit2_value]
+  cmp dword ptr [rcx+3C], eax //-1 = enemy?
+  je set_hp
+
+@@:
+  cmp dword ptr [is_uhp_crit_3], 1
+  jne code
+  mov al, byte ptr [i_crit3_value]
+  cmp byte ptr [rcx+80], al
+  je set_hp
+  jmp code
+
+set_hp:
+  mov eax, [rcx+44]
+  mov [rcx+48], eax
+
+code:
+  mov eax,[rcx+48]
+  mov [rbx+00000324],eax
+  jmp return
+
+INJECT_BATT_HP_FULL_ATK:
+  jmp newmem
+  nop 4
+return:
+registersymbol(INJECT_BATT_HP_FULL_ATK)
+
+[DISABLE]
+
+INJECT_BATT_HP_FULL_ATK:
+  db 8B 41 48 89 83 24 03 00 00
+
+unregistersymbol(INJECT_BATT_HP_FULL_ATK)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: SRWV.EXE+3C39E6
+
+SRWV.EXE+3C39B1: 85 C0                    - test eax,eax
+SRWV.EXE+3C39B3: 0F 89 F7 00 00 00        - jns SRWV.EXE+3C3AB0
+SRWV.EXE+3C39B9: 48 69 DA 40 03 00 00     - imul rbx,rdx,00000340
+SRWV.EXE+3C39C0: 49 03 9E 50 01 00 00     - add rbx,[r14+00000150]
+SRWV.EXE+3C39C7: 4D 89 84 D6 F0 05 00 00  - mov [r14+rdx*8+000005F0],r8
+SRWV.EXE+3C39CF: 41 FF 86 E8 05 00 00     - inc [r14+000005E8]
+SRWV.EXE+3C39D6: 49 8B 48 08              - mov rcx,[r8+08]
+SRWV.EXE+3C39DA: 49 8B 10                 - mov rdx,[r8]
+SRWV.EXE+3C39DD: 8B 41 44                 - mov eax,[rcx+44]
+SRWV.EXE+3C39E0: 89 83 20 03 00 00        - mov [rbx+00000320],eax
+// ---------- INJECTING HERE ----------
+SRWV.EXE+3C39E6: 8B 41 48                 - mov eax,[rcx+48]
+// ---------- DONE INJECTING  ----------
+SRWV.EXE+3C39E9: 89 83 24 03 00 00        - mov [rbx+00000324],eax
+SRWV.EXE+3C39EF: 0F B7 41 4C              - movzx eax,word ptr [rcx+4C]
+SRWV.EXE+3C39F3: 66 89 83 28 03 00 00     - mov [rbx+00000328],ax
+SRWV.EXE+3C39FA: 0F B7 41 4E              - movzx eax,word ptr [rcx+4E]
+SRWV.EXE+3C39FE: 66 89 83 2A 03 00 00     - mov [rbx+0000032A],ax
+SRWV.EXE+3C3A05: 0F B7 42 4A              - movzx eax,word ptr [rdx+4A]
+SRWV.EXE+3C3A09: 66 89 83 2C 03 00 00     - mov [rbx+0000032C],ax
+SRWV.EXE+3C3A10: 66 89 B3 2E 03 00 00     - mov [rbx+0000032E],si
+SRWV.EXE+3C3A17: 48 8B 4F 10              - mov rcx,[rdi+10]
+SRWV.EXE+3C3A1B: E8 10 14 03 00           - call SRWV.EXE+3F4E30
+}
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>254</ID>
+              <Description>"Criteria values: same as above"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>81</ID>
+              <Description>"Enable criteria #1?"</Description>
+              <DropDownListLink>YesNo</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>is_uhp_crit_1</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>82</ID>
+              <Description>"Enable criteria #2?"</Description>
+              <DropDownListLink>YesNo</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>is_uhp_crit_2</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>83</ID>
+              <Description>"Enable criteria #3?"</Description>
+              <DropDownListLink>YesNo</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>is_uhp_crit_3</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>84</ID>
+      <Description>"Battle: inf. SP after use"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : SRWV.EXE
+  Version: 
+  Date   : 2026-01-26
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_BATT_INF_SP,$process,66 41 89 40 58 E9) // should be unique
+alloc(newmem,$1000,INJECT_BATT_INF_SP)
+
+label(code)
+label(return)
+
+newmem:
+  cmp word ptr [r8+8E], 0
+  je code
+  mov ax, [r8+38]
+
+code:
+  mov [r8+58],ax
+  jmp return
+
+INJECT_BATT_INF_SP:
+  jmp newmem
+return:
+registersymbol(INJECT_BATT_INF_SP)
+
+[DISABLE]
+
+INJECT_BATT_INF_SP:
+  db 66 41 89 40 58
+
+unregistersymbol(INJECT_BATT_INF_SP)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: SRWV.EXE+3DC49A
+
+SRWV.EXE+3DC479: 66 03 C2        - add ax,dx
+SRWV.EXE+3DC47C: 41 0F B7 50 38  - movzx edx,word ptr [r8+38]
+SRWV.EXE+3DC481: 66 3B C2        - cmp ax,dx
+SRWV.EXE+3DC484: 7E 0D           - jle SRWV.EXE+3DC493
+SRWV.EXE+3DC486: 0F B7 C2        - movzx eax,dx
+SRWV.EXE+3DC489: 66 41 89 50 58  - mov [r8+58],dx
+SRWV.EXE+3DC48E: E9 2D 11 FA FF  - jmp SRWV.EXE+37D5C0
+SRWV.EXE+3DC493: 66 85 C0        - test ax,ax
+SRWV.EXE+3DC496: 79 02           - jns SRWV.EXE+3DC49A
+SRWV.EXE+3DC498: 33 C0           - xor eax,eax
+// ---------- INJECTING HERE ----------
+SRWV.EXE+3DC49A: 66 41 89 40 58  - mov [r8+58],ax
+// ---------- DONE INJECTING  ----------
+SRWV.EXE+3DC49F: E9 1C 11 FA FF  - jmp SRWV.EXE+37D5C0
+SRWV.EXE+3DC4A4: CC              - int 3 
+SRWV.EXE+3DC4A5: CC              - int 3 
+SRWV.EXE+3DC4A6: CC              - int 3 
+SRWV.EXE+3DC4A7: CC              - int 3 
+SRWV.EXE+3DC4A8: CC              - int 3 
+SRWV.EXE+3DC4A9: CC              - int 3 
+SRWV.EXE+3DC4AA: CC              - int 3 
+SRWV.EXE+3DC4AB: CC              - int 3 
+SRWV.EXE+3DC4AC: CC              - int 3 
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>85</ID>
+      <Description>"Map: add move range"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : SRWV.EXE
+  Version: 
+  Date   : 2026-01-27
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_MOV_PLUS6,$process,0F BF D8 48 8B CF) // should be unique
+alloc(newmem,$1000,INJECT_MOV_PLUS6)
+
+label(code)
+label(return i_extra_moves)
+
+newmem:
+
+code:
+  // orig. code
+  movsx ebx,ax
+  mov rcx,rdi
+  // orig code end
+
+  // 開始判定是否為玩家單位
+  push rax
+  lea rax, [rdi+00000098]
+  cmp byte ptr [rax+08], 00   // 檢查 Team ID (Player = 0)
+  jne short to_enemy
+  test byte ptr [rax+0000008F], 01 // 檢查 AI 是否關閉 (Player 手動控制 = 0)
+  jne short skip
+
+  // 通過檢查，加移動力
+  movzx eax, byte ptr [i_extra_moves]
+  add ebx, eax
+  jmp skip
+to_enemy:
+  //xor ebx, ebx
+
+skip:
+  pop rax
+  jmp return
+  align 10 cc
+  i_extra_moves:
+  db 6
+
+INJECT_MOV_PLUS6:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT_MOV_PLUS6 i_extra_moves)
+
+[DISABLE]
+
+INJECT_MOV_PLUS6:
+  db 0F BF D8 48 8B CF
+
+unregistersymbol(INJECT_MOV_PLUS6 i_extra_moves)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: SRWV.EXE+3E8AC9
+
+SRWV.EXE+3E8AA8: 48 85 C0        - test rax,rax
+SRWV.EXE+3E8AAB: 74 56           - je SRWV.EXE+3E8B03
+SRWV.EXE+3E8AAD: 48 85 D2        - test rdx,rdx
+SRWV.EXE+3E8AB0: 74 51           - je SRWV.EXE+3E8B03
+SRWV.EXE+3E8AB2: 48 8B 0A        - mov rcx,[rdx]
+SRWV.EXE+3E8AB5: 48 85 C9        - test rcx,rcx
+SRWV.EXE+3E8AB8: 74 49           - je SRWV.EXE+3E8B03
+SRWV.EXE+3E8ABA: 48 89 5C 24 30  - mov [rsp+30],rbx
+SRWV.EXE+3E8ABF: E8 9C 80 FF FF  - call SRWV.EXE+3E0B60
+SRWV.EXE+3E8AC4: BA 0A 00 00 00  - mov edx,0000000A
+// ---------- INJECTING HERE ----------
+SRWV.EXE+3E8AC9: 0F BF D8        - movsx ebx,ax
+// ---------- DONE INJECTING  ----------
+SRWV.EXE+3E8ACC: 48 8B CF        - mov rcx,rdi
+SRWV.EXE+3E8ACF: E8 4C 42 FF FF  - call SRWV.EXE+3DCD20
+SRWV.EXE+3E8AD4: 85 C0           - test eax,eax
+SRWV.EXE+3E8AD6: 74 03           - je SRWV.EXE+3E8ADB
+SRWV.EXE+3E8AD8: 83 C3 03        - add ebx,03
+SRWV.EXE+3E8ADB: 33 D2           - xor edx,edx
+SRWV.EXE+3E8ADD: 48 8B CF        - mov rcx,rdi
+SRWV.EXE+3E8AE0: E8 4B 2B FE FF  - call SRWV.EXE+3CB630
+SRWV.EXE+3E8AE5: 3C 01           - cmp al,01
+SRWV.EXE+3E8AE7: 75 03           - jne SRWV.EXE+3E8AEC
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>86</ID>
+          <Description>"Extra moves"</Description>
+          <ShowAsSigned>1</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>Byte</VariableType>
+          <Address>i_extra_moves</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>87</ID>
+      <Description>"Map: add weapon range"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : SRWV.EXE
+  Version: 
+  Date   : 2026-01-27
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_RANGE_NEW,$process,0F B6 46 26 3B D8) // should be unique
+alloc(newmem,$1000,INJECT_RANGE_NEW)
+
+label(code)
+label(return i_extra_range)
+
+newmem:
+  // 判定是否為玩家單位
+  push rax
+  mov rax, [r14+20]            // 取得單位資料基準點
+  test rax, rax
+  je short endp
+  lea rax, [rax+00000098]      // 指標指向狀態區資料
+  cmp byte ptr [rax+08], 00    // 檢查 Team ID (Player = 0)
+  jne short endp
+  test byte ptr [rax+0000008F], 01 // 檢查 AI 是否關閉 (Player 控制 = 0)
+  jne short endp
+
+  // 如果是玩家單位，射程 +?
+  movzx eax, byte ptr [i_extra_range]
+  add ebx, eax
+
+endp:
+  pop rax
+
+code:
+  movzx eax,byte ptr [rsi+26]
+  cmp ebx,eax
+  jmp return
+  align 10 cc
+  i_extra_range:
+  db 5
+
+INJECT_RANGE_NEW:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT_RANGE_NEW i_extra_range)
+
+[DISABLE]
+
+INJECT_RANGE_NEW:
+  db 0F B6 46 26 3B D8
+
+unregistersymbol(INJECT_RANGE_NEW i_extra_range)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: SRWV.EXE+3E1D4F
+
+SRWV.EXE+3E1D2F: 49 8B CE                 - mov rcx,r14
+SRWV.EXE+3E1D32: E8 29 F1 FF FF           - call SRWV.EXE+3E0E60
+SRWV.EXE+3E1D37: 0F BF 44 24 5E           - movsx eax,word ptr [rsp+5E]
+SRWV.EXE+3E1D3C: 48 8B D6                 - mov rdx,rsi
+SRWV.EXE+3E1D3F: 49 8B CE                 - mov rcx,r14
+SRWV.EXE+3E1D42: 03 D8                    - add ebx,eax
+SRWV.EXE+3E1D44: E8 B7 AA F8 FF           - call SRWV.EXE+36C800
+SRWV.EXE+3E1D49: 85 C0                    - test eax,eax
+SRWV.EXE+3E1D4B: 7E 02                    - jle SRWV.EXE+3E1D4F
+SRWV.EXE+3E1D4D: 03 D8                    - add ebx,eax
+// ---------- INJECTING HERE ----------
+SRWV.EXE+3E1D4F: 0F B6 46 26              - movzx eax,byte ptr [rsi+26]
+// ---------- DONE INJECTING  ----------
+SRWV.EXE+3E1D53: 3B D8                    - cmp ebx,eax
+SRWV.EXE+3E1D55: 66 0F 4D C3              - cmovge ax,bx
+SRWV.EXE+3E1D59: 48 8B 8C 24 A0 00 00 00  - mov rcx,[rsp+000000A0]
+SRWV.EXE+3E1D61: 48 33 CC                 - xor rcx,rsp
+SRWV.EXE+3E1D64: E8 77 C4 04 00           - call SRWV.EXE+42E1E0
+SRWV.EXE+3E1D69: 48 81 C4 B0 00 00 00     - add rsp,000000B0
+SRWV.EXE+3E1D70: 41 5F                    - pop r15
+SRWV.EXE+3E1D72: 41 5E                    - pop r14
+SRWV.EXE+3E1D74: 5E                       - pop rsi
+SRWV.EXE+3E1D75: 5D                       - pop rbp
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>88</ID>
+          <Description>"Extra range"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>Byte</VariableType>
+          <Address>i_extra_range</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>89</ID>
+      <Description>"ammo no decrease (incl. enemy)"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : SRWV.EXE
+  Version: 
+  Date   : 2026-01-27
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_INF_AMMOS,$process,66 41 2B D1 66 44 39 0B) // should be unique
+
+INJECT_INF_AMMOS:
+  nop 4
+
+registersymbol(INJECT_INF_AMMOS)
+
+[DISABLE]
+
+INJECT_INF_AMMOS:
+  db 66 41 2B D1
+
+unregistersymbol(INJECT_INF_AMMOS)
+
+
+{
+// ORIGINAL CODE - INJECTION POINT: SRWV.EXE+3E044B
+
+SRWV.EXE+3E0428: 83 F8 03           - cmp eax,03
+SRWV.EXE+3E042B: 75 06              - jne SRWV.EXE+3E0433
+SRWV.EXE+3E042D: 44 8D 48 11        - lea r9d,[rax+11]
+SRWV.EXE+3E0431: EB 13              - jmp SRWV.EXE+3E0446
+SRWV.EXE+3E0433: 83 F8 04           - cmp eax,04
+SRWV.EXE+3E0436: BA 10 00 00 00     - mov edx,00000010
+SRWV.EXE+3E043B: 41 B9 24 00 00 00  - mov r9d,00000024
+SRWV.EXE+3E0441: 66 44 0F 44 CA     - cmove r9w,dx
+SRWV.EXE+3E0446: 0F B7 13           - movzx edx,word ptr [rbx]
+SRWV.EXE+3E0449: 33 C0              - xor eax,eax
+// ---------- INJECTING HERE ----------
+SRWV.EXE+3E044B: 66 41 2B D1        - sub dx,r9w
+// ---------- DONE INJECTING  ----------
+SRWV.EXE+3E044F: 66 44 39 0B        - cmp [rbx],r9w
+SRWV.EXE+3E0453: 66 0F 43 C2        - cmovae ax,dx
+SRWV.EXE+3E0457: 66 89 03           - mov [rbx],ax
+SRWV.EXE+3E045A: 48 83 C4 20        - add rsp,20
+SRWV.EXE+3E045E: 5B                 - pop rbx
+SRWV.EXE+3E045F: C3                 - ret 
+SRWV.EXE+3E0460: 48 8B 49 08        - mov rcx,[rcx+08]
+SRWV.EXE+3E0464: 8B C2              - mov eax,edx
+SRWV.EXE+3E0466: 4C 8B 41 08        - mov r8,[rcx+08]
+SRWV.EXE+3E046A: 41 0F BF 50 4E     - movsx edx,word ptr [r8+4E]
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>90</ID>
+      <Description>"Keep min skill stock before use in skill program"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : SRWV.EXE
+  Version: 
+  Date   : 2026-01-27
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_INF_SKILL_STOCK_WHEN_BROWSE,$process,83 39 00 48 8B 4C 24 40) // should be unique
+alloc(newmem,$1000,INJECT_INF_SKILL_STOCK_WHEN_BROWSE)
+
+label(code)
+label(return)
+
+newmem:
+  cmp dword ptr [rcx], A
+  jae code
+  mov dword ptr [rcx], A
+
+code:
+  cmp dword ptr [rcx],00
+  mov rcx,[rsp+40]
+  jmp return
+
+INJECT_INF_SKILL_STOCK_WHEN_BROWSE:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_INF_SKILL_STOCK_WHEN_BROWSE)
+
+[DISABLE]
+
+INJECT_INF_SKILL_STOCK_WHEN_BROWSE:
+  db 83 39 00 48 8B 4C 24 40
+
+unregistersymbol(INJECT_INF_SKILL_STOCK_WHEN_BROWSE)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: SRWV.EXE+39D04A
+
+SRWV.EXE+39D01F: 84 C0                 - test al,al
+SRWV.EXE+39D021: 75 07                 - jne SRWV.EXE+39D02A
+SRWV.EXE+39D023: BA 03 00 00 00        - mov edx,00000003
+SRWV.EXE+39D028: EB 37                 - jmp SRWV.EXE+39D061
+SRWV.EXE+39D02A: 48 8B 05 AF 9E B9 00  - mov rax,[SRWV.EXE+F36EE0]
+SRWV.EXE+39D031: 41 B9 01 00 00 00     - mov r9d,00000001
+SRWV.EXE+39D037: 4C 8B 44 24 48        - mov r8,[rsp+48]
+SRWV.EXE+39D03C: 48 8B 48 08           - mov rcx,[rax+08]
+SRWV.EXE+39D040: 48 8B 44 24 38        - mov rax,[rsp+38]
+SRWV.EXE+39D045: 48 89 44 24 20        - mov [rsp+20],rax
+// ---------- INJECTING HERE ----------
+SRWV.EXE+39D04A: 83 39 00              - cmp dword ptr [rcx],00
+// ---------- DONE INJECTING  ----------
+SRWV.EXE+39D04D: 48 8B 4C 24 40        - mov rcx,[rsp+40]
+SRWV.EXE+39D052: 75 06                 - jne SRWV.EXE+39D05A
+SRWV.EXE+39D054: 41 8D 51 01           - lea edx,[r9+01]
+SRWV.EXE+39D058: EB 21                 - jmp SRWV.EXE+39D07B
+SRWV.EXE+39D05A: 41 8B D1              - mov edx,r9d
+SRWV.EXE+39D05D: EB 1C                 - jmp SRWV.EXE+39D07B
+SRWV.EXE+39D05F: 33 D2                 - xor edx,edx
+SRWV.EXE+39D061: 48 8B 44 24 38        - mov rax,[rsp+38]
+SRWV.EXE+39D066: 41 B9 01 00 00 00     - mov r9d,00000001
+SRWV.EXE+39D06C: 4C 8B 44 24 48        - mov r8,[rsp+48]
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>91</ID>
+      <Description>"All robots, ships have 4 slots"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : SRWV.EXE
+  Version: 
+  Date   : 2026-01-27
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_SLOTS_NEW,$process,B8 04 00 00 00 3B D8 0F 42 C3 48 8B 5C 24 38 48 83 C4 20 5F C3 FF C3 B8 04 00 00 00 3B D8 0F 42 C3 48 8B 5C 24 38 48 83 C4 20 5F C3 33 C0 48 83 C4 20 5F C3) // should be unique
+
+// 1. 處理第一處 cmovb (在位址 3718C8)
+INJECT_SLOTS_NEW+07:
+  nop 3 //SRWV.EXE+3718C8 - 0F42 C3               - cmovb eax,ebx
+
+// 2. 處理第二處 cmovb (在位址 3718DF)
+INJECT_SLOTS_NEW+1E:
+  nop 3 //SRWV.EXE+3718DF - 0F42 C3               - cmovb eax,ebx
+
+// 3.處理函數上方的 cmovl (在位址 371840)
+// 戰艦也 4 格
+INJECT_SLOTS_NEW-81:
+   nop 3  // SRWV.EXE+371840 - 0F4C C8               - cmovl ecx,eax
+
+registersymbol(INJECT_SLOTS_NEW)
+
+[DISABLE]
+INJECT_SLOTS_NEW+07:
+  db 0F 42 C3
+INJECT_SLOTS_NEW+1E:
+  db 0F 42 C3
+INJECT_SLOTS_NEW-81:
+  db 0F 4C C8
+
+unregistersymbol(INJECT_SLOTS_NEW)
+
+{
+// ORIGINAL CODE - INJECTION POINT: SRWV.EXE+3718C1
+
+SRWV.EXE+37189C: 84 C0                 - test al,al
+SRWV.EXE+37189E: 74 38                 - je SRWV.EXE+3718D8
+SRWV.EXE+3718A0: 0F B7 4C 24 30        - movzx ecx,word ptr [rsp+30]
+SRWV.EXE+3718A5: 48 8D 05 AC 1A 2B 00  - lea rax,[SRWV.EXE+623358]
+SRWV.EXE+3718AC: 48 8D 15 AF 1A 2B 00  - lea rdx,[SRWV.EXE+623362]
+SRWV.EXE+3718B3: 66 39 08              - cmp [rax],cx
+SRWV.EXE+3718B6: 74 1E                 - je SRWV.EXE+3718D6
+SRWV.EXE+3718B8: 48 83 C0 02           - add rax,02
+SRWV.EXE+3718BC: 48 3B C2              - cmp rax,rdx
+SRWV.EXE+3718BF: 7C F2                 - jl SRWV.EXE+3718B3
+// ---------- INJECTING HERE ----------
+SRWV.EXE+3718C1: B8 04 00 00 00        - mov eax,00000004
+// ---------- DONE INJECTING  ----------
+SRWV.EXE+3718C6: 3B D8                 - cmp ebx,eax
+SRWV.EXE+3718C8: 0F 42 C3              - cmovb eax,ebx
+SRWV.EXE+3718CB: 48 8B 5C 24 38        - mov rbx,[rsp+38]
+SRWV.EXE+3718D0: 48 83 C4 20           - add rsp,20
+SRWV.EXE+3718D4: 5F                    - pop rdi
+SRWV.EXE+3718D5: C3                    - ret 
+SRWV.EXE+3718D6: FF C3                 - inc ebx
+SRWV.EXE+3718D8: B8 04 00 00 00        - mov eax,00000004
+SRWV.EXE+3718DD: 3B D8                 - cmp ebx,eax
+SRWV.EXE+3718DF: 0F 42 C3              - cmovb eax,ebx
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>92</ID>
+      <Description>"Get char skill data"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : SRWV.EXE
+  Version: 
+  Date   : 2026-01-27
+  Author :
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_SKILL_DATA,SRWV.EXE,80 BC 9F A0 00 00 00 00) // should be unique
+alloc(newmem,$1000,INJECT_GET_SKILL_DATA)
+
+label(code)
+label(return char_skill_base)
+
+newmem:
+  push r15
+  lea r15, [rdi+A0]
+  mov [char_skill_base], r15
+  pop r15
+
+code:
+  cmp byte ptr [rdi+rbx*4+000000A0],00
+  jmp return
+  align 10 cc
+  char_skill_base:
+  dq 0
+
+INJECT_GET_SKILL_DATA:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_GET_SKILL_DATA char_skill_base)
+
+[DISABLE]
+
+INJECT_GET_SKILL_DATA:
+  db 80 BC 9F A0 00 00 00 00
+
+unregistersymbol(INJECT_GET_SKILL_DATA char_skill_base)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: SRWV.EXE+38A281
+
+SRWV.EXE+38A251: E9 01 02 00 00           - jmp SRWV.EXE+38A457
+SRWV.EXE+38A256: E8 15 ED FF FF           - call SRWV.EXE+388F70
+SRWV.EXE+38A25B: 48 63 C8                 - movsxd  rcx,eax
+SRWV.EXE+38A25E: 48 8D 05 47 29 BA 00     - lea rax,[SRWV.EXE+F2CBAC]
+SRWV.EXE+38A265: 48 69 D1 AC 00 00 00     - imul rdx,rcx,000000AC
+SRWV.EXE+38A26C: 4C 8B CE                 - mov r9,rsi
+SRWV.EXE+38A26F: 45 33 C0                 - xor r8d,r8d
+SRWV.EXE+38A272: 48 03 D0                 - add rdx,rax
+SRWV.EXE+38A275: 48 8D 0D F4 43 2A 00     - lea rcx,[SRWV.EXE+62E670]
+SRWV.EXE+38A27C: E8 4F 40 03 00           - call SRWV.EXE+3BE2D0
+// ---------- INJECTING HERE ----------
+SRWV.EXE+38A281: 80 BC 9F A0 00 00 00 00  - cmp byte ptr [rdi+rbx*4+000000A0],00
+// ---------- DONE INJECTING  ----------
+SRWV.EXE+38A289: 0F 8E C6 01 00 00        - jng SRWV.EXE+38A455
+SRWV.EXE+38A28F: 0F B6 8C 9F 9E 00 00 00  - movzx ecx,byte ptr [rdi+rbx*4+0000009E]
+SRWV.EXE+38A297: E8 24 FE FF FF           - call SRWV.EXE+38A0C0
+SRWV.EXE+38A29C: 83 F8 01                 - cmp eax,01
+SRWV.EXE+38A29F: 0F 8E B0 01 00 00        - jng SRWV.EXE+38A455
+SRWV.EXE+38A2A5: 0F BE 8C 9F A0 00 00 00  - movsx ecx,byte ptr [rdi+rbx*4+000000A0]
+SRWV.EXE+38A2AD: B8 67 66 66 66           - mov eax,66666667
+SRWV.EXE+38A2B2: F7 E9                    - imul ecx
+SRWV.EXE+38A2B4: C1 FA 02                 - sar edx,02
+SRWV.EXE+38A2B7: 8B C2                    - mov eax,edx
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>93</ID>
+          <Description>"Base"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>808080</Color>
+          <VariableType>8 Bytes</VariableType>
+          <Address>char_skill_base</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>94</ID>
+          <Description>"Short Name?"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>FF8080</Color>
+          <VariableType>String</VariableType>
+          <Length>30</Length>
+          <Unicode>0</Unicode>
+          <CodePage>0</CodePage>
+          <ZeroTerminate>1</ZeroTerminate>
+          <Address>char_skill_base</Address>
+          <Offsets>
+            <Offset>0</Offset>
+            <Offset>0</Offset>
+            <Offset>-80</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>95</ID>
+          <Description>"01-10"</Description>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>96</ID>
+              <Description>"Trait 01"</Description>
+              <Options moDeactivateChildrenAsWell="1"/>
+              <ShowAsSigned>0</ShowAsSigned>
+              <GroupHeader>1</GroupHeader>
+              <Address>char_skill_base</Address>
+              <Offsets>
+                <Offset>0</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>97</ID>
+                  <Description>"ID 1 (スキルプログラム / Skill Program)"</Description>
+                  <DropDownListLink>Trait.ID1</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>-2</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>98</ID>
+                  <Description>"ID 1 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+0</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>99</ID>
+                  <Description>"ID 2"</Description>
+                  <DropDownListLink>Trait.ID2</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+96</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>100</ID>
+                  <Description>"ID 2 Lv (total)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+98</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>101</ID>
+              <Description>"Trait 02"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <GroupHeader>1</GroupHeader>
+              <Address>char_skill_base</Address>
+              <Offsets>
+                <Offset>4</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>102</ID>
+                  <Description>"ID 1 (スキルプログラム / Skill Program)"</Description>
+                  <DropDownListLink>Trait.ID1</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>-2</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>103</ID>
+                  <Description>"ID 1 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+0</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>104</ID>
+                  <Description>"ID 2"</Description>
+                  <DropDownListLink>Trait.ID2</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+96</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>105</ID>
+                  <Description>"ID 2 Lv (total)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+98</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>106</ID>
+              <Description>"Trait 03"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <GroupHeader>1</GroupHeader>
+              <Address>char_skill_base</Address>
+              <Offsets>
+                <Offset>8</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>107</ID>
+                  <Description>"ID 1 (スキルプログラム / Skill Program)"</Description>
+                  <DropDownListLink>Trait.ID1</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>-2</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>108</ID>
+                  <Description>"ID 1 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+0</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>109</ID>
+                  <Description>"ID 2"</Description>
+                  <DropDownListLink>Trait.ID2</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+96</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>110</ID>
+                  <Description>"ID 2 Lv (total)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+98</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>111</ID>
+              <Description>"Trait 04"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <GroupHeader>1</GroupHeader>
+              <Address>char_skill_base</Address>
+              <Offsets>
+                <Offset>C</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>112</ID>
+                  <Description>"ID 1 (スキルプログラム / Skill Program)"</Description>
+                  <DropDownListLink>Trait.ID1</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>-2</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>113</ID>
+                  <Description>"ID 1 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+0</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>114</ID>
+                  <Description>"ID 2"</Description>
+                  <DropDownListLink>Trait.ID2</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+96</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>115</ID>
+                  <Description>"ID 2 Lv (total)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+98</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>116</ID>
+              <Description>"Trait 05"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <GroupHeader>1</GroupHeader>
+              <Address>char_skill_base</Address>
+              <Offsets>
+                <Offset>10</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>117</ID>
+                  <Description>"ID 1 (スキルプログラム / Skill Program)"</Description>
+                  <DropDownListLink>Trait.ID1</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>-2</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>118</ID>
+                  <Description>"ID 1 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+0</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>119</ID>
+                  <Description>"ID 2"</Description>
+                  <DropDownListLink>Trait.ID2</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+96</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>120</ID>
+                  <Description>"ID 2 Lv (total)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+98</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>121</ID>
+              <Description>"Trait 06"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <GroupHeader>1</GroupHeader>
+              <Address>char_skill_base</Address>
+              <Offsets>
+                <Offset>14</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>122</ID>
+                  <Description>"ID 1 (スキルプログラム / Skill Program)"</Description>
+                  <DropDownListLink>Trait.ID1</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>-2</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>123</ID>
+                  <Description>"ID 1 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+0</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>124</ID>
+                  <Description>"ID 2"</Description>
+                  <DropDownListLink>Trait.ID2</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+96</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>125</ID>
+                  <Description>"ID 2 Lv (total)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+98</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>126</ID>
+              <Description>"Trait 07"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <GroupHeader>1</GroupHeader>
+              <Address>char_skill_base</Address>
+              <Offsets>
+                <Offset>18</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>127</ID>
+                  <Description>"ID 1 (スキルプログラム / Skill Program)"</Description>
+                  <DropDownListLink>Trait.ID1</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>-2</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>128</ID>
+                  <Description>"ID 1 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+0</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>129</ID>
+                  <Description>"ID 2"</Description>
+                  <DropDownListLink>Trait.ID2</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+96</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>130</ID>
+                  <Description>"ID 2 Lv (total)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+98</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>131</ID>
+              <Description>"Trait 08"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <GroupHeader>1</GroupHeader>
+              <Address>char_skill_base</Address>
+              <Offsets>
+                <Offset>1C</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>132</ID>
+                  <Description>"ID 1 (スキルプログラム / Skill Program)"</Description>
+                  <DropDownListLink>Trait.ID1</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>-2</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>133</ID>
+                  <Description>"ID 1 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+0</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>134</ID>
+                  <Description>"ID 2"</Description>
+                  <DropDownListLink>Trait.ID2</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+96</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>135</ID>
+                  <Description>"ID 2 Lv (total)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+98</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>136</ID>
+              <Description>"Trait 09"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <GroupHeader>1</GroupHeader>
+              <Address>char_skill_base</Address>
+              <Offsets>
+                <Offset>20</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>137</ID>
+                  <Description>"ID 1 (スキルプログラム / Skill Program)"</Description>
+                  <DropDownListLink>Trait.ID1</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>-2</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>138</ID>
+                  <Description>"ID 1 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+0</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>139</ID>
+                  <Description>"ID 2"</Description>
+                  <DropDownListLink>Trait.ID2</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+96</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>140</ID>
+                  <Description>"ID 2 Lv (total)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+98</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>141</ID>
+              <Description>"Trait 10"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <GroupHeader>1</GroupHeader>
+              <Address>char_skill_base</Address>
+              <Offsets>
+                <Offset>24</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>142</ID>
+                  <Description>"ID 1 (スキルプログラム / Skill Program)"</Description>
+                  <DropDownListLink>Trait.ID1</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>-2</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>143</ID>
+                  <Description>"ID 1 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+0</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>144</ID>
+                  <Description>"ID 2"</Description>
+                  <DropDownListLink>Trait.ID2</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+96</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>145</ID>
+                  <Description>"ID 2 Lv (total)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+98</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>146</ID>
+          <Description>"11-20"</Description>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>147</ID>
+              <Description>"Trait 11"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <GroupHeader>1</GroupHeader>
+              <Address>char_skill_base</Address>
+              <Offsets>
+                <Offset>28</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>148</ID>
+                  <Description>"ID 1 (スキルプログラム / Skill Program)"</Description>
+                  <DropDownListLink>Trait.ID1</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>-2</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>149</ID>
+                  <Description>"ID 1 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+0</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>150</ID>
+                  <Description>"ID 2"</Description>
+                  <DropDownListLink>Trait.ID2</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+96</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>151</ID>
+                  <Description>"ID 2 Lv (total)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+98</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>152</ID>
+              <Description>"Trait 12"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <GroupHeader>1</GroupHeader>
+              <Address>char_skill_base</Address>
+              <Offsets>
+                <Offset>2C</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>153</ID>
+                  <Description>"ID 1 (スキルプログラム / Skill Program)"</Description>
+                  <DropDownListLink>Trait.ID1</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>-2</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>154</ID>
+                  <Description>"ID 1 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+0</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>155</ID>
+                  <Description>"ID 2"</Description>
+                  <DropDownListLink>Trait.ID2</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+96</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>156</ID>
+                  <Description>"ID 2 Lv (total)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+98</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>157</ID>
+              <Description>"Trait 13"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <GroupHeader>1</GroupHeader>
+              <Address>char_skill_base</Address>
+              <Offsets>
+                <Offset>30</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>158</ID>
+                  <Description>"ID 1 (スキルプログラム / Skill Program)"</Description>
+                  <DropDownListLink>Trait.ID1</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>-2</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>159</ID>
+                  <Description>"ID 1 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+0</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>160</ID>
+                  <Description>"ID 2"</Description>
+                  <DropDownListLink>Trait.ID2</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+96</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>161</ID>
+                  <Description>"ID 2 Lv (total)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+98</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>162</ID>
+              <Description>"Trait 14"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <GroupHeader>1</GroupHeader>
+              <Address>char_skill_base</Address>
+              <Offsets>
+                <Offset>34</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>163</ID>
+                  <Description>"ID 1 (スキルプログラム / Skill Program)"</Description>
+                  <DropDownListLink>Trait.ID1</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>-2</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>164</ID>
+                  <Description>"ID 1 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+0</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>165</ID>
+                  <Description>"ID 2"</Description>
+                  <DropDownListLink>Trait.ID2</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+96</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>166</ID>
+                  <Description>"ID 2 Lv (total)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+98</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>167</ID>
+              <Description>"Trait 15"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <GroupHeader>1</GroupHeader>
+              <Address>char_skill_base</Address>
+              <Offsets>
+                <Offset>38</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>168</ID>
+                  <Description>"ID 1 (スキルプログラム / Skill Program)"</Description>
+                  <DropDownListLink>Trait.ID1</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>-2</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>169</ID>
+                  <Description>"ID 1 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+0</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>170</ID>
+                  <Description>"ID 2"</Description>
+                  <DropDownListLink>Trait.ID2</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+96</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>171</ID>
+                  <Description>"ID 2 Lv (total)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+98</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>172</ID>
+              <Description>"Trait 16"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <GroupHeader>1</GroupHeader>
+              <Address>char_skill_base</Address>
+              <Offsets>
+                <Offset>3C</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>173</ID>
+                  <Description>"ID 1 (スキルプログラム / Skill Program)"</Description>
+                  <DropDownListLink>Trait.ID1</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>-2</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>174</ID>
+                  <Description>"ID 1 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+0</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>175</ID>
+                  <Description>"ID 2"</Description>
+                  <DropDownListLink>Trait.ID2</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+96</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>176</ID>
+                  <Description>"ID 2 Lv (total)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+98</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>177</ID>
+              <Description>"Trait 17"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <GroupHeader>1</GroupHeader>
+              <Address>char_skill_base</Address>
+              <Offsets>
+                <Offset>40</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>178</ID>
+                  <Description>"ID 1 (スキルプログラム / Skill Program)"</Description>
+                  <DropDownListLink>Trait.ID1</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>-2</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>179</ID>
+                  <Description>"ID 1 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+0</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>180</ID>
+                  <Description>"ID 2"</Description>
+                  <DropDownListLink>Trait.ID2</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+96</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>181</ID>
+                  <Description>"ID 2 Lv (total)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+98</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>182</ID>
+              <Description>"Trait 18"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <GroupHeader>1</GroupHeader>
+              <Address>char_skill_base</Address>
+              <Offsets>
+                <Offset>44</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>183</ID>
+                  <Description>"ID 1 (スキルプログラム / Skill Program)"</Description>
+                  <DropDownListLink>Trait.ID1</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>-2</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>184</ID>
+                  <Description>"ID 1 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+0</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>185</ID>
+                  <Description>"ID 2"</Description>
+                  <DropDownListLink>Trait.ID2</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+96</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>186</ID>
+                  <Description>"ID 2 Lv (total)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+98</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>187</ID>
+              <Description>"Trait 19"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <GroupHeader>1</GroupHeader>
+              <Address>char_skill_base</Address>
+              <Offsets>
+                <Offset>48</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>188</ID>
+                  <Description>"ID 1 (スキルプログラム / Skill Program)"</Description>
+                  <DropDownListLink>Trait.ID1</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>-2</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>189</ID>
+                  <Description>"ID 1 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+0</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>190</ID>
+                  <Description>"ID 2"</Description>
+                  <DropDownListLink>Trait.ID2</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+96</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>191</ID>
+                  <Description>"ID 2 Lv (total)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+98</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>192</ID>
+              <Description>"Trait 20"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <GroupHeader>1</GroupHeader>
+              <Address>char_skill_base</Address>
+              <Offsets>
+                <Offset>4C</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>193</ID>
+                  <Description>"ID 1 (スキルプログラム / Skill Program)"</Description>
+                  <DropDownListLink>Trait.ID1</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>-2</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>194</ID>
+                  <Description>"ID 1 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+0</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>195</ID>
+                  <Description>"ID 2"</Description>
+                  <DropDownListLink>Trait.ID2</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+96</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>196</ID>
+                  <Description>"ID 2 Lv (total)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+98</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>197</ID>
+          <Description>"21-30"</Description>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>198</ID>
+              <Description>"Trait 21"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <GroupHeader>1</GroupHeader>
+              <Address>char_skill_base</Address>
+              <Offsets>
+                <Offset>50</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>199</ID>
+                  <Description>"ID 1 (スキルプログラム / Skill Program)"</Description>
+                  <DropDownListLink>Trait.ID1</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>-2</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>200</ID>
+                  <Description>"ID 1 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+0</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>201</ID>
+                  <Description>"ID 2"</Description>
+                  <DropDownListLink>Trait.ID2</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+96</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>202</ID>
+                  <Description>"ID 2 Lv (total)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+98</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>203</ID>
+              <Description>"Trait 22"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <GroupHeader>1</GroupHeader>
+              <Address>char_skill_base</Address>
+              <Offsets>
+                <Offset>54</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>204</ID>
+                  <Description>"ID 1 (スキルプログラム / Skill Program)"</Description>
+                  <DropDownListLink>Trait.ID1</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>-2</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>205</ID>
+                  <Description>"ID 1 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+0</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>206</ID>
+                  <Description>"ID 2"</Description>
+                  <DropDownListLink>Trait.ID2</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+96</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>207</ID>
+                  <Description>"ID 2 Lv (total)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+98</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>208</ID>
+              <Description>"Trait 23"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <GroupHeader>1</GroupHeader>
+              <Address>char_skill_base</Address>
+              <Offsets>
+                <Offset>58</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>209</ID>
+                  <Description>"ID 1 (スキルプログラム / Skill Program)"</Description>
+                  <DropDownListLink>Trait.ID1</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>-2</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>210</ID>
+                  <Description>"ID 1 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+0</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>211</ID>
+                  <Description>"ID 2"</Description>
+                  <DropDownListLink>Trait.ID2</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+96</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>212</ID>
+                  <Description>"ID 2 Lv (total)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+98</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>213</ID>
+              <Description>"Trait 24"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <GroupHeader>1</GroupHeader>
+              <Address>char_skill_base</Address>
+              <Offsets>
+                <Offset>5C</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>214</ID>
+                  <Description>"ID 1 (スキルプログラム / Skill Program)"</Description>
+                  <DropDownListLink>Trait.ID1</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>-2</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>215</ID>
+                  <Description>"ID 1 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+0</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>216</ID>
+                  <Description>"ID 2"</Description>
+                  <DropDownListLink>Trait.ID2</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+96</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>217</ID>
+                  <Description>"ID 2 Lv (total)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+98</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>218</ID>
+              <Description>"Trait 25"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <GroupHeader>1</GroupHeader>
+              <Address>char_skill_base</Address>
+              <Offsets>
+                <Offset>60</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>219</ID>
+                  <Description>"ID 1 (スキルプログラム / Skill Program)"</Description>
+                  <DropDownListLink>Trait.ID1</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>-2</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>220</ID>
+                  <Description>"ID 1 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+0</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>221</ID>
+                  <Description>"ID 2"</Description>
+                  <DropDownListLink>Trait.ID2</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+96</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>222</ID>
+                  <Description>"ID 2 Lv (total)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+98</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>223</ID>
+              <Description>"Trait 26"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <GroupHeader>1</GroupHeader>
+              <Address>char_skill_base</Address>
+              <Offsets>
+                <Offset>64</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>224</ID>
+                  <Description>"ID 1 (スキルプログラム / Skill Program)"</Description>
+                  <DropDownListLink>Trait.ID1</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>-2</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>225</ID>
+                  <Description>"ID 1 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+0</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>226</ID>
+                  <Description>"ID 2"</Description>
+                  <DropDownListLink>Trait.ID2</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+96</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>227</ID>
+                  <Description>"ID 2 Lv (total)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+98</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>228</ID>
+              <Description>"Trait 27"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <GroupHeader>1</GroupHeader>
+              <Address>char_skill_base</Address>
+              <Offsets>
+                <Offset>68</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>229</ID>
+                  <Description>"ID 1 (スキルプログラム / Skill Program)"</Description>
+                  <DropDownListLink>Trait.ID1</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>-2</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>230</ID>
+                  <Description>"ID 1 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+0</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>231</ID>
+                  <Description>"ID 2"</Description>
+                  <DropDownListLink>Trait.ID2</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+96</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>232</ID>
+                  <Description>"ID 2 Lv (total)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+98</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>233</ID>
+              <Description>"Trait 28"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <GroupHeader>1</GroupHeader>
+              <Address>char_skill_base</Address>
+              <Offsets>
+                <Offset>6C</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>234</ID>
+                  <Description>"ID 1 (スキルプログラム / Skill Program)"</Description>
+                  <DropDownListLink>Trait.ID1</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>-2</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>235</ID>
+                  <Description>"ID 1 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+0</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>236</ID>
+                  <Description>"ID 2"</Description>
+                  <DropDownListLink>Trait.ID2</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+96</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>237</ID>
+                  <Description>"ID 2 Lv (total)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+98</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>238</ID>
+              <Description>"Trait 29"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <GroupHeader>1</GroupHeader>
+              <Address>char_skill_base</Address>
+              <Offsets>
+                <Offset>70</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>239</ID>
+                  <Description>"ID 1 (スキルプログラム / Skill Program)"</Description>
+                  <DropDownListLink>Trait.ID1</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>-2</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>240</ID>
+                  <Description>"ID 1 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+0</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>241</ID>
+                  <Description>"ID 2"</Description>
+                  <DropDownListLink>Trait.ID2</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+96</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>242</ID>
+                  <Description>"ID 2 Lv (total)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+98</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>243</ID>
+              <Description>"Trait 30"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <GroupHeader>1</GroupHeader>
+              <Address>char_skill_base</Address>
+              <Offsets>
+                <Offset>74</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>244</ID>
+                  <Description>"ID 1 (スキルプログラム / Skill Program)"</Description>
+                  <DropDownListLink>Trait.ID1</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>-2</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>245</ID>
+                  <Description>"ID 1 Lv"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+0</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>246</ID>
+                  <Description>"ID 2"</Description>
+                  <DropDownListLink>Trait.ID2</DropDownListLink>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+96</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>247</ID>
+                  <Description>"ID 2 Lv (total)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>+98</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>248</ID>
+      <Description>"Super Robot Wars V  /  https://opencheattables.com  /  CE 7.6"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <Color>008800</Color>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>249</ID>
+          <Description>"SpCmds"</Description>
+          <DropDownList DisplayValueAsItem="1">0:N/A
+1:熱血 / Valor
+2:魂 / Soul
+3:ひらめき / Flash
+4:不屈 / Persistence
+5:鉄壁 / Iron Wall
+6:集中 / Focus
+7:必中 / Bullseye
+8:感応 / Intuition
+9:直感 / Instinct
+10:加速 / Accel
+11:覚醒 / Zeal
+12:根性 / Guts
+13:ド根性 / Grit
+14:信賴 / Trust
+15:友情 / Friendship
+16:補給 / Resupply
+17:気合 / Spirit
+18:気迫 / Drive
+19:激励 / Rouse
+20:てかげん / Mercy
+21:狙撃 / Snipe
+22:突撃 / Charge
+23:脱力 / Daunt
+24:かく乱 / Confuse
+25:愛 / Love
+26:勇気 / Bravery
+27:幸運 / Luck
+28:祝福 / Bless
+29:努力 / Cheer
+30:応援 / Glee
+31:分析 / Analyze
+32:絆 / Bonds
+33:期待 / Hope
+34:先見 / Forethought
+35:希望 / Wish
+</DropDownList>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>250</ID>
+          <Description>"YesNo"</Description>
+          <DropDownList DisplayValueAsItem="1">0:No
+1:Yes
+</DropDownList>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>251</ID>
+          <Description>"Trait.ID1"</Description>
+          <DropDownList DisplayValueAsItem="1">1: 援護攻撃 / Support Attack
+2: 再攻撃 / Second Attack
+3: サポートアタック / Enhance Attack
+4: 援護防御 / Support Defend
+5: 闘争心 / Fighter's Spirit
+6: 気力＋（攻撃） / Focus+ (ATK)
+7: 気力＋（防御） / Focus+ (DEF)
+8: 気力限界突破 / Focus Over Limit
+9: 底力 / Potential
+10: Ｅセーブ / E-Sav
+11: Ｂセーブ / B-Sav
+12: 見切り / Instinct
+13: ガード / Guard
+14: プロテクション / Protection
+15: サイズ差補正無視 / Ignore Size
+16: 気力＋（ダメージ） / Spirit Endurance
+17: ヒット＆アウェイ / Hit &amp; Run
+18: 修理技能 / Repair Skill
+19: 補給技能 / Resupply Skill
+20: パーツ供給 / Supply Parts
+21: ＳＰアップ / SP Up
+22: エースプラウド / Proud Ace
+23: アタッカー / Attacker
+24: フルカウンター / Perfect Counter
+25: ダッシュ / Dash
+26: ＳＰ回復 / SP Recovery
+27: 集中力 / Concentration
+28: 戦術待機 / Standby Strategy
+29: 指揮官 / Commander
+30: 強運 / Strong Luck
+31: 底力（不屈） / Defiance
+32: 地形利用 / Apply Terrain
+33: ニュータイプ / New Type
+34: 強化人間 / Cyber NT
+35: ＳＥＥＤ / SEED
+36: イノベイター / Innovator
+37: 極 / The Ultimate
+38: 社長 / President
+39: ヒーロー / Hero
+40: ＩＦＳ / IFS
+41: 電子の妖精 / Electron Fairy
+42: メールライダー / Mail Rider
+43: 艦隊指揮 / Captain's Order
+44: シンクロ率 / Synchro Rate
+45: 天才 / Genius
+46: ２回行動 / Double Move
+47: ３回行動 / Triple Move
+48: エクストラカウントプラス / Bonus Focus
+49: プレッシャー / Pressure
+</DropDownList>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>252</ID>
+          <Description>"Trait.ID2"</Description>
+          <DropDownList DisplayValueAsItem="1">1: 再攻撃 / Second Attack
+2: サポートアタック / Enhance Attack
+3: 精神耐性 / Spirit Endurance
+4: ヒット＆アウェイ / Hit &amp; Run
+5: ダッシュ / Dash
+6: 修理スキル / Repair Skill
+7: 補給スキル / Resupply Skill
+8: パーツ供給 / Supply Parts
+9: ＳＰ回復 / SP Recovery
+10: エクストラカウントプラス / Bonus Focus
+11: 極 / The Ultimate
+12: ２回行動 / Double Move
+13: 強運 / Strong Luck
+14: 天才 / Genius
+15: 社長 / President
+16: ＳＥＥＤ / SEED
+17: イノベイター / Innovator
+18: ３回行動 / Triple Move
+19: 不屈 / Defiance
+20: 地形利用 / Apply Terrain
+21: 戦術待機 / Standby Strategy
+32: 援護攻撃 L1 / Support Attack 1
+33: 援護攻撃 L2 / Support Attack 2
+34: 援護攻撃 L3 / Support Attack 3
+35: 援護攻撃 L4 / Support Attack 4
+36: 援護防御 L1 / Support Defend 1
+37: 援護防御 L2 / Support Defend 2
+38: 援護防御 L3 / Support Defend 3
+39: 援護防御 L4 / Support Defend 4
+40: 闘争心 L1 / Fighter's Spirit 1
+41: 闘争心 L2 / Fighter's Spirit 2
+42: 闘争心 L3 / Fighter's Spirit 3
+43: 気力＋（攻撃） / Focus+ (ATK)
+44: 気力＋（防御） / Focus+ (DEF)
+45: 気力限界突破 L1 / Focus Over Limit 1
+46: 気力限界突破 L2 / Focus Over Limit 2
+47: 気力限界突破 L3 / Focus Over Limit 3
+48: 底力 L1 / Potential 1
+49: 底力 L2 / Potential 2
+50: 底力 L3 / Potential 3
+51: 底力 L4 / Potential 4
+52: 底力 L5 / Potential 5
+53: 底力 L6 / Potential 6
+54: 底力 L7 / Potential 7
+55: 底力 L8 / Potential 8
+56: 底力 L9 / Potential 9
+57: Ｅセーブ L1 / E-sav 1
+58: Ｅセーブ L2 / E-sav 2
+59: Ｂセーブ L1 / B-sav 1
+60: Ｂセーブ L2 / B-sav 2
+61: 見切り L1 / Instinct 1
+62: 見切り L2 / Instinct 2
+63: 見切り L3 / Instinct 3
+64: ガード L1 / Guard 1
+65: ガード L2 / Guard 2
+66: ガード L3 / Guard 3
+67: プロテクション / Protection
+68: サイズ差補正無視 L1 / Ignore Size 1
+69: サイズ差補正無視 L2 / Ignore Size 2
+70: サイズ差補正無視 L3 / Ignore Size 3
+71: サイズ差補正無視 L4 / Ignore Size 4
+72: ＳＰアップ L1 / SP Up 1
+73: ＳＰアップ L2 / SP Up 2
+74: ＳＰアップ L3 / SP Up 3
+75: ＳＰアップ L4 / SP Up 4
+76: ＳＰアップ L5 / SP Up 5
+77: ＳＰアップ L6 / SP Up 6
+78: ＳＰアップ L7 / SP Up 7
+79: ＳＰアップ L8 / SP Up 8
+80: ＳＰアップ L9 / SP Up 9
+81: エースプラウド / Proud Ace
+82: アタッカー / Attacker
+83: フルカウンター / Perfect Counter
+84: 集中力 L1 / Concentration 1
+85: 集中力 L2 / Concentration 2
+86: 集中力 L3 / Concentration 3
+87: 指揮官 L1 / Commander 1
+88: 指揮官 L2 / Commander 2
+89: 指揮官 L3 / Commander 3
+90: 指揮官 L4 / Commander 4
+91: ニュータイプ L1 / New Type 1
+92: ニュータイプ L2 / New Type 2
+93: ニュータイプ L3 / New Type 3
+94: ニュータイプ L4 / New Type 4
+95: ニュータイプ L5 / New Type 5
+96: ニュータイプ L6 / New Type 6
+97: ニュータイプ L7 / New Type 7
+98: ニュータイプ L8 / New Type 8
+99: ニュータイプ L9 / New Type 9
+100: 強化人間 L1 / Cyber NT 1
+101: 強化人間 L2 / Cyber NT 2
+102: 強化人間 L3 / Cyber NT 3
+103: 強化人間 L4 / Cyber NT 4
+104: 強化人間 L5 / Cyber NT 5
+105: 強化人間 L6 / Cyber NT 6
+106: 強化人間 L7 / Cyber NT 7
+107: 強化人間 L8 / Cyber NT 8
+108: 強化人間 L9 / Cyber NT 9
+109: ヒーロー L1 / Hero 1
+110: ヒーロー L2 / Hero 2
+111: ヒーロー L3 / Hero 3
+112: ヒーロー L4 / Hero 4
+113: ヒーロー L5 / Hero 5
+114: ヒーロー L6 / Hero 6
+115: ヒーロー L7 / Hero 7
+116: ヒーロー L8 / Hero 8
+117: ヒーロー L9 / Hero 9
+118: ＩＦＳ / IFS
+119: 電子の妖精 / Electron Fairy
+120: メールライダー / Mail Rider
+121: 艦隊指揮 / Captain's Order
+122: プレッシャー L1 / Pressure 1
+123: プレッシャー L2 / Pressure 2
+124: プレッシャー L3 / Pressure 3
+125: プレッシャー L4 / Pressure 4
+126: シンクロ率 / Synchro Rate
+</DropDownList>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols>
+    <SymbolEntry>
+      <Name>money_base</Name>
+      <Address>7FF775DA0430</Address>
+    </SymbolEntry>
+  </UserdefinedSymbols>
+  <LuaScript>--[[
+[ENABLE]
+{$lua}
+if syntaxcheck then return end
+]]--
+-- **デバッグモードの設定 (デフォルト: 無効)**
+local debugMode = false
+
+-- AOBScanModule関数
+if not AOBScanModule then
+    function AOBScanModule(moduleName, signature, scanOptions)
+        local baseAddr = nil
+        local maxAddr = 0
+        local modList
+
+        synchronize(function()
+            modList = enumModules()
+        end)
+
+        for _, mod in ipairs(modList) do
+            if string.lower(mod.Name) == string.lower(moduleName) then
+                baseAddr = mod.Address
+                maxAddr = baseAddr + mod.Size
+                break
+            end
+        end
+
+        if not baseAddr then
+            if debugMode then print("❗ Error: Module " .. moduleName .. " not found!") end
+            return nil
+        end
+
+        if debugMode then
+            print(string.format("✔️ %s Base Address: 0x%X", moduleName, baseAddr))
+            print(string.format("🔬 Scanning Range: 0x%X - 0x%X", baseAddr, maxAddr))
+        end
+
+        local ms = createMemScan()
+
+        synchronize(function()
+            ms.firstScan(
+                soExactValue,
+                vtByteArray,
+                nil,
+                signature,
+                nil,
+                baseAddr,
+                maxAddr,
+                scanOptions or "+X+R",
+                fsmNotAligned,
+                "1",
+                true,
+                true,
+                false,
+                false
+            )
+        end)
+
+        ms.waitTillDone()
+
+        local results = createFoundList(ms)
+        results.initialize()
+
+        local addr
+        synchronize(function()
+            if results.getCount() &gt; 0 then
+                addr = results[0]
+            end
+        end)
+
+        if addr then
+            if debugMode then print("🔦 AOB found at: 0x" .. addr) end
+        else
+            if debugMode then print("💔 AOB not found in " .. moduleName) end
+        end
+
+        results.destroy()
+        ms.destroy()
+        return addr
+    end
+end
+
+registerLuaFunctionHighlight('AOBScanModule')
+
+--[[
+test AOBScanModule()
+local aob_addr_str = AOBScanModule("???.exe", "48 8B 05 ?? ?? ?? ?? 33 ED 48 8B 88", "+X+R")
+if aob_addr_str then
+    print("🔦 Final AOB Address: 0x" .. aob_addr_str)
+else
+    print("💔 AOB not found in ???.exe")
+end
+]]--
+
+-- AOBScanModuleN関数
+if not AOBScanModuleN then
+    function AOBScanModuleN(moduleName, signature, maxResults, scanOptions)
+        local baseAddr = nil
+        local maxAddr = 0
+        local modList
+
+        synchronize(function()
+            modList = enumModules()
+        end)
+
+        for _, mod in ipairs(modList) do
+            if string.lower(mod.Name) == string.lower(moduleName) then
+                baseAddr = mod.Address
+                maxAddr = baseAddr + mod.Size
+                break
+            end
+        end
+
+        if not baseAddr then
+            if debugMode then print("❗ Error: Module " .. moduleName .. " not found!") end
+            return nil
+        end
+
+        if debugMode then
+            print(string.format("✔️ %s Base Address: 0x%X", moduleName, baseAddr))
+            print(string.format("🔬 Scanning Range: 0x%X - 0x%X", baseAddr, maxAddr))
+        end
+
+        local ms = createMemScan()
+
+        synchronize(function()
+            ms.firstScan(
+                soExactValue,
+                vtByteArray,
+                nil,
+                signature,
+                nil,
+                baseAddr,
+                maxAddr,
+                scanOptions or "+X+R",
+                fsmNotAligned,
+                "1",
+                true,
+                true,
+                false,
+                false
+            )
+        end)
+
+        ms.waitTillDone()
+
+        local results = createFoundList(ms)
+        results.initialize()
+
+        local addrs = {}
+        synchronize(function()
+            local count = results.getCount()
+            for i = 0, math.min(maxResults - 1, count - 1) do
+                table.insert(addrs, results[i])
+                if debugMode then
+                    print(string.format("🔦 AOB[%d] found at: 0x%s", i + 1, results[i]))
+                end
+            end
+        end)
+
+        if #addrs == 0 and debugMode then
+            print("💔 AOB not found in " .. moduleName)
+        end
+
+        results.destroy()
+        ms.destroy()
+
+        return addrs
+    end
+end
+
+registerLuaFunctionHighlight('AOBScanModuleN')
+
+
+-- 搜尋並取出最多5筆結果
+--[[
+local list = AOBScanModuleN("GameModule.exe", "12 34 56 ?? 78", 5)
+
+if list then
+    for i, addr in ipairs(list) do
+        print(string.format("地址 %d: 0x%s", i, addr))
+    end
+end
+]]--
+
+
+-- Lua scripts that table checkbox will not be checked with "NO_ACTIVATE" in comment/script body
+if not onMemRecPostExecute then
+    function onMemRecPostExecute(memoryrecord, newState, succeeded)
+        if memoryrecord.Type == vtAutoAssembler and memoryrecord.Script:find("NO_ACTIVATE") and newState and succeeded then
+            synchronize(function()
+                memoryrecord.disableWithoutExecute()
+            end)
+        end
+    end
+end
+
+-- Memory record IDs now allowed to be 'locked'
+IDs = {999999, 9999999}
+
+-- Determine event trigger sequence
+if not contains then
+    function contains(table, val)
+       for i = 1, #table do
+          if table[i] == val then
+             return true
+          end
+       end
+       return false
+    end
+end
+
+if not onMemRecPreExecute then
+    function onMemRecPreExecute(memoryrecord, newstate)
+        if contains(IDs, memoryrecord.ID) and newstate then
+            synchronize(function()
+                if not memoryrecord.OnActivate then
+                    memoryrecord.OnActivate = function(memoryrecord, before, currentstate)
+                        return false
+                    end
+                end
+            end)
+        end
+    end
+end
+
+-- Utility Functions
+-- Clear lua engine log
+if not clearLuaLog then
+    function clearLuaLog()
+        synchronize(function()
+          getLuaEngine().MenuItem5.doClick()
+        end)
+    end
+end
+registerLuaFunctionHighlight('clearLuaLog')
+
+-- Close lua engine log
+if not closeLuaEngine then
+    function closeLuaEngine()
+        synchronize(function()
+          getLuaEngine().Close()
+        end)
+    end
+end
+registerLuaFunctionHighlight('closeLuaEngine')
+
+-- Clear lua engine log &amp; close lua engine
+if not closeLuaEngine2 then
+    function closeLuaEngine2()
+        synchronize(function()
+          getLuaEngine().MenuItem5.doClick()
+          getLuaEngine().Close()
+        end)
+    end
+end
+registerLuaFunctionHighlight('closeLuaEngine2')
+
+if not getProcessNameFromPID then
+	function getProcessNameFromPID(pid)
+	  local sl = createStringList()
+	  getProcessList(sl)
+	  local hexPid = string.format("%X", pid):upper()
+
+	  for i = 0, sl.Count - 1 do
+		local entry = sl[i]
+		local hexid, name = entry:match("^(%x+)%-(.+)$")
+		if hexid and name then
+		  if tonumber(hexid, 16) == pid then
+			return name
+		  end
+		end
+	  end
+	  return "(unknown)"
+	end
+end
+registerLuaFunctionHighlight('getProcessNameFromPID')
+
+if not printProcessInfo then
+	function printProcessInfo()
+	  local pid = getOpenedProcessID()
+	  local name = getProcessNameFromPID(pid)
+	  print(string.format("📎 Attached to process: %s (PID: %d / 0x%X)", name, pid, pid))
+	end
+end
+registerLuaFunctionHighlight('printProcessInfo')
+
+if not dumpProcessListAndFindPID then
+	function dumpProcessListAndFindPID()
+	  local pid = getOpenedProcessID()
+	  print(string.format("💭 Current PID: %d / 0x%X", pid, pid))
+
+	  local sl = createStringList()
+	  getProcessList(sl)
+
+	  print("🧾 Dumping process list:")
+	  for i = 0, sl.Count - 1 do
+		local entry = sl[i]
+		print(string.format("[%d] %s", i, entry))
+
+		-- 嘗試解析並比對 PID
+		local name, hexid = entry:match("(.+)%-(%x+)$")
+		if name and hexid then
+		  local parsed = tonumber(hexid, 16)
+		  if parsed == pid then
+			print("🔦 Match found in process list:")
+			print(string.format("Name: %s | PID: %s (0x%s)", name, parsed, hexid))
+		  end
+		end
+	  end
+	end
+end
+registerLuaFunctionHighlight('dumpProcessListAndFindPID')
+
+if not toHex32 then
+	function toHex32(num)
+		local hexstr = "0123456789ABCDEF"
+		local result = ""
+		if num &lt; 0 then
+			num = (num + (1 &lt;&lt; 32)) % (1 &lt;&lt; 32) -- 轉成32-bit補數
+		end
+		for i = 1, 8 do -- 32-bit 一共8個hex位
+			local n = num &amp; 0xF -- 取最低4 bit
+			result = hexstr:sub(n + 1, n + 1) .. result
+			num = num &gt;&gt; 4 -- 右移4 bit
+		end
+		return result
+	end
+end
+registerLuaFunctionHighlight('toHex32')
+
+if not toHex then
+	function toHex(num)
+		local hexstr = "0123456789ABCDEF"
+		local result = ""
+		if num &lt; 0 then
+			num = (num + (1 &lt;&lt; 64)) % (1 &lt;&lt; 64)  -- 轉成64-bit補數
+		end
+		for i = 1, 16 do -- 每4 bit 一個 hex字，64-bit總共16個hex位
+			local n = num &amp; 0xF -- 取最低4bit
+			result = hexstr:sub(n + 1, n + 1) .. result
+			num = num &gt;&gt; 4 -- 右移4bit
+		end
+		return result
+	end
+end	
+registerLuaFunctionHighlight('toHex')
+
+synchronize(function() AddressList.Header.OnSectionClick = nil end)
+--[[
+[DISABLE]
+{$lua}
+
+if AOBScanModule then
+    AOBScanModule = nil
+end
+if onMemRecPostExecute then
+    onMemRecPostExecute = nil
+end
+if onMemRecPreExecute then
+    onMemRecPreExecute = nil
+end
+if clearLuaLog then
+    clearLuaLog = nil
+end
+if closeLuaEngine then
+    closeLuaEngine = nil
+end
+if closeLuaEngine2 then
+    closeLuaEngine2 = nil
+end
+]]--
+</LuaScript>
+</CheatTable>

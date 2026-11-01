@@ -1,0 +1,3781 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="42">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>262</ID>
+      <Description>"MAIN"</Description>
+      <Options moAllowManualCollapseAndExpand="1"/>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>163</ID>
+          <Description>"STATIC LOC"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>4 Bytes</VariableType>
+          <Address>0</Address>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>159</ID>
+              <Description>"SPEED 1"</Description>
+              <VariableType>Float</VariableType>
+              <Address>+68</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>160</ID>
+              <Description>"SPEED 2"</Description>
+              <VariableType>Float</VariableType>
+              <Address>+68+4</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>161</ID>
+              <Description>"SPEED 3"</Description>
+              <VariableType>Float</VariableType>
+              <Address>+84</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>162</ID>
+              <Description>"ACCELERATION"</Description>
+              <VariableType>Float</VariableType>
+              <Address>+7c</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>223</ID>
+          <Description>"TELEPORTER"</Description>
+          <Options moHideChildren="1" moAllowManualCollapseAndExpand="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : gta_sa.exe
+  Version: 
+  Date   : 2020-08-03
+  Author : atult
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,gta_sa.exe,8B 08 8B 40 08 89 44 24 38 8D 85) // should be unique
+alloc(newmem,$1000)
+alloc(loc,4)
+alloc(key,4)
+alloc(t1,100)
+alloc(t2,100)
+alloc(t3,100)
+alloc(t4,100)
+alloc(x1,4)
+alloc(y1,4)
+alloc(z1,4)
+alloc(x2,4)
+alloc(y2,4)
+alloc(z2,4)
+alloc(st,4)
+label(code)
+label(return)
+newmem:
+
+
+code:
+cmp [key],(int)1
+je t1
+cmp [key],(int)2
+je t2
+cmp [key],(int)3
+je t3
+cmp [key],(int)4
+je t4
+mov [loc],eax
+  mov ecx,[eax]
+  mov eax,[eax+08]
+  jmp return
+
+x1:
+dd 0
+x2:
+dd 0
+y1:
+dd 0
+y2:
+dd 0
+z1:
+dd 0
+z2:
+dd 0
+
+t1:
+mov [key],0
+fld [eax]
+fstp [x1]
+fld [eax+4]
+fstp [y1]
+fld [eax+8]
+fstp [z1]
+mov [loc],eax
+mov ecx,[eax]
+mov eax,[eax+08]
+jmp return
+
+t2:
+mov [key],0
+fld [eax]
+fstp [x2]
+fld [eax+4]
+fstp [y2]
+fld [eax+8]
+fstp [z2]
+mov [loc],eax
+mov ecx,[eax]
+mov eax,[eax+08]
+jmp return
+
+t3:
+mov [key],0
+fld [x1]
+fstp [eax]
+fld [y1]
+fstp [eax+4]
+fld [z1]
+fadd [st]
+fstp [eax+8]
+mov [loc],eax
+mov ecx,[eax]
+mov eax,[eax+08]
+jmp return
+
+t4:
+mov [key],0
+fld [x2]
+fstp [eax]
+fld [y2]
+fstp [eax+4]
+fld [z2]
+fadd [st]
+fstp [eax+8]
+mov [loc],eax
+mov ecx,[eax]
+mov eax,[eax+08]
+jmp return
+
+
+st:
+dd (float)2.5
+
+
+INJECT:
+  jmp newmem
+return:
+registersymbol(key)
+registersymbol(loc)
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db 8B 08 8B 40 08
+
+unregistersymbol(key)
+unregistersymbol(loc)
+unregistersymbol(INJECT)
+dealloc(t1)
+dealloc(t2)
+dealloc(t3)
+dealloc(t4)
+dealloc(key)
+dealloc(x1,4)
+dealloc(y1,4)
+dealloc(z1,4)
+dealloc(x2,4)
+dealloc(y2,4)
+dealloc(z2,4)
+dealloc(loc)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "gta_sa.exe"+86E97
+
+"gta_sa.exe"+86E7E: EB 14                 -  jmp gta_sa.exe+86E94
+"gta_sa.exe"+86E80: 83 C0 04              -  add eax,04
+"gta_sa.exe"+86E83: EB 0F                 -  jmp gta_sa.exe+86E94
+"gta_sa.exe"+86E85: 8B 46 14              -  mov eax,[esi+14]
+"gta_sa.exe"+86E88: 85 C0                 -  test eax,eax
+"gta_sa.exe"+86E8A: 74 05                 -  je gta_sa.exe+86E91
+"gta_sa.exe"+86E8C: 83 C0 30              -  add eax,30
+"gta_sa.exe"+86E8F: EB 03                 -  jmp gta_sa.exe+86E94
+"gta_sa.exe"+86E91: 8D 46 04              -  lea eax,[esi+04]
+"gta_sa.exe"+86E94: 8B 50 04              -  mov edx,[eax+04]
+// ---------- INJECTING HERE ----------
+"gta_sa.exe"+86E97: 8B 08                 -  mov ecx,[eax]
+"gta_sa.exe"+86E99: 8B 40 08              -  mov eax,[eax+08]
+// ---------- DONE INJECTING  ----------
+"gta_sa.exe"+86E9C: 89 44 24 38           -  mov [esp+38],eax
+"gta_sa.exe"+86EA0: 8D 85 11 FF FF FF     -  lea eax,[ebp-000000EF]
+"gta_sa.exe"+86EA6: 83 F8 14              -  cmp eax,14
+"gta_sa.exe"+86EA9: 89 4C 24 30           -  mov [esp+30],ecx
+"gta_sa.exe"+86EAD: 89 54 24 34           -  mov [esp+34],edx
+"gta_sa.exe"+86EB1: 77 21                 -  ja gta_sa.exe+86ED4
+"gta_sa.exe"+86EB3: 0F B6 88 30 71 48 00  -  movzx ecx,byte ptr [eax+gta_sa.exe+87130]
+"gta_sa.exe"+86EBA: FF 24 8D 28 71 48 00  -  jmp dword ptr [ecx*4+gta_sa.exe+87128]
+"gta_sa.exe"+86EC1: 56                    -  push esi
+"gta_sa.exe"+86EC2: E8 C9 F2 FF FF        -  call gta_sa.exe+86190
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>224</ID>
+              <Description>"KEY"</Description>
+              <VariableType>4 Bytes</VariableType>
+              <Address>key</Address>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Set Value</Action>
+                  <Keys>
+                    <Key>49</Key>
+                  </Keys>
+                  <Value>1</Value>
+                  <ID>0</ID>
+                </Hotkey>
+                <Hotkey>
+                  <Action>Set Value</Action>
+                  <Keys>
+                    <Key>50</Key>
+                  </Keys>
+                  <Value>2</Value>
+                  <ID>1</ID>
+                </Hotkey>
+                <Hotkey>
+                  <Action>Set Value</Action>
+                  <Keys>
+                    <Key>51</Key>
+                  </Keys>
+                  <Value>3</Value>
+                  <ID>2</ID>
+                </Hotkey>
+                <Hotkey>
+                  <Action>Set Value</Action>
+                  <Keys>
+                    <Key>52</Key>
+                  </Keys>
+                  <Value>4</Value>
+                  <ID>3</ID>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>233</ID>
+          <Description>"BOATS"</Description>
+          <Options moAllowManualCollapseAndExpand="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(CAR_pter,gta_sa.exe,8B 86 F8 04 00 00 E9) // should be unique
+alloc(newmem,$1000)
+alloc(crpa,4)
+label(code)
+label(return)
+registersymbol(crpa)
+
+newmem:
+mov [crpa],esi
+
+code:
+  mov eax,[esi+000004F8]
+  jmp return
+
+CAR_pter:
+  jmp newmem
+  nop
+return:
+registersymbol(CAR_pter)
+
+[DISABLE]
+
+CAR_pter:
+  db 8B 86 F8 04 00 00
+
+unregistersymbol(CAR_pter)
+unregistersymbol(crpa)
+dealloc(crpa)
+dealloc(newmem)
+
+
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>135</ID>
+              <Description>"CAR LOCKED STATE"</Description>
+              <Options moHideChildren="1" moAllowManualCollapseAndExpand="1"/>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>[crpa]+4f8</Address>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>136</ID>
+                  <Description>"CAR HEALTH"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>-38</Address>
+                  <Hotkeys>
+                    <Hotkey>
+                      <Action>Set Value</Action>
+                      <Keys>
+                        <Key>73</Key>
+                      </Keys>
+                      <Value>(CAR HEALTH)*2.0</Value>
+                      <ID>0</ID>
+                    </Hotkey>
+                  </Hotkeys>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>137</ID>
+                  <Description>"X SPEED water"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>-4b4</Address>
+                  <Hotkeys>
+                    <Hotkey>
+                      <Action>Set Value</Action>
+                      <Keys>
+                        <Key>70</Key>
+                      </Keys>
+                      <Value>0</Value>
+                      <ID>2</ID>
+                    </Hotkey>
+                    <Hotkey>
+                      <Action>Set Value</Action>
+                      <Keys>
+                        <Key>66</Key>
+                      </Keys>
+                      <Value>(X SPEED)*2</Value>
+                      <ID>0</ID>
+                    </Hotkey>
+                  </Hotkeys>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>138</ID>
+                  <Description>"Y SPEED water"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>-4b4+4</Address>
+                  <Hotkeys>
+                    <Hotkey>
+                      <Action>Set Value</Action>
+                      <Keys>
+                        <Key>66</Key>
+                      </Keys>
+                      <Value>(Y SPEED)*2</Value>
+                      <ID>0</ID>
+                    </Hotkey>
+                    <Hotkey>
+                      <Action>Set Value</Action>
+                      <Keys>
+                        <Key>70</Key>
+                      </Keys>
+                      <Value>0</Value>
+                      <ID>2</ID>
+                    </Hotkey>
+                  </Hotkeys>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>139</ID>
+                  <Description>"Z SPEED water"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>-4b4+8</Address>
+                  <Hotkeys>
+                    <Hotkey>
+                      <Action>Increase Value</Action>
+                      <Keys>
+                        <Key>87</Key>
+                      </Keys>
+                      <Value>0.1</Value>
+                      <ID>0</ID>
+                    </Hotkey>
+                    <Hotkey>
+                      <Action>Set Value</Action>
+                      <Keys>
+                        <Key>70</Key>
+                      </Keys>
+                      <Value>0</Value>
+                      <ID>1</ID>
+                    </Hotkey>
+                  </Hotkeys>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>164</ID>
+                  <Description>"MASS"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>-46c</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>165</ID>
+                  <Description>"TURN MASS"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>-46c+4</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>166</ID>
+                  <Description>"GRIP"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>-46c+8</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>140</ID>
+                  <Description>"HOR FLIP"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>-4b4+8+4</Address>
+                  <Hotkeys>
+                    <Hotkey>
+                      <Action>Set Value</Action>
+                      <Keys>
+                        <Key>16</Key>
+                      </Keys>
+                      <Value>0.1</Value>
+                      <ID>0</ID>
+                    </Hotkey>
+                  </Hotkeys>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>142</ID>
+                  <Description>"HOR ROTATE"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>-4b4+8+4+8</Address>
+                  <Hotkeys>
+                    <Hotkey>
+                      <Action>Set Value</Action>
+                      <Keys>
+                        <Key>82</Key>
+                      </Keys>
+                      <Value>0.8</Value>
+                      <ID>0</ID>
+                    </Hotkey>
+                  </Hotkeys>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>150</ID>
+                  <Description>"DRAG"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>-460</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>158</ID>
+                  <Description>"STATIC LOC PTR"</Description>
+                  <ShowAsHex>1</ShowAsHex>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>-174</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>263</ID>
+                  <Description>"Gear System 3"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>{$lua}
+
+if synataxcheck then return end
+
+[ENABLE]
+
+local mul=1.1
+local climb_mul=3
+local gearMul=3
+local rangeShifter=0.3
+local Top_Speed=0.1
+local reverse_speed=0.2
+local speedXString='X SPEED water'
+local speedYString='Y SPEED water'
+local speedZString='Z SPEED water'
+
+--Instructions
+--mul is the multiplier by which the car will accelerate if the speed of the car is lower than top speed.
+--gearMul is the multiplier by which the speed of the car will be brought down if it is higher than the top Speed.
+--climb_mul is the power for climbing mountains(the higher the stronger).Avoid this in normal driving conditions.
+--rangeShifter is the multiplier by which the range will be added to calculate the new top speed.
+--reverse_speed is the constant speed at which the vehicle will travel in the reverse direction at the time of activation of reverser hotkey.
+--Up is the initial top speed
+--In this,range is adjusted by constants.
+--Gear is increased by W and decreased by S
+--When trying to use this script in a game just adjust speedStrings , Top_Speed and rangeShifter depending on the game.
+
+
+local TempUp=Top_Speed
+local temp_mul=mul
+local rflag=false
+local dirx=0
+local diry=0
+
+
+t=getAddressList()
+x=t.getMemoryRecordByDescription(speedXString)
+y=t.getMemoryRecordByDescription(speedYString)
+
+
+function adjustSpeed(x,y,tempUp,speedUp)
+r=((x.Value^2)+(y.Value^2))^0.5
+if tempUp&gt;0 then
+	if r&lt;=tempUp then
+      if r*mul&lt;=tempUp then
+        if speedUp then
+          x.Value=x.Value*mul
+          y.Value=y.Value*mul
+        end
+      else
+        if speedUp then
+          local ratio=tempUp/r
+          x.Value=x.Value*ratio
+          y.Value=y.Value*ratio
+        end
+      end
+    else
+      if (r/gearMul)&gt;=tempUp then
+        x.Value=x.Value/gearMul
+        y.Value=y.Value/gearMul
+      else
+        local ratio=tempUp/r
+        x.Value=x.Value*ratio
+        y.Value=y.Value*ratio
+      end
+	end
+else
+	if rflag==false then
+	    rflag=true
+		dirx=(x.Value/r)*(-1)
+		diry=(y.Value/r)*(-1)
+	end
+	  x.Value=dirx*reverse_speed
+	  y.Value=diry*reverse_speed
+	end
+end
+
+
+normal=createHotkey(function()
+adjustSpeed(x,y,TempUp,true)
+end,0x26) --UP key
+
+
+up=createHotkey(function()
+TempUp=TempUp+rangeShifter
+adjustSpeed(x,y,TempUp,false)
+end,0x57) --W
+
+down=createHotkey(function()
+TempUp=TempUp-rangeShifter
+adjustSpeed(x,y,TempUp,false)
+end,0x53) --S
+
+reset=createHotkey(function()
+TempUp=Top_Speed
+rflag=false
+adjustSpeed(x,y,TempUp,false)
+end,0x20) --SPACE
+
+
+mulInc=createHotkey(function()
+mul=climb_mul
+end,0x45) --E
+
+mulDec=createHotkey(function()
+mul=temp_mul
+end,0x44) --D
+
+reverser=createHotkey(function()
+TempUp=-1
+adjustSpeed(x,y,TempUp,false)
+end,0x52)
+
+
+[DISABLE]
+normal.destroy()
+up.destroy()
+down.destroy()
+reset.destroy()
+mulInc.destroy()
+mulDec.destroy()
+reverser.destroy()
+</AssemblerScript>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>234</ID>
+          <Description>"ROAD CARS"</Description>
+          <Options moAllowManualCollapseAndExpand="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(CAR_pter,gta_sa.exe,8B 86 F8 04 00 00 E9) // should be unique
+alloc(newmem,$1000)
+alloc(crp,4)
+label(code)
+label(return)
+registersymbol(crp)
+
+newmem:
+mov [crp],esi
+
+code:
+  mov eax,[esi+000004F8]
+  jmp return
+
+CAR_pter:
+  jmp newmem
+  nop
+return:
+registersymbol(CAR_pter)
+
+[DISABLE]
+
+CAR_pter:
+  db 8B 86 F8 04 00 00
+
+unregistersymbol(CAR_pter)
+unregistersymbol(crp)
+dealloc(crp)
+dealloc(newmem)
+
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>235</ID>
+              <Description>"CAR LOCKED STATE"</Description>
+              <Options moHideChildren="1" moAllowManualCollapseAndExpand="1"/>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>[crp]+4f8</Address>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>236</ID>
+                  <Description>"CAR HEALTH"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>-38</Address>
+                  <Hotkeys>
+                    <Hotkey>
+                      <Action>Set Value</Action>
+                      <Keys>
+                        <Key>73</Key>
+                      </Keys>
+                      <Value>(CAR HEALTH)*2.0</Value>
+                      <ID>0</ID>
+                    </Hotkey>
+                  </Hotkeys>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>237</ID>
+                  <Description>"X SPEED road"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>-4b4</Address>
+                  <Hotkeys>
+                    <Hotkey>
+                      <Action>Set Value</Action>
+                      <Keys>
+                        <Key>70</Key>
+                      </Keys>
+                      <Value>0</Value>
+                      <ID>0</ID>
+                    </Hotkey>
+                  </Hotkeys>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>238</ID>
+                  <Description>"Y SPEED road"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>-4b4+4</Address>
+                  <Hotkeys>
+                    <Hotkey>
+                      <Action>Set Value</Action>
+                      <Keys>
+                        <Key>70</Key>
+                      </Keys>
+                      <Value>0</Value>
+                      <ID>2</ID>
+                    </Hotkey>
+                  </Hotkeys>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>239</ID>
+                  <Description>"Z SPEED road"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>-4b4+8</Address>
+                  <Hotkeys>
+                    <Hotkey>
+                      <Action>Increase Value</Action>
+                      <Keys>
+                        <Key>71</Key>
+                      </Keys>
+                      <Value>0.15</Value>
+                      <ID>0</ID>
+                    </Hotkey>
+                    <Hotkey>
+                      <Action>Set Value</Action>
+                      <Keys>
+                        <Key>70</Key>
+                      </Keys>
+                      <Value>0</Value>
+                      <ID>1</ID>
+                    </Hotkey>
+                  </Hotkeys>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>240</ID>
+                  <Description>"MASS"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>-46c</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>241</ID>
+                  <Description>"TURN MASS"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>-46c+4</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>242</ID>
+                  <Description>"GRIP"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>-46c+8</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>243</ID>
+                  <Description>"HOR FLIP"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>-4b4+8+4</Address>
+                  <Hotkeys>
+                    <Hotkey>
+                      <Action>Set Value</Action>
+                      <Keys>
+                        <Key>16</Key>
+                      </Keys>
+                      <Value>0.1</Value>
+                      <ID>0</ID>
+                    </Hotkey>
+                  </Hotkeys>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>244</ID>
+                  <Description>"HOR ROTATE road"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>-4b4+8+4+8</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>245</ID>
+                  <Description>"DRAG"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>-460</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>246</ID>
+                  <Description>"STATIC LOC PTR"</Description>
+                  <ShowAsHex>1</ShowAsHex>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>-174</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>257</ID>
+                  <Description>"Speeder"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>{$lua}
+
+[ENABLE]
+
+local multi=1.03
+
+
+hk1=createHotkey(function()
+x=readFloat('[crp]+4f8-4b4')
+y=readFloat('[crp]+4f8-4b4+4')
+writeFloat('[crp]+4f8-4b4',x*multi)
+writeFloat('[crp]+4f8-4b4+4',y*multi)
+end,0x26)
+
+
+
+
+[DISABLE]
+
+hk1.destroy()
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>256</ID>
+                  <Description>"Gear System"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>{$lua}
+
+[ENABLE]
+
+local mul=1+3e-3
+local rangeMultiplier=2
+local Up=0.1
+local Down=0
+local div=0.85
+local motion=1e-3
+local speedXString='X SPEED road'
+local speedYString='Y SPEED road'
+
+
+
+--Gear is increased by W and decreased by S
+
+local TempUp=Up
+local TempDown=Down
+
+
+
+hk1=createHotkey(function()
+t=getAddressList()
+x=t.getMemoryRecordByDescription(speedXString)
+y=t.getMemoryRecordByDescription(speedYString)
+r=((x.Value^2)+(y.Value^2))^0.5
+if r&gt;=motion then
+if r&gt;TempUp then
+ratio=TempUp/r
+x.Value=x.Value*ratio
+y.Value=y.Value*ratio
+elseif r&lt;TempDown then
+ratio=TempDown/r
+x.Value=x.Value*ratio
+y.Value=y.Value*ratio
+else
+x.Value=x.Value*mul
+y.Value=y.Value*mul
+end
+end
+end,0x26)
+
+
+
+hk2=createHotkey(function()
+x=getAddressList().getMemoryRecordByDescription(speedXString)
+y=getAddressList().getMemoryRecordByDescription(speedYString)
+r=((x.Value^2)+(y.Value^2))^0.5
+if r&gt;=motion then
+if r&gt;TempDown then
+x.Value=x.Value*div
+y.Value=y.Value*div
+else
+ratio=TempDown/r
+x.Value=x.Value*ratio
+y.Value=y.Value*ratio
+end
+end
+end,0x28)
+
+
+hk3=createHotkey(function()
+TempDown=TempUp
+TempUp=TempUp*rangeMultiplier
+t=getAddressList()
+x=t.getMemoryRecordByDescription(speedXString)
+y=t.getMemoryRecordByDescription(speedYString)
+r=((x.Value^2)+(y.Value^2))^0.5
+if r&gt;=motion then
+ratio=TempDown/r
+x.Value=x.Value*ratio
+y.Value=y.Value*ratio
+end
+speak('Gear Up')
+end,0x57)
+
+hk6=createHotkey(function()
+TempUp=TempDown
+TempDown=TempDown/rangeMultiplier
+t=getAddressList()
+x=t.getMemoryRecordByDescription(speedXString)
+y=t.getMemoryRecordByDescription(speedYString)
+r=((x.Value^2)+(y.Value^2))^0.5
+if r&gt;=motion then
+mid=(TempUp+TempDown)/2
+ratio=mid/r
+x.Value=x.Value*ratio
+y.Value=y.Value*ratio
+end
+speak('Gear Down')
+end,0x53)
+
+hk7=createHotkey(function()
+TempUp=Up
+TempDown=Down
+t=getAddressList()
+x=t.getMemoryRecordByDescription(speedXString)
+y=t.getMemoryRecordByDescription(speedYString)
+r=((x.Value^2)+(y.Value^2))^0.5
+if r&gt;=motion then
+ratio=TempUp/r
+x.Value=x.Value*ratio
+y.Value=y.Value*ratio
+end
+speak('Reset')
+end,0x52)
+
+
+
+[DISABLE]
+hk1.destroy()
+hk2.destroy()
+hk3.destroy()
+hk6.destroy()
+hk7.destroy()
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>258</ID>
+                  <Description>"Gear System 2"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>{$lua}
+
+if synataxcheck then return end
+
+[ENABLE]
+
+local mul=1+3e-3
+local gearMul=2
+local rangeShifter=0.15
+local Up=0.08
+local Down=0
+local motion=0.001
+local speedXString='X SPEED road'
+local speedYString='Y SPEED road'
+local speedZString='Z SPEED road'
+
+--Instructions
+--mul is the speed by which the car will accelerate if the speed of the car is in range of (TempUp,TempDown)
+--gearMul is the speed by which the car will be forced such that finally the speed of the car comes under the range of (TempUp,TempDown).Setting a higher value for gearMul will result in huge jerks but lower value for this will result in late input reaction.
+--rangeMultiplier is the multiplier by which the range will be multiplied to calculate the new bottom and top speed.
+--Up is the initial top speed
+-- Down is the initial bottom speed
+--motion is the threshold for the speed of the car so that script may start to work normally.
+--In this,range is adjusted by constants.
+--Gear is increased by W and decreased by S
+
+local TempUp=Up
+local TempDown=Down
+
+
+t=getAddressList()
+x=t.getMemoryRecordByDescription(speedXString)
+y=t.getMemoryRecordByDescription(speedYString)
+z=t.getMemoryRecordByDescription(speedZString)
+
+
+function adjustSpeed(x,y,tempUp,tempDown,speedUp)
+
+	r=((x.Value^2)+(y.Value^2)+(z.Value^2))^0.5
+	if r&lt;tempDown then
+		if r*gearMul&lt;=tempDown then
+			x.Value=x.Value*gearMul
+			y.Value=y.Value*gearMul
+            z.Value=z.Value*gearMul
+		else
+			ratio=tempDown/r
+			x.Value=x.Value*ratio
+			y.Value=y.Value*ratio
+            z.Value=z.Value*ratio
+		end
+	elseif r&gt;=tempDown and r&lt;tempUp then
+		if r*mul&lt;=tempUp then
+			if speedUp then
+				x.Value=x.Value*mul
+				y.Value=y.Value*mul
+                z.Value=z.Value*mul
+            else
+                x.Value=x.Value/mul
+				y.Value=y.Value/mul
+                z.Value=z.Value/mul
+			end
+		else
+			ratio=tempUp/r
+			x.Value=x.Value*ratio
+			y.Value=y.Value*ratio
+            z.Value=z.Value*ratio
+		end
+	else
+		if r/gearMul&gt;tempUp then
+			x.Value=x.Value/gearMul
+			y.Value=y.Value/gearMul
+            z.Value=z.Value/gearMul
+		else
+			ratio=tempUp/r
+			x.Value=x.Value*ratio
+			y.Value=y.Value*ratio
+            z.Value=z.Value*ratio
+		end
+	end
+end
+
+
+hk1=createHotkey(function()
+adjustSpeed(x,y,TempUp,TempDown,1)
+end,0x26)
+
+
+hk3=createHotkey(function()
+TempDown=TempUp
+TempUp=TempUp+rangeShifter
+adjustSpeed(x,y,TempUp,TempDown)
+end,0x57)
+
+hk6=createHotkey(function()
+TempUp=TempDown
+TempDown=TempDown-rangeShifter
+adjustSpeed(x,y,TempUp,TempDown,1)
+end,0x53)
+
+hk7=createHotkey(function()
+TempUp=Up
+TempDown=Down
+adjustSpeed(x,y,TempUp,TempDown,1)
+end,0x20)
+
+
+stop=createHotkey(function()
+x.Value=0
+y.Value=0
+z.Value=0
+end,0x52)
+
+
+[DISABLE]
+hk1.destroy()
+hk3.destroy()
+hk6.destroy()
+hk7.destroy()
+stop.destroy()
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>261</ID>
+                  <Description>"Gear System 3"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>{$lua}
+
+if synataxcheck then return end
+
+[ENABLE]
+
+local mul=1.1
+local climb_mul=3
+local gearMul=1.3
+local rangeShifter=0.2
+local Top_Speed=0.05
+local reverse_speed=0.2
+local speedXString='X SPEED road'
+local speedYString='Y SPEED road'
+local speedZString='Z SPEED road'
+
+--Instructions
+--mul is the multiplier by which the car will accelerate if the speed of the car is lower than top speed.
+--gearMul is the multiplier by which the speed of the car will be brought down if it is higher than the top Speed.
+--climb_mul is the power for climbing mountains(the higher the stronger).Avoid this in normal driving conditions.
+--rangeShifter is the multiplier by which the range will be added to calculate the new top speed.
+--reverse_speed is the constant speed at which the vehicle will travel in the reverse direction at the time of activation of reverser hotkey.
+--Up is the initial top speed
+--In this,range is adjusted by constants.
+--Gear is increased by W and decreased by S
+--When trying to use this script in a game just adjust speedStrings , Top_Speed and rangeShifter depending on the game.
+
+
+local TempUp=Top_Speed
+local temp_mul=mul
+local rflag=false
+local dirx=0
+local diry=0
+
+
+t=getAddressList()
+x=t.getMemoryRecordByDescription(speedXString)
+y=t.getMemoryRecordByDescription(speedYString)
+z=t.getMemoryRecordByDescription(speedZString)
+
+timer=createTimer()
+timer.Interval=200
+timer.OnTimer=function()
+if x==nil or x.Value==nil then return end
+if isKeyPressed(0x26)  then --up key
+adjustSpeed(x,y,TempUp,true)
+else
+adjustSpeed(x,y,TempUp,false)
+end
+end
+
+timer.Enabled=true
+
+
+
+function adjustSpeed(x,y,tempUp,speedUp)
+r=((x.Value^2)+(y.Value^2)+(z.Value^2))^0.5
+if tempUp&gt;0 then
+	if r&lt;=tempUp then
+      if r*mul&lt;=tempUp then
+        if speedUp then
+          x.Value=x.Value*mul
+          y.Value=y.Value*mul
+          z.Value=z.Value*mul
+        end
+      else
+        if speedUp then
+          local ratio=tempUp/r
+          x.Value=x.Value*ratio
+          y.Value=y.Value*ratio
+          z.Value=z.Value*ratio
+        end
+      end
+    else
+      if (r/gearMul)&gt;=tempUp then
+        x.Value=x.Value/gearMul
+        y.Value=y.Value/gearMul
+        z.Value=z.Value/gearMul
+      else
+        local ratio=tempUp/r
+        x.Value=x.Value*ratio
+        y.Value=y.Value*ratio
+        z.Value=z.Value*ratio
+      end
+	end
+else
+	if rflag==false then
+	    rflag=true
+		dirx=(x.Value/r)*(-1)
+		diry=(y.Value/r)*(-1)
+	end
+	  x.Value=dirx*reverse_speed
+	  y.Value=diry*reverse_speed
+	end
+end
+
+
+
+
+up=createHotkey(function()
+TempUp=TempUp+rangeShifter
+adjustSpeed(x,y,TempUp,false)
+end,0x57) --W
+
+down=createHotkey(function()
+TempUp=TempUp-rangeShifter
+adjustSpeed(x,y,TempUp,false)
+end,0x53) --S
+
+reset=createHotkey(function()
+TempUp=Top_Speed
+rflag=false
+adjustSpeed(x,y,TempUp,false)
+end,0x20) --SPACE
+
+
+mulInc=createHotkey(function()
+mul=climb_mul
+end,0x45) --E
+
+mulDec=createHotkey(function()
+mul=temp_mul
+end,0x44) --D
+
+reverser=createHotkey(function()
+TempUp=-1
+adjustSpeed(x,y,TempUp,false)
+end,0x52)
+
+
+[DISABLE]
+up.destroy()
+down.destroy()
+reset.destroy()
+mulInc.destroy()
+mulDec.destroy()
+reverser.destroy()
+timer.destroy()
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>260</ID>
+                  <Description>"Breaker"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>{$lua}
+
+if syntaxcheck then return end
+
+[ENABLE]
+
+local breakStrength=1.3
+local t=getAddressList()
+local x=t.getMemoryRecordByDescription('X SPEED road')
+local y=t.getMemoryRecordByDescription('Y SPEED road')
+local z=t.getMemoryRecordByDescription('Z SPEED road')
+
+
+breaker=createHotkey(function()
+x.Value=x.Value/breakStrength
+y.Value=y.Value/breakStrength
+z.Value=z.Value/breakStrength
+end,0x28)
+
+
+[DISABLE]
+breaker.destroy()
+
+
+</AssemblerScript>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>198</ID>
+          <Description>"CJ LOCATION AND SPEEDER"</Description>
+          <Options moAllowManualCollapseAndExpand="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : gta_sa.exe
+  Version: 
+  Date   : 2020-08-03
+  Author : atult
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(speeder,gta_sa.exe,8B 08 8B 40 08 89 44 24 38 8D 85) // should be unique
+alloc(newmem,$1000)
+alloc(loc,4)
+alloc(amp,4)
+alloc(booster,100)
+alloc(htkey,4)
+label(code)
+label(return)
+newmem:
+
+
+code:
+cmp [htkey],1
+je booster
+mov [loc],eax
+  mov ecx,[eax]
+  mov eax,[eax+08]
+  jmp return
+
+booster:
+mov [htkey],0
+fld [eax-20]
+fmul [amp]
+fstp [eax-20]
+fld [eax-1C]
+fmul [amp]
+fstp [eax-1C]
+mov [loc],eax
+  mov ecx,[eax]
+  mov eax,[eax+08]
+  jmp return
+
+htkey:
+dd 0
+
+amp:
+dd (float)30.0
+
+speeder:
+  jmp newmem
+return:
+registersymbol(htkey)
+registersymbol(amp)
+registersymbol(loc)
+registersymbol(speeder)
+
+[DISABLE]
+
+speeder:
+  db 8B 08 8B 40 08
+unregistersymbol(htkey)
+unregistersymbol(amp)
+unregistersymbol(loc)
+unregistersymbol(speeder)
+dealloc(amp)
+dealloc(booster)
+dealloc(htkey)
+dealloc(loc)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "gta_sa.exe"+86E97
+
+"gta_sa.exe"+86E7E: EB 14                 -  jmp gta_sa.exe+86E94
+"gta_sa.exe"+86E80: 83 C0 04              -  add eax,04
+"gta_sa.exe"+86E83: EB 0F                 -  jmp gta_sa.exe+86E94
+"gta_sa.exe"+86E85: 8B 46 14              -  mov eax,[esi+14]
+"gta_sa.exe"+86E88: 85 C0                 -  test eax,eax
+"gta_sa.exe"+86E8A: 74 05                 -  je gta_sa.exe+86E91
+"gta_sa.exe"+86E8C: 83 C0 30              -  add eax,30
+"gta_sa.exe"+86E8F: EB 03                 -  jmp gta_sa.exe+86E94
+"gta_sa.exe"+86E91: 8D 46 04              -  lea eax,[esi+04]
+"gta_sa.exe"+86E94: 8B 50 04              -  mov edx,[eax+04]
+// ---------- INJECTING HERE ----------
+"gta_sa.exe"+86E97: 8B 08                 -  mov ecx,[eax]
+"gta_sa.exe"+86E99: 8B 40 08              -  mov eax,[eax+08]
+// ---------- DONE INJECTING  ----------
+"gta_sa.exe"+86E9C: 89 44 24 38           -  mov [esp+38],eax
+"gta_sa.exe"+86EA0: 8D 85 11 FF FF FF     -  lea eax,[ebp-000000EF]
+"gta_sa.exe"+86EA6: 83 F8 14              -  cmp eax,14
+"gta_sa.exe"+86EA9: 89 4C 24 30           -  mov [esp+30],ecx
+"gta_sa.exe"+86EAD: 89 54 24 34           -  mov [esp+34],edx
+"gta_sa.exe"+86EB1: 77 21                 -  ja gta_sa.exe+86ED4
+"gta_sa.exe"+86EB3: 0F B6 88 30 71 48 00  -  movzx ecx,byte ptr [eax+gta_sa.exe+87130]
+"gta_sa.exe"+86EBA: FF 24 8D 28 71 48 00  -  jmp dword ptr [ecx*4+gta_sa.exe+87128]
+"gta_sa.exe"+86EC1: 56                    -  push esi
+"gta_sa.exe"+86EC2: E8 C9 F2 FF FF        -  call gta_sa.exe+86190
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>199</ID>
+              <Description>"X"</Description>
+              <VariableType>Float</VariableType>
+              <Address>[loc]</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>200</ID>
+              <Description>"Y"</Description>
+              <VariableType>Float</VariableType>
+              <Address>[loc]+4</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>202</ID>
+              <Description>"Z"</Description>
+              <VariableType>Float</VariableType>
+              <Address>[loc]+8</Address>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Increase Value</Action>
+                  <Keys>
+                    <Key>66</Key>
+                  </Keys>
+                  <Value>15</Value>
+                  <ID>0</ID>
+                </Hotkey>
+                <Hotkey>
+                  <Action>Decrease Value</Action>
+                  <Keys>
+                    <Key>78</Key>
+                  </Keys>
+                  <Value>15</Value>
+                  <ID>1</ID>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>226</ID>
+              <Description>"HTKEY"</Description>
+              <VariableType>4 Bytes</VariableType>
+              <Address>htkey</Address>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Set Value</Action>
+                  <Keys>
+                    <Key>87</Key>
+                  </Keys>
+                  <Value>1</Value>
+                  <ID>0</ID>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>227</ID>
+              <Description>"AMP"</Description>
+              <VariableType>Float</VariableType>
+              <Address>amp</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>204</ID>
+          <Description>"CAR SPEED"</Description>
+          <Options moHideChildren="1" moAllowManualCollapseAndExpand="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : gta_sa.exe
+  Version: 
+  Date   : 2020-08-07
+  Author : atult
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(cspeed,gta_sa.exe,8B 01 8B 51 04 89 44 24 10) // should be unique
+alloc(newmem,$1000)
+alloc(flag,4)
+alloc(multi,4)
+alloc(ref,4)
+label(code)
+label(return)
+
+newmem:
+
+code:
+mov [ecx+47c],(float)10000.0
+mov [ref],ecx
+mov ecx,[ref]
+cmp [flag],1
+je atul
+cmp [flag],2
+je tikku
+  mov eax,[ecx]
+  mov edx,[ecx+04]
+  jmp return
+
+
+atul:
+mov [flag],0
+mov [multi],(float)1.0125
+fld [ecx]
+fmul [multi]
+fstp [ecx]
+fld [ecx+04]
+fmul [multi]
+fstp [ecx+04]
+fld [ecx+08]
+fmul [multi]
+fstp [ecx+08]
+mov eax,[ecx]
+  mov edx,[ecx+04]
+  jmp return
+
+tikku:
+mov [flag],0
+mov [multi],(float)0.7
+fld [ecx]
+fmul [multi]
+fstp [ecx]
+fld [ecx+04]
+fmul [multi]
+fstp [ecx+04]
+fld [ecx+08]
+fmul [multi]
+fstp [ecx+08]
+mov eax,[ecx]
+  mov edx,[ecx+04]
+  jmp return
+
+
+flag:
+dd 0
+
+multi:
+dd (float)1.0125
+
+
+cspeed:
+  jmp newmem
+return:
+registersymbol(ref)
+registersymbol(flag)
+registersymbol(multi)
+registersymbol(cspeed)
+
+[DISABLE]
+
+cspeed:
+  db 8B 01 8B 51 04
+unregistersymbol(ref)
+unregistersymbol(flag)
+unregistersymbol(multi)
+unregistersymbol(cspeed)
+dealloc(multi)
+dealloc(flag)
+dealloc(ref)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "gta_sa.exe"+13D580
+
+"gta_sa.exe"+13D561: 83 C4 04           -  add esp,04
+"gta_sa.exe"+13D564: 3B C3              -  cmp eax,ebx
+"gta_sa.exe"+13D566: 74 7B              -  je gta_sa.exe+13D5E3
+"gta_sa.exe"+13D568: 8B 88 6C 04 00 00  -  mov ecx,[eax+0000046C]
+"gta_sa.exe"+13D56E: F6 C5 01           -  test ch,01
+"gta_sa.exe"+13D571: 74 1B              -  je gta_sa.exe+13D58E
+"gta_sa.exe"+13D573: 8B 88 8C 05 00 00  -  mov ecx,[eax+0000058C]
+"gta_sa.exe"+13D579: 3B CB              -  cmp ecx,ebx
+"gta_sa.exe"+13D57B: 74 11              -  je gta_sa.exe+13D58E
+"gta_sa.exe"+13D57D: 83 C1 44           -  add ecx,44
+// ---------- INJECTING HERE ----------
+"gta_sa.exe"+13D580: 8B 01              -  mov eax,[ecx]
+"gta_sa.exe"+13D582: 8B 51 04           -  mov edx,[ecx+04]
+// ---------- DONE INJECTING  ----------
+"gta_sa.exe"+13D585: 89 44 24 10        -  mov [esp+10],eax
+"gta_sa.exe"+13D589: 8B 41 08           -  mov eax,[ecx+08]
+"gta_sa.exe"+13D58C: EB 0F              -  jmp gta_sa.exe+13D59D
+"gta_sa.exe"+13D58E: 83 C0 44           -  add eax,44
+"gta_sa.exe"+13D591: 8B 08              -  mov ecx,[eax]
+"gta_sa.exe"+13D593: 8B 50 04           -  mov edx,[eax+04]
+"gta_sa.exe"+13D596: 8B 40 08           -  mov eax,[eax+08]
+"gta_sa.exe"+13D599: 89 4C 24 10        -  mov [esp+10],ecx
+"gta_sa.exe"+13D59D: D9 44 24 10        -  fld dword ptr [esp+10]
+"gta_sa.exe"+13D5A1: 89 54 24 14        -  mov [esp+14],edx
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>205</ID>
+              <Description>"FLAG"</Description>
+              <VariableType>4 Bytes</VariableType>
+              <Address>flag</Address>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Set Value</Action>
+                  <Keys>
+                    <Key>38</Key>
+                  </Keys>
+                  <Value>1</Value>
+                  <ID>0</ID>
+                </Hotkey>
+                <Hotkey>
+                  <Action>Set Value</Action>
+                  <Keys>
+                    <Key>87</Key>
+                  </Keys>
+                  <Value>1</Value>
+                  <ID>1</ID>
+                </Hotkey>
+                <Hotkey>
+                  <Action>Set Value</Action>
+                  <Keys>
+                    <Key>83</Key>
+                  </Keys>
+                  <Value>2</Value>
+                  <ID>2</ID>
+                </Hotkey>
+                <Hotkey>
+                  <Action>Set Value</Action>
+                  <Keys>
+                    <Key>40</Key>
+                  </Keys>
+                  <Value>2</Value>
+                  <ID>3</ID>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>206</ID>
+              <Description>"MULTIPLIER"</Description>
+              <VariableType>Float</VariableType>
+              <Address>multi</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>207</ID>
+              <Description>"X"</Description>
+              <VariableType>Float</VariableType>
+              <Address>[ref]</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>208</ID>
+              <Description>"Y"</Description>
+              <VariableType>Float</VariableType>
+              <Address>[ref]+4</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>209</ID>
+              <Description>"Z"</Description>
+              <VariableType>Float</VariableType>
+              <Address>[ref]+8</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>219</ID>
+              <Description>"FLIP"</Description>
+              <VariableType>Float</VariableType>
+              <Address>[ref]+8+8</Address>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Set Value</Action>
+                  <Keys>
+                    <Key>16</Key>
+                  </Keys>
+                  <Value>0.1</Value>
+                  <ID>0</ID>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>210</ID>
+              <Description>"HEALTH"</Description>
+              <VariableType>4 Bytes</VariableType>
+              <Address>[ref]+47c</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>218</ID>
+          <Description>"OHK(with armour)"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : gta_sa.exe
+  Version: 
+  Date   : 2020-08-08
+  Author : atult
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(one,gta_sa.exe,D9 86 40 05 00 00 D8 1D * * * * C6) // should be unique
+alloc(newmem,$1000)
+label(code)
+label(return)
+
+newmem:
+
+code:
+cmp [esi+548],#0
+je ohk
+mov [esi+540],(float)1000.0
+mov [esi+548],(float)1000.0
+  fld dword ptr [esi+00000540]
+  jmp return
+
+ohk:
+mov [esi+540],(float)0.0
+fld dword ptr [esi+00000540]
+  jmp return
+
+one:
+  jmp newmem
+  nop
+return:
+registersymbol(one)
+
+[DISABLE]
+
+one:
+  db D9 86 40 05 00 00
+
+unregistersymbol(one)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "gta_sa.exe"+33ADE1
+
+"gta_sa.exe"+33ADC5: 50                                -  push eax
+"gta_sa.exe"+33ADC6: 6A 00                             -  push 00
+"gta_sa.exe"+33ADC8: 51                                -  push ecx
+"gta_sa.exe"+33ADC9: 57                                -  push edi
+"gta_sa.exe"+33ADCA: 53                                -  push ebx
+"gta_sa.exe"+33ADCB: 52                                -  push edx
+"gta_sa.exe"+33ADCC: 55                                -  push ebp
+"gta_sa.exe"+33ADCD: 8D 4C 24 44                       -  lea ecx,[esp+44]
+"gta_sa.exe"+33ADD1: C7 84 24 90 00 00 00 00 00 00 00  -  mov [esp+00000090],00000000
+"gta_sa.exe"+33ADDC: E8 CF 2A D7 FF                    -  call gta_sa.exe+AD8B0
+// ---------- INJECTING HERE ----------
+"gta_sa.exe"+33ADE1: D9 86 40 05 00 00                 -  fld dword ptr [esi+00000540]
+// ---------- DONE INJECTING  ----------
+"gta_sa.exe"+33ADE7: D8 1D 50 9B 85 00                 -  fcomp dword ptr [gta_sa.exe+459B50]
+"gta_sa.exe"+33ADED: C6 44 24 74 01                    -  mov byte ptr [esp+74],01
+"gta_sa.exe"+33ADF2: DF E0                             -  fnstsw ax
+"gta_sa.exe"+33ADF4: F6 C4 41                          -  test ah,41
+"gta_sa.exe"+33ADF7: 0F 8A A6 00 00 00                 -  jp gta_sa.exe+33AEA3
+"gta_sa.exe"+33ADFD: E8 CE 28 E3 FF                    -  call gta_sa.exe+16D6D0
+"gta_sa.exe"+33AE02: 84 C0                             -  test al,al
+"gta_sa.exe"+33AE04: 0F 84 99 00 00 00                 -  je gta_sa.exe+33AEA3
+"gta_sa.exe"+33AE0A: E8 01 29 E3 FF                    -  call gta_sa.exe+16D710
+"gta_sa.exe"+33AE0F: 84 C0                             -  test al,al
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>222</ID>
+          <Description>"CAR FAST EXPLOSION"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : gta_sa.exe
+  Version: 
+  Date   : 2020-08-12
+  Author : atult
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,gta_sa.exe,D9 86 C0 04 00 00 0F) // should be unique
+alloc(newmem,$1000)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+mov [esi+4c0],(float)0.0
+  fld dword ptr [esi+000004C0]
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db D9 86 C0 04 00 00
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "gta_sa.exe"+2D8897
+
+"gta_sa.exe"+2D886F: 8D 86 0C 05 00 00     -  lea eax,[esi+0000050C]
+"gta_sa.exe"+2D8875: 50                    -  push eax
+"gta_sa.exe"+2D8876: 8B CF                 -  mov ecx,edi
+"gta_sa.exe"+2D8878: 89 38                 -  mov [eax],edi
+"gta_sa.exe"+2D887A: E8 91 97 E9 FF        -  call gta_sa.exe+172010
+"gta_sa.exe"+2D887F: D9 86 C0 04 00 00     -  fld dword ptr [esi+000004C0]
+"gta_sa.exe"+2D8885: D8 9C 24 90 00 00 00  -  fcomp dword ptr [esp+00000090]
+"gta_sa.exe"+2D888C: DF E0                 -  fnstsw ax
+"gta_sa.exe"+2D888E: F6 C4 41              -  test ah,41
+"gta_sa.exe"+2D8891: 0F 85 8A 01 00 00     -  jne gta_sa.exe+2D8A21
+// ---------- INJECTING HERE ----------
+"gta_sa.exe"+2D8897: D9 86 C0 04 00 00     -  fld dword ptr [esi+000004C0]
+// ---------- DONE INJECTING  ----------
+"gta_sa.exe"+2D889D: 0F B6 46 36           -  movzx eax,byte ptr [esi+36]
+"gta_sa.exe"+2D88A1: D8 A4 24 90 00 00 00  -  fsub dword ptr [esp+00000090]
+"gta_sa.exe"+2D88A8: 8B 96 C0 04 00 00     -  mov edx,[esi+000004C0]
+"gta_sa.exe"+2D88AE: C1 E8 03              -  shr eax,03
+"gta_sa.exe"+2D88B1: 3B C5                 -  cmp eax,ebp
+"gta_sa.exe"+2D88B3: E9 48 77 E3 01        -  jmp 02510000
+"gta_sa.exe"+2D88B8: 90                    -  nop 
+"gta_sa.exe"+2D88B9: 89 94 24 88 00 00 00  -  mov [esp+00000088],edx
+"gta_sa.exe"+2D88C0: 74 12                 -  je gta_sa.exe+2D88D4
+"gta_sa.exe"+2D88C2: 83 F8 01              -  cmp eax,01
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>230</ID>
+          <Description>"SUPER JUMP"</Description>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1" moAllowManualCollapseAndExpand="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+{$lua}
+
+if syntaxcheck then return end
+
+{$asm}
+
+aobscanmodule(super_jump,gta_sa.exe,8B 08 8B 50 04 8B 40 08 8B 3D) // should be unique
+alloc(newmem,$150)
+alloc(speed_ptr,4)
+label(code)
+label(return)
+
+newmem:
+mov [speed_ptr],eax
+code:
+  mov ecx,[eax]
+  mov edx,[eax+04]
+  jmp return
+
+
+super_jump:
+  jmp newmem
+return:
+registersymbol(speed_ptr)
+registersymbol(super_jump)
+
+{$lua}
+
+--zDownSpeed=0.012 is gravity defying for gta san andreas.
+
+local multi=0.22
+local multiSpeeder=1.5
+local zBoost=0.2
+local zDownSpeed=0.006
+local deg=10
+local y=0
+local x=0
+local xaddr="[speed_ptr]"
+local yaddr="[speed_ptr]+4"
+local zaddr="[speed_ptr]+8"
+
+
+hk=createHotkey(function()
+local multi=multi
+writeFloat("[speed_ptr]+4fc",100000.0)
+writeFloat("[speed_ptr]+504",100000.0)
+writeFloat(zaddr,zBoost)
+while readFloat(zaddr)&gt;0 do end
+x=readFloat(xaddr)
+y=readFloat(yaddr)
+r=((x^2)+(y^2))^0.5
+if r==0 then return end
+xdir=x/r
+ydir=y/r
+while readFloat(zaddr)~=0 do
+x=xdir*multi
+y=ydir*multi
+writeFloat(xaddr,x)
+writeFloat(yaddr,y)
+writeFloat(zaddr,zDownSpeed)
+if isKeyPressed(0x53) then break
+end
+if isKeyPressed(0x25) then
+angle=math.rad(deg)
+xdir=xdir*math.cos(angle)-ydir*math.sin(angle)
+ydir=xdir*math.sin(angle)+ydir*math.cos(angle)
+keyUp(0x25)
+end
+if isKeyPressed(0x27) then
+angle=-math.rad(deg)
+xdir=xdir*math.cos(angle)-ydir*math.sin(angle)
+ydir=xdir*math.sin(angle)+ydir*math.cos(angle)
+keyUp(0x27)
+end
+if isKeyPressed(0x26) then
+multi=multi*multiSpeeder
+keyUp(0x26)
+end
+if isKeyPressed(0x28) then
+multi=multi/multiSpeeder
+keyUp(0x28)
+end
+end
+end,VK_CONTROL)
+
+{$asm}
+
+[DISABLE]
+
+super_jump:
+  db 8B 08 8B 50 04
+unregistersymbol(speed_ptr)
+unregistersymbol(super_jump)
+dealloc(speed_ptr)
+dealloc(newmem)
+
+{$lua}
+hk.destroy()
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>252</ID>
+          <Description>"SPEEDER "</Description>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1" moAllowManualCollapseAndExpand="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(super_jump1,gta_sa.exe,8B 08 8B 50 04 8B 40 08 8B 3D) // should be unique
+alloc(newmem,$150)
+alloc(speed_ptr1,4)
+label(code)
+label(return)
+
+newmem:
+mov [speed_ptr1],eax
+code:
+  mov ecx,[eax]
+  mov edx,[eax+04]
+  jmp return
+
+
+super_jump1:
+  jmp newmem
+return:
+registersymbol(speed_ptr1)
+registersymbol(super_jump1)
+
+[DISABLE]
+
+super_jump1:
+  db 8B 08 8B 50 04
+unregistersymbol(speed_ptr1)
+unregistersymbol(super_jump1)
+dealloc(speed_ptr1)
+dealloc(newmem)
+
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>253</ID>
+              <Description>"cj x"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>[speed_ptr1]</Address>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Set Value</Action>
+                  <Keys>
+                    <Key>66</Key>
+                  </Keys>
+                  <Value>(cj x)*4</Value>
+                  <ID>0</ID>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>254</ID>
+              <Description>"cj y"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>[speed_ptr1]+4</Address>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Set Value</Action>
+                  <Keys>
+                    <Key>66</Key>
+                  </Keys>
+                  <Value>(cj y)*4</Value>
+                  <ID>0</ID>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>264</ID>
+          <Description>"Super Jumper"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+{$lua}
+
+if syntaxcheck then return end
+
+--This is the super jump with turn
+
+{$asm}
+
+aobscanmodule(super_jump,gta_sa.exe,8B 08 8B 50 04 8B 40 08 8B 3D) // should be unique
+alloc(newmem,$150)
+alloc(speed_ptr,4)
+label(code)
+label(return)
+
+newmem:
+mov [speed_ptr],eax
+code:
+  mov ecx,[eax]
+  mov edx,[eax+04]
+  jmp return
+
+
+super_jump:
+  jmp newmem
+return:
+registersymbol(speed_ptr)
+registersymbol(super_jump)
+
+{$lua}
+
+--zDownSpeed=0.012 is gravity defying for gta san andreas.
+-- boost more than 20 is too much for game to handle.
+
+local multi=0.12
+local multiSpeeder=1.5
+local zUpSpeed=0.05
+local zDownSpeed=-8e-2
+local deg=10
+local boost=0.2
+local flyiter=5e2
+local jumpIterVelocity=0.5
+local stopKey=0x53
+local slowKey=0x28
+local fastKey=0x26
+local xaddr="[speed_ptr]"
+local yaddr="[speed_ptr]+4"
+local zaddr="[speed_ptr]+8"
+local mode=1
+
+
+function isBlocked()
+if readFloat(xaddr)==0 or readFloat(yaddr)==0 or readFloat(zaddr)==0 then
+return true
+else
+return false
+end
+end
+
+
+function fwdSpeedModifier(speed,multiplier)
+if isKeyPressed(slowKey) then
+speed=speed/multiplier
+keyUp(slowKey)
+end
+if isKeyPressed(fastKey) then
+speed=speed*multiplier
+keyUp(fastKey)
+end
+return speed
+end
+
+function JumpStraight()
+local multi=multi
+writeFloat("[speed_ptr]+4fc",100000.0)
+writeFloat("[speed_ptr]+504",100000.0)
+while (readFloat(xaddr)==0 and readFloat(yaddr)==0 and not isKeyPressed(stopKey)) do end
+keyUp(stopKey)
+x=readFloat(xaddr)
+y=readFloat(yaddr)
+r=((x^2)+(y^2))^0.5
+xdir=x/r
+ydir=y/r
+while (not isKeyPressed(stopKey)) do
+x=xdir*multi
+y=ydir*multi
+writeFloat(xaddr,x)
+writeFloat(yaddr,y)
+writeFloat(zaddr,zUpSpeed)
+multi=fwdSpeedModifier(multi,multiSpeeder)
+end
+keyUp(stopKey)
+while (not isBlocked()) and (not isKeyPressed(stopKey) ) do
+x=xdir*multi
+y=ydir*multi
+writeFloat(xaddr,x)
+writeFloat(yaddr,y)
+writeFloat(zaddr,zDownSpeed)
+multi=fwdSpeedModifier(multi,multiSpeeder)
+end
+keyUp(stopKey)
+end
+
+
+
+function JumpWithTurn()
+local multi=multi
+writeFloat("[speed_ptr]+4fc",100000.0)
+writeFloat("[speed_ptr]+504",100000.0)
+while(readFloat(xaddr)==0 and readFloat(yaddr)==0 and not isKeyPressed(stopKey)) do end
+keyUp(stopKey)
+x=readFloat(xaddr)
+y=readFloat(yaddr)
+r=((x^2)+(y^2))^0.5
+xdir=x/r
+ydir=y/r
+while (not isKeyPressed(stopKey)) do
+x=xdir*multi
+y=ydir*multi
+if isKeyPressed(0x25) then
+angle=math.rad(deg)
+xdir=xdir*math.cos(angle)-ydir*math.sin(angle)
+ydir=xdir*math.sin(angle)+ydir*math.cos(angle)
+keyUp(0x25)
+end
+if isKeyPressed(0x27) then
+angle=-math.rad(deg)
+xdir=xdir*math.cos(angle)-ydir*math.sin(angle)
+ydir=xdir*math.sin(angle)+ydir*math.cos(angle)
+keyUp(0x27)
+end
+writeFloat(xaddr,x)
+writeFloat(yaddr,y)
+writeFloat(zaddr,zUpSpeed)
+multi=fwdSpeedModifier(multi,multiSpeeder)
+end
+keyUp(stopKey)
+while (not isBlocked()) and (not isKeyPressed(stopKey) ) do
+x=xdir*multi
+y=ydir*multi
+if isKeyPressed(0x25) then
+angle=math.rad(deg)
+xdir=xdir*math.cos(angle)-ydir*math.sin(angle)
+ydir=xdir*math.sin(angle)+ydir*math.cos(angle)
+keyUp(0x25)
+end
+if isKeyPressed(0x27) then
+angle=-math.rad(deg)
+xdir=xdir*math.cos(angle)-ydir*math.sin(angle)
+ydir=xdir*math.sin(angle)+ydir*math.cos(angle)
+keyUp(0x27)
+end
+writeFloat(xaddr,x)
+writeFloat(yaddr,y)
+writeFloat(zaddr,zDownSpeed)
+multi=fwdSpeedModifier(multi,multiSpeeder)
+end
+keyUp(stopKey)
+end
+
+
+function JumpWithBoost()
+while readFloat(zaddr)&lt;=0 do end
+writeFloat("[speed_ptr]+4fc",100000.0)
+writeFloat("[speed_ptr]+504",100000.0)
+local x,y,z=readFloat(xaddr),readFloat(yaddr),readFloat(zaddr)
+local i=0
+local r=((x^2)+(y^2))^0.5
+local ratio=boost/r
+while (not isBlocked()) and  i&lt;flyiter do
+writeFloat(xaddr,x*ratio)
+writeFloat(yaddr,y*ratio)
+writeFloat(zaddr,jumpIterVelocity)
+i=i+1
+end
+while readFloat(zaddr)&gt;=0 do end
+while (not isBlocked()) and (not isKeyPressed(stopKey) ) do
+writeFloat(xaddr,x*ratio)
+writeFloat(yaddr,y*ratio)
+writeFloat(zaddr,zDownSpeed)
+end
+keyUp(stopKey)
+end
+
+
+
+hk=createHotkey(function()
+if mode==1 then
+JumpWithTurn()
+end
+if mode==2 then
+JumpStraight()
+end
+if mode==3 then
+JumpWithBoost()
+end
+end,VK_CONTROL)
+
+
+hk2=createHotkey(function()
+if mode&lt;3 then
+mode=mode+1
+else
+mode=1
+end
+end,0x42) --B
+
+
+{$asm}
+
+[DISABLE]
+
+super_jump:
+  db 8B 08 8B 50 04
+unregistersymbol(speed_ptr)
+unregistersymbol(super_jump)
+dealloc(speed_ptr)
+dealloc(newmem)
+
+{$lua}
+hk.destroy()
+hk2.destroy()
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <CheatCodes>
+    <CodeEntry>
+      <Description>CAR speed(x or y)</Description>
+      <AddressString>gta_sa.exe+14304A</AddressString>
+      <Before>
+        <Byte>24</Byte>
+        <Byte>0C</Byte>
+        <Byte>D8</Byte>
+        <Byte>46</Byte>
+        <Byte>44</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>5E</Byte>
+        <Byte>44</Byte>
+      </Actual>
+      <After>
+        <Byte>D9</Byte>
+        <Byte>44</Byte>
+        <Byte>24</Byte>
+        <Byte>08</Byte>
+        <Byte>D8</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>CAR ROTATION</Description>
+      <AddressString>gta_sa.exe+14316A</AddressString>
+      <Before>
+        <Byte>24</Byte>
+        <Byte>30</Byte>
+        <Byte>D8</Byte>
+        <Byte>46</Byte>
+        <Byte>54</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>5E</Byte>
+        <Byte>54</Byte>
+      </Actual>
+      <After>
+        <Byte>D9</Byte>
+        <Byte>44</Byte>
+        <Byte>24</Byte>
+        <Byte>34</Byte>
+        <Byte>D8</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>CAR HEALTH</Description>
+      <AddressString>gta_sa.exe+2A8B4B</AddressString>
+      <Before>
+        <Byte>AE</Byte>
+        <Byte>C0</Byte>
+        <Byte>04</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>9E</Byte>
+        <Byte>C0</Byte>
+        <Byte>04</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>A0</Byte>
+        <Byte>E4</Byte>
+        <Byte>B7</Byte>
+        <Byte>96</Byte>
+        <Byte>00</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Only addresses my car speed</Description>
+      <AddressString>gta_sa.exe+10919</AddressString>
+      <Before>
+        <Byte>74</Byte>
+        <Byte>3B</Byte>
+        <Byte>83</Byte>
+        <Byte>C0</Byte>
+        <Byte>44</Byte>
+      </Before>
+      <Actual>
+        <Byte>8B</Byte>
+        <Byte>08</Byte>
+      </Actual>
+      <After>
+        <Byte>8B</Byte>
+        <Byte>50</Byte>
+        <Byte>04</Byte>
+        <Byte>8B</Byte>
+        <Byte>40</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>cj velocity</Description>
+      <AddressString>gta_sa.exe+1451B8</AddressString>
+      <Before>
+        <Byte>D9</Byte>
+        <Byte>C0</Byte>
+        <Byte>D8</Byte>
+        <Byte>4E</Byte>
+        <Byte>44</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>5E</Byte>
+        <Byte>44</Byte>
+      </Actual>
+      <After>
+        <Byte>D9</Byte>
+        <Byte>C0</Byte>
+        <Byte>D8</Byte>
+        <Byte>4E</Byte>
+        <Byte>48</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>CAR JUMP</Description>
+      <AddressString>gta_sa.exe+14305E</AddressString>
+      <Before>
+        <Byte>24</Byte>
+        <Byte>0C</Byte>
+        <Byte>D8</Byte>
+        <Byte>46</Byte>
+        <Byte>4C</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>5E</Byte>
+        <Byte>4C</Byte>
+      </Actual>
+      <After>
+        <Byte>8B</Byte>
+        <Byte>46</Byte>
+        <Byte>40</Byte>
+        <Byte>A8</Byte>
+        <Byte>10</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>CJ JUMP</Description>
+      <AddressString>gta_sa.exe+1451C6</AddressString>
+      <Before>
+        <Byte>5E</Byte>
+        <Byte>48</Byte>
+        <Byte>D8</Byte>
+        <Byte>4E</Byte>
+        <Byte>4C</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>5E</Byte>
+        <Byte>4C</Byte>
+      </Actual>
+      <After>
+        <Byte>D9</Byte>
+        <Byte>46</Byte>
+        <Byte>50</Byte>
+        <Byte>D8</Byte>
+        <Byte>0D</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>BOAT SPEED</Description>
+      <AddressString>gta_sa.exe+143160</AddressString>
+      <Before>
+        <Byte>24</Byte>
+        <Byte>34</Byte>
+        <Byte>D8</Byte>
+        <Byte>46</Byte>
+        <Byte>50</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>5E</Byte>
+        <Byte>50</Byte>
+      </Actual>
+      <After>
+        <Byte>D9</Byte>
+        <Byte>44</Byte>
+        <Byte>24</Byte>
+        <Byte>30</Byte>
+        <Byte>D8</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>CAR SPEED 2(x or y)</Description>
+      <AddressString>gta_sa.exe+143054</AddressString>
+      <Before>
+        <Byte>24</Byte>
+        <Byte>08</Byte>
+        <Byte>D8</Byte>
+        <Byte>46</Byte>
+        <Byte>48</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>5E</Byte>
+        <Byte>48</Byte>
+      </Actual>
+      <After>
+        <Byte>D9</Byte>
+        <Byte>44</Byte>
+        <Byte>24</Byte>
+        <Byte>0C</Byte>
+        <Byte>D8</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>MY CAR SPEED WATCHER 2</Description>
+      <AddressString>gta_sa.exe+13D582</AddressString>
+      <Before>
+        <Byte>83</Byte>
+        <Byte>C1</Byte>
+        <Byte>44</Byte>
+        <Byte>8B</Byte>
+        <Byte>01</Byte>
+      </Before>
+      <Actual>
+        <Byte>8B</Byte>
+        <Byte>51</Byte>
+        <Byte>04</Byte>
+      </Actual>
+      <After>
+        <Byte>89</Byte>
+        <Byte>44</Byte>
+        <Byte>24</Byte>
+        <Byte>10</Byte>
+        <Byte>8B</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>CJ JUMP WATCHER</Description>
+      <AddressString>gta_sa.exe+13D596</AddressString>
+      <Before>
+        <Byte>8B</Byte>
+        <Byte>08</Byte>
+        <Byte>8B</Byte>
+        <Byte>50</Byte>
+        <Byte>04</Byte>
+      </Before>
+      <Actual>
+        <Byte>8B</Byte>
+        <Byte>40</Byte>
+        <Byte>08</Byte>
+      </Actual>
+      <After>
+        <Byte>89</Byte>
+        <Byte>4C</Byte>
+        <Byte>24</Byte>
+        <Byte>10</Byte>
+        <Byte>D9</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>PLANE VELOCITY(+8 se aaega height)</Description>
+      <AddressString>gta_sa.exe+142ECE</AddressString>
+      <Before>
+        <Byte>24</Byte>
+        <Byte>0C</Byte>
+        <Byte>D8</Byte>
+        <Byte>41</Byte>
+        <Byte>44</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>59</Byte>
+        <Byte>44</Byte>
+      </Actual>
+      <After>
+        <Byte>DD</Byte>
+        <Byte>D8</Byte>
+        <Byte>D9</Byte>
+        <Byte>44</Byte>
+        <Byte>24</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>PLANE HEALTH</Description>
+      <AddressString>gta_sa.exe+2CCEEE</AddressString>
+      <Before>
+        <Byte>AE</Byte>
+        <Byte>C0</Byte>
+        <Byte>04</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>9E</Byte>
+        <Byte>C0</Byte>
+        <Byte>04</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>D9</Byte>
+        <Byte>86</Byte>
+        <Byte>C0</Byte>
+        <Byte>04</Byte>
+        <Byte>00</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>bike speed</Description>
+      <AddressString>gta_sa.exe+14304A</AddressString>
+      <Before>
+        <Byte>24</Byte>
+        <Byte>0C</Byte>
+        <Byte>D8</Byte>
+        <Byte>46</Byte>
+        <Byte>44</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>5E</Byte>
+        <Byte>44</Byte>
+      </Actual>
+      <After>
+        <Byte>D9</Byte>
+        <Byte>44</Byte>
+        <Byte>24</Byte>
+        <Byte>08</Byte>
+        <Byte>D8</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>BIKE SPEED WATCHER</Description>
+      <AddressString>gta_sa.exe+13D580</AddressString>
+      <Before>
+        <Byte>74</Byte>
+        <Byte>11</Byte>
+        <Byte>83</Byte>
+        <Byte>C1</Byte>
+        <Byte>44</Byte>
+      </Before>
+      <Actual>
+        <Byte>8B</Byte>
+        <Byte>01</Byte>
+      </Actual>
+      <After>
+        <Byte>8B</Byte>
+        <Byte>51</Byte>
+        <Byte>04</Byte>
+        <Byte>89</Byte>
+        <Byte>44</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>car speed accelerator</Description>
+      <AddressString>gta_sa.exe+145163</AddressString>
+      <Before>
+        <Byte>DB</Byte>
+        <Byte>DD</Byte>
+        <Byte>D8</Byte>
+        <Byte>DD</Byte>
+        <Byte>D8</Byte>
+      </Before>
+      <Actual>
+        <Byte>D8</Byte>
+        <Byte>8E</Byte>
+        <Byte>98</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>D9</Byte>
+        <Byte>5C</Byte>
+        <Byte>24</Byte>
+        <Byte>04</Byte>
+        <Byte>E8</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>MY PLANE WATCHER</Description>
+      <AddressString>gta_sa.exe+1AF78</AddressString>
+      <Before>
+        <Byte>E8</Byte>
+        <Byte>B8</Byte>
+        <Byte>35</Byte>
+        <Byte>15</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>8B</Byte>
+        <Byte>10</Byte>
+      </Actual>
+      <After>
+        <Byte>8B</Byte>
+        <Byte>48</Byte>
+        <Byte>04</Byte>
+        <Byte>89</Byte>
+        <Byte>54</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>something</Description>
+      <AddressString>gta_sa.exe+1489C2</AddressString>
+      <Before>
+        <Byte>43</Byte>
+        <Byte>08</Byte>
+        <Byte>D9</Byte>
+        <Byte>5B</Byte>
+        <Byte>08</Byte>
+      </Before>
+      <Actual>
+        <Byte>89</Byte>
+        <Byte>4E</Byte>
+        <Byte>5C</Byte>
+      </Actual>
+      <After>
+        <Byte>8B</Byte>
+        <Byte>4C</Byte>
+        <Byte>24</Byte>
+        <Byte>0C</Byte>
+        <Byte>89</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>car acc</Description>
+      <AddressString>gta_sa.exe+143254</AddressString>
+      <Before>
+        <Byte>60</Byte>
+        <Byte>D9</Byte>
+        <Byte>44</Byte>
+        <Byte>24</Byte>
+        <Byte>04</Byte>
+      </Before>
+      <Actual>
+        <Byte>D8</Byte>
+        <Byte>46</Byte>
+        <Byte>5C</Byte>
+      </Actual>
+      <After>
+        <Byte>5E</Byte>
+        <Byte>D9</Byte>
+        <Byte>18</Byte>
+        <Byte>D9</Byte>
+        <Byte>58</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>tyre1 weight</Description>
+      <AddressString>gta_sa.exe+2B2AA5</AddressString>
+      <Before>
+        <Byte>00</Byte>
+        <Byte>D8</Byte>
+        <Byte>E2</Byte>
+        <Byte>DE</Byte>
+        <Byte>F9</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>58</Byte>
+        <Byte>FC</Byte>
+      </Actual>
+      <After>
+        <Byte>DD</Byte>
+        <Byte>D8</Byte>
+        <Byte>75</Byte>
+        <Byte>D4</Byte>
+        <Byte>8B</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>CAR SPEED WATCHER</Description>
+      <AddressString>gta_sa.exe+1AF7A</AddressString>
+      <Before>
+        <Byte>35</Byte>
+        <Byte>15</Byte>
+        <Byte>00</Byte>
+        <Byte>8B</Byte>
+        <Byte>10</Byte>
+      </Before>
+      <Actual>
+        <Byte>8B</Byte>
+        <Byte>48</Byte>
+        <Byte>04</Byte>
+      </Actual>
+      <After>
+        <Byte>89</Byte>
+        <Byte>54</Byte>
+        <Byte>24</Byte>
+        <Byte>38</Byte>
+        <Byte>8B</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>REAL CAR ACCELERATION</Description>
+      <AddressString>gta_sa.exe+2D0FA1</AddressString>
+      <Before>
+        <Byte>05</Byte>
+        <Byte>FC</Byte>
+        <Byte>F2</Byte>
+        <Byte>C1</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>D8</Byte>
+        <Byte>49</Byte>
+        <Byte>50</Byte>
+      </Actual>
+      <After>
+        <Byte>8B</Byte>
+        <Byte>44</Byte>
+        <Byte>24</Byte>
+        <Byte>14</Byte>
+        <Byte>DE</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>CAR LOCKED STATE</Description>
+      <AddressString>gta_sa.exe+1A5E45</AddressString>
+      <Before>
+        <Byte>E9</Byte>
+        <Byte>50</Byte>
+        <Byte>25</Byte>
+        <Byte>18</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>8B</Byte>
+        <Byte>86</Byte>
+        <Byte>F8</Byte>
+        <Byte>04</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>E9</Byte>
+        <Byte>09</Byte>
+        <Byte>C8</Byte>
+        <Byte>12</Byte>
+        <Byte>00</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :mov ecx,[eax]</Description>
+      <AddressString>gta_sa.exe+13D591</AddressString>
+      <Before>
+        <Byte>EB</Byte>
+        <Byte>0F</Byte>
+        <Byte>83</Byte>
+        <Byte>C0</Byte>
+        <Byte>44</Byte>
+      </Before>
+      <Actual>
+        <Byte>8B</Byte>
+        <Byte>08</Byte>
+      </Actual>
+      <After>
+        <Byte>8B</Byte>
+        <Byte>50</Byte>
+        <Byte>04</Byte>
+        <Byte>8B</Byte>
+        <Byte>40</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>CJ LOCATION</Description>
+      <AddressString>gta_sa.exe+14328B</AddressString>
+      <Before>
+        <Byte>49</Byte>
+        <Byte>44</Byte>
+        <Byte>D8</Byte>
+        <Byte>40</Byte>
+        <Byte>30</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>58</Byte>
+        <Byte>30</Byte>
+      </Actual>
+      <After>
+        <Byte>8B</Byte>
+        <Byte>41</Byte>
+        <Byte>14</Byte>
+        <Byte>D9</Byte>
+        <Byte>05</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>CAR speed(x or y)</Description>
+      <AddressString>gta_sa.exe+14304A</AddressString>
+      <Before>
+        <Byte>24</Byte>
+        <Byte>0C</Byte>
+        <Byte>D8</Byte>
+        <Byte>46</Byte>
+        <Byte>44</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>5E</Byte>
+        <Byte>44</Byte>
+      </Actual>
+      <After>
+        <Byte>D9</Byte>
+        <Byte>44</Byte>
+        <Byte>24</Byte>
+        <Byte>08</Byte>
+        <Byte>D8</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>CAR ROTATION</Description>
+      <AddressString>gta_sa.exe+14316A</AddressString>
+      <Before>
+        <Byte>24</Byte>
+        <Byte>30</Byte>
+        <Byte>D8</Byte>
+        <Byte>46</Byte>
+        <Byte>54</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>5E</Byte>
+        <Byte>54</Byte>
+      </Actual>
+      <After>
+        <Byte>D9</Byte>
+        <Byte>44</Byte>
+        <Byte>24</Byte>
+        <Byte>34</Byte>
+        <Byte>D8</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>CAR HEALTH</Description>
+      <AddressString>gta_sa.exe+2A8B4B</AddressString>
+      <Before>
+        <Byte>AE</Byte>
+        <Byte>C0</Byte>
+        <Byte>04</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>9E</Byte>
+        <Byte>C0</Byte>
+        <Byte>04</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>A0</Byte>
+        <Byte>E4</Byte>
+        <Byte>B7</Byte>
+        <Byte>96</Byte>
+        <Byte>00</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Only addresses my car speed</Description>
+      <AddressString>gta_sa.exe+10919</AddressString>
+      <Before>
+        <Byte>74</Byte>
+        <Byte>3B</Byte>
+        <Byte>83</Byte>
+        <Byte>C0</Byte>
+        <Byte>44</Byte>
+      </Before>
+      <Actual>
+        <Byte>8B</Byte>
+        <Byte>08</Byte>
+      </Actual>
+      <After>
+        <Byte>8B</Byte>
+        <Byte>50</Byte>
+        <Byte>04</Byte>
+        <Byte>8B</Byte>
+        <Byte>40</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>cj velocity</Description>
+      <AddressString>gta_sa.exe+1451B8</AddressString>
+      <Before>
+        <Byte>D9</Byte>
+        <Byte>C0</Byte>
+        <Byte>D8</Byte>
+        <Byte>4E</Byte>
+        <Byte>44</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>5E</Byte>
+        <Byte>44</Byte>
+      </Actual>
+      <After>
+        <Byte>D9</Byte>
+        <Byte>C0</Byte>
+        <Byte>D8</Byte>
+        <Byte>4E</Byte>
+        <Byte>48</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>CAR JUMP</Description>
+      <AddressString>gta_sa.exe+14305E</AddressString>
+      <Before>
+        <Byte>24</Byte>
+        <Byte>0C</Byte>
+        <Byte>D8</Byte>
+        <Byte>46</Byte>
+        <Byte>4C</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>5E</Byte>
+        <Byte>4C</Byte>
+      </Actual>
+      <After>
+        <Byte>8B</Byte>
+        <Byte>46</Byte>
+        <Byte>40</Byte>
+        <Byte>A8</Byte>
+        <Byte>10</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>CJ JUMP</Description>
+      <AddressString>gta_sa.exe+1451C6</AddressString>
+      <Before>
+        <Byte>5E</Byte>
+        <Byte>48</Byte>
+        <Byte>D8</Byte>
+        <Byte>4E</Byte>
+        <Byte>4C</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>5E</Byte>
+        <Byte>4C</Byte>
+      </Actual>
+      <After>
+        <Byte>D9</Byte>
+        <Byte>46</Byte>
+        <Byte>50</Byte>
+        <Byte>D8</Byte>
+        <Byte>0D</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>BOAT SPEED</Description>
+      <AddressString>gta_sa.exe+143160</AddressString>
+      <Before>
+        <Byte>24</Byte>
+        <Byte>34</Byte>
+        <Byte>D8</Byte>
+        <Byte>46</Byte>
+        <Byte>50</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>5E</Byte>
+        <Byte>50</Byte>
+      </Actual>
+      <After>
+        <Byte>D9</Byte>
+        <Byte>44</Byte>
+        <Byte>24</Byte>
+        <Byte>30</Byte>
+        <Byte>D8</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>CAR SPEED 2(x or y)</Description>
+      <AddressString>gta_sa.exe+143054</AddressString>
+      <Before>
+        <Byte>24</Byte>
+        <Byte>08</Byte>
+        <Byte>D8</Byte>
+        <Byte>46</Byte>
+        <Byte>48</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>5E</Byte>
+        <Byte>48</Byte>
+      </Actual>
+      <After>
+        <Byte>D9</Byte>
+        <Byte>44</Byte>
+        <Byte>24</Byte>
+        <Byte>0C</Byte>
+        <Byte>D8</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>MY CAR SPEED WATCHER 2</Description>
+      <AddressString>gta_sa.exe+13D582</AddressString>
+      <Before>
+        <Byte>83</Byte>
+        <Byte>C1</Byte>
+        <Byte>44</Byte>
+        <Byte>8B</Byte>
+        <Byte>01</Byte>
+      </Before>
+      <Actual>
+        <Byte>8B</Byte>
+        <Byte>51</Byte>
+        <Byte>04</Byte>
+      </Actual>
+      <After>
+        <Byte>89</Byte>
+        <Byte>44</Byte>
+        <Byte>24</Byte>
+        <Byte>10</Byte>
+        <Byte>8B</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>CJ JUMP WATCHER</Description>
+      <AddressString>gta_sa.exe+13D596</AddressString>
+      <Before>
+        <Byte>8B</Byte>
+        <Byte>08</Byte>
+        <Byte>8B</Byte>
+        <Byte>50</Byte>
+        <Byte>04</Byte>
+      </Before>
+      <Actual>
+        <Byte>8B</Byte>
+        <Byte>40</Byte>
+        <Byte>08</Byte>
+      </Actual>
+      <After>
+        <Byte>89</Byte>
+        <Byte>4C</Byte>
+        <Byte>24</Byte>
+        <Byte>10</Byte>
+        <Byte>D9</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>PLANE VELOCITY(+8 se aaega height)</Description>
+      <AddressString>gta_sa.exe+142ECE</AddressString>
+      <Before>
+        <Byte>24</Byte>
+        <Byte>0C</Byte>
+        <Byte>D8</Byte>
+        <Byte>41</Byte>
+        <Byte>44</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>59</Byte>
+        <Byte>44</Byte>
+      </Actual>
+      <After>
+        <Byte>DD</Byte>
+        <Byte>D8</Byte>
+        <Byte>D9</Byte>
+        <Byte>44</Byte>
+        <Byte>24</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>PLANE HEALTH</Description>
+      <AddressString>gta_sa.exe+2CCEEE</AddressString>
+      <Before>
+        <Byte>AE</Byte>
+        <Byte>C0</Byte>
+        <Byte>04</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>9E</Byte>
+        <Byte>C0</Byte>
+        <Byte>04</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>D9</Byte>
+        <Byte>86</Byte>
+        <Byte>C0</Byte>
+        <Byte>04</Byte>
+        <Byte>00</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>bike speed</Description>
+      <AddressString>gta_sa.exe+14304A</AddressString>
+      <Before>
+        <Byte>24</Byte>
+        <Byte>0C</Byte>
+        <Byte>D8</Byte>
+        <Byte>46</Byte>
+        <Byte>44</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>5E</Byte>
+        <Byte>44</Byte>
+      </Actual>
+      <After>
+        <Byte>D9</Byte>
+        <Byte>44</Byte>
+        <Byte>24</Byte>
+        <Byte>08</Byte>
+        <Byte>D8</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>BIKE SPEED WATCHER</Description>
+      <AddressString>gta_sa.exe+13D580</AddressString>
+      <Before>
+        <Byte>74</Byte>
+        <Byte>11</Byte>
+        <Byte>83</Byte>
+        <Byte>C1</Byte>
+        <Byte>44</Byte>
+      </Before>
+      <Actual>
+        <Byte>8B</Byte>
+        <Byte>01</Byte>
+      </Actual>
+      <After>
+        <Byte>8B</Byte>
+        <Byte>51</Byte>
+        <Byte>04</Byte>
+        <Byte>89</Byte>
+        <Byte>44</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>car speed accelerator</Description>
+      <AddressString>gta_sa.exe+145163</AddressString>
+      <Before>
+        <Byte>DB</Byte>
+        <Byte>DD</Byte>
+        <Byte>D8</Byte>
+        <Byte>DD</Byte>
+        <Byte>D8</Byte>
+      </Before>
+      <Actual>
+        <Byte>D8</Byte>
+        <Byte>8E</Byte>
+        <Byte>98</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>D9</Byte>
+        <Byte>5C</Byte>
+        <Byte>24</Byte>
+        <Byte>04</Byte>
+        <Byte>E8</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>MY PLANE WATCHER</Description>
+      <AddressString>gta_sa.exe+1AF78</AddressString>
+      <Before>
+        <Byte>E8</Byte>
+        <Byte>B8</Byte>
+        <Byte>35</Byte>
+        <Byte>15</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>8B</Byte>
+        <Byte>10</Byte>
+      </Actual>
+      <After>
+        <Byte>8B</Byte>
+        <Byte>48</Byte>
+        <Byte>04</Byte>
+        <Byte>89</Byte>
+        <Byte>54</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>something</Description>
+      <AddressString>gta_sa.exe+1489C2</AddressString>
+      <Before>
+        <Byte>43</Byte>
+        <Byte>08</Byte>
+        <Byte>D9</Byte>
+        <Byte>5B</Byte>
+        <Byte>08</Byte>
+      </Before>
+      <Actual>
+        <Byte>89</Byte>
+        <Byte>4E</Byte>
+        <Byte>5C</Byte>
+      </Actual>
+      <After>
+        <Byte>8B</Byte>
+        <Byte>4C</Byte>
+        <Byte>24</Byte>
+        <Byte>0C</Byte>
+        <Byte>89</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>car acc</Description>
+      <AddressString>gta_sa.exe+143254</AddressString>
+      <Before>
+        <Byte>60</Byte>
+        <Byte>D9</Byte>
+        <Byte>44</Byte>
+        <Byte>24</Byte>
+        <Byte>04</Byte>
+      </Before>
+      <Actual>
+        <Byte>D8</Byte>
+        <Byte>46</Byte>
+        <Byte>5C</Byte>
+      </Actual>
+      <After>
+        <Byte>5E</Byte>
+        <Byte>D9</Byte>
+        <Byte>18</Byte>
+        <Byte>D9</Byte>
+        <Byte>58</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>tyre1 weight</Description>
+      <AddressString>gta_sa.exe+2B2AA5</AddressString>
+      <Before>
+        <Byte>00</Byte>
+        <Byte>D8</Byte>
+        <Byte>E2</Byte>
+        <Byte>DE</Byte>
+        <Byte>F9</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>58</Byte>
+        <Byte>FC</Byte>
+      </Actual>
+      <After>
+        <Byte>DD</Byte>
+        <Byte>D8</Byte>
+        <Byte>75</Byte>
+        <Byte>D4</Byte>
+        <Byte>8B</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>CAR SPEED WATCHER</Description>
+      <AddressString>gta_sa.exe+1AF7A</AddressString>
+      <Before>
+        <Byte>35</Byte>
+        <Byte>15</Byte>
+        <Byte>00</Byte>
+        <Byte>8B</Byte>
+        <Byte>10</Byte>
+      </Before>
+      <Actual>
+        <Byte>8B</Byte>
+        <Byte>48</Byte>
+        <Byte>04</Byte>
+      </Actual>
+      <After>
+        <Byte>89</Byte>
+        <Byte>54</Byte>
+        <Byte>24</Byte>
+        <Byte>38</Byte>
+        <Byte>8B</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>REAL CAR ACCELERATION</Description>
+      <AddressString>gta_sa.exe+2D0FA1</AddressString>
+      <Before>
+        <Byte>05</Byte>
+        <Byte>FC</Byte>
+        <Byte>F2</Byte>
+        <Byte>C1</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>D8</Byte>
+        <Byte>49</Byte>
+        <Byte>50</Byte>
+      </Actual>
+      <After>
+        <Byte>8B</Byte>
+        <Byte>44</Byte>
+        <Byte>24</Byte>
+        <Byte>14</Byte>
+        <Byte>DE</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>CAR LOCKED STATE</Description>
+      <AddressString>gta_sa.exe+1A5E45</AddressString>
+      <Before>
+        <Byte>E9</Byte>
+        <Byte>50</Byte>
+        <Byte>25</Byte>
+        <Byte>18</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>8B</Byte>
+        <Byte>86</Byte>
+        <Byte>F8</Byte>
+        <Byte>04</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>E9</Byte>
+        <Byte>09</Byte>
+        <Byte>C8</Byte>
+        <Byte>12</Byte>
+        <Byte>00</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :mov ecx,[eax]</Description>
+      <AddressString>gta_sa.exe+13D591</AddressString>
+      <Before>
+        <Byte>EB</Byte>
+        <Byte>0F</Byte>
+        <Byte>83</Byte>
+        <Byte>C0</Byte>
+        <Byte>44</Byte>
+      </Before>
+      <Actual>
+        <Byte>8B</Byte>
+        <Byte>08</Byte>
+      </Actual>
+      <After>
+        <Byte>8B</Byte>
+        <Byte>50</Byte>
+        <Byte>04</Byte>
+        <Byte>8B</Byte>
+        <Byte>40</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>CJ HEALTH</Description>
+      <AddressString>gta_sa.exe+B339F</AddressString>
+      <Before>
+        <Byte>14</Byte>
+        <Byte>8B</Byte>
+        <Byte>54</Byte>
+        <Byte>24</Byte>
+        <Byte>14</Byte>
+      </Before>
+      <Actual>
+        <Byte>89</Byte>
+        <Byte>96</Byte>
+        <Byte>40</Byte>
+        <Byte>05</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>74</Byte>
+        <Byte>74</Byte>
+        <Byte>83</Byte>
+        <Byte>7D</Byte>
+        <Byte>0C</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>health test</Description>
+      <AddressString>gta_sa.exe+226B9E</AddressString>
+      <Before>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>8B</Byte>
+        <Byte>4E</Byte>
+        <Byte>10</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>81</Byte>
+        <Byte>40</Byte>
+        <Byte>05</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>D8</Byte>
+        <Byte>1D</Byte>
+        <Byte>50</Byte>
+        <Byte>9B</Byte>
+        <Byte>85</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Health test 2</Description>
+      <AddressString>gta_sa.exe+33ADE1</AddressString>
+      <Before>
+        <Byte>E8</Byte>
+        <Byte>CF</Byte>
+        <Byte>2A</Byte>
+        <Byte>D7</Byte>
+        <Byte>FF</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>86</Byte>
+        <Byte>40</Byte>
+        <Byte>05</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>D8</Byte>
+        <Byte>1D</Byte>
+        <Byte>50</Byte>
+        <Byte>9B</Byte>
+        <Byte>85</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :fstp dword ptr [eax+10]</Description>
+      <AddressString>gta_sa.exe+143375</AddressString>
+      <Before>
+        <Byte>10</Byte>
+        <Byte>8D</Byte>
+        <Byte>4C</Byte>
+        <Byte>24</Byte>
+        <Byte>34</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>58</Byte>
+        <Byte>10</Byte>
+      </Actual>
+      <After>
+        <Byte>8B</Byte>
+        <Byte>46</Byte>
+        <Byte>14</Byte>
+        <Byte>D9</Byte>
+        <Byte>44</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Change of fcomp dword ptr [gta_sa.exe+459B40]</Description>
+      <AddressString>gta_sa.exe+2F37E9</AddressString>
+      <Before>
+        <Byte>64</Byte>
+        <Byte>24</Byte>
+        <Byte>1C</Byte>
+        <Byte>D9</Byte>
+        <Byte>E1</Byte>
+      </Before>
+      <Actual>
+        <Byte>D8</Byte>
+        <Byte>1D</Byte>
+        <Byte>40</Byte>
+        <Byte>9B</Byte>
+        <Byte>85</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>DF</Byte>
+        <Byte>E0</Byte>
+        <Byte>F6</Byte>
+        <Byte>C4</Byte>
+        <Byte>41</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Change of fcom dword ptr [gta_sa.exe+4ADAEC]</Description>
+      <AddressString>gta_sa.exe+D8403</AddressString>
+      <Before>
+        <Byte>25</Byte>
+        <Byte>F0</Byte>
+        <Byte>DA</Byte>
+        <Byte>8A</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>D8</Byte>
+        <Byte>15</Byte>
+        <Byte>EC</Byte>
+        <Byte>DA</Byte>
+        <Byte>8A</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>DF</Byte>
+        <Byte>E0</Byte>
+        <Byte>F6</Byte>
+        <Byte>C4</Byte>
+        <Byte>05</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :fcomp dword ptr [eax+38]</Description>
+      <AddressString>gta_sa.exe+1E38DB</AddressString>
+      <Before>
+        <Byte>4C</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>D8</Byte>
+        <Byte>58</Byte>
+        <Byte>38</Byte>
+      </Actual>
+      <After>
+        <Byte>DF</Byte>
+        <Byte>E0</Byte>
+        <Byte>F6</Byte>
+        <Byte>C4</Byte>
+        <Byte>05</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>timee bomb inst</Description>
+      <AddressString>gta_sa.exe+A17C9</AddressString>
+      <Before>
+        <Byte>4E</Byte>
+        <Byte>28</Byte>
+        <Byte>89</Byte>
+        <Byte>46</Byte>
+        <Byte>30</Byte>
+      </Before>
+      <Actual>
+        <Byte>89</Byte>
+        <Byte>46</Byte>
+        <Byte>34</Byte>
+      </Actual>
+      <After>
+        <Byte>89</Byte>
+        <Byte>46</Byte>
+        <Byte>38</Byte>
+        <Byte>E8</Byte>
+        <Byte>CC</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>CJ 's very own location</Description>
+      <AddressString>gta_sa.exe+86E97</AddressString>
+      <Before>
+        <Byte>46</Byte>
+        <Byte>04</Byte>
+        <Byte>8B</Byte>
+        <Byte>50</Byte>
+        <Byte>04</Byte>
+      </Before>
+      <Actual>
+        <Byte>8B</Byte>
+        <Byte>08</Byte>
+      </Actual>
+      <After>
+        <Byte>8B</Byte>
+        <Byte>40</Byte>
+        <Byte>08</Byte>
+        <Byte>89</Byte>
+        <Byte>44</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Ball Location Shayad</Description>
+      <AddressString>gta_sa.exe+19C71D</AddressString>
+      <Before>
+        <Byte>41</Byte>
+        <Byte>38</Byte>
+        <Byte>D8</Byte>
+        <Byte>48</Byte>
+        <Byte>24</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>41</Byte>
+        <Byte>34</Byte>
+      </Actual>
+      <After>
+        <Byte>D8</Byte>
+        <Byte>48</Byte>
+        <Byte>14</Byte>
+        <Byte>DE</Byte>
+        <Byte>C1</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>basketball location shayad</Description>
+      <AddressString>gta_sa.exe+F07C5</AddressString>
+      <Before>
+        <Byte>0C</Byte>
+        <Byte>8B</Byte>
+        <Byte>CC</Byte>
+        <Byte>89</Byte>
+        <Byte>11</Byte>
+      </Before>
+      <Actual>
+        <Byte>8B</Byte>
+        <Byte>50</Byte>
+        <Byte>04</Byte>
+      </Actual>
+      <After>
+        <Byte>8B</Byte>
+        <Byte>40</Byte>
+        <Byte>08</Byte>
+        <Byte>89</Byte>
+        <Byte>51</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>material something</Description>
+      <AddressString>gta_sa.exe+145319</AddressString>
+      <Before>
+        <Byte>D8</Byte>
+        <Byte>60</Byte>
+        <Byte>04</Byte>
+        <Byte>8B</Byte>
+        <Byte>CC</Byte>
+      </Before>
+      <Actual>
+        <Byte>D9</Byte>
+        <Byte>03</Byte>
+      </Actual>
+      <After>
+        <Byte>D8</Byte>
+        <Byte>20</Byte>
+        <Byte>D9</Byte>
+        <Byte>5C</Byte>
+        <Byte>24</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>very important gun related function</Description>
+      <AddressString>gta_sa.exe+1E6779</AddressString>
+      <Before>
+        <Byte>05</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>85</Byte>
+        <Byte>C0</Byte>
+      </Before>
+      <Actual>
+        <Byte>89</Byte>
+        <Byte>AE</Byte>
+        <Byte>40</Byte>
+        <Byte>07</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>74</Byte>
+        <Byte>09</Byte>
+        <Byte>83</Byte>
+        <Byte>F8</Byte>
+        <Byte>01</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Gun Clip </Description>
+      <AddressString>gta_sa.exe+3430E0</AddressString>
+      <Before>
+        <Byte>85</Byte>
+        <Byte>C0</Byte>
+        <Byte>7E</Byte>
+        <Byte>04</Byte>
+        <Byte>48</Byte>
+      </Before>
+      <Actual>
+        <Byte>89</Byte>
+        <Byte>46</Byte>
+        <Byte>08</Byte>
+      </Actual>
+      <After>
+        <Byte>8B</Byte>
+        <Byte>46</Byte>
+        <Byte>0C</Byte>
+        <Byte>85</Byte>
+        <Byte>C0</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Gun Damage (2 Byte)</Description>
+      <AddressString>gta_sa.exe+33C1C9</AddressString>
+      <Before>
+        <Byte>24</Byte>
+        <Byte>98</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>0F</Byte>
+        <Byte>BF</Byte>
+        <Byte>42</Byte>
+        <Byte>22</Byte>
+      </Actual>
+      <After>
+        <Byte>89</Byte>
+        <Byte>84</Byte>
+        <Byte>24</Byte>
+        <Byte>94</Byte>
+        <Byte>00</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>position Level indicator</Description>
+      <AddressString>gta_sa.exe+2821F2</AddressString>
+      <Before>
+        <Byte>90</Byte>
+        <Byte>90</Byte>
+        <Byte>90</Byte>
+        <Byte>33</Byte>
+        <Byte>C0</Byte>
+      </Before>
+      <Actual>
+        <Byte>83</Byte>
+        <Byte>3C</Byte>
+        <Byte>81</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>75</Byte>
+        <Byte>20</Byte>
+        <Byte>40</Byte>
+        <Byte>83</Byte>
+        <Byte>F8</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :mov ecx,[ebx+08] (Gun Fire Range)</Description>
+      <AddressString>gta_sa.exe+34122F</AddressString>
+      <Before>
+        <Byte>01</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>85</Byte>
+        <Byte>C0</Byte>
+      </Before>
+      <Actual>
+        <Byte>8B</Byte>
+        <Byte>4B</Byte>
+        <Byte>08</Byte>
+      </Actual>
+      <After>
+        <Byte>89</Byte>
+        <Byte>4C</Byte>
+        <Byte>24</Byte>
+        <Byte>20</Byte>
+        <Byte>75</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :mov [eax+34],edx (time bomb location ref)</Description>
+      <AddressString>gta_sa.exe+19ADB1</AddressString>
+      <Before>
+        <Byte>50</Byte>
+        <Byte>30</Byte>
+        <Byte>8B</Byte>
+        <Byte>51</Byte>
+        <Byte>34</Byte>
+      </Before>
+      <Actual>
+        <Byte>89</Byte>
+        <Byte>50</Byte>
+        <Byte>34</Byte>
+      </Actual>
+      <After>
+        <Byte>8B</Byte>
+        <Byte>49</Byte>
+        <Byte>38</Byte>
+        <Byte>50</Byte>
+        <Byte>89</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :mov bl,[ecx+000000B9] cj is in air or not flag</Description>
+      <AddressString>gta_sa.exe+1434EE</AddressString>
+      <Before>
+        <Byte>C2</Byte>
+        <Byte>01</Byte>
+        <Byte>74</Byte>
+        <Byte>40</Byte>
+        <Byte>53</Byte>
+      </Before>
+      <Actual>
+        <Byte>8A</Byte>
+        <Byte>99</Byte>
+        <Byte>B9</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>55</Byte>
+        <Byte>56</Byte>
+        <Byte>0F</Byte>
+        <Byte>B6</Byte>
+        <Byte>F3</Byte>
+      </After>
+    </CodeEntry>
+  </CheatCodes>
+  <UserdefinedSymbols>
+    <SymbolEntry>
+      <Name>booster</Name>
+      <Address>001F0010</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>mult</Name>
+      <Address>02510000</Address>
+    </SymbolEntry>
+  </UserdefinedSymbols>
+  <Comments>CheatTable version: 1.0 updated
+Made by s0LaRdReAm and CoFFeEWinE!
+Many cheats fixed and new cheats added...
+------------------------------------------
+This cheattable goodly working on 1.01 version!
+If you tested on 1.0, version that this cheattable works, please say at the commets on site!
+Gun Damage inst can only get the addresses if its used on someone. 
+</Comments>
+</CheatTable>

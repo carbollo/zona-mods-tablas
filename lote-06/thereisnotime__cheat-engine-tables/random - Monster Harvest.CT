@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="38">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>3</ID>
+      <Description>"Player Stats"</Description>
+      <Options moHideChildren="1"/>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//MonsterHarvest.Player.PlayerStats:ABKGPLKCHLH+16b - 48 63 56 6C           - movsxd  rdx,dword ptr [rsi+6C]
+aobscan(playerstats,48 63 56 6C 48 8B C8) // should be unique
+alloc(newmem,$1000,playerstats)
+
+label(code)
+label(return)
+label(PlayerStatsAddy)
+
+newmem:
+
+code:
+  mov [PlayerStatsAddy],rsi
+  movsxd  rdx,dword ptr [rsi+6C]
+  mov rcx,rax
+  jmp return
+  PlayerStatsAddy:
+
+playerstats:
+  jmp newmem
+  nop 2
+return:
+registersymbol(playerstats)
+registersymbol(PlayerStatsAddy)
+[DISABLE]
+playerstats:
+  db 48 63 56 6C 48 8B C8
+
+unregistersymbol(PlayerStatsAddy)
+unregistersymbol(playerstats)
+dealloc(newmem)
+{
+// ORIGINAL CODE - INJECTION POINT: MonsterHarvest.Player.PlayerStats:ABKGPLKCHLH+16b
+
+MonsterHarvest.Player.PlayerStats:ABKGPLKCHLH+13d: F2 0F 10 C8                    - movsd xmm1,xmm0
+MonsterHarvest.Player.PlayerStats:ABKGPLKCHLH+141: F2 0F 5A C9                    - cvtsd2ss xmm1,xmm1
+MonsterHarvest.Player.PlayerStats:ABKGPLKCHLH+145: 83 38 00                       - cmp dword ptr [rax],00
+MonsterHarvest.Player.PlayerStats:ABKGPLKCHLH+148: 48 8D 64 24 00                 - lea rsp,[rsp+00]
+MonsterHarvest.Player.PlayerStats:ABKGPLKCHLH+14d: 90                             - nop 
+MonsterHarvest.Player.PlayerStats:ABKGPLKCHLH+14e: 49 BB 20 10 D4 B8 C2 01 00 00  - mov r11,MonsterHarvest.MHUI.UIClockController:SetStamina
+MonsterHarvest.Player.PlayerStats:ABKGPLKCHLH+158: 41 FF D3                       - call r11
+MonsterHarvest.Player.PlayerStats:ABKGPLKCHLH+15b: 66 66 90                       - nop 3
+MonsterHarvest.Player.PlayerStats:ABKGPLKCHLH+15e: 49 BB A0 7B 9C 37 C2 01 00 00  - mov r11,MonsterHarvest.MHUI.UIClockController:get_Instance
+MonsterHarvest.Player.PlayerStats:ABKGPLKCHLH+168: 41 FF D3                       - call r11
+// ---------- INJECTING HERE ----------
+MonsterHarvest.Player.PlayerStats:ABKGPLKCHLH+16b: 48 63 56 6C                    - movsxd  rdx,dword ptr [rsi+6C]
+// ---------- DONE INJECTING  ----------
+MonsterHarvest.Player.PlayerStats:ABKGPLKCHLH+16f: 48 8B C8                       - mov rcx,rax
+MonsterHarvest.Player.PlayerStats:ABKGPLKCHLH+172: 83 38 00                       - cmp dword ptr [rax],00
+MonsterHarvest.Player.PlayerStats:ABKGPLKCHLH+175: 90                             - nop 
+MonsterHarvest.Player.PlayerStats:ABKGPLKCHLH+176: 49 BB 70 10 D4 B8 C2 01 00 00  - mov r11,MonsterHarvest.MHUI.UIClockController:SetMoney
+MonsterHarvest.Player.PlayerStats:ABKGPLKCHLH+180: 41 FF D3                       - call r11
+MonsterHarvest.Player.PlayerStats:ABKGPLKCHLH+183: 48 8B 75 F8                    - mov rsi,[rbp-08]
+MonsterHarvest.Player.PlayerStats:ABKGPLKCHLH+187: 48 8D 65 00                    - lea rsp,[rbp+00]
+MonsterHarvest.Player.PlayerStats:ABKGPLKCHLH+18b: 5D                             - pop rbp
+MonsterHarvest.Player.PlayerStats:ABKGPLKCHLH+18c: C3                             - ret 
+MonsterHarvest.Player.PlayerStats:ABKGPLKCHLH+18d: BA F5 00 00 00                 - mov edx,000000F5
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>4</ID>
+          <Description>"Money"</Description>
+          <LastState Value="5000" RealAddress="1C2855ABAFC"/>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>[PlayerStatsAddy]+6c</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>6</ID>
+          <Description>"Stamina"</Description>
+          <LastState Value="1000" RealAddress="1C2855ABAF0"/>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>000000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>[PlayerStatsAddy]+6c-8-4</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>10</ID>
+          <Description>"Max Stamina"</Description>
+          <LastState Value="1000" RealAddress="1C2855ABAF4"/>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C0C0C0</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>[PlayerStatsAddy]+6c-8</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>7</ID>
+          <Description>"XP"</Description>
+          <LastState Value="3" RealAddress="1C2855ABAF8"/>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>[PlayerStatsAddy]+6c-4</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>8</ID>
+          <Description>"Level"</Description>
+          <LastState Value="2" RealAddress="1C2855ABB00"/>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>[PlayerStatsAddy]+6c+4</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>9</ID>
+          <Description>"Heartslime"</Description>
+          <LastState Value="0" RealAddress="1C2855ABB04"/>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>[PlayerStatsAddy]+6c+8</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>5</ID>
+      <Description>"Do Not Use"</Description>
+      <Options moHideChildren="1"/>
+      <LastState Value="" RealAddress="00000000"/>
+      <Color>C0C0C0</Color>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>1</ID>
+          <Description>"Infinite Stacking (right click item)"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+//MGCACAIOGFK:PBHAFKBKKGM+14 - 2B 4C 24 08 - sub ecx,[rsp+08]
+aobscan(infinitestack,2B 4C 24 08 89 4F 20) // should be unique
+infinitestack:
+  db 90 90 90 90
+registersymbol(infinitestack)
+[DISABLE]
+infinitestack:
+  db 2B 4C 24 08
+
+unregistersymbol(infinitestack)
+{
+// ORIGINAL CODE - INJECTION POINT: MGCACAIOGFK:PBHAFKBKKGM+14
+
+1C2BEEC9777: 00 00           - add [rax],al
+1C2BEEC9779: 00 00           - add [rax],al
+1C2BEEC977B: 00 00           - add [rax],al
+1C2BEEC977D: 00 00           - add [rax],al
+1C2BEEC977F: 00 48 83        - add [rax-7D],cl
+MGCACAIOGFK:PBHAFKBKKGM+2: EC              - in al,dx
+MGCACAIOGFK:PBHAFKBKKGM+3: 18 48 89        - sbb [rax-77],cl
+MGCACAIOGFK:PBHAFKBKKGM+6: 3C 24           - cmp al,24
+MGCACAIOGFK:PBHAFKBKKGM+8: 48 8B F9        - mov rdi,rcx
+MGCACAIOGFK:PBHAFKBKKGM+b: 48 89 54 24 08  - mov [rsp+08],rdx
+// ---------- INJECTING HERE ----------
+MGCACAIOGFK:PBHAFKBKKGM+10: 48 63 4F 20     - movsxd  rcx,dword ptr [rdi+20]
+// ---------- DONE INJECTING  ----------
+MGCACAIOGFK:PBHAFKBKKGM+14: 2B 4C 24 08     - sub ecx,[rsp+08]
+MGCACAIOGFK:PBHAFKBKKGM+18: 89 4F 20        - mov [rdi+20],ecx
+MGCACAIOGFK:PBHAFKBKKGM+1b: 33 C0           - xor eax,eax
+MGCACAIOGFK:PBHAFKBKKGM+1d: 85 C9           - test ecx,ecx
+MGCACAIOGFK:PBHAFKBKKGM+1f: 48 0F 4F C1     - cmovg rax,rcx
+MGCACAIOGFK:PBHAFKBKKGM+23: 89 47 20        - mov [rdi+20],eax
+MGCACAIOGFK:PBHAFKBKKGM+26: 85 C0           - test eax,eax
+MGCACAIOGFK:PBHAFKBKKGM+28: 7F 08           - jg MGCACAIOGFK:PBHAFKBKKGM+32
+MGCACAIOGFK:PBHAFKBKKGM+2a: 48 8B 47 18     - mov rax,[rdi+18]
+MGCACAIOGFK:PBHAFKBKKGM+2e: 48 89 47 10     - mov [rdi+10],rax
+}
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <CheatCodes>
+    <CodeEntry>
+      <Description>Change of sub ecx,[rsp+08]</Description>
+      <AddressString>1C2BEEC9794</AddressString>
+      <Before>
+        <Byte>08</Byte>
+        <Byte>48</Byte>
+        <Byte>63</Byte>
+        <Byte>4F</Byte>
+        <Byte>20</Byte>
+      </Before>
+      <Actual>
+        <Byte>2B</Byte>
+        <Byte>4C</Byte>
+        <Byte>24</Byte>
+        <Byte>08</Byte>
+      </Actual>
+      <After>
+        <Byte>89</Byte>
+        <Byte>4F</Byte>
+        <Byte>20</Byte>
+        <Byte>33</Byte>
+        <Byte>C0</Byte>
+      </After>
+    </CodeEntry>
+  </CheatCodes>
+  <UserdefinedSymbols/>
+</CheatTable>

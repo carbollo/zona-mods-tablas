@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>0</ID>
+      <Description>"version: 1.17.0.0_12688467"</Description>
+      <LastState Value="" RealAddress="00000000"/>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>2</ID>
+      <Description>"Money does not decrease"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : Dungeons-Win64-Shipping.exe
+  Version: 
+  Date   : 2024-03-09
+  Author : bboyh
+
+  Money updated when shopping at vendor
+}
+
+[ENABLE]
+
+aobscanmodule(MONEY_UPDATE,Dungeons-Win64-Shipping.exe,89 7B 08 48 8B 5C 24 48 48 8B 74) // should be unique
+alloc(newmem,250,MONEY_UPDATE)
+
+label(code)
+label(return)
+
+newmem:
+  cmp edi,[rbx+08]
+  jl code
+  mov [rbx+08],edi  // original code, update money address
+
+code:
+  mov rbx,[rsp+48]
+  jmp return
+
+MONEY_UPDATE:
+  jmp newmem
+  nop 3
+return:
+registersymbol(MONEY_UPDATE)
+
+[DISABLE]
+
+MONEY_UPDATE:
+  db 89 7B 08 48 8B 5C 24 48
+
+unregistersymbol(MONEY_UPDATE)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: Dungeons-Win64-Shipping.exe+9B0CF6
+
+Dungeons-Win64-Shipping.exe+9B0CD6: 89 7A 08           - mov [rdx+08],edi
+Dungeons-Win64-Shipping.exe+9B0CD9: 49 83 42 08 0C     - add qword ptr [r10+08],0C
+Dungeons-Win64-Shipping.exe+9B0CDE: EB 36              - jmp Dungeons-Win64-Shipping.exe+9B0D16
+Dungeons-Win64-Shipping.exe+9B0CE0: 49 3B D9           - cmp rbx,r9
+Dungeons-Win64-Shipping.exe+9B0CE3: 74 D4              - je Dungeons-Win64-Shipping.exe+9B0CB9
+Dungeons-Win64-Shipping.exe+9B0CE5: 48 8B 06           - mov rax,[rsi]
+Dungeons-Win64-Shipping.exe+9B0CE8: 8B D7              - mov edx,edi
+Dungeons-Win64-Shipping.exe+9B0CEA: 2B 53 08           - sub edx,[rbx+08]
+Dungeons-Win64-Shipping.exe+9B0CED: 48 8B CE           - mov rcx,rsi
+Dungeons-Win64-Shipping.exe+9B0CF0: FF 90 C8 03 00 00  - call qword ptr [rax+000003C8]
+// ---------- INJECTING HERE ----------
+Dungeons-Win64-Shipping.exe+9B0CF6: 89 7B 08           - mov [rbx+08],edi
+// ---------- DONE INJECTING  ----------
+Dungeons-Win64-Shipping.exe+9B0CF9: 48 8B 5C 24 48     - mov rbx,[rsp+48]
+Dungeons-Win64-Shipping.exe+9B0CFE: 48 8B 74 24 50     - mov rsi,[rsp+50]
+Dungeons-Win64-Shipping.exe+9B0D03: 48 83 C4 30        - add rsp,30
+Dungeons-Win64-Shipping.exe+9B0D07: 5F                 - pop rdi
+Dungeons-Win64-Shipping.exe+9B0D08: C3                 - ret 
+Dungeons-Win64-Shipping.exe+9B0D09: 4C 8D 44 24 20     - lea r8,[rsp+20]
+Dungeons-Win64-Shipping.exe+9B0D0E: 49 8B CA           - mov rcx,r10
+Dungeons-Win64-Shipping.exe+9B0D11: E8 1A 32 FC FF     - call Dungeons-Win64-Shipping.exe+973F30
+Dungeons-Win64-Shipping.exe+9B0D16: 48 8B 06           - mov rax,[rsi]
+Dungeons-Win64-Shipping.exe+9B0D19: 8B D7              - mov edx,edi
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>8</ID>
+      <Description>"Unlimited Enchantment Points Usage"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : Dungeons-Win64-Shipping.exe
+  Version: 
+  Date   : 2024-03-09
+  Author : bboyh
+
+  enchantment points update when used or equipping weapons with enchantment points.
+}
+
+[ENABLE]
+
+aobscanmodule(ENCHANT_POINTS,Dungeons-Win64-Shipping.exe,89 83 9C 02 00 00 8B 83) // should be unique
+alloc(newmem,200,ENCHANT_POINTS)
+
+label(code)
+label(return)
+
+newmem:
+  cmp eax,[rbx+0000029C]  // this is the value of total enchantment points used.
+  jg return
+code:
+  mov [rbx+0000029C],eax
+  jmp return
+
+ENCHANT_POINTS:
+  jmp newmem
+  nop
+return:
+registersymbol(ENCHANT_POINTS)
+
+[DISABLE]
+
+ENCHANT_POINTS:
+  db 89 83 9C 02 00 00
+
+unregistersymbol(ENCHANT_POINTS)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: Dungeons-Win64-Shipping.exe+9F01D9
+
+Dungeons-Win64-Shipping.exe+9F01B7: 21 45 FF                 - and [rbp-01],eax
+Dungeons-Win64-Shipping.exe+9F01BA: E8 F1 9D 95 FF           - call Dungeons-Win64-Shipping.exe+349FB0
+Dungeons-Win64-Shipping.exe+9F01BF: EB 91                    - jmp Dungeons-Win64-Shipping.exe+9F0152
+Dungeons-Win64-Shipping.exe+9F01C1: 8D 47 FF                 - lea eax,[rdi-01]
+Dungeons-Win64-Shipping.exe+9F01C4: 48 8B CB                 - mov rcx,rbx
+Dungeons-Win64-Shipping.exe+9F01C7: 33 FF                    - xor edi,edi
+Dungeons-Win64-Shipping.exe+9F01C9: 85 C0                    - test eax,eax
+Dungeons-Win64-Shipping.exe+9F01CB: 0F 4E C7                 - cmovle eax,edi
+Dungeons-Win64-Shipping.exe+9F01CE: 89 83 98 02 00 00        - mov [rbx+00000298],eax
+Dungeons-Win64-Shipping.exe+9F01D4: E8 97 42 FE FF           - call Dungeons-Win64-Shipping.exe+9D4470
+// ---------- INJECTING HERE ----------
+Dungeons-Win64-Shipping.exe+9F01D9: 89 83 9C 02 00 00        - mov [rbx+0000029C],eax
+// ---------- DONE INJECTING  ----------
+Dungeons-Win64-Shipping.exe+9F01DF: 8B 83 98 02 00 00        - mov eax,[rbx+00000298]
+Dungeons-Win64-Shipping.exe+9F01E5: 2B 83 9C 02 00 00        - sub eax,[rbx+0000029C]
+Dungeons-Win64-Shipping.exe+9F01EB: 4C 8B BC 24 90 00 00 00  - mov r15,[rsp+00000090]
+Dungeons-Win64-Shipping.exe+9F01F3: 4C 8B AC 24 A0 00 00 00  - mov r13,[rsp+000000A0]
+Dungeons-Win64-Shipping.exe+9F01FB: 48 8B BC 24 D0 00 00 00  - mov rdi,[rsp+000000D0]
+Dungeons-Win64-Shipping.exe+9F0203: 48 8B B4 24 C8 00 00 00  - mov rsi,[rsp+000000C8]
+Dungeons-Win64-Shipping.exe+9F020B: 39 45 67                 - cmp [rbp+67],eax
+Dungeons-Win64-Shipping.exe+9F020E: 74 23                    - je Dungeons-Win64-Shipping.exe+9F0233
+Dungeons-Win64-Shipping.exe+9F0210: 48 8D 8B 88 01 00 00     - lea rcx,[rbx+00000188]
+Dungeons-Win64-Shipping.exe+9F0217: 89 45 C7                 - mov [rbp-39],eax
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>13</ID>
+      <Description>"No Damage Player"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : Dungeons-Win64-Shipping.exe
+  Version: 
+  Date   : 2024-03-09
+  Author : bboyh
+
+  When player attacked by zombie
+  Null out the function call to damage player.
+}
+
+[ENABLE]
+
+aobscanmodule(PLAYER_DAMAGE,Dungeons-Win64-Shipping.exe,FF 54 24 78 48 81 C4 40 01 00 00) // should be unique
+
+PLAYER_DAMAGE:
+  db 90 90 90 90
+registersymbol(PLAYER_DAMAGE)
+
+[DISABLE]
+
+PLAYER_DAMAGE:
+  db FF 54 24 78 48 81 C4 40 01 00 00
+
+unregistersymbol(PLAYER_DAMAGE)
+
+{
+// ORIGINAL CODE - INJECTION POINT: Dungeons-Win64-Shipping.exe+9D9520
+
+Dungeons-Win64-Shipping.exe+9D94E1: 0F 10 83 C0 00 00 00     - movups xmm0,[rbx+000000C0]
+Dungeons-Win64-Shipping.exe+9D94E8: 0F 11 89 80 00 00 00     - movups [rcx+00000080],xmm1
+Dungeons-Win64-Shipping.exe+9D94EF: 0F 10 8B D0 00 00 00     - movups xmm1,[rbx+000000D0]
+Dungeons-Win64-Shipping.exe+9D94F6: 0F 11 81 90 00 00 00     - movups [rcx+00000090],xmm0
+Dungeons-Win64-Shipping.exe+9D94FD: 0F 10 43 20              - movups xmm0,[rbx+20]
+Dungeons-Win64-Shipping.exe+9D9501: 0F 11 89 A0 00 00 00     - movups [rcx+000000A0],xmm1
+Dungeons-Win64-Shipping.exe+9D9508: 48 63 8C 24 80 00 00 00  - movsxd  rcx,dword ptr [rsp+00000080]
+Dungeons-Win64-Shipping.exe+9D9510: 49 03 C8                 - add rcx,r8
+Dungeons-Win64-Shipping.exe+9D9513: 0F 29 44 24 60           - movaps [rsp+60],xmm0
+Dungeons-Win64-Shipping.exe+9D9518: 4C 8D 84 24 90 00 00 00  - lea r8,[rsp+00000090]
+// ---------- INJECTING HERE ----------
+Dungeons-Win64-Shipping.exe+9D9520: FF 54 24 78              - call qword ptr [rsp+78]
+// ---------- DONE INJECTING  ----------
+Dungeons-Win64-Shipping.exe+9D9524: 48 81 C4 40 01 00 00     - add rsp,00000140
+Dungeons-Win64-Shipping.exe+9D952B: 5B                       - pop rbx
+Dungeons-Win64-Shipping.exe+9D952C: C3                       - ret 
+Dungeons-Win64-Shipping.exe+9D952D: CC                       - int 3 
+Dungeons-Win64-Shipping.exe+9D952E: CC                       - int 3 
+Dungeons-Win64-Shipping.exe+9D952F: CC                       - int 3 
+Dungeons-Win64-Shipping.exe+9D9530: 40 55                    - push rbp
+Dungeons-Win64-Shipping.exe+9D9532: 56                       - push rsi
+Dungeons-Win64-Shipping.exe+9D9533: 57                       - push rdi
+Dungeons-Win64-Shipping.exe+9D9534: 48 8D 6C 24 B9           - lea rbp,[rsp-47]
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>18</ID>
+      <Description>"Inf Arrows"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : Dungeons-Win64-Shipping.exe
+  Version: 
+  Date   : 2024-03-09
+  Author : bboyh
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(ARROWS_DEC,Dungeons-Win64-Shipping.exe,29 BB FC 01 00 00 48 8B CB) // should be unique
+
+ARROWS_DEC:
+  db 90 90 90 90 90 90
+registersymbol(ARROWS_DEC)
+
+[DISABLE]
+
+ARROWS_DEC:
+  db 29 BB FC 01 00 00
+
+unregistersymbol(ARROWS_DEC)
+
+{
+// ORIGINAL CODE - INJECTION POINT: Dungeons-Win64-Shipping.exe+B4A9D2
+
+Dungeons-Win64-Shipping.exe+B4A9AA: 83 B9 FC 01 00 00 00  - cmp dword ptr [rcx+000001FC],00
+Dungeons-Win64-Shipping.exe+B4A9B1: 8B FA                 - mov edi,edx
+Dungeons-Win64-Shipping.exe+B4A9B3: 48 8B D9              - mov rbx,rcx
+Dungeons-Win64-Shipping.exe+B4A9B6: 74 49                 - je Dungeons-Win64-Shipping.exe+B4AA01
+Dungeons-Win64-Shipping.exe+B4A9B8: 48 8B 89 08 02 00 00  - mov rcx,[rcx+00000208]
+Dungeons-Win64-Shipping.exe+B4A9BF: 48 85 C9              - test rcx,rcx
+Dungeons-Win64-Shipping.exe+B4A9C2: 74 0E                 - je Dungeons-Win64-Shipping.exe+B4A9D2
+Dungeons-Win64-Shipping.exe+B4A9C4: E8 77 A4 FA FF        - call Dungeons-Win64-Shipping.exe+AF4E40
+Dungeons-Win64-Shipping.exe+B4A9C9: 83 B8 80 00 00 00 00  - cmp dword ptr [rax+00000080],00
+Dungeons-Win64-Shipping.exe+B4A9D0: 75 2F                 - jne Dungeons-Win64-Shipping.exe+B4AA01
+// ---------- INJECTING HERE ----------
+Dungeons-Win64-Shipping.exe+B4A9D2: 29 BB FC 01 00 00     - sub [rbx+000001FC],edi
+// ---------- DONE INJECTING  ----------
+Dungeons-Win64-Shipping.exe+B4A9D8: 48 8B CB              - mov rcx,rbx
+Dungeons-Win64-Shipping.exe+B4A9DB: E8 D0 08 01 00        - call Dungeons-Win64-Shipping.exe+B5B2B0
+Dungeons-Win64-Shipping.exe+B4A9E0: 83 BB FC 01 00 00 00  - cmp dword ptr [rbx+000001FC],00
+Dungeons-Win64-Shipping.exe+B4A9E7: 7F 18                 - jg Dungeons-Win64-Shipping.exe+B4AA01
+Dungeons-Win64-Shipping.exe+B4A9E9: 48 8B 83 E8 00 00 00  - mov rax,[rbx+000000E8]
+Dungeons-Win64-Shipping.exe+B4A9F0: 80 B8 18 01 00 00 03  - cmp byte ptr [rax+00000118],03
+Dungeons-Win64-Shipping.exe+B4A9F7: 75 08                 - jne Dungeons-Win64-Shipping.exe+B4AA01
+Dungeons-Win64-Shipping.exe+B4A9F9: 48 8B CB              - mov rcx,rbx
+Dungeons-Win64-Shipping.exe+B4A9FC: E8 AF 5E 3D 00        - call Dungeons-Win64-Shipping.exe+F208B0
+Dungeons-Win64-Shipping.exe+B4AA01: 48 8B 5C 24 30        - mov rbx,[rsp+30]
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>12</ID>
+      <Description>"General Health Dec Function"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : Dungeons-Win64-Shipping.exe
+  Version: 
+  Date   : 2024-03-09
+  Author : bboyh
+
+  General Health Dec fucntion
+}
+
+[ENABLE]
+
+aobscanmodule(HEALTH,Dungeons-Win64-Shipping.exe,F3 0F 11 49 4C 45 84) // should be unique
+alloc(newmem,$1000,HEALTH)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  movss [rcx+4C],xmm1
+  jmp return
+
+HEALTH:
+  jmp newmem
+return:
+registersymbol(HEALTH)
+
+[DISABLE]
+
+HEALTH:
+  db F3 0F 11 49 4C
+
+unregistersymbol(HEALTH)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: Dungeons-Win64-Shipping.exe+3D9A50
+
+Dungeons-Win64-Shipping.exe+3D9A43: 48 83 C4 20        - add rsp,20
+Dungeons-Win64-Shipping.exe+3D9A47: 5F                 - pop rdi
+Dungeons-Win64-Shipping.exe+3D9A48: C3                 - ret 
+Dungeons-Win64-Shipping.exe+3D9A49: CC                 - int 3 
+Dungeons-Win64-Shipping.exe+3D9A4A: CC                 - int 3 
+Dungeons-Win64-Shipping.exe+3D9A4B: CC                 - int 3 
+Dungeons-Win64-Shipping.exe+3D9A4C: CC                 - int 3 
+Dungeons-Win64-Shipping.exe+3D9A4D: CC                 - int 3 
+Dungeons-Win64-Shipping.exe+3D9A4E: CC                 - int 3 
+Dungeons-Win64-Shipping.exe+3D9A4F: CC                 - int 3 
+// ---------- INJECTING HERE ----------
+Dungeons-Win64-Shipping.exe+3D9A50: F3 0F 11 49 4C     - movss [rcx+4C],xmm1
+// ---------- DONE INJECTING  ----------
+Dungeons-Win64-Shipping.exe+3D9A55: 45 84 C0           - test r8b,r8b
+Dungeons-Win64-Shipping.exe+3D9A58: 0F 85 22 89 FF FF  - jne Dungeons-Win64-Shipping.exe+3D2380
+Dungeons-Win64-Shipping.exe+3D9A5E: C3                 - ret 
+Dungeons-Win64-Shipping.exe+3D9A5F: CC                 - int 3 
+Dungeons-Win64-Shipping.exe+3D9A60: 0F B6 41 38        - movzx eax,byte ptr [rcx+38]
+Dungeons-Win64-Shipping.exe+3D9A64: C3                 - ret 
+Dungeons-Win64-Shipping.exe+3D9A65: CC                 - int 3 
+Dungeons-Win64-Shipping.exe+3D9A66: CC                 - int 3 
+Dungeons-Win64-Shipping.exe+3D9A67: CC                 - int 3 
+Dungeons-Win64-Shipping.exe+3D9A68: CC                 - int 3 
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>20</ID>
+      <Description>"Get Money and Gold read function"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : Dungeons-Win64-Shipping.exe
+  Version: 
+  Date   : 2024-04-21
+  Author : bboyh
+
+  Finds the address that reads the money/gold values when entering the inventory
+  screen. seems to be that the difference in offsets between money and gold are
+  0x4 * 4 bytes way. There are about 9 bytes after the ret that can be used
+  for something else. This function will only read gold if gold has already been
+  collected.
+}
+
+[ENABLE]
+
+aobscanmodule(MONEY_GOLD_READ,Dungeons-Win64-Shipping.exe,F8 8B 41 08 C3 CC) // should be unique
+
+MONEY_GOLD_READ+01:
+  db 8B 41 08 C3 CC
+registersymbol(MONEY_GOLD_READ)
+
+[DISABLE]
+
+MONEY_GOLD_READ+01:
+  db 8B 41 08 C3 CC
+
+unregistersymbol(MONEY_GOLD_READ)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: Dungeons-Win64-Shipping.exe+DE3673
+
+Dungeons-Win64-Shipping.exe+DE365A: 0F 94 C2     - sete dl
+Dungeons-Win64-Shipping.exe+DE365D: 44 84 C2     - test dl,r8b
+Dungeons-Win64-Shipping.exe+DE3660: 75 0C        - jne Dungeons-Win64-Shipping.exe+DE366E
+Dungeons-Win64-Shipping.exe+DE3662: 48 83 C1 0C  - add rcx,0C
+Dungeons-Win64-Shipping.exe+DE3666: 49 3B C9     - cmp rcx,r9
+Dungeons-Win64-Shipping.exe+DE3669: 75 E5        - jne Dungeons-Win64-Shipping.exe+DE3650
+Dungeons-Win64-Shipping.exe+DE366B: 33 C0        - xor eax,eax
+Dungeons-Win64-Shipping.exe+DE366D: C3           - ret 
+Dungeons-Win64-Shipping.exe+DE366E: 49 3B C9     - cmp rcx,r9
+Dungeons-Win64-Shipping.exe+DE3671: 74 F8        - je Dungeons-Win64-Shipping.exe+DE366B
+// ---------- INJECTING HERE ----------
+Dungeons-Win64-Shipping.exe+DE3673: 8B 41 08     - mov eax,[rcx+08]
+// ---------- DONE INJECTING  ----------
+Dungeons-Win64-Shipping.exe+DE3676: C3           - ret 
+Dungeons-Win64-Shipping.exe+DE3677: CC           - int 3 
+Dungeons-Win64-Shipping.exe+DE3678: CC           - int 3 
+Dungeons-Win64-Shipping.exe+DE3679: CC           - int 3 
+Dungeons-Win64-Shipping.exe+DE367A: CC           - int 3 
+Dungeons-Win64-Shipping.exe+DE367B: CC           - int 3 
+Dungeons-Win64-Shipping.exe+DE367C: CC           - int 3 
+Dungeons-Win64-Shipping.exe+DE367D: CC           - int 3 
+Dungeons-Win64-Shipping.exe+DE367E: CC           - int 3 
+Dungeons-Win64-Shipping.exe+DE367F: CC           - int 3 
+}
+</AssemblerScript>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

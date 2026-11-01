@@ -1,0 +1,1136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="46">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>3197</ID>
+      <Description>"[X] &lt;== Hearts of Iron IV v1.18.1 "unofficial" Table Extension"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <Color>FF0000</Color>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>5652</ID>
+          <Description>"-- ! -- All cheats except the console, achievement and upgrade cheat require Recifense's script -- ! --"</Description>
+          <Color>0080FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>7220</ID>
+          <Description>"-- ! -- Activate Modded Achievements before main menu (during game startup) if using mods -- ! --"</Description>
+          <Color>0080FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>0</ID>
+          <Description>"[X] &lt;== Enable Console/Developer Mode in Ironman"</Description>
+          <Options moHideChildren="1"/>
+          <Color>008000</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : hoi4.exe
+  Version:
+  Date   : 2022-09-30
+  Author : Nameless
+  Updated:
+          Version: 1.18.1
+          Date:    2026-05-05
+          Updater: Fuwa
+
+  This script does blah blah blah
+
+  To find the CHP6 and CHP7 bits:
+  Find the string "Command available only for developers", put a breakpoint on the mov above (in non-ironman).
+  Run "focus.autocomplete", and it shoudl break. Get the basepointer, get the struct, get the offset bool into the address list,
+  "what accesses.."
+
+  run "xp 50" to get the normal one (CHP6)
+  run "focus.autocomplete" (again), to get those. (CHP7)
+
+
+}
+
+{
+define(CHP1,hoi4.exe+B51BED) //1.12.2 -&amp;gt; Enable console key
+define(CHP2,hoi4.exe+1B8108A) //1.12.2 -&amp;gt; ("Console not available in multiplayer or ironman mode.")
+define(CHP3,hoi4.exe+1B81140) //1.12.2 -&gt; ("Command available only for developers.") the JE a bit above
+define(CHP4,hoi4.exe+1B81167) //1.12.2 -&gt; Only a little below CHP3, mov byte ptr [r15+000000D1],01. AOB hits one before
+define(CHP5,hoi4.exe+1B81142) //1.12.2 -&gt; Just above "Command available only for developers.",  mov byte ptr [r15+000000D0],00, AOB hits one before
+define(CHP5b,hoi4.exe+20b3ae7) // 1.13.7 -&gt; A bit above "command"
+define(CHP6,hoi4.exe+1B8128) //1.12.2 -&gt;  mov [r15+000000D0],cl, AOB hits 7 before
+define(CHP7,hoi4.exe+1B82900) //1.12.2 -&gt; Separate function,  mov [rcx+000000D0],dl, AOB hits one before
+
+}
+
+[ENABLE]
+
+aobscanmodule(CHP1,hoi4.exe,84 C0 0F 84 ?? ?? ?? ?? 48 8B CF E8 ?? ?? ?? ?? E9 ?? ?? ?? ?? 49)
+
+// Enable console in multiplayer and ironman
+aobScanModule(CHP2,$process, 84 C0 75 1A 49 8B 8D 90 00 00 00 48 85 C9 )
+
+// Developer commands
+aobscanmodule(CHP3,hoi4.exe,74 1E 41 C6 07 00)
+
+// Crash on console use
+//aobscanmodule(CHP6,hoi4.exe, 41 88 ?? D8 00 00 00) -&gt; brute forced it
+aobscanmodule(CHP6,hoi4.exe, 41 88 B7 D8 00 00 00)
+aobscanmodule(CHP6b,hoi4.exe, 0F B6 45 90 41 88 85 D8 00 00 00)
+aobscanmodule(CHP6c,hoi4.exe, 41 88 85 D8 00 00 00 48 83 7D B0 00)
+aobscanmodule(CHP6d,hoi4.exe, 41 88 85 D8 00 00 00 48 83 7D D8 00)
+
+// Crash on console use on focus.autocomplete
+aobScanModule(CHP7,$process, CC 88 91 D8 00 00 00 C3 CC)
+// 1.16: CC 88 91 D8 00 00 00 C3 CC ;;;  CC 88 91 ?? 00 00 00 C3 CC
+
+/*
+hoi4.exe+1B81087 - FF 50 10              - call qword ptr [rax+10]
+CHP2             - 84 C0                 - test al,al
+hoi4.exe+1B8108C - 75 1A                 - jne hoi4.exe+1B810A8 &lt;-- Nop out
+hoi4.exe+1B8108E - 49 8B 8F 88000000     - mov rcx,[r15+00000088]
+*/
+
+registersymbol(CHP1 CHP2 CHP3 CHP6 CHP6b CHP6c CHP6d CHP7)
+newmem:
+
+CHP1+2:
+ nop
+ nop
+ nop
+ nop
+ nop
+ nop
+
+CHP2+2:
+ db 90 90         // replace jne with nop, never jump
+
+CHP3:
+ db eb
+
+CHP6:
+ nop
+ nop
+ nop
+ nop
+ nop
+ nop
+ nop
+
+CHP6b+4:
+ nop
+ nop
+ nop
+ nop
+ nop
+ nop
+ nop
+
+CHP6c:
+ nop
+ nop
+ nop
+ nop
+ nop
+ nop
+ nop
+
+CHP6d:
+ nop
+ nop
+ nop
+ nop
+ nop
+ nop
+ nop
+
+CHP7+1:
+ nop
+ nop
+ nop
+ nop
+ nop
+ nop
+
+[DISABLE]
+
+CHP1+2:
+  db 0F 84 B1 02 00 00
+
+CHP2+2:
+ db 74 35
+
+CHP3:
+ db 74
+
+CHP6:
+ //mov [r13+000000D8],al
+ db 41 88 85 D8 00 00 00
+
+CHP6b+4:
+ db 41 88 85 D8 00 00 00
+
+CHP6c:
+ db 41 88 85 D8 00 00 00
+
+CHP6d:
+ db 41 88 85 D8 00 00 00
+
+CHP7+1:
+ //mov [rcx+000000D8],dl
+ db CC 88 91 D8 00 00 00 C3 CC
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: hoi4.exe+B51BEF
+
+hoi4.exe+B51BC3: 48 8B CF              - mov rcx,rdi
+hoi4.exe+B51BC6: E8 15 02 B9 00        - call hoi4.exe+16E1DE0
+hoi4.exe+B51BCB: E9 D6 02 00 00        - jmp hoi4.exe+B51EA6
+hoi4.exe+B51BD0: 48 8B 0D D1 33 F0 01  - mov rcx,[hoi4.exe+2A54FA8]
+hoi4.exe+B51BD7: 48 85 C9              - test rcx,rcx
+hoi4.exe+B51BDA: 75 0C                 - jne hoi4.exe+B51BE8
+hoi4.exe+B51BDC: E8 2F F3 02 01        - call hoi4.exe+1B80F10
+hoi4.exe+B51BE1: 48 8B 0D C0 33 F0 01  - mov rcx,[hoi4.exe+2A54FA8]
+hoi4.exe+B51BE8: E8 C3 F2 02 01        - call hoi4.exe+1B80EB0
+hoi4.exe+B51BED: 84 C0                 - test al,al
+// ---------- INJECTING HERE ----------
+hoi4.exe+B51BEF: 0F 84 B1 02 00 00     - je hoi4.exe+B51EA6
+// ---------- DONE INJECTING  ----------
+hoi4.exe+B51BF5: 48 8B CF              - mov rcx,rdi
+hoi4.exe+B51BF8: E8 83 03 B9 00        - call hoi4.exe+16E1F80
+hoi4.exe+B51BFD: E9 A4 02 00 00        - jmp hoi4.exe+B51EA6
+hoi4.exe+B51C02: 49 8B CE              - mov rcx,r14
+hoi4.exe+B51C05: E8 36 52 D7 00        - call hoi4.exe+18C6E40
+hoi4.exe+B51C0A: 49 8B CE              - mov rcx,r14
+hoi4.exe+B51C0D: 84 C0                 - test al,al
+hoi4.exe+B51C0F: 74 14                 - je hoi4.exe+B51C25
+hoi4.exe+B51C11: E8 7A 47 D7 00        - call hoi4.exe+18C6390
+hoi4.exe+B51C16: 8B D0                 - mov edx,eax
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>3321</ID>
+              <Description>"http://www.hoi4wiki.com/Console_commands"</Description>
+              <Options moHideChildren="1"/>
+              <Color>0080FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>3320</ID>
+              <Description>"! -- List of console commands on the wiki -- !"</Description>
+              <Color>0080FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>7218</ID>
+          <Description>"[X] &lt;== Enable Achievements with mods"</Description>
+          <Options moHideChildren="1"/>
+          <Color>008000</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>//=========================================
+// Definitions
+//=========================================
+{
+define(MAVC+5,"hoi4.exe"+00217D15)
+define(MACD+C,"hoi4.exe"+000A0EDA)
+define(MAGR+7,"hoi4.exe"+00283AEC)
+
+1.10.4
+define(MAVC+5, "hoi4.exe"+00502355)
+define(MACD+C, "hoi4.exe"+0013B2CA) // Doesn't have any effect on the custom difficulty
+define(MAGR+7, "hoi4.exe"+0059DF46)
+
+
+}
+//=========================================
+[ENABLE]
+//=========================================
+
+{$LUA}
+memrec.Color = 0x00008000
+{$ASM}
+
+// Allows achievements with NAC (Not Achievement Compatible) mods
+aobScanModule(MAVC,$process,E8 ?? ?? ?? ?? 40 88 BB A2 00 00 00)
+
+
+registerSymbol(MAVC)
+
+//=========================================
+// Actual script
+//=========================================
+MAVC+5:
+ mov byte ptr [rbx+a2],01
+ 
+//=========================================
+[DISABLE]
+//=========================================
+// This part restores all original code
+//=========================================
+
+{$LUA}
+memrec.Color = 0x00c08000
+{$ASM}
+
+MAVC+5:
+// mov [rbx+6A],dil
+ db 40 88 BB A2 00 00 00
+ 
+
+unregisterSymbol(MAVC)
+
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>7219</ID>
+              <Description>"-- ! -- Experimental feature -- ! --"</Description>
+              <Color>0080FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>7355</ID>
+          <Description>"[X] &lt;== Upgrade some equipment to 99"</Description>
+          <Color>C08000</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : hoi4.exe
+  Version: 
+  Date   : 2022-10-08
+  Author : Nameless
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(UpgradeLevel,$process,41 38 AD 34 01 00 00) // should be unique
+aobscanmodule(UPXP,$process,8B 08 89 8F D8 09 00 00) //8B 08 89 8D 20 01 00 00
+
+alloc(newmem,$1000,UpgradeLevel)
+
+label(code)
+label(return)
+label(noxpcost)
+label(return_upxp)
+
+registersymbol(UpgradeLevel)
+registersymbol(UPXP)
+
+
+newmem:
+
+code:
+  mov [r13+00000134],#99
+  cmp [r13+00000134],bpl
+  
+  jmp return
+
+noxpcost:
+  mov ecx,500
+  mov [rdi+000009D8],ecx
+  jmp return_upxp
+
+UpgradeLevel:
+ jmp newmem
+  nop 2
+return:
+
+UPXP:
+  jmp noxpcost
+  nop
+  nop
+  nop
+return_upxp:
+
+[DISABLE]
+
+UpgradeLevel:
+  db 41 38 AD 34 01 00 00
+
+UPXP:
+  db 8B 08 89 8F D8 09 00 00
+
+
+unregistersymbol(UpgradeLevel)
+//unregistersymbol(UPG2)
+//unregistersymbol(UPG3)
+unregistersymbol(UPXP)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: hoi4.exe+1680188
+
+hoi4.exe+1680163: 48 8D 15 4E 88 94 00  - lea rdx,[hoi4.exe+1FC89B8]
+hoi4.exe+168016A: 48 8D 4C 24 20        - lea rcx,[rsp+20]
+hoi4.exe+168016F: E8 DC 77 38 00        - call hoi4.exe+1A07950
+hoi4.exe+1680174: 90                    - nop 
+hoi4.exe+1680175: 41 B0 01              - mov r8b,01
+hoi4.exe+1680178: 48 8D 54 24 20        - lea rdx,[rsp+20]
+hoi4.exe+168017D: 49 8B CE              - mov rcx,r14
+hoi4.exe+1680180: FF D3                 - call rbx
+hoi4.exe+1680182: 48 8B 10              - mov rdx,[rax]
+hoi4.exe+1680185: 48 8B C8              - mov rcx,rax
+// ---------- INJECTING HERE ----------
+hoi4.exe+1680188: 44 38 A5 0C 01 00 00  - cmp [rbp+0000010C],r12b
+// ---------- DONE INJECTING  ----------
+hoi4.exe+168018F: 76 08                 - jna hoi4.exe+1680199
+hoi4.exe+1680191: FF 92 70 02 00 00     - call qword ptr [rdx+00000270]
+hoi4.exe+1680197: EB 07                 - jmp hoi4.exe+16801A0
+hoi4.exe+1680199: FF 92 78 02 00 00     - call qword ptr [rdx+00000278]
+hoi4.exe+168019F: 90                    - nop 
+hoi4.exe+16801A0: 48 8B 54 24 38        - mov rdx,[rsp+38]
+hoi4.exe+16801A5: 48 83 FA 10           - cmp rdx,10
+hoi4.exe+16801A9: 72 32                 - jb hoi4.exe+16801DD
+hoi4.exe+16801AB: 48 FF C2              - inc rdx
+hoi4.exe+16801AE: 48 8B 4C 24 20        - mov rcx,[rsp+20]
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>17334</ID>
+          <Description>"[X] &lt;== Get player pointer (experimental)"</Description>
+          <Options moHideChildren="1"/>
+          <Color>0000FF</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : hoi4.exe
+  Version: 
+  Date   : 2024-11-14
+  Author : Nameless
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(GetPPlayer,hoi4.exe,48 8B 01 FF 50 48 48 8D 95 80) // should be unique
+alloc(newmem,$1000,GetPPlayer)
+
+label(code)
+label(return)
+label(pPlayer)
+registersymbol(GetPPlayer)
+registersymbol(pPlayer)
+
+newmem:
+
+code:
+  mov [pPlayer],rcx
+  mov rax,[rcx]
+  call qword ptr [rax+48]
+  jmp return
+  
+pPlayer:
+ dq 0
+
+GetPPlayer:
+  jmp newmem
+  nop
+return:
+
+[DISABLE]
+
+GetPPlayer:
+  db 48 8B 01 FF 50 48
+
+unregistersymbol(GetPPlayer)
+unregistersymbol(pPlayer)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: hoi4.exe+276BE9
+
+hoi4.exe+276BC6: FF 50 60              - call qword ptr [rax+60]
+hoi4.exe+276BC9: EB 0C                 - jmp hoi4.exe+276BD7
+hoi4.exe+276BCB: 33 D2                 - xor edx,edx
+hoi4.exe+276BCD: 48 8B 4F 10           - mov rcx,[rdi+10]
+hoi4.exe+276BD1: E8 BA 12 37 00        - call hoi4.exe+5E7E90
+hoi4.exe+276BD6: 90                    - nop 
+hoi4.exe+276BD7: 48 8D 4D 90           - lea rcx,[rbp-70]
+hoi4.exe+276BDB: E8 30 91 1A 00        - call hoi4.exe+41FD10
+hoi4.exe+276BE0: E9 9F 00 00 00        - jmp hoi4.exe+276C84
+hoi4.exe+276BE5: 48 8B 4F 10           - mov rcx,[rdi+10]
+// ---------- INJECTING HERE ----------
+hoi4.exe+276BE9: 48 8B 01              - mov rax,[rcx]
+// ---------- DONE INJECTING  ----------
+hoi4.exe+276BEC: FF 50 48              - call qword ptr [rax+48]
+hoi4.exe+276BEF: 48 8D 95 80 00 00 00  - lea rdx,[rbp+00000080]
+hoi4.exe+276BF6: 48 8B C8              - mov rcx,rax
+hoi4.exe+276BF9: E8 A2 D6 33 00        - call hoi4.exe+5B42A0
+hoi4.exe+276BFE: 8B 00                 - mov eax,[rax]
+hoi4.exe+276C00: 01 47 38              - add [rdi+38],eax
+hoi4.exe+276C03: 8B 1D DF 57 BD 02     - mov ebx,[hoi4.exe+2E4C3E8]
+hoi4.exe+276C09: 40 38 35 99 1A 0A 03  - cmp [hoi4.exe+33186A9],sil
+hoi4.exe+276C10: 74 58                 - je hoi4.exe+276C6A
+hoi4.exe+276C12: 40 38 35 67 FE BC 02  - cmp [hoi4.exe+2E46A80],sil
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>17335</ID>
+              <Description>"Will get the player pointer at midnight, so let a day pass"</Description>
+              <Color>0080FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>17336</ID>
+              <Description>"Do not enable this if you are using Recifenses script"</Description>
+              <Color>0080FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>17337</ID>
+          <Description>"[X] &lt;== Get province pointer (experimental)"</Description>
+          <Options moHideChildren="1"/>
+          <Color>0000FF</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : hoi4.exe
+  Version: 
+  Date   : 2024-11-16
+  Author : Nameless
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(GetProvincePointer,hoi4.exe,8B 48 40 89 4D 58) // should be unique
+alloc(newmem,$1000,GetProvincePointer)
+
+label(code)
+label(return)
+
+registersymbol(pRegion)
+registersymbol(GetProvincePointer)
+
+newmem:
+
+code:
+  mov [pRegion],rax
+  mov ecx,[rax+40]
+  mov [rbp+58],ecx
+  jmp return
+
+pRegion:
+ dq 0
+
+GetProvincePointer:
+  jmp newmem
+  nop
+return:
+
+[DISABLE]
+
+GetProvincePointer:
+  db 8B 48 40 89 4D 58
+
+unregistersymbol(GetProvincePointer)
+unregistersymbol(pRegion)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: hoi4.exe+14F640A
+
+hoi4.exe+14F63E3: C6 44 24 30 00        - mov byte ptr [rsp+30],00
+hoi4.exe+14F63E8: 80 63 75 EF           - and byte ptr [rbx+75],-11
+hoi4.exe+14F63EC: 48 8B 03              - mov rax,[rbx]
+hoi4.exe+14F63EF: 48 8B CB              - mov rcx,rbx
+hoi4.exe+14F63F2: FF 50 78              - call qword ptr [rax+78]
+hoi4.exe+14F63F5: 41 80 66 75 EF        - and byte ptr [r14+75],-11
+hoi4.exe+14F63FA: 49 8B 06              - mov rax,[r14]
+hoi4.exe+14F63FD: 49 8B CE              - mov rcx,r14
+hoi4.exe+14F6400: FF 50 78              - call qword ptr [rax+78]
+hoi4.exe+14F6403: 48 8B 86 40 05 00 00  - mov rax,[rsi+00000540]
+// ---------- INJECTING HERE ----------
+hoi4.exe+14F640A: 8B 48 38              - mov ecx,[rax+38]
+// ---------- DONE INJECTING  ----------
+hoi4.exe+14F640D: 89 4D 58              - mov [rbp+58],ecx
+hoi4.exe+14F6410: 4C 8D 4D 58           - lea r9,[rbp+58]
+hoi4.exe+14F6414: 4C 8D 05 B1 E5 EC 00  - lea r8,[hoi4.exe+23C49CC] ("VALUE")
+hoi4.exe+14F641B: 48 8D 15 9E 63 13 01  - lea rdx,[hoi4.exe+262C7C0] ("STATE_VIEW_WICTORY_POINTS")
+hoi4.exe+14F6422: 48 8D 4C 24 30        - lea rcx,[rsp+30]
+hoi4.exe+14F6427: E8 A4 1F D9 FE        - call hoi4.exe+2883D0
+hoi4.exe+14F642C: 48 8B D0              - mov rdx,rax
+hoi4.exe+14F642F: 49 8B CE              - mov rcx,r14
+hoi4.exe+14F6432: E8 89 6F A5 00        - call hoi4.exe+1F4D3C0
+hoi4.exe+14F6437: 4C 8B 75 68           - mov r14,[rbp+68]
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>17338</ID>
+              <Description>"Do not enable this if you are using Recifenses script"</Description>
+              <Color>0080FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>3703</ID>
+          <Description>"[X] &lt;== Minimum Fuel (Requires player pointer)"</Description>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+          <Color>008000</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>//=========================================
+// Definitions
+//=========================================
+{
+define(MOMF+5,"hoi4.exe"+005C8DB8)
+
+define(MOMF+5, "hoi4.exe"+0099CA97) 
+}
+//=========================================
+[ENABLE]
+//=========================================
+
+{$LUA}
+memrec.Color = 0x00008000
+{$ASM}
+
+label(_BackMMF)
+label(_ExitMMF)
+
+aobScanModule(MOMF,$process,48 8B 51 10 48 89 54 24 50)
+
+registerSymbol(_MonMinFuel)
+registerSymbol(MOMF)
+
+//=========================================
+alloc(_MonMinFuel,512,$process)
+//=========================================
+_MonMinFuel:
+ push rax
+ push rbx
+ mov rax,[pPlayer]
+ cmp [rcx+000000B0],rax
+ jne _ExitMMF
+
+ mov rbx, #8192000000 //#2228224000
+ cmp [rcx+10],rbx
+ jns _ExitMMF
+
+ mov [rcx+10],rbx
+
+_ExitMMF:
+ pop rbx
+ pop rax
+ mov rdx,[rcx+10]
+ mov [rsp+50],rdx 
+jmp _BackMMF
+
+MOMF:
+ jmp _MonMinFuel
+ nop
+ nop
+ nop
+ nop
+_BackMMF:
+
+//=========================================
+[DISABLE]
+//=========================================
+// This part restores all original code
+//=========================================
+
+{$LUA}
+memrec.Color = 0x00c08000
+{$ASM}
+
+MOMF:
+//mov rdx,[rcx+10]
+//mov [rsp+50],rdx
+  db 48 8B 51 10 48 89 54 24 50
+
+unregisterSymbol(_MonMinFuel)
+unregisterSymbol(MOMF)
+
+dealloc(_MonMinFuel)
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>3208</ID>
+          <Description>"[X] &lt;======== Pointers (Requires player and province pointers) ========"</Description>
+          <Options moHideChildren="1" moActivateChildrenAsWell="1"/>
+          <Color>404080</Color>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>3209</ID>
+              <Description>"[X] &lt;================== Country Info =================="</Description>
+              <Options moHideChildren="1" moActivateChildrenAsWell="1"/>
+              <Color>008000</Color>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>3210</ID>
+                  <Description>"[X] &lt;== Politics ==================="</Description>
+                  <Options moHideChildren="1"/>
+                  <Color>800000</Color>
+                  <GroupHeader>1</GroupHeader>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>7347</ID>
+                      <Description>"Country ID (Do not change this)"</Description>
+                      <Color>0000FF</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>pPlayer</Address>
+                      <Offsets>
+                        <Offset>18</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>3211</ID>
+                      <Description>"Country Name (&lt;16) (Do not change this)"</Description>
+                      <Color>0000FF</Color>
+                      <VariableType>String</VariableType>
+                      <Length>16</Length>
+                      <Unicode>0</Unicode>
+                      <CodePage>0</CodePage>
+                      <ZeroTerminate>1</ZeroTerminate>
+                      <Address>pPlayer</Address>
+                      <Offsets>
+                        <Offset>20</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>3212</ID>
+                      <Description>"Country Name (&gt;=16) (Do not change this)"</Description>
+                      <Color>0000FF</Color>
+                      <VariableType>String</VariableType>
+                      <Length>64</Length>
+                      <Unicode>0</Unicode>
+                      <CodePage>0</CodePage>
+                      <ZeroTerminate>1</ZeroTerminate>
+                      <Address>pPlayer</Address>
+                      <Offsets>
+                        <Offset>0</Offset>
+                        <Offset>20</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>3215</ID>
+                      <Description>"Political Power (x1000)"</Description>
+                      <DropDownList>680000:680
+1000000:1000
+</DropDownList>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FF00FF</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>pPlayer</Address>
+                      <Offsets>
+                        <Offset>F8</Offset>
+                        <Offset>1028</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>3216</ID>
+                      <Description>"Base Stability (x10)"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FF00FF</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>pPlayer</Address>
+                      <Offsets>
+                        <Offset>1160</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>3690</ID>
+                      <Description>"Base War Support (x10)"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FF00FF</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>pPlayer</Address>
+                      <Offsets>
+                        <Offset>1164</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>3701</ID>
+                      <Description>"Fuel (x32768)"</Description>
+                      <DropDownList>1638400000:50K
+3276800000:100K
+8192000000:250k
+</DropDownList>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FF00FF</Color>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>pPlayer</Address>
+                      <Offsets>
+                        <Offset>10</Offset>
+                        <Offset>1C28</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>7346</ID>
+                      <Description>"Convoys (x1000)"</Description>
+                      <DropDownList>500000:500
+1000000:1000
+</DropDownList>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FF00FF</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>pPlayer</Address>
+                      <Offsets>
+                        <Offset>141C</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>3664</ID>
+                  <Description>"[X] &lt;== Factions ==================="</Description>
+                  <Options moHideChildren="1"/>
+                  <Color>800000</Color>
+                  <GroupHeader>1</GroupHeader>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>3675</ID>
+                      <Description>"Communist Support (x1000)"</Description>
+                      <DropDownList>0:0
+10000:10
+20000:20
+30000:30
+40000:40
+50000:50
+60000:60
+70000:70
+80000:80
+90000:90
+100000:100
+</DropDownList>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FF00FF</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>pPlayer</Address>
+                      <Offsets>
+                        <Offset>88</Offset>
+                        <Offset>8</Offset>
+                        <Offset>28</Offset>
+                        <Offset>1028</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>3674</ID>
+                      <Description>"Democratic Support (x1000)"</Description>
+                      <DropDownList>0:0
+10000:10
+20000:20
+30000:30
+40000:40
+50000:50
+60000:60
+70000:70
+80000:80
+90000:90
+100000:100
+</DropDownList>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FF00FF</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>pPlayer</Address>
+                      <Offsets>
+                        <Offset>88</Offset>
+                        <Offset>0</Offset>
+                        <Offset>28</Offset>
+                        <Offset>1028</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>3673</ID>
+                      <Description>"Fascist Support (x1000)"</Description>
+                      <DropDownList>0:0
+10000:10
+20000:20
+30000:30
+40000:40
+50000:50
+60000:60
+70000:70
+80000:80
+90000:90
+100000:100
+</DropDownList>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FF00FF</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>pPlayer</Address>
+                      <Offsets>
+                        <Offset>88</Offset>
+                        <Offset>10</Offset>
+                        <Offset>28</Offset>
+                        <Offset>1028</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>3672</ID>
+                      <Description>"Non-Aligned Support (x1000)"</Description>
+                      <DropDownList>0:0
+10000:10
+20000:20
+30000:30
+40000:40
+50000:50
+60000:60
+70000:70
+80000:80
+90000:90
+100000:100
+</DropDownList>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FF00FF</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>pPlayer</Address>
+                      <Offsets>
+                        <Offset>88</Offset>
+                        <Offset>18</Offset>
+                        <Offset>28</Offset>
+                        <Offset>1028</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>3223</ID>
+                  <Description>"[X] &lt;== Military ==================="</Description>
+                  <Options moHideChildren="1"/>
+                  <Color>800000</Color>
+                  <GroupHeader>1</GroupHeader>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>3224</ID>
+                      <Description>"Command Power (x1000)"</Description>
+                      <DropDownList>100000:100
+200000:200
+300000:300
+400000:400
+500000:500
+600000:600
+</DropDownList>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FF00FF</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>pPlayer</Address>
+                      <Offsets>
+                        <Offset>210</Offset>
+                        <Offset>E0</Offset>
+                        <Offset>1028</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>3702</ID>
+                      <Description>"Army Experience (x32768)"</Description>
+                      <DropDownList>16384000:500
+8192000:250
+3276800:100
+</DropDownList>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FF00FF</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>pPlayer</Address>
+                      <Offsets>
+                        <Offset>230</Offset>
+                        <Offset>E0</Offset>
+                        <Offset>1028</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>3225</ID>
+                      <Description>"Navy Experience (x32768)"</Description>
+                      <DropDownList>16384000:500
+8192000:250
+3276800:100
+</DropDownList>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FF00FF</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>pPlayer</Address>
+                      <Offsets>
+                        <Offset>248</Offset>
+                        <Offset>E0</Offset>
+                        <Offset>1028</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>3226</ID>
+                      <Description>"Air Experience (x32768)"</Description>
+                      <DropDownList>16384000:500
+8192000:250
+3276800:100
+</DropDownList>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FF00FF</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>pPlayer</Address>
+                      <Offsets>
+                        <Offset>260</Offset>
+                        <Offset>E0</Offset>
+                        <Offset>1028</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>7299</ID>
+              <Description>"[X] &lt;================== Province Info =================="</Description>
+              <Options moHideChildren="1" moActivateChildrenAsWell="1"/>
+              <Color>008000</Color>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>7300</ID>
+                  <Description>"[X] &lt;== Province  ================="</Description>
+                  <Options moHideChildren="1"/>
+                  <Color>800000</Color>
+                  <GroupHeader>1</GroupHeader>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>7302</ID>
+                      <Description>"Province ID (Do not change this)"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>0000FF</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>pRegion</Address>
+                      <Offsets>
+                        <Offset>AC</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>7310</ID>
+                      <Description>"Victory Points (x1)"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FF00FF</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>pRegion</Address>
+                      <Offsets>
+                        <Offset>40</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>7350</ID>
+                      <Description>"-- ! -- Don't edit buildings! Pause game, use console command-- ! --"</Description>
+                      <Color>0080FF</Color>
+                      <GroupHeader>1</GroupHeader>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>7353</ID>
+                      <Description>"-- ! -- InstantConstruction, build, run command again, unpause -- ! --"</Description>
+                      <Color>0080FF</Color>
+                      <GroupHeader>1</GroupHeader>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>17340</ID>
+                      <Description>"--!-- Pointers removed as they were read only--!--"</Description>
+                      <Color>0080FF</Color>
+                      <GroupHeader>1</GroupHeader>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>7314</ID>
+                  <Description>"[X] &lt;== State ===================="</Description>
+                  <Options moHideChildren="1"/>
+                  <Color>800000</Color>
+                  <GroupHeader>1</GroupHeader>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>7308</ID>
+                      <Description>"State ID (Do not change this)"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>0000FF</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>pRegion</Address>
+                      <Offsets>
+                        <Offset>60</Offset>
+                        <Offset>C8</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>7304</ID>
+                      <Description>"State Name (&lt;16) (Do not change this)"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>0000FF</Color>
+                      <VariableType>String</VariableType>
+                      <Length>16</Length>
+                      <Unicode>0</Unicode>
+                      <CodePage>0</CodePage>
+                      <ZeroTerminate>1</ZeroTerminate>
+                      <Address>pRegion</Address>
+                      <Offsets>
+                        <Offset>28</Offset>
+                        <Offset>38</Offset>
+                        <Offset>C8</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>7303</ID>
+                      <Description>"State Name (&gt;=16) (Do not change this)"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>0000FF</Color>
+                      <VariableType>String</VariableType>
+                      <Length>64</Length>
+                      <Unicode>0</Unicode>
+                      <CodePage>0</CodePage>
+                      <ZeroTerminate>1</ZeroTerminate>
+                      <Address>pRegion</Address>
+                      <Offsets>
+                        <Offset>0</Offset>
+                        <Offset>28</Offset>
+                        <Offset>38</Offset>
+                        <Offset>C8</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>7344</ID>
+                      <Description>"Extra building slots (x1)"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FF00FF</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>pRegion</Address>
+                      <Offsets>
+                        <Offset>8E0</Offset>
+                        <Offset>C8</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>7352</ID>
+                      <Description>"-- ! -- Don't edit buildings! Pause game, use console command-- ! --"</Description>
+                      <Color>0080FF</Color>
+                      <GroupHeader>1</GroupHeader>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>7351</ID>
+                      <Description>"-- ! -- InstantConstruction, build, run command again, unpause -- ! --"</Description>
+                      <Color>0080FF</Color>
+                      <GroupHeader>1</GroupHeader>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>17339</ID>
+                      <Description>"--!-- Pointers removed as they were read only--!--"</Description>
+                      <Color>0080FF</Color>
+                      <GroupHeader>1</GroupHeader>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>17341</ID>
+      <Description>"No description"</Description>
+      <ShowAsSigned>0</ShowAsSigned>
+      <VariableType>4 Bytes</VariableType>
+      <Address>27CB79F10B0+000000D8</Address>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

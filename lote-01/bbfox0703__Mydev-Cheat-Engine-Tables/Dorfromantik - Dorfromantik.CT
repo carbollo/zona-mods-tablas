@@ -1,0 +1,480 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>22</ID>
+      <Description>"Compact Mode"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+--https://forum.cheatengine.org/viewtopic.php?t=570055
+LuaCall(function cycleFullCompact(sender,force) local state = not(compactmenuitem.Caption == 'Compact View Mode'); if force~=nil then state = not force end; compactmenuitem.Caption = state and 'Compact View Mode' or 'Full View Mode'; getMainForm().Splitter1.Visible = state; getMainForm().Panel4.Visible    = state; getMainForm().Panel5.Visible    = state; end; function addCompactMenu() if compactmenualreadyexists then return end; local parent = getMainForm().Menu.Items; compactmenuitem = createMenuItem(parent); parent.add(compactmenuitem); compactmenuitem.Caption = 'Compact View Mode'; compactmenuitem.OnClick = cycleFullCompact; compactmenualreadyexists = 'yes'; end; addCompactMenu(); cycleFullCompact(nil,true))
+
+[DISABLE]
+LuaCall(cycleFullCompact(nil,false))
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>4</ID>
+      <Description>"Enable (Enable twice)"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+if syntaxcheck then
+    return
+end
+if process == nil then
+    ShowMessage("Process is not selected.")
+elseif readInteger(process) == 0 then
+    ShowMessage("Process cannot be opened.")
+else
+    if monopipe ~= nil and monopipe.ProcessID ~= getOpenedProcessID() then
+        monopipe.destroy()
+        monopipe = nil
+    end
+    if monopipe == nil then
+        LaunchMonoDataCollector()
+    end
+end
+
+
+--thetick=0;Timer1=createTimer()Timer1.Interval=60000;Timer1.OnTimer=function(a)thetick=thetick+1;if thetick==90 then addOCTFooter(true)end end
+
+{$asm}
+define(RewardSystemAddScoreProc,"RewardSystem:AddScore")
+define(SessionQuest_TilesPlacedAddProgressProc,"SessionQuest_TilesPlaced:AddProgress")
+define(SessionQuest_ScoreUpdateProgressProc,"SessionQuest_Score:UpdateProgress")
+define(GroupConditionWatcherCheckIfConditionIsFulfilledProc,"GroupConditionWatcher:CheckIfConditionIsFulfilled")
+
+
+registersymbol(RewardSystemAddScoreProc)
+registersymbol(SessionQuest_TilesPlacedAddProgressProc)
+registersymbol(SessionQuest_ScoreUpdateProgressProc)
+registersymbol(GroupConditionWatcherCheckIfConditionIsFulfilledProc)
+
+[DISABLE]
+{$lua}
+if syntaxcheck then return end;if not syntaxcheck and monopipe then monopipe=nil,monopipe.Destroy()end
+--Timer1.Destroy()
+
+{$asm}
+unregistersymbol(*)
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>5</ID>
+          <Description>"Score multiplier"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : Dorfromantik.exe
+  Version: 
+  Date   : 2024-06-07
+  Author : bbfox @ https://opencheattables.com
+
+}
+
+[ENABLE]
+aobscanregion(INJECT_SCORE_MULTI,RewardSystemAddScoreProc+16,RewardSystemAddScoreProc+56,03 C6 89 87 00 01 00 00) // should be unique
+
+
+alloc(newmem,$1000,INJECT_SCORE_MULTI)
+
+label(code)
+label(return)
+label(vf_score_multi)
+
+newmem:
+  vmovss xmm14, [vf_score_multi]
+  cvtsi2ss xmm15, esi
+  vmulss xmm15, xmm14, xmm15
+  cvtss2si esi, xmm15
+
+code:
+  add eax,esi
+  mov [rdi+00000100],eax
+  jmp return
+
+align 10 cc
+  vf_score_multi:
+  dd (float)2
+
+INJECT_SCORE_MULTI:
+  jmp newmem
+  nop 3
+return:
+
+registersymbol(vf_score_multi)
+registersymbol(INJECT_SCORE_MULTI)
+
+[DISABLE]
+
+INJECT_SCORE_MULTI:
+  db 03 C6 89 87 00 01 00 00
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: RewardSystem:AddScore+1d
+
+27BCDB55FEC: 00 00                 - add [rax],al
+27BCDB55FEE: 00 00                 - add [rax],al
+RewardSystemAddScoreProc: 55                    - push rbp
+RewardSystem:AddScore+1: 48 8B EC              - mov rbp,rsp
+RewardSystem:AddScore+4: 48 83 EC 30           - sub rsp,30
+RewardSystem:AddScore+8: 48 89 75 F0           - mov [rbp-10],rsi
+RewardSystem:AddScore+c: 48 89 7D F8           - mov [rbp-08],rdi
+RewardSystem:AddScore+10: 48 8B F9              - mov rdi,rcx
+RewardSystem:AddScore+13: 48 8B F2              - mov rsi,rdx
+RewardSystem:AddScore+16: 48 63 87 00 01 00 00  - movsxd  rax,dword ptr [rdi+00000100]
+// ---------- INJECTING HERE ----------
+RewardSystem:AddScore+1d: 03 C6                 - add eax,esi
+// ---------- DONE INJECTING  ----------
+RewardSystem:AddScore+1f: 89 87 00 01 00 00     - mov [rdi+00000100],eax
+RewardSystem:AddScore+25: 48 8B 47 70           - mov rax,[rdi+70]
+RewardSystem:AddScore+29: 48 8B C8              - mov rcx,rax
+RewardSystem:AddScore+2c: 48 8B F9              - mov rdi,rcx
+RewardSystem:AddScore+2f: 48 85 C0              - test rax,rax
+RewardSystem:AddScore+32: 75 02                 - jne RewardSystem:AddScore+36
+RewardSystem:AddScore+34: EB 09                 - jmp RewardSystem:AddScore+3f
+RewardSystem:AddScore+36: 48 8B CF              - mov rcx,rdi
+RewardSystem:AddScore+39: 48 8B D6              - mov rdx,rsi
+RewardSystem:AddScore+3c: FF 57 18              - call qword ptr [rdi+18]
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>27</ID>
+              <Description>"*** Notice: this is a worldwide score"</Description>
+              <Color>400080</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>6</ID>
+              <Description>"multiplier (don't set too high)"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>Float</VariableType>
+              <Address>vf_score_multi</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>8</ID>
+          <Description>"Faster tile progress"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : Dorfromantik.exe
+  Version: 
+  Date   : 2022-04-28
+  Author : bbfox @ https://opencheattables.com
+}
+
+[ENABLE]
+aobscanregion(INJECT_FAST_PROGRESS,SessionQuest_TilesPlacedAddProgressProc+19,SessionQuest_TilesPlacedAddProgressProc+49,FF C0 89 87 8C 00 00 00 48) // should be unique
+alloc(newmem,$1000,INJECT_FAST_PROGRESS)
+
+label(code)
+label(return)
+label(i_tile_progress)
+
+newmem:
+  add eax, [i_tile_progress]
+code:
+  //inc eax
+  mov [rdi+0000008C],eax
+  jmp return
+
+align 10 cc
+  i_tile_progress:
+  dd a
+
+INJECT_FAST_PROGRESS:
+  jmp newmem
+  nop 3
+return:
+
+registersymbol(i_tile_progress)
+registersymbol(INJECT_FAST_PROGRESS)
+
+[DISABLE]
+
+INJECT_FAST_PROGRESS:
+  db FF C0 89 87 8C 00 00 00
+
+unregistersymbol(*)
+dealloc(newmem)
+
+
+{
+// ORIGINAL CODE - INJECTION POINT: SessionQuest_TilesPlaced:AddProgress+26
+
+SessionQuest_TilesPlacedAddProgressProc: 55                    - push rbp
+SessionQuest_TilesPlaced:AddProgress+1: 48 8B EC              - mov rbp,rsp
+SessionQuest_TilesPlaced:AddProgress+4: 48 83 EC 40           - sub rsp,40
+SessionQuest_TilesPlaced:AddProgress+8: 48 89 7D F8           - mov [rbp-08],rdi
+SessionQuest_TilesPlaced:AddProgress+c: 48 8B F9              - mov rdi,rcx
+SessionQuest_TilesPlaced:AddProgress+f: 4C 89 45 E8           - mov [rbp-18],r8
+SessionQuest_TilesPlaced:AddProgress+13: 0F B6 45 E8           - movzx eax,byte ptr [rbp-18]
+SessionQuest_TilesPlaced:AddProgress+17: 85 C0                 - test eax,eax
+SessionQuest_TilesPlaced:AddProgress+19: 0F 84 34 00 00 00     - je SessionQuest_TilesPlaced:AddProgress+53
+SessionQuest_TilesPlaced:AddProgress+1f: 48 63 87 8C 00 00 00  - movsxd  rax,dword ptr [rdi+0000008C]
+// ---------- INJECTING HERE ----------
+SessionQuest_TilesPlaced:AddProgress+26: FF C0                 - inc eax
+// ---------- DONE INJECTING  ----------
+SessionQuest_TilesPlaced:AddProgress+28: 89 87 8C 00 00 00     - mov [rdi+0000008C],eax
+SessionQuest_TilesPlaced:AddProgress+2e: 48 8B CF              - mov rcx,rdi
+SessionQuest_TilesPlaced:AddProgress+31: BA 01 00 00 00        - mov edx,00000001
+SessionQuest_TilesPlaced:AddProgress+36: 48 8B 07              - mov rax,[rdi]
+SessionQuest_TilesPlaced:AddProgress+39: FF 90 98 00 00 00     - call qword ptr [rax+00000098]
+SessionQuest_TilesPlaced:AddProgress+3f: 48 8B CF              - mov rcx,rdi
+SessionQuest_TilesPlaced:AddProgress+42: 33 D2                 - xor edx,edx
+SessionQuest_TilesPlaced:AddProgress+44: 41 B8 01 00 00 00     - mov r8d,00000001
+SessionQuest_TilesPlaced:AddProgress+4a: 48 8B 07              - mov rax,[rdi]
+SessionQuest_TilesPlaced:AddProgress+4d: FF 90 88 00 00 00     - call qword ptr [rax+00000088]
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>20</ID>
+              <Description>"Progress# (orig. = 1)"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_tile_progress</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>11</ID>
+          <Description>"Quest score multiplier"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : Dorfromantik.exe
+  Version: 
+  Date   : 2022-04-28
+  Author : bbfox @ https://opencheattables.com
+}
+
+[ENABLE]
+aobscanregion(INJECT_QUEST_SCORE_MULTI,SessionQuest_ScoreUpdateProgressProc+2e,SessionQuest_ScoreUpdateProgressProc+6e,03 45 F0 89 87 8C 00 00 00) // should be unique
+
+alloc(newmem,$1000,INJECT_QUEST_SCORE_MULTI)
+
+label(code)
+label(return)
+label(vf_quest_score_multi)
+
+newmem:
+  vmovss xmm14, [vf_quest_score_multi]
+  cvtsi2ss xmm15, [rbp-10]
+  vmulss xmm15, xmm15, xmm14
+  push rbx
+  cvtss2si ebx, xmm15
+  mov [rbp-10], ebx
+  pop rbx
+
+code:
+  add eax,[rbp-10]
+  mov [rdi+0000008C],eax
+  jmp return
+
+align 10 cc
+  vf_quest_score_multi:
+  dd (float)2.5
+
+INJECT_QUEST_SCORE_MULTI:
+  jmp newmem
+  nop 4
+return:
+registersymbol(vf_quest_score_multi)
+registersymbol(INJECT_QUEST_SCORE_MULTI)
+
+[DISABLE]
+
+INJECT_QUEST_SCORE_MULTI:
+  db 03 45 F0 89 87 8C 00 00 00
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: SessionQuest_Score:UpdateProgress+3e
+
+SessionQuest_Score:UpdateProgress+13: 0F B6 87 91 00 00 00  - movzx eax,byte ptr [rdi+00000091]
+SessionQuest_Score:UpdateProgress+1a: 85 C0                 - test eax,eax
+SessionQuest_Score:UpdateProgress+1c: 75 19                 - jne SessionQuest_Score:UpdateProgress+37
+SessionQuest_Score:UpdateProgress+1e: 48 8B 47 48           - mov rax,[rdi+48]
+SessionQuest_Score:UpdateProgress+22: 48 8B C8              - mov rcx,rax
+SessionQuest_Score:UpdateProgress+25: 83 39 00              - cmp dword ptr [rcx],00
+SessionQuest_Score:UpdateProgress+28: 48 63 80 F8 00 00 00  - movsxd  rax,dword ptr [rax+000000F8]
+SessionQuest_Score:UpdateProgress+2f: 89 87 8C 00 00 00     - mov [rdi+0000008C],eax
+SessionQuest_Score:UpdateProgress+35: EB 10                 - jmp SessionQuest_Score:UpdateProgress+47
+SessionQuest_Score:UpdateProgress+37: 48 63 87 8C 00 00 00  - movsxd  rax,dword ptr [rdi+0000008C]
+// ---------- INJECTING HERE ----------
+SessionQuest_Score:UpdateProgress+3e: 03 45 F0              - add eax,[rbp-10]
+// ---------- DONE INJECTING  ----------
+SessionQuest_Score:UpdateProgress+41: 89 87 8C 00 00 00     - mov [rdi+0000008C],eax
+SessionQuest_Score:UpdateProgress+47: 48 8B CF              - mov rcx,rdi
+SessionQuest_Score:UpdateProgress+4a: BA 01 00 00 00        - mov edx,00000001
+SessionQuest_Score:UpdateProgress+4f: 48 8B 07              - mov rax,[rdi]
+SessionQuest_Score:UpdateProgress+52: FF 90 98 00 00 00     - call qword ptr [rax+00000098]
+SessionQuest_Score:UpdateProgress+58: 48 8B CF              - mov rcx,rdi
+SessionQuest_Score:UpdateProgress+5b: 33 D2                 - xor edx,edx
+SessionQuest_Score:UpdateProgress+5d: 41 B8 01 00 00 00     - mov r8d,00000001
+SessionQuest_Score:UpdateProgress+63: 48 8B 07              - mov rax,[rdi]
+SessionQuest_Score:UpdateProgress+66: FF 90 88 00 00 00     - call qword ptr [rax+00000088]
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>12</ID>
+              <Description>"Multiplier"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>Float</VariableType>
+              <Address>vf_quest_score_multi</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>17</ID>
+          <Description>"Faster condition fulfill"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript Async="1">{ Game   : Dorfromantik.exe
+  Version: 
+  Date   : 2022-04-28
+  Author : bbfox @ https://opencheattables.com
+}
+
+[ENABLE]
+aobscanregion(INJECT_FAST_COND_FULFILLED,GroupConditionWatcherCheckIfConditionIsFulfilledProc+190,GroupConditionWatcherCheckIfConditionIsFulfilledProc+290,2B C1 89 46 58) // should be unique
+
+alloc(newmem,$1000,INJECT_FAST_COND_FULFILLED)
+
+label(code)
+label(return)
+label(vf_cond_fulfill_multi)
+label(is_fulfill_multi_enabled)
+
+newmem:
+
+  cmp dword ptr [is_fulfill_multi_enabled], 1
+  jne code
+  db EB 3B 54 68 69 73 20 74
+  db 61 62 6C 65 20 63 6F 6D 65 73 20 66 72 6F 6D 20
+  db 68 74 74 70 73 3A 2F
+  db 2F 6F 70 65 6E 63 68 65
+  db 61 74
+  db 74 61 62 6C 65 73 2E 63 6F 6D
+  db 20 2F 20 43 45 20 37 2E 34 2B
+  vmovss xmm14, [vf_cond_fulfill_multi]
+  cvtsi2ss xmm15, ecx
+  cvtsi2ss xmm13, eax
+  vmulss xmm15, xmm15, xmm14
+  vsubss xmm12, xmm13, xmm15
+  vmovss xmm14, [vf_0]
+  vcomiss xmm12, xmm14
+  jb @F
+  cvtss2si ecx, xmm15
+  jmp code
+
+@@:
+  mov ecx, eax
+
+code:
+  sub eax,ecx
+  mov [rsi+58],eax
+  jmp return
+
+align 10 cc
+  is_fulfill_multi_enabled:
+  dd 1
+  vf_cond_fulfill_multi:
+  dd (float)1.5
+  vf_0:
+  dd (float)0
+
+INJECT_FAST_COND_FULFILLED:
+  jmp newmem
+return:
+registersymbol(is_fulfill_multi_enabled)
+registersymbol(vf_cond_fulfill_multi)
+registersymbol(INJECT_FAST_COND_FULFILLED)
+
+[DISABLE]
+
+INJECT_FAST_COND_FULFILLED:
+  db 2B C1 89 46 58
+
+unregistersymbol(*)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GroupConditionWatcher:CheckIfConditionIsFulfilled+1a5
+
+GroupConditionWatcher:CheckIfConditionIsFulfilled+178: 49 8B CE                       - mov rcx,r14
+GroupConditionWatcher:CheckIfConditionIsFulfilled+17b: 49 8B D5                       - mov rdx,r13
+GroupConditionWatcher:CheckIfConditionIsFulfilled+17e: 49 BB F0 DB 6D AB C2 01 00 00  - mov r11,System.Linq.Enumerable:All
+GroupConditionWatcher:CheckIfConditionIsFulfilled+188: 41 FF D3                       - call r11
+GroupConditionWatcher:CheckIfConditionIsFulfilled+18b: 85 C0                          - test eax,eax
+GroupConditionWatcher:CheckIfConditionIsFulfilled+18d: 0F 84 68 01 00 00              - je GroupConditionWatcher:CheckIfConditionIsFulfilled+2fb
+GroupConditionWatcher:CheckIfConditionIsFulfilled+193: BF 02 00 00 00                 - mov edi,00000002
+GroupConditionWatcher:CheckIfConditionIsFulfilled+198: E9 5E 01 00 00                 - jmp GroupConditionWatcher:CheckIfConditionIsFulfilled+2fb
+GroupConditionWatcher:CheckIfConditionIsFulfilled+19d: 48 63 46 50                    - movsxd  rax,dword ptr [rsi+50]
+GroupConditionWatcher:CheckIfConditionIsFulfilled+1a1: 48 63 4E 54                    - movsxd  rcx,dword ptr [rsi+54]
+// ---------- INJECTING HERE ----------
+GroupConditionWatcher:CheckIfConditionIsFulfilled+1a5: 2B C1                          - sub eax,ecx
+// ---------- DONE INJECTING  ----------
+GroupConditionWatcher:CheckIfConditionIsFulfilled+1a7: 89 46 58                       - mov [rsi+58],eax
+GroupConditionWatcher:CheckIfConditionIsFulfilled+1aa: 48 8B CE                       - mov rcx,rsi
+GroupConditionWatcher:CheckIfConditionIsFulfilled+1ad: 90                             - nop
+GroupConditionWatcher:CheckIfConditionIsFulfilled+1ae: 49 BB F0 DA 6D AB C2 01 00 00  - mov r11,GroupConditionWatcher:FulfillmentCountSufficient
+GroupConditionWatcher:CheckIfConditionIsFulfilled+1b8: 41 FF D3                       - call r11
+GroupConditionWatcher:CheckIfConditionIsFulfilled+1bb: 48 8B F8                       - mov rdi,rax
+GroupConditionWatcher:CheckIfConditionIsFulfilled+1be: 83 F8 01                       - cmp eax,01
+GroupConditionWatcher:CheckIfConditionIsFulfilled+1c1: 0F 85 34 01 00 00              - jne GroupConditionWatcher:CheckIfConditionIsFulfilled+2fb
+GroupConditionWatcher:CheckIfConditionIsFulfilled+1c7: 48 8B 56 60                    - mov rdx,[rsi+60]
+GroupConditionWatcher:CheckIfConditionIsFulfilled+1cb: 48 B8 D0 8A 9C B4 C3 01 00 00  - mov rax,000001C3B49C8AD0
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>26</ID>
+              <Description>"Enabled?"</Description>
+              <DropDownList DisplayValueAsItem="1">0:No
+1:Yes
+</DropDownList>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>is_fulfill_multi_enabled</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>18</ID>
+              <Description>"Multiplier"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>Float</VariableType>
+              <Address>vf_cond_fulfill_multi</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>19</ID>
+              <Description>"*** disable when get in trouble"</Description>
+              <Color>400080</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>21</ID>
+      <Description>"Dorfromantik 1.1.5.1  /  https://opencheattables.com  /  CE 7.5+"</Description>
+      <Color>400080</Color>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

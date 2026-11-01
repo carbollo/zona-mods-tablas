@@ -1,0 +1,976 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="28">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>40</ID>
+      <Description>"Unlimited Health"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(healthAob,ILB.exe,8B 82 ?? ?? ?? ?? 89 03 8B 41)
+alloc(newmem,$1000)
+
+label(healthCopy)
+label(return)
+
+newmem:
+  db 8D 41
+  readmem(healthAob+A,1)
+  mov eax,[eax]
+  db 89 82
+  readmem(healthAob+2,4)
+healthCopy:
+  readmem(healthAob,6)
+  jmp return
+
+healthAob:
+  jmp newmem
+  nop
+return:
+registersymbol(healthAob)
+registersymbol(healthCopy)
+
+[DISABLE]
+healthAob:
+  readmem(healthCopy,6)
+unregistersymbol(healthAob)
+unregistersymbol(healthCopy)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "ILB.exe"+AD70D
+
+"ILB.exe"+AD6FE: 84 C0              -  test al,al
+"ILB.exe"+AD700: 74 54              -  je ILB.exe+AD756
+"ILB.exe"+AD702: CC                 -  int 3 
+"ILB.exe"+AD703: 5B                 -  pop ebx
+"ILB.exe"+AD704: 5E                 -  pop esi
+"ILB.exe"+AD705: 5F                 -  pop edi
+"ILB.exe"+AD706: 8B E5              -  mov esp,ebp
+"ILB.exe"+AD708: 5D                 -  pop ebp
+"ILB.exe"+AD709: C3                 -  ret 
+"ILB.exe"+AD70A: 8B 5D FC           -  mov ebx,[ebp-04]
+// ---------- INJECTING HERE ----------
+"ILB.exe"+AD70D: 8B 82 9C 08 00 00  -  mov eax,[edx+0000089C]
+// ---------- DONE INJECTING  ----------
+"ILB.exe"+AD713: 89 03              -  mov [ebx],eax
+"ILB.exe"+AD715: 8B 41 70           -  mov eax,[ecx+70]
+"ILB.exe"+AD718: 8B 5D 0C           -  mov ebx,[ebp+0C]
+"ILB.exe"+AD71B: 89 07              -  mov [edi],eax
+"ILB.exe"+AD71D: 8B 82 B0 08 00 00  -  mov eax,[edx+000008B0]
+"ILB.exe"+AD723: 8B 55 18           -  mov edx,[ebp+18]
+"ILB.exe"+AD726: 89 06              -  mov [esi],eax
+"ILB.exe"+AD728: 8B 41 7C           -  mov eax,[ecx+7C]
+"ILB.exe"+AD72B: 89 03              -  mov [ebx],eax
+"ILB.exe"+AD72D: E9 CE 28 7D 0B     -  jmp 0C790000
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>16</ID>
+      <Description>"Unlimited Mana"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(manaAob,ILB.exe,7C ?? FF 8F ?? ?? ?? ?? 8B)
+alloc(newmem,$1000)
+
+label(manaCopy)
+
+newmem:
+manaCopy:
+  readmem(manaAob+2,6)
+
+manaAob+2:
+  db 90 90 90 90 90 90
+registersymbol(manaAob)
+registersymbol(manaCopy)
+
+[DISABLE]
+manaAob+2:
+  readmem(manaCopy,6)
+unregistersymbol(manaAob)
+unregistersymbol(manaCopy)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "ILB.exe"+A6B52
+
+"ILB.exe"+A6B29: B9 20 19 03 01                 -  mov ecx,ILB.exe+121920
+"ILB.exe"+A6B2E: E9 D3 FE FF FF                 -  jmp ILB.exe+A6A06
+"ILB.exe"+A6B33: 8B 80 E4 00 00 00              -  mov eax,[eax+000000E4]
+"ILB.exe"+A6B39: 8B 34 85 8C 04 01 01           -  mov esi,[eax*4+ILB.exe+10048C]
+"ILB.exe"+A6B40: FF 15 F4 E1 00 01              -  call dword ptr [ILB.exe+FE1F4]
+"ILB.exe"+A6B46: 99                             -  cdq 
+"ILB.exe"+A6B47: B9 64 00 00 00                 -  mov ecx,00000064
+"ILB.exe"+A6B4C: F7 F9                          -  idiv ecx
+"ILB.exe"+A6B4E: 3B D6                          -  cmp edx,esi
+"ILB.exe"+A6B50: 7C 15                          -  jl ILB.exe+A6B67
+// ---------- INJECTING HERE ----------
+"ILB.exe"+A6B52: FF 8F B0 08 00 00              -  dec [edi+000008B0]
+// ---------- DONE INJECTING  ----------
+"ILB.exe"+A6B58: 8B 97 B0 08 00 00              -  mov edx,[edi+000008B0]
+"ILB.exe"+A6B5E: 8B 4C 24 20                    -  mov ecx,[esp+20]
+"ILB.exe"+A6B62: E8 79 B3 FA FF                 -  call ILB.exe+51EE0
+"ILB.exe"+A6B67: F6 87 D4 09 00 00 40           -  test byte ptr [edi+000009D4],40
+"ILB.exe"+A6B6E: 74 07                          -  je ILB.exe+A6B77
+"ILB.exe"+A6B70: 8B CF                          -  mov ecx,edi
+"ILB.exe"+A6B72: E8 39 FD FF FF                 -  call ILB.exe+A68B0
+"ILB.exe"+A6B77: F7 87 4C 09 00 00 00 08 00 00  -  test [edi+0000094C],0800
+"ILB.exe"+A6B81: 74 13                          -  je ILB.exe+A6B96
+"ILB.exe"+A6B83: 6A FF                          -  push -01
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>35</ID>
+      <Description>"Unlimited Hunger"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(hungerAob,ILB.exe,8B 55 10 8B 81 ?? ?? ?? ?? 89 02)
+alloc(newmem,$1000)
+
+label(return)
+label(hungerCopy)
+
+newmem:
+  db 8D 81
+  readmem(hungerAob+5,4)
+  add eax,4
+  mov eax,[eax]
+  db 89 81
+  readmem(hungerAob+5,4)
+hungerCopy:
+  readmem(hungerAob+3,6)
+  jmp return
+
+hungerAob+3:
+  jmp newmem
+  nop
+return:
+registersymbol(hungerAob)
+registersymbol(hungerCopy)
+
+[DISABLE]
+hungerAob+3:
+  readmem(hungerCopy,6)
+unregistersymbol(hungerAob)
+unregistersymbol(hungerCopy)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "ILB.exe"+AD743
+
+"ILB.exe"+AD723: 8B 55 18           -  mov edx,[ebp+18]
+"ILB.exe"+AD726: 89 06              -  mov [esi],eax
+"ILB.exe"+AD728: 8B 41 7C           -  mov eax,[ecx+7C]
+"ILB.exe"+AD72B: 89 03              -  mov [ebx],eax
+"ILB.exe"+AD72D: 8B 81 A4 00 00 00  -  mov eax,[ecx+000000A4]
+"ILB.exe"+AD733: 89 02              -  mov [edx],eax
+"ILB.exe"+AD735: 8B 55 1C           -  mov edx,[ebp+1C]
+"ILB.exe"+AD738: 8B 81 A8 00 00 00  -  mov eax,[ecx+000000A8]
+"ILB.exe"+AD73E: 89 02              -  mov [edx],eax
+"ILB.exe"+AD740: 8B 55 10           -  mov edx,[ebp+10]
+// ---------- INJECTING HERE ----------
+"ILB.exe"+AD743: 8B 81 C8 00 00 00  -  mov eax,[ecx+000000C8]
+// ---------- DONE INJECTING  ----------
+"ILB.exe"+AD749: 89 02              -  mov [edx],eax
+"ILB.exe"+AD74B: 8B 81 CC 00 00 00  -  mov eax,[ecx+000000CC]
+"ILB.exe"+AD751: 8B 4D 14           -  mov ecx,[ebp+14]
+"ILB.exe"+AD754: 89 01              -  mov [ecx],eax
+"ILB.exe"+AD756: 5B                 -  pop ebx
+"ILB.exe"+AD757: 5E                 -  pop esi
+"ILB.exe"+AD758: 5F                 -  pop edi
+"ILB.exe"+AD759: 8B E5              -  mov esp,ebp
+"ILB.exe"+AD75B: 5D                 -  pop ebp
+"ILB.exe"+AD75C: C3                 -  ret 
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>37</ID>
+      <Description>"Unlimited Stamina"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(staminaAob,ILB.exe,89 03 8B 81 ?? ?? ?? ?? 89 02 8B 55 1C)
+alloc(newmem,$1000)
+
+label(staminaCopy)
+label(return)
+
+newmem:
+  db 8D 81
+  readmem(staminaAob+4,4)
+  add eax,4
+  mov eax,[eax]
+  db 89 81
+  readmem(staminaAob+4,4)
+staminaCopy:
+  readmem(staminaAob+2,6)
+  jmp return
+
+staminaAob+2:
+  jmp newmem
+  nop
+return:
+registersymbol(staminaAob)
+registersymbol(staminaCopy)
+
+[DISABLE]
+staminaAob+2:
+  readmem(staminaCopy,6)
+unregistersymbol(staminaAob)
+unregistersymbol(staminaCopy)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "ILB.exe"+AD72D
+
+"ILB.exe"+AD70D: 8B 82 9C 08 00 00  -  mov eax,[edx+0000089C]
+"ILB.exe"+AD713: 89 03              -  mov [ebx],eax
+"ILB.exe"+AD715: 8B 41 70           -  mov eax,[ecx+70]
+"ILB.exe"+AD718: 8B 5D 0C           -  mov ebx,[ebp+0C]
+"ILB.exe"+AD71B: 89 07              -  mov [edi],eax
+"ILB.exe"+AD71D: 8B 82 B0 08 00 00  -  mov eax,[edx+000008B0]
+"ILB.exe"+AD723: 8B 55 18           -  mov edx,[ebp+18]
+"ILB.exe"+AD726: 89 06              -  mov [esi],eax
+"ILB.exe"+AD728: 8B 41 7C           -  mov eax,[ecx+7C]
+"ILB.exe"+AD72B: 89 03              -  mov [ebx],eax
+// ---------- INJECTING HERE ----------
+"ILB.exe"+AD72D: 8B 81 A4 00 00 00  -  mov eax,[ecx+000000A4]
+// ---------- DONE INJECTING  ----------
+"ILB.exe"+AD733: 89 02              -  mov [edx],eax
+"ILB.exe"+AD735: 8B 55 1C           -  mov edx,[ebp+1C]
+"ILB.exe"+AD738: 8B 81 A8 00 00 00  -  mov eax,[ecx+000000A8]
+"ILB.exe"+AD73E: 89 02              -  mov [edx],eax
+"ILB.exe"+AD740: 8B 55 10           -  mov edx,[ebp+10]
+"ILB.exe"+AD743: 8B 81 C8 00 00 00  -  mov eax,[ecx+000000C8]
+"ILB.exe"+AD749: 89 02              -  mov [edx],eax
+"ILB.exe"+AD74B: 8B 81 CC 00 00 00  -  mov eax,[ecx+000000CC]
+"ILB.exe"+AD751: 8B 4D 14           -  mov ecx,[ebp+14]
+"ILB.exe"+AD754: 89 01              -  mov [ecx],eax
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>48</ID>
+      <Description>"Instant Ancient Cooldown"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(ancientCooldownAob,ILB.exe,7E 04 48 89 47 5C)
+ancientCooldownAob:
+  xor eax,eax
+  db 90
+registersymbol(ancientCooldownAob)
+
+[DISABLE]
+ancientCooldownAob:
+  db 7E 04 48
+unregistersymbol(ancientCooldownAob)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "ILB.exe"+650DD
+
+"ILB.exe"+650BD: 80 7F 01 00                    -  cmp byte ptr [edi+01],00
+"ILB.exe"+650C1: 74 15                          -  je ILB.exe+650D8
+"ILB.exe"+650C3: 8B CE                          -  mov ecx,esi
+"ILB.exe"+650C5: E8 E6 FA FF FF                 -  call ILB.exe+64BB0
+"ILB.exe"+650CA: 8B CE                          -  mov ecx,esi
+"ILB.exe"+650CC: E8 7F FC FF FF                 -  call ILB.exe+64D50
+"ILB.exe"+650D1: 8B CE                          -  mov ecx,esi
+"ILB.exe"+650D3: E8 F8 FE FF FF                 -  call ILB.exe+64FD0
+"ILB.exe"+650D8: 8B 47 5C                       -  mov eax,[edi+5C]
+"ILB.exe"+650DB: 85 C0                          -  test eax,eax
+// ---------- INJECTING HERE ----------
+"ILB.exe"+650DD: 7E 04                          -  jle ILB.exe+650E3
+"ILB.exe"+650DF: 48                             -  dec eax
+"ILB.exe"+650E0: 89 47 5C                       -  mov [edi+5C],eax
+// ---------- DONE INJECTING  ----------
+"ILB.exe"+650E3: 8B F3                          -  mov esi,ebx
+"ILB.exe"+650E5: 85 DB                          -  test ebx,ebx
+"ILB.exe"+650E7: 75 B8                          -  jne ILB.exe+650A1
+"ILB.exe"+650E9: 5F                             -  pop edi
+"ILB.exe"+650EA: 5E                             -  pop esi
+"ILB.exe"+650EB: 5B                             -  pop ebx
+"ILB.exe"+650EC: C3                             -  ret 
+"ILB.exe"+650ED: 51                             -  push ecx
+"ILB.exe"+650EE: 6A 00                          -  push 00
+"ILB.exe"+650F0: 68 3B 31 00 00                 -  push 0000313B
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>26</ID>
+      <Description>"Unlimited Item Use"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(itemUseAob,ILB.exe,7E 0D 48 89 42 0C)
+itemUseAob:
+  db 90 90 90
+registersymbol(itemUseAob)
+
+[DISABLE]
+itemUseAob:
+  db 7E 0D 48
+unregistersymbol(itemUseAob)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "ILB.exe"+54E93
+
+"ILB.exe"+54E63: E9 34 FF FF FF                 -  jmp ILB.exe+54D9C
+"ILB.exe"+54E68: BA 9A 00 00 00                 -  mov edx,0000009A
+"ILB.exe"+54E6D: E9 2A FF FF FF                 -  jmp ILB.exe+54D9C
+"ILB.exe"+54E72: 69 8F 14 08 00 00 F8 00 00 00  -  imul ecx,[edi+00000814]000000F8
+"ILB.exe"+54E7C: A1 00 7E 07 01                 -  mov eax,[ILB.exe+167E00]
+"ILB.exe"+54E81: 83 BC 01 C4 00 00 00 00        -  cmp dword ptr [ecx+eax+000000C4],00
+"ILB.exe"+54E89: 7E 15                          -  jle ILB.exe+54EA0
+"ILB.exe"+54E8B: 8B 42 0C                       -  mov eax,[edx+0C]
+"ILB.exe"+54E8E: 83 F8 01                       -  cmp eax,01
+"ILB.exe"+54E91: 7E 0D                          -  jle ILB.exe+54EA0
+// ---------- INJECTING HERE ----------
+"ILB.exe"+54E93: 48                             -  dec eax
+"ILB.exe"+54E94: 89 42 0C                       -  mov [edx+0C],eax
+"ILB.exe"+54E97: 32 C0                          -  xor al,al
+// ---------- DONE INJECTING  ----------
+"ILB.exe"+54E99: 5F                             -  pop edi
+"ILB.exe"+54E9A: 5E                             -  pop esi
+"ILB.exe"+54E9B: 5B                             -  pop ebx
+"ILB.exe"+54E9C: 8B E5                          -  mov esp,ebp
+"ILB.exe"+54E9E: 5D                             -  pop ebp
+"ILB.exe"+54E9F: C3                             -  ret 
+"ILB.exe"+54EA0: 8B CF                          -  mov ecx,edi
+"ILB.exe"+54EA2: E8 89 C2 FF FF                 -  call ILB.exe+51130
+"ILB.exe"+54EA7: B0 01                          -  mov al,01
+"ILB.exe"+54EA9: 5F                             -  pop edi
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>42</ID>
+      <Description>"Unlimited Item Place"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(itemPlaceAob,ILB.exe,7E 2D 2B C2 89 17)
+itemPlaceAob:
+  db 90 90 90 90
+registersymbol(itemPlaceAob)
+
+[DISABLE]
+itemPlaceAob:
+  db 7E 2D 2B C2
+unregistersymbol(itemPlaceAob)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "ILB.exe"+578E9
+
+"ILB.exe"+578CC: 85 C9                    -  test ecx,ecx
+"ILB.exe"+578CE: 75 11                    -  jne ILB.exe+578E1
+"ILB.exe"+578D0: 51                       -  push ecx
+"ILB.exe"+578D1: 51                       -  push ecx
+"ILB.exe"+578D2: 68 87 19 00 00           -  push 00001987
+"ILB.exe"+578D7: B9 80 14 11 01           -  mov ecx,ILB.exe+111480
+"ILB.exe"+578DC: E9 5C FF FF FF           -  jmp ILB.exe+5783D
+"ILB.exe"+578E1: 8B 41 0C                 -  mov eax,[ecx+0C]
+"ILB.exe"+578E4: 8B 55 08                 -  mov edx,[ebp+08]
+"ILB.exe"+578E7: 3B C2                    -  cmp eax,edx
+// ---------- INJECTING HERE ----------
+"ILB.exe"+578E9: 7E 2D                    -  jle ILB.exe+57918
+"ILB.exe"+578EB: 2B C2                    -  sub eax,edx
+"ILB.exe"+578ED: 89 17                    -  mov [edi],edx
+// ---------- DONE INJECTING  ----------
+"ILB.exe"+578EF: 83 79 64 00              -  cmp dword ptr [ecx+64],00
+"ILB.exe"+578F3: 89 41 0C                 -  mov [ecx+0C],eax
+"ILB.exe"+578F6: 7E 17                    -  jle ILB.exe+5790F
+"ILB.exe"+578F8: 8B 96 24 0A 00 00        -  mov edx,[esi+00000A24]
+"ILB.exe"+578FE: 8B CE                    -  mov ecx,esi
+"ILB.exe"+57900: 0F AF 55 08              -  imul edx,[ebp+08]
+"ILB.exe"+57904: 50                       -  push eax
+"ILB.exe"+57905: F7 DA                    -  neg edx
+"ILB.exe"+57907: E8 B4 CE FF FF           -  call ILB.exe+547C0
+"ILB.exe"+5790C: 83 C4 04                 -  add esp,04
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>28</ID>
+      <Description>"Unlimited Item Extract"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(extractAob,ILB.exe,83 F8 01 0F 8E ?? ?? ?? ?? 48 89 47)
+alloc(newmem,$1000)
+
+label(extractCopy)
+
+newmem:
+extractCopy:
+  readmem(extractAob,10)
+
+extractAob:
+  db 90 90 90 90 90 90 90 90 90 90
+registersymbol(extractAob)
+registersymbol(extractCopy)
+
+[DISABLE]
+extractAob:
+  readmem(extractCopy,10)
+unregistersymbol(extractAob)
+unregistersymbol(extractCopy)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "ILB.exe"+563D2
+
+"ILB.exe"+563A4: 8B 53 04                 -  mov edx,[ebx+04]
+"ILB.exe"+563A7: 8B 4C 24 1C              -  mov ecx,[esp+1C]
+"ILB.exe"+563AB: E8 E0 EF FF FF           -  call ILB.exe+55390
+"ILB.exe"+563B0: 8B 5C 24 10              -  mov ebx,[esp+10]
+"ILB.exe"+563B4: 8B 74 24 14              -  mov esi,[esp+14]
+"ILB.exe"+563B8: 8B 7C 24 18              -  mov edi,[esp+18]
+"ILB.exe"+563BC: A1 00 7E 07 01           -  mov eax,[ILB.exe+167E00]
+"ILB.exe"+563C1: 83 BC 06 C4 00 00 00 00  -  cmp dword ptr [esi+eax+000000C4],00
+"ILB.exe"+563C9: 0F 8E EE FC FF FF        -  jng ILB.exe+560BD
+"ILB.exe"+563CF: 8B 47 0C                 -  mov eax,[edi+0C]
+// ---------- INJECTING HERE ----------
+"ILB.exe"+563D2: 83 F8 01                 -  cmp eax,01
+"ILB.exe"+563D5: 0F 8E E2 FC FF FF        -  jng ILB.exe+560BD
+// ---------- DONE INJECTING  ----------
+"ILB.exe"+563DB: 48                       -  dec eax
+"ILB.exe"+563DC: 89 47 0C                 -  mov [edi+0C],eax
+"ILB.exe"+563DF: 32 C0                    -  xor al,al
+"ILB.exe"+563E1: 5F                       -  pop edi
+"ILB.exe"+563E2: 5E                       -  pop esi
+"ILB.exe"+563E3: 5B                       -  pop ebx
+"ILB.exe"+563E4: 8B E5                    -  mov esp,ebp
+"ILB.exe"+563E6: 5D                       -  pop ebp
+"ILB.exe"+563E7: C3                       -  ret 
+"ILB.exe"+563E8: E8 B3 D6 04 00           -  call ILB.exe+A3AA0
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>23</ID>
+      <Description>"Unlimited Stack Split"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(splitStackAob,ILB.exe,2B C3 89 47 0C)
+splitStackAob:
+  db 90 90
+registersymbol(splitStackAob)
+
+[DISABLE]
+splitStackAob:
+  db 2B C3
+unregistersymbol(splitStackAob)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "ILB.exe"+56B75
+
+"ILB.exe"+56B5C: 85 D2              -  test edx,edx
+"ILB.exe"+56B5E: 75 0E              -  jne ILB.exe+56B6E
+"ILB.exe"+56B60: 51                 -  push ecx
+"ILB.exe"+56B61: 52                 -  push edx
+"ILB.exe"+56B62: 68 44 18 00 00     -  push 00001844
+"ILB.exe"+56B67: B9 C4 3B 02 01     -  mov ecx,ILB.exe+113BC4
+"ILB.exe"+56B6C: EB 52              -  jmp ILB.exe+56BC0
+"ILB.exe"+56B6E: 8B 47 0C           -  mov eax,[edi+0C]
+"ILB.exe"+56B71: 8B D8              -  mov ebx,eax
+"ILB.exe"+56B73: D1 FB              -  sar ebx,1
+// ---------- INJECTING HERE ----------
+"ILB.exe"+56B75: 2B C3              -  sub eax,ebx
+"ILB.exe"+56B77: 89 47 0C           -  mov [edi+0C],eax
+// ---------- DONE INJECTING  ----------
+"ILB.exe"+56B7A: 89 5A 0C           -  mov [edx+0C],ebx
+"ILB.exe"+56B7D: 83 7F 64 00        -  cmp dword ptr [edi+64],00
+"ILB.exe"+56B81: 7E 26              -  jle ILB.exe+56BA9
+"ILB.exe"+56B83: 8B 91 24 0A 00 00  -  mov edx,[ecx+00000A24]
+"ILB.exe"+56B89: 0F AF D3           -  imul edx,ebx
+"ILB.exe"+56B8C: E8 9F DC FF FF     -  call ILB.exe+54830
+"ILB.exe"+56B91: 8B 96 24 0A 00 00  -  mov edx,[esi+00000A24]
+"ILB.exe"+56B97: 8B CE              -  mov ecx,esi
+"ILB.exe"+56B99: FF 77 0C           -  push [edi+0C]
+"ILB.exe"+56B9C: 0F AF D3           -  imul edx,ebx
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>45</ID>
+      <Description>"Unlimited Attribute Points"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(attributePointsAob,ILB.exe,FF 48 30 5F 5E)
+attributePointsAob:
+  db 90 90 90
+registersymbol(attributePointsAob)
+
+[DISABLE]
+attributePointsAob:
+  db FF 48 30
+unregistersymbol(attributePointsAob)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "ILB.exe"+A353F
+
+"ILB.exe"+A3523: 84 C0                 -  test al,al
+"ILB.exe"+A3525: 74 1E                 -  je ILB.exe+A3545
+"ILB.exe"+A3527: 8D 87 DC 0A 00 00     -  lea eax,[edi+00000ADC]
+"ILB.exe"+A352D: 85 C0                 -  test eax,eax
+"ILB.exe"+A352F: 75 0E                 -  jne ILB.exe+A353F
+"ILB.exe"+A3531: 51                    -  push ecx
+"ILB.exe"+A3532: 50                    -  push eax
+"ILB.exe"+A3533: 68 7F 0C 00 00        -  push 00000C7F
+"ILB.exe"+A3538: B9 A0 FD 11 01        -  mov ecx,ILB.exe+11FDA0
+"ILB.exe"+A353D: EB 13                 -  jmp ILB.exe+A3552
+// ---------- INJECTING HERE ----------
+"ILB.exe"+A353F: FF 48 30              -  dec [eax+30]
+"ILB.exe"+A3542: 5F                    -  pop edi
+"ILB.exe"+A3543: 5E                    -  pop esi
+// ---------- DONE INJECTING  ----------
+"ILB.exe"+A3544: C3                    -  ret 
+"ILB.exe"+A3545: 51                    -  push ecx
+"ILB.exe"+A3546: 6A 00                 -  push 00
+"ILB.exe"+A3548: 68 7C 0C 00 00        -  push 00000C7C
+"ILB.exe"+A354D: B9 48 36 11 01        -  mov ecx,ILB.exe+113648
+"ILB.exe"+A3552: 68 AC 0B 12 01        -  push ILB.exe+120BAC
+"ILB.exe"+A3557: BA 78 FD 11 01        -  mov edx,ILB.exe+11FD78
+"ILB.exe"+A355C: E8 4F E7 F5 FF        -  call ILB.exe+1CB0
+"ILB.exe"+A3561: 83 C4 10              -  add esp,10
+"ILB.exe"+A3564: 84 C0                 -  test al,al
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>46</ID>
+      <Description>"Unlimited Survival Points"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(survivalPointsAob,ILB.exe,48 89 42 44 09 74 BA 48)
+survivalPointsAob:
+  db 90
+registersymbol(survivalPointsAob)
+
+[DISABLE]
+survivalPointsAob:
+  db 48
+unregistersymbol(survivalPointsAob)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "ILB.exe"+A5142
+
+"ILB.exe"+A511B: 68 96 0F 00 00        -  push 00000F96
+"ILB.exe"+A5120: B9 E0 11 12 01        -  mov ecx,ILB.exe+1211E0
+"ILB.exe"+A5125: E9 6E FF FF FF        -  jmp ILB.exe+A5098
+"ILB.exe"+A512A: 85 74 BA 48           -  test [edx+edi*4+48],esi
+"ILB.exe"+A512E: 74 12                 -  je ILB.exe+A5142
+"ILB.exe"+A5130: 51                    -  push ecx
+"ILB.exe"+A5131: 6A 00                 -  push 00
+"ILB.exe"+A5133: 68 99 0F 00 00        -  push 00000F99
+"ILB.exe"+A5138: B9 FC 11 12 01        -  mov ecx,ILB.exe+1211FC
+"ILB.exe"+A513D: E9 56 FF FF FF        -  jmp ILB.exe+A5098
+// ---------- INJECTING HERE ----------
+"ILB.exe"+A5142: 48                    -  dec eax
+"ILB.exe"+A5143: 89 42 44              -  mov [edx+44],eax
+"ILB.exe"+A5146: 09 74 BA 48           -  or [edx+edi*4+48],esi
+// ---------- DONE INJECTING  ----------
+"ILB.exe"+A514A: 83 FF 04              -  cmp edi,04
+"ILB.exe"+A514D: 77 42                 -  ja ILB.exe+A5191
+"ILB.exe"+A514F: FF 24 BD 98 51 0A 01  -  jmp dword ptr [edi*4+ILB.exe+A5198]
+"ILB.exe"+A5156: 8B D6                 -  mov edx,esi
+"ILB.exe"+A5158: E8 53 FA FF FF        -  call ILB.exe+A4BB0
+"ILB.exe"+A515D: 5F                    -  pop edi
+"ILB.exe"+A515E: 5E                    -  pop esi
+"ILB.exe"+A515F: 8B E5                 -  mov esp,ebp
+"ILB.exe"+A5161: 5D                    -  pop ebp
+"ILB.exe"+A5162: C3                    -  ret 
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>11</ID>
+      <Description>"Weapon Pointer (equip to refresh)"</Description>
+      <Options moHideChildren="1"/>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(weaponAob,ILB.exe,74 3C 8B 87 ?? ?? ?? ?? 89 86)
+alloc(newmem,$1000)
+
+label(return)
+label(weaponCopy)
+label(weaponPtr)
+
+newmem:
+  push ecx
+  push eax
+  lea ecx,[edi+8c8]
+  mov eax,weaponPtr
+  db 8D 8F
+  readmem(weaponAob+4,4)
+  mov [eax],ecx
+  db 8D 8F
+  readmem(weaponAob+10,4)
+  mov [eax+4],ecx
+  db 8D 8F
+  readmem(weaponAob+1c,4)
+  mov [eax+8],ecx
+  db 8D 8F
+  readmem(weaponAob+28,4)
+  mov [eax+c],ecx
+  pop eax
+  pop ecx
+weaponCopy:
+  readmem(weaponAob+2,6)
+  jmp return
+
+weaponPtr:
+  dd 0
+  dd 0
+  dd 0
+  dd 0
+
+weaponAob+2:
+  jmp newmem
+  nop
+return:
+registersymbol(weaponAob)
+registersymbol(weaponCopy)
+registersymbol(weaponPtr)
+
+[DISABLE]
+weaponAob+2:
+  readmem(weaponCopy,6)
+unregistersymbol(weaponAob)
+unregistersymbol(weaponCopy)
+unregistersymbol(weaponPtr)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "ILB.exe"+9E4B5
+
+"ILB.exe"+9E47F: 8B 87 DC 09 00 00  -  mov eax,[edi+000009DC]
+"ILB.exe"+9E485: 01 86 DC 09 00 00  -  add [esi+000009DC],eax
+"ILB.exe"+9E48B: 8B 87 E0 09 00 00  -  mov eax,[edi+000009E0]
+"ILB.exe"+9E491: 01 86 E0 09 00 00  -  add [esi+000009E0],eax
+"ILB.exe"+9E497: 8B 87 E4 09 00 00  -  mov eax,[edi+000009E4]
+"ILB.exe"+9E49D: 01 86 E4 09 00 00  -  add [esi+000009E4],eax
+"ILB.exe"+9E4A3: 8B 87 70 09 00 00  -  mov eax,[edi+00000970]
+"ILB.exe"+9E4A9: 01 86 70 09 00 00  -  add [esi+00000970],eax
+"ILB.exe"+9E4AF: 80 7D 08 00        -  cmp byte ptr [ebp+08],00
+"ILB.exe"+9E4B3: 74 3C              -  je ILB.exe+9E4F1
+// ---------- INJECTING HERE ----------
+"ILB.exe"+9E4B5: 8B 87 C8 08 00 00  -  mov eax,[edi+000008C8]
+// ---------- DONE INJECTING  ----------
+"ILB.exe"+9E4BB: 89 86 C8 08 00 00  -  mov [esi+000008C8],eax
+"ILB.exe"+9E4C1: 8B 87 CC 08 00 00  -  mov eax,[edi+000008CC]
+"ILB.exe"+9E4C7: 89 86 CC 08 00 00  -  mov [esi+000008CC],eax
+"ILB.exe"+9E4CD: 8B 87 D4 08 00 00  -  mov eax,[edi+000008D4]
+"ILB.exe"+9E4D3: 89 86 D4 08 00 00  -  mov [esi+000008D4],eax
+"ILB.exe"+9E4D9: 8B 87 E4 08 00 00  -  mov eax,[edi+000008E4]
+"ILB.exe"+9E4DF: 89 86 E4 08 00 00  -  mov [esi+000008E4],eax
+"ILB.exe"+9E4E5: 8B 87 48 09 00 00  -  mov eax,[edi+00000948]
+"ILB.exe"+9E4EB: 09 86 48 09 00 00  -  or [esi+00000948],eax
+"ILB.exe"+9E4F1: 5B                 -  pop ebx
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>12</ID>
+          <Description>"Damage Type"</Description>
+          <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">0:Physical
+1:Magic
+2:Fire
+3:Cold
+4:Lightning
+5:Poison
+6:Rainbow
+</DropDownList>
+          <LastState Value="0" RealAddress="28C15714"/>
+          <VariableType>4 Bytes</VariableType>
+          <Address>weaponPtr</Address>
+          <Offsets>
+            <Offset>0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>15</ID>
+          <Description>"Minimum Damage"</Description>
+          <LastState Value="0" RealAddress="28C15718"/>
+          <VariableType>4 Bytes</VariableType>
+          <Address>weaponPtr+4</Address>
+          <Offsets>
+            <Offset>0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>14</ID>
+          <Description>"Maximum Damage"</Description>
+          <LastState Value="0" RealAddress="28C15720"/>
+          <VariableType>4 Bytes</VariableType>
+          <Address>weaponPtr+8</Address>
+          <Offsets>
+            <Offset>0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>13</ID>
+          <Description>"Rate of Fire Delay"</Description>
+          <LastState Value="0" RealAddress="28C15730"/>
+          <VariableType>4 Bytes</VariableType>
+          <Address>weaponPtr+c</Address>
+          <Offsets>
+            <Offset>0</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>52</ID>
+      <Description>"Player Pointer"</Description>
+      <Options moHideChildren="1"/>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(playerAob,ILB.exe,8B 87 ?? ?? ?? ?? A8 40 74 ?? 33)
+alloc(newmem,$1000)
+
+label(playerCopy)
+label(playerPtr)
+label(return)
+
+newmem:
+  mov [playerPtr],edi
+playerCopy:
+  readmem(playerAob,6)
+  jmp return
+
+playerPtr:
+  dd 0
+
+playerAob:
+  jmp newmem
+  nop
+return:
+registersymbol(playerAob)
+registersymbol(playerCopy)
+registersymbol(playerPtr)
+
+[DISABLE]
+playerAob:
+  readmem(playerCopy,6)
+unregistersymbol(playerAob)
+unregistersymbol(playerCopy)
+unregistersymbol(playerPtr)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "ILB.exe"+AD289
+
+"ILB.exe"+AD261: E8 1A F7 FF FF        -  call ILB.exe+AC980
+"ILB.exe"+AD266: 8B CF                 -  mov ecx,edi
+"ILB.exe"+AD268: E8 D3 3B FF FF        -  call ILB.exe+A0E40
+"ILB.exe"+AD26D: 8B CF                 -  mov ecx,edi
+"ILB.exe"+AD26F: E8 6C 41 FF FF        -  call ILB.exe+A13E0
+"ILB.exe"+AD274: 84 C0                 -  test al,al
+"ILB.exe"+AD276: 0F 85 BD 00 00 00     -  jne ILB.exe+AD339
+"ILB.exe"+AD27C: E8 EF 54 FF FF        -  call ILB.exe+A2770
+"ILB.exe"+AD281: 84 C0                 -  test al,al
+"ILB.exe"+AD283: 0F 85 B0 00 00 00     -  jne ILB.exe+AD339
+// ---------- INJECTING HERE ----------
+"ILB.exe"+AD289: 8B 87 54 09 00 00     -  mov eax,[edi+00000954]
+// ---------- DONE INJECTING  ----------
+"ILB.exe"+AD28F: A8 40                 -  test al,40
+"ILB.exe"+AD291: 74 09                 -  je ILB.exe+AD29C
+"ILB.exe"+AD293: 33 B3 E0 00 00 00     -  xor esi,[ebx+000000E0]
+"ILB.exe"+AD299: 89 75 FC              -  mov [ebp-04],esi
+"ILB.exe"+AD29C: A8 12                 -  test al,12
+"ILB.exe"+AD29E: BE 00 00 00 00        -  mov esi,00000000
+"ILB.exe"+AD2A3: 8B CF                 -  mov ecx,edi
+"ILB.exe"+AD2A5: 0F 44 75 FC           -  cmove esi,[ebp-04]
+"ILB.exe"+AD2A9: 8B D6                 -  mov edx,esi
+"ILB.exe"+AD2AB: E8 90 D6 FF FF        -  call ILB.exe+AA940
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>53</ID>
+          <Description>"Show/Hide"</Description>
+          <Options moHideChildren="1"/>
+          <LastState Value="" Activated="1" RealAddress="00000000"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>49</ID>
+              <Description>"Player"</Description>
+              <LastState RealAddress="26E33020"/>
+              <VariableType>String</VariableType>
+              <Length>0</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>playerPtr</Address>
+              <Offsets>
+                <Offset>0</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>54</ID>
+                  <Description>"Name"</Description>
+                  <LastState RealAddress="26E3302C"/>
+                  <VariableType>String</VariableType>
+                  <Length>128</Length>
+                  <Unicode>1</Unicode>
+                  <CodePage>0</CodePage>
+                  <ZeroTerminate>1</ZeroTerminate>
+                  <Address>+c</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>56</ID>
+                  <Description>"Gold"</Description>
+                  <LastState Value="105" RealAddress="26E33B5C"/>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>+b3c</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>57</ID>
+                  <Description>"Crystal Shards"</Description>
+                  <LastState Value="100" RealAddress="26E33B60"/>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>+b40</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>58</ID>
+                  <Description>"Compost"</Description>
+                  <LastState Value="100" RealAddress="26E33B64"/>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>+b44</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>31</ID>
+      <Description>"Mouseover Pointer"</Description>
+      <Options moHideChildren="1"/>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(mouseoverAob,ILB.exe,8B 8F ?? ?? ?? ?? 8B D3 E8 ?? ?? ?? ?? 8B F0)
+alloc(newmem,$1000)
+
+label(return)
+label(mouseoverPtr)
+label(mouseoverCopy)
+
+newmem:
+  mov [mouseoverPtr],edi
+mouseoverCopy:
+  readmem(mouseoverAob,6)
+  jmp return
+
+mouseoverPtr:
+  dd 0
+
+mouseoverAob:
+  jmp newmem
+  nop
+return:
+registersymbol(mouseoverAob)
+registersymbol(mouseoverPtr)
+registersymbol(mouseoverCopy)
+
+[DISABLE]
+mouseoverAob:
+  readmem(mouseoverCopy,6)
+unregistersymbol(mouseoverAob)
+unregistersymbol(mouseoverPtr)
+unregistersymbol(mouseoverCopy)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "ILB.exe"+60A4A
+
+"ILB.exe"+60A20: 80 3D 4D 85 0B 01 00           -  cmp byte ptr [ILB.exe+1A854D],00
+"ILB.exe"+60A27: 89 45 F4                       -  mov [ebp-0C],eax
+"ILB.exe"+60A2A: C6 45 FF 00                    -  mov byte ptr [ebp-01],00
+"ILB.exe"+60A2E: 75 16                          -  jne ILB.exe+60A46
+"ILB.exe"+60A30: 80 3D E2 7E 07 01 00           -  cmp byte ptr [ILB.exe+167EE2],00
+"ILB.exe"+60A37: 75 0D                          -  jne ILB.exe+60A46
+"ILB.exe"+60A39: 80 3D 45 85 0B 01 00           -  cmp byte ptr [ILB.exe+1A8545],00
+"ILB.exe"+60A40: C6 45 FE 00                    -  mov byte ptr [ebp-02],00
+"ILB.exe"+60A44: 74 04                          -  je ILB.exe+60A4A
+"ILB.exe"+60A46: C6 45 FE 01                    -  mov byte ptr [ebp-02],01
+// ---------- INJECTING HERE ----------
+"ILB.exe"+60A4A: 8B 8F 14 08 00 00              -  mov ecx,[edi+00000814]
+// ---------- DONE INJECTING  ----------
+"ILB.exe"+60A50: 8B D3                          -  mov edx,ebx
+"ILB.exe"+60A52: E8 D9 A1 FE FF                 -  call ILB.exe+4AC30
+"ILB.exe"+60A57: 8B F0                          -  mov esi,eax
+"ILB.exe"+60A59: BA 40 82 09 01                 -  mov edx,ILB.exe+188240
+"ILB.exe"+60A5E: 8B CF                          -  mov ecx,edi
+"ILB.exe"+60A60: 89 75 F8                       -  mov [ebp-08],esi
+"ILB.exe"+60A63: E8 C8 C6 FF FF                 -  call ILB.exe+5D130
+"ILB.exe"+60A68: 89 35 44 8A 09 01              -  mov [ILB.exe+188A44],esi
+"ILB.exe"+60A6E: BA 01 00 00 00                 -  mov edx,00000001
+"ILB.exe"+60A73: 80 3B 00                       -  cmp byte ptr [ebx],00
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>32</ID>
+          <Description>"Show/Hide"</Description>
+          <Options moHideChildren="1"/>
+          <LastState Value="" RealAddress="00000000"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>30</ID>
+              <Description>"Item"</Description>
+              <LastState RealAddress="290AF594"/>
+              <VariableType>String</VariableType>
+              <Length>0</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>mouseoverPtr</Address>
+              <Offsets>
+                <Offset>0</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>29</ID>
+                  <Description>"Name"</Description>
+                  <LastState RealAddress="290AF5A0"/>
+                  <VariableType>String</VariableType>
+                  <Length>128</Length>
+                  <Unicode>1</Unicode>
+                  <CodePage>0</CodePage>
+                  <ZeroTerminate>1</ZeroTerminate>
+                  <Address>+c</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>33</ID>
+                  <Description>"Quantity"</Description>
+                  <LastState Value="3" RealAddress="290B007C"/>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>+ae8</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

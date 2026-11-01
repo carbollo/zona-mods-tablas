@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>3</ID>
+      <Description>"Cheats Created by @michal.flaska"</Description>
+      <Color>FFFF00</Color>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>4</ID>
+      <Description>"Toggle Cheats"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <Color>0000FF</Color>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>1</ID>
+          <Description>"INF. Health"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : StuntsDvojka
+  Version: 
+  Date   : 2025-06-05
+  Author : misof
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscan(INJECT,F3 0F 11 AE 9C 00 00 00 48 8B 4E 60) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  nop
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db F3 0F 11 AE 9C 00 00 00
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: 2C366B6E893
+
+2C366B6E864: F3 0F 10 96 98 00 00 00        - movss xmm2,[rsi+00000098]
+2C366B6E86C: F3 0F 5A D2                    - cvtss2sd xmm2,xmm2
+2C366B6E870: F2 0F 5A D2                    - cvtsd2ss xmm2,xmm2
+2C366B6E874: F2 0F 5A C9                    - cvtsd2ss xmm1,xmm1
+2C366B6E878: F2 0F 5A C0                    - cvtsd2ss xmm0,xmm0
+2C366B6E87C: 66 90                          - nop 2
+2C366B6E87E: 49 BB 30 28 A0 5D C3 02 00 00  - mov r11,000002C35DA02830
+2C366B6E888: 41 FF D3                       - call r11
+2C366B6E88B: F3 0F 5A C0                    - cvtss2sd xmm0,xmm0
+2C366B6E88F: F2 0F 5A E8                    - cvtsd2ss xmm5,xmm0
+// ---------- INJECTING HERE ----------
+2C366B6E893: F3 0F 11 AE 9C 00 00 00        - movss [rsi+0000009C],xmm5
+// ---------- DONE INJECTING  ----------
+2C366B6E89B: 48 8B 4E 60                    - mov rcx,[rsi+60]
+2C366B6E89F: 48 8D AD 00 00 00 00           - lea rbp,[rbp+00000000]
+2C366B6E8A6: 49 BB 50 2D EF 65 C3 02 00 00  - mov r11,000002C365EF2D50
+2C366B6E8B0: 41 FF D3                       - call r11
+2C366B6E8B3: 85 C0                          - test eax,eax
+2C366B6E8B5: 0F 84 58 01 00 00              - je 2C366B6EA13
+2C366B6E8BB: 48 8B 46 60                    - mov rax,[rsi+60]
+2C366B6E8BF: 48 89 45 88                    - mov [rbp-78],rax
+2C366B6E8C3: F3 0F 10 86 A0 00 00 00        - movss xmm0,[rsi+000000A0]
+2C366B6E8CB: F3 0F 5A C0                    - cvtss2sd xmm0,xmm0
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>2</ID>
+          <Description>"HEALTH (you need to rescan)"</Description>
+          <VariableType>Float</VariableType>
+          <Address>2C38C8C0E5C</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <CheatCodes>
+    <CodeEntry>
+      <Description>Code :movss [rsi+0000009C],xmm5</Description>
+      <AddressString>2C366B6E893</AddressString>
+      <Before>
+        <Byte>C0</Byte>
+        <Byte>F2</Byte>
+        <Byte>0F</Byte>
+        <Byte>5A</Byte>
+        <Byte>E8</Byte>
+      </Before>
+      <Actual>
+        <Byte>F3</Byte>
+        <Byte>0F</Byte>
+        <Byte>11</Byte>
+        <Byte>AE</Byte>
+        <Byte>9C</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>4E</Byte>
+        <Byte>60</Byte>
+        <Byte>48</Byte>
+      </After>
+    </CodeEntry>
+  </CheatCodes>
+  <UserdefinedSymbols/>
+</CheatTable>

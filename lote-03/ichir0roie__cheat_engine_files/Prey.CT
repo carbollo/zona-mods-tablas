@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>14</ID>
+      <Description>"ammo"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : Prey.exe
+  Version: 
+  Date   : 2024-01-05
+  Author : ichir
+
+  This script does blah blah blah
+}
+
+define(address,"PreyDll.dll"+169B2BF)
+define(bytes,89 91 84 04 00 00)
+
+[ENABLE]
+
+
+assert(address,bytes)
+alloc(newmem,$1000,"PreyDll.dll"+169B2BF)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  mov [rcx+00000484],edx
+  mov [rcx+00000484],ff
+  jmp return
+
+address:
+  jmp newmem
+  nop
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+  // mov [rcx+00000484],edx
+
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: PreyDll.dll+169B2BF
+
+PreyDll.dll+169B29F: CC                 - int 3 
+PreyDll.dll+169B2A0: 48 89 74 24 10     - mov [rsp+10],rsi
+PreyDll.dll+169B2A5: 57                 - push rdi
+PreyDll.dll+169B2A6: 48 83 EC 20        - sub rsp,20
+PreyDll.dll+169B2AA: 8B B9 84 04 00 00  - mov edi,[rcx+00000484]
+PreyDll.dll+169B2B0: 48 8B F1           - mov rsi,rcx
+PreyDll.dll+169B2B3: 3B FA              - cmp edi,edx
+PreyDll.dll+169B2B5: 74 79              - je PreyDll.dll+169B330
+PreyDll.dll+169B2B7: 48 8B 01           - mov rax,[rcx]
+PreyDll.dll+169B2BA: 48 89 5C 24 30     - mov [rsp+30],rbx
+// ---------- INJECTING HERE ----------
+PreyDll.dll+169B2BF: 89 91 84 04 00 00  - mov [rcx+00000484],edx
+// ---------- DONE INJECTING  ----------
+PreyDll.dll+169B2C5: FF 50 30           - call qword ptr [rax+30]
+PreyDll.dll+169B2C8: 8B 8E 84 04 00 00  - mov ecx,[rsi+00000484]
+PreyDll.dll+169B2CE: 33 DB              - xor ebx,ebx
+PreyDll.dll+169B2D0: 85 C9              - test ecx,ecx
+PreyDll.dll+169B2D2: 79 08              - jns PreyDll.dll+169B2DC
+PreyDll.dll+169B2D4: 89 9E 84 04 00 00  - mov [rsi+00000484],ebx
+PreyDll.dll+169B2DA: EB 0A              - jmp PreyDll.dll+169B2E6
+PreyDll.dll+169B2DC: 3B C8              - cmp ecx,eax
+PreyDll.dll+169B2DE: 7E 06              - jle PreyDll.dll+169B2E6
+PreyDll.dll+169B2E0: 89 86 84 04 00 00  - mov [rsi+00000484],eax
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>9</ID>
+      <Description>"hp"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : Prey.exe
+  Version: 
+  Date   : 2024-01-05
+  Author : ichir
+
+  This script does blah blah blah
+}
+
+define(address,"PreyDll.dll"+158BF0F)
+define(bytes,F3 0F 11 73 40)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,"PreyDll.dll"+158BF0F)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  movss [rbx+40],xmm6
+  //add [rbx+40],447a0000
+  jmp return
+
+address:
+  jmp newmem
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+  // movss [rbx+40],xmm6
+
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: PreyDll.dll+158BF0F
+
+PreyDll.dll+158BEE2: 89 7D 7F                    - mov [rbp+7F],edi
+PreyDll.dll+158BEE5: 0F 29 B4 24 D0 00 00 00     - movaps [rsp+000000D0],xmm6
+PreyDll.dll+158BEED: 44 0F 29 8C 24 A0 00 00 00  - movaps [rsp+000000A0],xmm9
+PreyDll.dll+158BEF6: 45 0F 57 C9                 - xorps xmm9,xmm9
+PreyDll.dll+158BEFA: 45 0F 2F C1                 - comiss xmm8,xmm9
+PreyDll.dll+158BEFE: 73 05                       - jae PreyDll.dll+158BF05
+PreyDll.dll+158BF00: 0F 57 F6                    - xorps xmm6,xmm6
+PreyDll.dll+158BF03: EB 0A                       - jmp PreyDll.dll+158BF0F
+PreyDll.dll+158BF05: F3 0F 10 73 44              - movss xmm6,[rbx+44]
+PreyDll.dll+158BF0A: F3 41 0F 5D F0              - minss xmm6,xmm8
+// ---------- INJECTING HERE ----------
+PreyDll.dll+158BF0F: F3 0F 11 73 40              - movss [rbx+40],xmm6
+// ---------- DONE INJECTING  ----------
+PreyDll.dll+158BF14: 48 8B 05 25 A9 68 01        - mov rax,[PreyDll.dll+2C16840]
+PreyDll.dll+158BF1B: 48 8B 88 08 03 00 00        - mov rcx,[rax+00000308]
+PreyDll.dll+158BF22: E8 29 45 C3 FF              - call PreyDll.dll+11C0450
+PreyDll.dll+158BF27: 48 8B 48 08                 - mov rcx,[rax+08]
+PreyDll.dll+158BF2B: 48 8B 18                    - mov rbx,[rax]
+PreyDll.dll+158BF2E: 48 8B C1                    - mov rax,rcx
+PreyDll.dll+158BF31: 48 2B C3                    - sub rax,rbx
+PreyDll.dll+158BF34: 48 83 C0 07                 - add rax,07
+PreyDll.dll+158BF38: 48 C1 E8 03                 - shr rax,03
+PreyDll.dll+158BF3C: 48 3B D9                    - cmp rbx,rcx
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>12</ID>
+      <Description>"item use"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : Prey.exe
+  Version: 
+  Date   : 2024-01-05
+  Author : ichir
+
+  This script does blah blah blah
+}
+
+define(address,"PreyDll.dll"+10E31BD)
+define(bytes,89 7B 54 85 D2)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,"PreyDll.dll"+10E31BD)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  mov [rbx+54],edi
+  add [rbx+54],ff
+  test edx,edx
+  jmp return
+
+address:
+  jmp newmem
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+  // mov [rbx+54],edi
+  // test edx,edx
+
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: PreyDll.dll+10E31BD
+
+PreyDll.dll+10E3196: 48 8B CB              - mov rcx,rbx
+PreyDll.dll+10E3199: 41 FF 90 18 01 00 00  - call qword ptr [r8+00000118]
+PreyDll.dll+10E31A0: 44 8B CE              - mov r9d,esi
+PreyDll.dll+10E31A3: 48 8D 0D 16 E3 D0 00  - lea rcx,[PreyDll.dll+1DF14C0]
+PreyDll.dll+10E31AA: 48 8B D0              - mov rdx,rax
+PreyDll.dll+10E31AD: 44 8B C7              - mov r8d,edi
+PreyDll.dll+10E31B0: E8 3B E6 1C FF        - call PreyDll.dll+2B17F0
+PreyDll.dll+10E31B5: 8B 53 58              - mov edx,[rbx+58]
+PreyDll.dll+10E31B8: 3B F7                 - cmp esi,edi
+PreyDll.dll+10E31BA: 0F 4C FE              - cmovl edi,esi
+// ---------- INJECTING HERE ----------
+PreyDll.dll+10E31BD: 89 7B 54              - mov [rbx+54],edi
+// ---------- DONE INJECTING  ----------
+PreyDll.dll+10E31C0: 85 D2                 - test edx,edx
+PreyDll.dll+10E31C2: 74 45                 - je PreyDll.dll+10E3209
+PreyDll.dll+10E31C4: 48 8B 03              - mov rax,[rbx]
+PreyDll.dll+10E31C7: 48 8B CB              - mov rcx,rbx
+PreyDll.dll+10E31CA: FF 90 30 02 00 00     - call qword ptr [rax+00000230]
+PreyDll.dll+10E31D0: 48 8B F8              - mov rdi,rax
+PreyDll.dll+10E31D3: 48 85 C0              - test rax,rax
+PreyDll.dll+10E31D6: 74 63                 - je PreyDll.dll+10E323B
+PreyDll.dll+10E31D8: 8B 5B 30              - mov ebx,[rbx+30]
+PreyDll.dll+10E31DB: 48 8B C8              - mov rcx,rax
+}
+</AssemblerScript>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

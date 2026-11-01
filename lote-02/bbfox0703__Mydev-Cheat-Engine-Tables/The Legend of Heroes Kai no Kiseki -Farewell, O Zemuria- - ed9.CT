@@ -1,0 +1,5040 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="46">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>0</ID>
+      <Description>"精簡模式 / Compact mode"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+if syntaxcheck then return end
+
+if not toggleCompactView then
+    function toggleCompactView(sender, forceEnable)
+        local isCompactMode = not (compactViewMenuItem.Caption == 'Compact View Mode')
+        if forceEnable ~= nil then
+            isCompactMode = not forceEnable
+        end
+
+        synchronize(function()
+            compactViewMenuItem.Caption = isCompactMode and 'Compact View Mode' or 'Full View Mode'
+            getMainForm().Splitter1.Visible = isCompactMode
+            getMainForm().Panel4.Visible    = isCompactMode
+            getMainForm().Panel5.Visible    = isCompactMode
+        end)
+    end
+end
+
+if not createCompactViewMenu then
+    function createCompactViewMenu()
+        if isCompactMenuCreated then return end
+
+        synchronize(function()
+            local mainMenu = getMainForm().Menu.Items
+            compactViewMenuItem = createMenuItem(mainMenu)
+            mainMenu.add(compactViewMenuItem)
+            compactViewMenuItem.Caption = 'Compact View Mode'
+            compactViewMenuItem.OnClick = toggleCompactView
+        end)
+
+        isCompactMenuCreated = true
+    end
+end
+
+createCompactViewMenu()
+toggleCompactView(nil, true)
+
+[DISABLE]
+{$lua}
+if toggleCompactView then
+    toggleCompactView(nil, false)
+end
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>2</ID>
+      <Description>"啟用 / Enable"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+if syntaxcheck then return end
+if memrec then print(memrec.Description) end
+synchronize(function()
+  getLuaEngine().MenuItem5.doClick()
+  AddressList.Header.OnSectionClick = nil
+end)
+
+if _kuro_2_customInt == nil then
+
+local p_proc = process
+
+registerCustomTypeAutoAssembler([[
+alloc(TypeName,256)
+alloc(ByteSize,8)
+alloc(ConvertRoutine,1024)
+alloc(ConvertBackRoutine,1024)
+alloc(UsesFloat,1)
+
+TypeName:
+db 'Kueo2 integer',0
+
+ByteSize:
+dd 4
+
+UsesFloat:
+db 0
+
+ConvertRoutine:
+//at this point ecx contains the address where the bytes are stored
+//return with rax/eax
+xor rax,rax
+
+mov eax, dword ptr [rcx]
+and eax, 3FFFFFFF
+
+ret
+
+ConvertBackRoutine:
+//at this point edx contains the address to write the value to
+//and ecx contains the value
+
+push rax
+xor rax, rax
+mov eax, ecx
+or eax, 40000000
+mov dword ptr [rdx], eax
+pop rax
+ret
+
+]])
+
+_kuro_2_customInt = true
+
+process = p_proc
+
+autoAssemble(string.format([[
+unregistersymbol($process)
+define($process, "%s")
+registersymbol($process)
+]], process))
+
+end
+
+local _dbg = true
+if (_dbg) then
+  local AOBs = {
+    {name = "addr_1", aob = "48 8B 05 ?? ?? ?? ?? 33 ED 48 8B 88", pos = 3, aoblen = 7, symbol = "addr_1_base"},
+  }
+
+  for _, v in ipairs(AOBs) do
+    local aob_addr_str = AOBScanModule("ed9.exe", v.aob, "+X+R")
+    if aob_addr_str then
+        local aob_addr_val = tonumber(aob_addr_str, 16)
+        if not aob_addr_val then
+            print("❌ AOBScanModule returned invalid address!")
+        else
+            local name_addr_str = getAddressSafe(aob_addr_val + v.pos)
+            local name_addr_val = readInteger(name_addr_str)
+            local final_addr_val = name_addr_val + aob_addr_val + v.aoblen
+            registerSymbol(v.symbol, final_addr_val)
+            -- Debug output
+            print(string.format("%s address: %08X", v.name, final_addr_val))
+        end
+    else
+        print(string.format("AOB scan failed: %s", v.name))
+    end
+  end
+  synchronize(function() getLuaEngine().Close() end)
+end
+
+[DISABLE]
+{$lua}
+if syntaxcheck then return end
+if memrec then print(memrec.Description) end
+
+local disable_array = {"addr_1_base",}
+for _, symbol in ipairs(disable_array) do
+  unregisterSymbol(symbol)
+end
+
+autoAssemble(string.format([[
+unregistersymbol($process)
+]], process))
+
+synchronize(function() getLuaEngine().Close() end)
+
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>1</ID>
+          <Description>"一鍵切換預設 / Toggle Scripts"</Description>
+          <Color>4080FF</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript Async="1">[ENABLE]
+{$lua}
+if (syntaxcheck) then return end
+synchronize(function()
+  getLuaEngine().menuItem5.doClick()
+  getLuaEngine().Close()
+end)
+
+local enableBattleScripts = {
+  0, -- "精簡模式 / Compact mode"
+  3, -- "Must: 快速釣魚 / fast fishing"
+  10, -- "EP/CP全滿 / Battle: EP/CP full"
+  11, -- "空洞核心EXP倍率 / Battle: master quatrz XP multiplier"
+  13, -- "EXP倍率 / Battle: EXP multiplier"
+  138, -- "Connect至少為1 / keep connect at least 1"
+  139, -- "角色狀態檢視 / Char. viewer"
+  15, -- "暈眩量表倍率 / Battle: Break multiplier"
+  17, -- "額外連段數 / Battle: extra chain"
+  176, -- "取得LGC資料 / Get LGC Data"
+  19, -- "晶片增幅量表增加倍率 / Battle: S-Boost inc. multiplier"
+  197, -- "服裝更換：啟用紳士視角 / Costume: enable Ecchi perspective"
+  25, -- "蓄力量表倍率 / Battle: Charge multiplier"
+  28, -- "取得或設定選擇中道具的數量 / Get or set focused item count"
+  37, -- "更新道具數量：整頁更新 / Update item stock for whole sheet"
+  41, -- "使用及裝備道具時數量不減 / Item use or equip: stock no decrease"
+  43, -- "取得所有結晶迴路、設定最少50個 / Get all quartz"
+  45, -- "取得空洞核心資料 / Get master quartz data"
+  58, -- "Z.O.C. 恢復速度倍率 / Z.O.C. recover multiplier"
+  6, -- "傷害倍率 / Battle: damage multiplier"
+  60, -- "駭入時停止計時 / Stop hacking timer"
+  61, -- "駭入．防壁解除時間無限 / inf. barrier cracking time"
+  62, -- "取得米拉和耀石資訊 / get mira"
+  77, -- "取得目前遊戲時數 / Get readable game time"
+  81, -- "取得目前連結度 / Get current connect value"
+  83, -- "任務中進行追蹤不易被發現 / more undetected tracking (found) during quests"
+  23, -- "晶片增幅量表減少倍率 / Battle: S-Boost dec. multiplier"
+}
+local addressList = getAddressList()
+synchronize(function()
+  for _, id in ipairs(enableBattleScripts) do
+    local memRec = addressList.getMemoryRecordByID(id)
+    if memRec and not memRec.Active then
+      memRec.Active = true
+      sleep(30)
+    end
+    addressList.refresh()
+  end
+end)
+synchronize(function() getLuaEngine().Close() end)
+[DISABLE]
+{$lua}
+if (syntaxcheck) then return end
+synchronize(function()
+  getLuaEngine().menuItem5.doClick()
+  getLuaEngine().Close()
+end)
+
+local disableBattleScripts = {
+  87, -- "取得資料 / Get data; max 50"
+  56, -- "啟用 / Enable"
+  33, -- "更新道具數量 / Update item stock"
+  23, -- "晶片增幅量表減少倍率 / Battle: S-Boost dec. multiplier"
+  185, -- "Grim Garten"
+  84, -- "取得進行中的成就 / Get in-progress achievement"
+  83, -- "任務中進行追蹤不易被發現 / more undetected tracking (found) during quests"
+  81, -- "取得目前連結度 / Get current connect value"
+  77, -- "取得目前遊戲時數 / Get readable game time"
+  62, -- "取得米拉和耀石資訊 / get mira"
+  61, -- "駭入．防壁解除時間無限 / inf. barrier cracking time"
+  60, -- "駭入時停止計時 / Stop hacking timer"
+  6, -- "傷害倍率 / Battle: damage multiplier"
+  58, -- "Z.O.C. 恢復速度倍率 / Z.O.C. recover multiplier"
+  53, -- "強制開啟釣果全記錄 / Force enable all fishing records"
+  48, -- "釣果記錄 / Get fishing data"
+  45, -- "取得空洞核心資料 / Get master quartz data"
+  43, -- "取得所有結晶迴路、設定最少50個 / Get all quartz"
+  41, -- "使用及裝備道具時數量不減 / Item use or equip: stock no decrease"
+  37, -- "更新道具數量：整頁更新 / Update item stock for whole sheet"
+  28, -- "取得或設定選擇中道具的數量 / Get or set focused item count"
+  25, -- "蓄力量表倍率 / Battle: Charge multiplier"
+  197, -- "服裝更換：啟用紳士視角 / Costume: enable Ecchi perspective"
+  194, -- "自製料理 / Cooking list"
+  19, -- "晶片增幅量表增加倍率 / Battle: S-Boost inc. multiplier"
+  176, -- "取得LGC資料 / Get LGC Data"
+  17, -- "額外連段數 / Battle: extra chain"
+  15, -- "暈眩量表倍率 / Battle: Break multiplier"
+  139, -- "角色狀態檢視 / Char. viewer"
+  138, -- "Connect至少為1 / keep connect at least 1"
+  13, -- "EXP倍率 / Battle: EXP multiplier"
+  11, -- "空洞核心EXP倍率 / Battle: master quatrz XP multiplier"
+  10, -- "EP/CP全滿 / Battle: EP/CP full"
+  198, -- "英雄傳說 界之軌跡 -告別塞姆利亞- v1.02  /  https://opencheattables.com / CE 7.6"
+  3, -- "Must: 快速釣魚 / fast fishing"
+  0, -- "精簡模式 / Compact mode"
+}
+local addressList = getAddressList()
+synchronize(function()
+  for _, id in ipairs(disableBattleScripts) do
+    local memRec = addressList.getMemoryRecordByID(id)
+    if memRec and memRec.Active then
+      memRec.Active = false
+      sleep(30)
+    end
+    addressList.refresh()
+  end
+end)
+synchronize(function() getLuaEngine().Close() end)
+-- Comments:
+-- ID: 0, Description: "精簡模式 / Compact mode", Depth: 0
+-- ID: 2, Description: "啟用 / Enable", Depth: 0
+--   ID: 3, Description: "Must: 快速釣魚 / fast fishing", Depth: 1
+--   ID: 6, Description: "傷害倍率 / Battle: damage multiplier", Depth: 1
+--   ID: 10, Description: "EP/CP全滿 / Battle: EP/CP full", Depth: 1
+--   ID: 11, Description: "空洞核心EXP倍率 / Battle: master quatrz XP multiplier", Depth: 1
+--   ID: 13, Description: "EXP倍率 / Battle: EXP multiplier", Depth: 1
+--   ID: 15, Description: "暈眩量表倍率 / Battle: Break multiplier", Depth: 1
+--   ID: 17, Description: "額外連段數 / Battle: extra chain", Depth: 1
+--   ID: 19, Description: "晶片增幅量表增加倍率 / Battle: S-Boost inc. multiplier", Depth: 1
+--     ID: 23, Description: "晶片增幅量表減少倍率 / Battle: S-Boost dec. multiplier", Depth: 2
+--   ID: 25, Description: "蓄力量表倍率 / Battle: Charge multiplier", Depth: 1
+--   ID: 28, Description: "取得或設定選擇中道具的數量 / Get or set focused item count", Depth: 1
+--     ID: 33, Description: "更新道具數量 / Update item stock", Depth: 2
+--   ID: 37, Description: "更新道具數量：整頁更新 / Update item stock for whole sheet", Depth: 1
+--   ID: 41, Description: "使用及裝備道具時數量不減 / Item use or equip: stock no decrease", Depth: 1
+--   ID: 43, Description: "取得所有結晶迴路、設定最少50個 / Get all quartz", Depth: 1
+--   ID: 45, Description: "取得空洞核心資料 / Get master quartz data", Depth: 1
+--   ID: 48, Description: "釣果記錄 / Get fishing data", Depth: 1
+--   ID: 53, Description: "強制開啟釣果全記錄 / Force enable all fishing records", Depth: 1
+--     ID: 56, Description: "啟用 / Enable", Depth: 2
+--   ID: 58, Description: "Z.O.C. 恢復速度倍率 / Z.O.C. recover multiplier", Depth: 1
+--   ID: 60, Description: "駭入時停止計時 / Stop hacking timer", Depth: 1
+--   ID: 61, Description: "駭入．防壁解除時間無限 / inf. barrier cracking time", Depth: 1
+--   ID: 62, Description: "取得米拉和耀石資訊 / get mira", Depth: 1
+--   ID: 77, Description: "取得目前遊戲時數 / Get readable game time", Depth: 1
+--   ID: 81, Description: "取得目前連結度 / Get current connect value", Depth: 1
+--   ID: 83, Description: "任務中進行追蹤不易被發現 / more undetected tracking (found) during quests", Depth: 1
+--   ID: 84, Description: "取得進行中的成就 / Get in-progress achievement", Depth: 1
+--     ID: 87, Description: "取得資料 / Get data; max 50", Depth: 2
+--   ID: 138, Description: "Connect至少為1 / keep connect at least 1", Depth: 1
+--   ID: 139, Description: "角色狀態檢視 / Char. viewer", Depth: 1
+--   ID: 176, Description: "取得LGC資料 / Get LGC Data", Depth: 1
+--     ID: 185, Description: "Grim Garten", Depth: 2
+--   ID: 194, Description: "自製料理 / Cooking list", Depth: 1
+--   ID: 197, Description: "服裝更換：啟用紳士視角 / Costume: enable Ecchi perspective", Depth: 1
+-- ID: 198, Description: "英雄傳說 界之軌跡 -告別塞姆利亞- v1.02  /  https://opencheattables.com / CE 7.6", Depth: 0
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>3</ID>
+          <Description>"Must: 快速釣魚 / fast fishing"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ed9.exe
+  Version: 
+  Date   : 2025-01-29
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_FAST_FISHING,ed9.exe,F3 0F 11 ?? ?? ?? 00 00 F3 0F 11 ?? ?? ?? 00 00 F3 0F 11 ?? ?? ?? 00 00 E8 ?? ?? ?? 00 0F 57) // should be unique
+alloc(newmem,$1000,INJECT_FAST_FISHING)
+
+alloc(INJECT_FAST_FISHINGo, 8)
+
+label(code)
+label(return)
+label(i_is_player_chk_type)
+label(i_player_chars_id)
+INJECT_FAST_FISHINGo:
+  readmem(INJECT_FAST_FISHING, 8)
+
+newmem:
+  vmovss xmm1, [vf_300]
+
+code:
+  //movss [rcx+00000328],xmm1
+  readmem(INJECT_FAST_FISHING, 8)
+  jmp return
+align 10 cc
+  i_is_player_chk_type:
+    dd 0 // 0 = two factor, 1 = 1 factor
+  i_player_chars_id:
+    dw #174 0
+  vf_300:
+  dd (float)300
+
+INJECT_FAST_FISHING:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_FAST_FISHING)
+registersymbol(INJECT_FAST_FISHINGo)
+registersymbol(i_is_player_chk_type)
+registersymbol(i_player_chars_id)
+[DISABLE]
+
+INJECT_FAST_FISHING:
+  //db F3 0F 11 89 28 03 00 00
+  readmem(INJECT_FAST_FISHINGo, 8)
+unregistersymbol(i_is_player_chk_type)
+unregistersymbol(i_player_chars_id)
+unregistersymbol(INJECT_FAST_FISHING)
+dealloc(newmem)
+unregistersymbol(INJECT_FAST_FISHINGo)
+dealloc(INJECT_FAST_FISHINGo)
+{
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+463E03
+
+ed9.exe+463DCD: 48 8B F9                    - mov rdi,rcx
+ed9.exe+463DD0: F3 44 0F 10 15 43 51 5E 00  - movss xmm10,[ed9.exe+A48F1C]
+ed9.exe+463DD9: 41 0F 2F C2                 - comiss xmm0,xmm10
+ed9.exe+463DDD: 76 3C                       - jna ed9.exe+463E1B
+ed9.exe+463DDF: 0F 28 C1                    - movaps xmm0,xmm1
+ed9.exe+463DE2: F3 0F 10 89 28 03 00 00     - movss xmm1,[rcx+00000328]
+ed9.exe+463DEA: F3 0F 59 81 38 03 00 00     - mulss xmm0,[rcx+00000338]
+ed9.exe+463DF2: 48 89 99 2C 03 00 00        - mov [rcx+0000032C],rbx
+ed9.exe+463DF9: 89 99 34 03 00 00           - mov [rcx+00000334],ebx
+ed9.exe+463DFF: F3 0F 5C C8                 - subss xmm1,xmm0
+// ---------- INJECTING HERE ----------
+ed9.exe+463E03: F3 0F 11 89 28 03 00 00     - movss [rcx+00000328],xmm1
+// ---------- DONE INJECTING  ----------
+ed9.exe+463E0B: F3 0F 11 89 20 03 00 00     - movss [rcx+00000320],xmm1
+ed9.exe+463E13: F3 0F 11 89 24 03 00 00     - movss [rcx+00000324],xmm1
+ed9.exe+463E1B: E8 40 45 00 00              - call ed9.exe+468360
+ed9.exe+463E20: 0F 57 F6                    - xorps xmm6,xmm6
+ed9.exe+463E23: 0F 2F B7 28 03 00 00        - comiss xmm6,[rdi+00000328]
+ed9.exe+463E2A: 76 47                       - jna ed9.exe+463E73
+ed9.exe+463E2C: 4C 8B 8F 08 01 00 00        - mov r9,[rdi+00000108]
+ed9.exe+463E33: 4D 85 C9                    - test r9,r9
+ed9.exe+463E36: 74 20                       - je ed9.exe+463E58
+ed9.exe+463E38: 48 63 87 FC 00 00 00        - movsxd  rax,dword ptr [rdi+000000FC]
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>4</ID>
+          <Description>"判別是否玩家方式 / Player check criteria"</Description>
+          <DropDownList DisplayValueAsItem="1">0:較嚴 / All
+1:角色ID、太空戰 / Player ID, Space Battle
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>4 Bytes</VariableType>
+          <Address>i_is_player_chk_type</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>5</ID>
+          <Description>"玩家角色ID上限值 / Player side char ID limit"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <Color>C08000</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>i_player_chars_id</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>6</ID>
+          <Description>"傷害倍率 / Battle: damage multiplier"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ed9.exe
+  Version: 
+  Date   : 2025-01-27
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_DAMAGE_CTRL,$process,41 8B 4A 0C 41 8B 42 14) // should be unique
+alloc(newmem,$1000,INJECT_DAMAGE_CTRL)
+
+label(code)
+label(return vf_damage_2_player vf_damage_2_enemy i_min_hp_threshold_2_player)
+
+newmem:
+  cmp r11d, 0
+  jge code
+
+  movaps xmm14, [vf_damage_2_player]
+  vcvtsi2ss xmm15, xmm15, r11d
+  vshufps xmm15, xmm15, xmm15, 0
+  vmulps xmm15, xmm14, xmm15
+
+  cmp dword ptr [i_is_player_chk_type], 1
+  je @F
+  cmp dword ptr [r10+598], 0  // 550, 598
+  jne to_enemy
+  cmp dword ptr [r10+48], 0  // RNG
+  je to_enemy
+  cmp dword ptr [r10+10], #400000
+  jae to_enemy
+@@:
+  mov cx,[i_player_chars_id]
+  cmp word ptr [r10], cx
+  ja to_enemy
+
+to_player:
+  mov ecx,[r10+0C]
+  cmp ecx, [i_min_hp_threshold_2_player]
+  jb code
+  vcvtss2si r11d, xmm15
+  jmp code
+
+to_enemy:
+  vshufps xmm15, xmm15, xmm15, 5
+  vcvtss2si r11d, xmm15
+
+code:
+  mov ecx,[r10+0C]
+  mov eax,[r10+14]
+  jmp return
+align 10 cc
+  vf_damage_2_player:
+  dd (float)0.9
+  vf_damage_2_enemy:
+  dd (float)1
+  dd 0 0
+  i_min_hp_threshold_2_player:
+  dd #500
+
+
+INJECT_DAMAGE_CTRL:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_DAMAGE_CTRL vf_damage_2_player vf_damage_2_enemy i_min_hp_threshold_2_player)
+
+[DISABLE]
+
+INJECT_DAMAGE_CTRL:
+  db 41 8B 4A 0C 41 8B 42 14
+
+unregistersymbol(INJECT_DAMAGE_CTRL vf_damage_2_player vf_damage_2_enemy i_min_hp_threshold_2_player)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+E16A4
+
+ed9.exe+E1687: 85 C0        - test eax,eax
+ed9.exe+E1689: 7F 04        - jg ed9.exe+E168F
+ed9.exe+E168B: 41 8B 42 10  - mov eax,[r10+10]
+ed9.exe+E168F: 44 3B D8     - cmp r11d,eax
+ed9.exe+E1692: 41 0F 4C C3  - cmovl eax,r11d
+ed9.exe+E1696: 45 33 C9     - xor r9d,r9d
+ed9.exe+E1699: 85 C0        - test eax,eax
+ed9.exe+E169B: 41 0F 48 C1  - cmovs eax,r9d
+ed9.exe+E169F: 41 89 42 0C  - mov [r10+0C],eax
+ed9.exe+E16A3: C3           - ret 
+// ---------- INJECTING HERE ----------
+ed9.exe+E16A4: 41 8B 4A 0C  - mov ecx,[r10+0C]
+// ---------- DONE INJECTING  ----------
+ed9.exe+E16A8: 41 8B 42 14  - mov eax,[r10+14]
+ed9.exe+E16AC: 41 03 CB     - add ecx,r11d
+ed9.exe+E16AF: 85 C0        - test eax,eax
+ed9.exe+E16B1: 7F 04        - jg ed9.exe+E16B7
+ed9.exe+E16B3: 41 8B 42 10  - mov eax,[r10+10]
+ed9.exe+E16B7: 3B C8        - cmp ecx,eax
+ed9.exe+E16B9: 0F 4C C1     - cmovl eax,ecx
+ed9.exe+E16BC: 45 33 C9     - xor r9d,r9d
+ed9.exe+E16BF: 85 C0        - test eax,eax
+ed9.exe+E16C1: 41 0F 48 C1  - cmovs eax,r9d
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>7</ID>
+              <Description>"對玩家倍率 / ratio to player:"</Description>
+              <DropDownList DisplayValueAsItem="1">1:Normal
+0.8999999762:90%
+0.00009999999747:1/10000
+</DropDownList>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>Float</VariableType>
+              <Address>vf_damage_2_player</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>8</ID>
+              <Description>"對敵方倍率 / ratio to enemy:"</Description>
+              <DropDownList DisplayValueAsItem="1">1:Normal
+1000:Fast kill
+</DropDownList>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>Float</VariableType>
+              <Address>vf_damage_2_enemy</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>9</ID>
+              <Description>"玩家HP小於此則不計算 / ignore player HP if cur. value &lt;"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_min_hp_threshold_2_player</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>10</ID>
+          <Description>"EP/CP全滿 / Battle: EP/CP full"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ed9.exe
+  Version: 
+  Date   : 2025-01-27
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_EPCP_FULL,ed9.exe,8B 5F 0C E9 36 08 00 00) // should be unique
+alloc(newmem,$1000,INJECT_EPCP_FULL)
+
+label(code)
+label(return)
+
+newmem:
+  cmp dword ptr [i_is_player_chk_type], 1
+  je @F
+  cmp dword ptr [rdi+598], 0
+  jne to_enemy
+
+@@:
+  mov bx, [i_player_chars_id]
+  cmp word ptr [rdi], bx
+  ja to_enemy
+
+to_player:
+  mov ebx,  [rdi+1C]
+  mov [rdi+18], ebx
+  mov ebx,  [rdi+24]
+  mov [rdi+20], ebx
+
+  jmp code
+
+to_enemy:
+
+
+code:
+  mov ebx,[rdi+0C]
+  //jmp ed9.exe+C5D90
+  reassemble(INJECT_EPCP_FULL+3)
+  jmp return
+align 10 cc
+
+
+
+INJECT_EPCP_FULL:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_EPCP_FULL)
+
+[DISABLE]
+
+INJECT_EPCP_FULL:
+  db 8B 5F 0C E9 36 08 00 00
+
+unregistersymbol(INJECT_EPCP_FULL)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+C5552
+
+ed9.exe+C5528: 48 8B F1              - mov rsi,rcx
+ed9.exe+C552B: 83 FA 1C              - cmp edx,1C
+ed9.exe+C552E: 0F 87 5C 08 00 00     - ja ed9.exe+C5D90
+ed9.exe+C5534: 48 63 C2              - movsxd  rax,edx
+ed9.exe+C5537: 48 8D 15 C2 AA F3 FF  - lea rdx,[ed9.exe]
+ed9.exe+C553E: 8B 8C 82 B4 5D 0C 00  - mov ecx,[rdx+rax*4+000C5DB4]
+ed9.exe+C5545: 48 03 CA              - add rcx,rdx
+ed9.exe+C5548: FF E1                 - jmp rcx
+ed9.exe+C554A: 8B 5F 04              - mov ebx,[rdi+04]
+ed9.exe+C554D: E9 3E 08 00 00        - jmp ed9.exe+C5D90
+// ---------- INJECTING HERE ----------
+ed9.exe+C5552: 8B 5F 0C              - mov ebx,[rdi+0C]
+// ---------- DONE INJECTING  ----------
+ed9.exe+C5555: E9 36 08 00 00        - jmp ed9.exe+C5D90
+ed9.exe+C555A: 8B 5F 10              - mov ebx,[rdi+10]
+ed9.exe+C555D: E9 2E 08 00 00        - jmp ed9.exe+C5D90
+ed9.exe+C5562: 41 BE 01 00 00 00     - mov r14d,00000001
+ed9.exe+C5568: 48 8B CE              - mov rcx,rsi
+ed9.exe+C556B: 41 8B D6              - mov edx,r14d
+ed9.exe+C556E: E8 8D FF FF FF        - call ed9.exe+C5500
+ed9.exe+C5573: BA 02 00 00 00        - mov edx,00000002
+ed9.exe+C5578: 48 8B CE              - mov rcx,rsi
+ed9.exe+C557B: 8B F8                 - mov edi,eax
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>11</ID>
+          <Description>"空洞核心EXP倍率 / Battle: master quatrz XP multiplier"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ed9.exe
+  Version: 
+  Date   : 2025-03-03
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_QUARTZ_XP_MULTI,ed9.exe,03 78 04 48 8B 05 ?? ?? ?? ?? 48) // should be unique
+alloc(newmem,$1000,INJECT_QUARTZ_XP_MULTI)
+
+alloc(INJECT_QUARTZ_XP_MULTIo, 10)
+
+label(code)
+label(return vf_quartz_xp_multi)
+
+INJECT_QUARTZ_XP_MULTIo:
+  readmem(INJECT_QUARTZ_XP_MULTI, 10)
+
+newmem:
+  vmovss xmm14, [vf_quartz_xp_multi]
+  vcvtsi2ss xmm15, xmm15, edi
+  vmulss xmm15, xmm14, xmm15
+  vcvtss2si edi, xmm15
+
+code:
+  add edi,[rax+04]
+  //mov rax,[ed9.exe+BE3868]
+  mov rax, [addr_1_base]
+
+  jmp return
+align 10 cc
+  i_offset:
+  dq 0
+  vf_quartz_xp_multi:
+  dd (float)3.333333
+
+INJECT_QUARTZ_XP_MULTI:
+  jmp newmem
+  nop 5
+return:
+registersymbol(INJECT_QUARTZ_XP_MULTI vf_quartz_xp_multi)
+registersymbol(INJECT_QUARTZ_XP_MULTIo)
+[DISABLE]
+
+INJECT_QUARTZ_XP_MULTI:
+  //db 03 78 04 48 8B 05 4A CA AB 00
+  readmem(INJECT_QUARTZ_XP_MULTIo, 10)
+
+unregistersymbol(INJECT_QUARTZ_XP_MULTI vf_quartz_xp_multi)
+dealloc(newmem)
+
+unregistersymbol(INJECT_QUARTZ_XP_MULTIo)
+dealloc(INJECT_QUARTZ_XP_MULTIo)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+126DD4
+
+ed9.exe+126DA5: E8 66 3B FB FF        - call ed9.exe+DA910
+ed9.exe+126DAA: 48 85 C0              - test rax,rax
+ed9.exe+126DAD: 0F 84 0C 01 00 00     - je ed9.exe+126EBF
+ed9.exe+126DB3: 48 0F BE 48 0D        - movsx rcx,byte ptr [rax+0D]
+ed9.exe+126DB8: 84 C9                 - test cl,cl
+ed9.exe+126DBA: 0F 88 FF 00 00 00     - js ed9.exe+126EBF
+ed9.exe+126DC0: 48 8D 83 E0 02 1C 00  - lea rax,[rbx+001C02E0]
+ed9.exe+126DC7: 48 8D 04 C8           - lea rax,[rax+rcx*8]
+ed9.exe+126DCB: 48 85 C0              - test rax,rax
+ed9.exe+126DCE: 0F 84 EB 00 00 00     - je ed9.exe+126EBF
+// ---------- INJECTING HERE ----------
+ed9.exe+126DD4: 03 78 04              - add edi,[rax+04]
+// ---------- DONE INJECTING  ----------
+ed9.exe+126DD7: 48 8B 05 8A DA AB 00  - mov rax,[addr_1_base]
+ed9.exe+126DDE: 48 8B 88 08 08 00 00  - mov rcx,[rax+00000808]
+ed9.exe+126DE5: 41 8B D6              - mov edx,r14d
+ed9.exe+126DE8: 48 8B 49 08           - mov rcx,[rcx+08]
+ed9.exe+126DEC: E8 1F 3B FB FF        - call ed9.exe+DA910
+ed9.exe+126DF1: 48 85 C0              - test rax,rax
+ed9.exe+126DF4: 74 1C                 - je ed9.exe+126E12
+ed9.exe+126DF6: 48 0F BE 40 0D        - movsx rax,byte ptr [rax+0D]
+ed9.exe+126DFB: 84 C0                 - test al,al
+ed9.exe+126DFD: 78 13                 - js ed9.exe+126E12
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>12</ID>
+              <Description>"multiplier"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>Float</VariableType>
+              <Address>vf_quartz_xp_multi</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>13</ID>
+          <Description>"EXP倍率 / Battle: EXP multiplier"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ed9.exe
+  Version: 
+  Date   : 2025-01-27
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_EXP_MULTI,ed9.exe,03 D3 3B D0 41 B8 96 00 00 00) // should be unique
+alloc(newmem,$1000,INJECT_EXP_MULTI)
+
+label(code)
+label(return vf_exp_multi)
+
+newmem:
+  vcvtsi2ss xmm15, xmm15, ebx
+  vmovss xmm14, [vf_exp_multi]
+  vmulss xmm15, xmm14, xmm15
+  vcvtss2si ebx, xmm15
+
+code:
+  add edx,ebx
+  cmp edx,eax
+  mov r8d,00000096
+  jmp return
+align 10 cc
+  vf_exp_multi:
+  dd (float)1.1
+
+INJECT_EXP_MULTI:
+  jmp newmem
+  nop 5
+return:
+registersymbol(INJECT_EXP_MULTI vf_exp_multi)
+
+[DISABLE]
+
+INJECT_EXP_MULTI:
+  db 03 D3 3B D0 41 B8 96 00 00 00
+
+unregistersymbol(INJECT_EXP_MULTI vf_exp_multi)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+E230F
+
+ed9.exe+E22EE: 8B 29              - mov ebp,[rcx]
+ed9.exe+E22F0: 45 8B F8           - mov r15d,r8d
+ed9.exe+E22F3: 8B DA              - mov ebx,edx
+ed9.exe+E22F5: 41 B8 96 00 00 00  - mov r8d,00000096
+ed9.exe+E22FB: 8B D5              - mov edx,ebp
+ed9.exe+E22FD: 4C 8B F1           - mov r14,rcx
+ed9.exe+E2300: E8 9B 00 00 00     - call ed9.exe+E23A0
+ed9.exe+E2305: 41 8B 56 08        - mov edx,[r14+08]
+ed9.exe+E2309: 8B F8              - mov edi,eax
+ed9.exe+E230B: 45 8B 66 04        - mov r12d,[r14+04]
+// ---------- INJECTING HERE ----------
+ed9.exe+E230F: 03 D3              - add edx,ebx
+// ---------- DONE INJECTING  ----------
+ed9.exe+E2311: 3B D0              - cmp edx,eax
+ed9.exe+E2313: 41 B8 96 00 00 00  - mov r8d,00000096
+ed9.exe+E2319: 0F 4C FA           - cmovl edi,edx
+ed9.exe+E231C: 33 DB              - xor ebx,ebx
+ed9.exe+E231E: 85 FF              - test edi,edi
+ed9.exe+E2320: 8B D5              - mov edx,ebp
+ed9.exe+E2322: 0F 48 FB           - cmovs edi,ebx
+ed9.exe+E2325: E8 76 00 00 00     - call ed9.exe+E23A0
+ed9.exe+E232A: 3B F8              - cmp edi,eax
+ed9.exe+E232C: 0F 4C C7           - cmovl eax,edi
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>14</ID>
+              <Description>"multiplier"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>Float</VariableType>
+              <Address>vf_exp_multi</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>15</ID>
+          <Description>"暈眩量表倍率 / Battle: Break multiplier"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ed9.exe
+  Version: 
+  Date   : 2025-01-27
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_BREAK_MULTI,ed9.exe,F3 0F 58 C6 0F 28 CA) // should be unique
+alloc(newmem,$1000,INJECT_BREAK_MULTI)
+
+label(code)
+label(return vf_break_multi)
+
+newmem:
+  vmovss xmm14, [vf_break_multi]
+  vmulss xmm6, xmm6, xmm14
+
+
+code:
+  addss xmm0,xmm6
+  movaps xmm1,xmm2
+  jmp return
+align 10 cc
+  vf_break_multi:
+  dd (float)1.5
+
+INJECT_BREAK_MULTI:
+  jmp newmem
+  nop 2
+return:
+registersymbol(INJECT_BREAK_MULTI vf_break_multi)
+
+[DISABLE]
+
+INJECT_BREAK_MULTI:
+  db F3 0F 58 C6 0F 28 CA
+
+unregistersymbol(INJECT_BREAK_MULTI vf_break_multi)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+CE78B
+
+ed9.exe+CE761: F3 44 0F 11 44 24 30  - movss [rsp+30],xmm8
+ed9.exe+CE768: 49 8B 0C 24           - mov rcx,[r12]
+ed9.exe+CE76C: 48 8D 44 24 30        - lea rax,[rsp+30]
+ed9.exe+CE771: 45 84 ED              - test r13b,r13b
+ed9.exe+CE774: 49 0F 44 C6           - cmove rax,r14
+ed9.exe+CE778: F3 0F 10 51 7C        - movss xmm2,[rcx+7C]
+ed9.exe+CE77D: 44 0F 2F C2           - comiss xmm8,xmm2
+ed9.exe+CE781: 73 62                 - jae ed9.exe+CE7E5
+ed9.exe+CE783: F3 0F 10 59 78        - movss xmm3,[rcx+78]
+ed9.exe+CE788: 0F 28 C3              - movaps xmm0,xmm3
+// ---------- INJECTING HERE ----------
+ed9.exe+CE78B: F3 0F 58 C6           - addss xmm0,xmm6
+// ---------- DONE INJECTING  ----------
+ed9.exe+CE78F: 0F 28 CA              - movaps xmm1,xmm2
+ed9.exe+CE792: F3 0F 5D C8           - minss xmm1,xmm0
+ed9.exe+CE796: 45 84 FF              - test r15b,r15b
+ed9.exe+CE799: 74 0D                 - je ed9.exe+CE7A8
+ed9.exe+CE79B: 0F 2F CA              - comiss xmm1,xmm2
+ed9.exe+CE79E: 72 08                 - jb ed9.exe+CE7A8
+ed9.exe+CE7A0: 0F 28 CA              - movaps xmm1,xmm2
+ed9.exe+CE7A3: F3 41 0F 5C C9        - subss xmm1,xmm9
+ed9.exe+CE7A8: 48 85 C0              - test rax,rax
+ed9.exe+CE7AB: 74 11                 - je ed9.exe+CE7BE
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>16</ID>
+              <Description>"multiplier"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>Float</VariableType>
+              <Address>vf_break_multi</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>17</ID>
+          <Description>"額外連段數 / Battle: extra chain"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ed9.exe
+  Version: 
+  Date   : 2025-01-28
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_EXTRA_CHAIN,ed9.exe,41 03 D4 3B D0) // should be unique
+alloc(newmem,$1000,INJECT_EXTRA_CHAIN)
+
+label(code)
+label(return)
+
+newmem:
+  inc r12d
+  inc r12d
+
+code:
+  add edx,r12d
+  cmp edx,eax
+  jmp return
+
+INJECT_EXTRA_CHAIN:
+  jmp newmem
+return:
+registersymbol(INJECT_EXTRA_CHAIN)
+
+[DISABLE]
+
+INJECT_EXTRA_CHAIN:
+  db 41 03 D4 3B D0
+
+unregistersymbol(INJECT_EXTRA_CHAIN)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+12B3CF
+
+ed9.exe+12B3AD: 49 83 C2 08              - add r10,08
+ed9.exe+12B3B1: 4D 3B D3                 - cmp r10,r11
+ed9.exe+12B3B4: 75 DA                    - jne ed9.exe+12B390
+ed9.exe+12B3B6: 33 C0                    - xor eax,eax
+ed9.exe+12B3B8: 8B 56 20                 - mov edx,[rsi+20]
+ed9.exe+12B3BB: 48 8B C8                 - mov rcx,rax
+ed9.exe+12B3BE: E8 6D 2F 5C 00           - call ed9.exe+6EE330
+ed9.exe+12B3C3: 8B 56 20                 - mov edx,[rsi+20]
+ed9.exe+12B3C6: B8 E7 03 00 00           - mov eax,000003E7
+ed9.exe+12B3CB: 48 8B 4E 10              - mov rcx,[rsi+10]
+// ---------- INJECTING HERE ----------
+ed9.exe+12B3CF: 41 03 D4                 - add edx,r12d
+// ---------- DONE INJECTING  ----------
+ed9.exe+12B3D2: 3B D0                    - cmp edx,eax
+ed9.exe+12B3D4: 0F 4F D0                 - cmovg edx,eax
+ed9.exe+12B3D7: 89 56 20                 - mov [rsi+20],edx
+ed9.exe+12B3DA: E8 51 2F 5C 00           - call ed9.exe+6EE330
+ed9.exe+12B3DF: 66 0F 6F 05 C9 00 92 00  - movdqa xmm0,[ed9.exe+A4B4B0]
+ed9.exe+12B3E7: 48 8D 44 24 30           - lea rax,[rsp+30]
+ed9.exe+12B3EC: 66 0F 6F 0D FC FF 91 00  - movdqa xmm1,[ed9.exe+A4B3F0]
+ed9.exe+12B3F4: BA 64 00 00 00           - mov edx,00000064
+ed9.exe+12B3F9: 8B 4E 20                 - mov ecx,[rsi+20]
+ed9.exe+12B3FC: 66 0F 7F 44 24 30        - movdqa [rsp+30],xmm0
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>18</ID>
+              <Description>"敵我皆適用 / Apply to enemy too"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>19</ID>
+          <Description>"晶片增幅量表增加倍率 / Battle: S-Boost inc. multiplier"</Description>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ed9.exe
+  Version: 
+  Date   : 2025-01-27
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_S_BOOST_MULTI,ed9.exe,F3 0F 58 CE F3 0F 5D 8F ?? ?? ?? 00) // should be unique
+alloc(newmem,$1000,INJECT_S_BOOST_MULTI)
+
+alloc(INJECT_S_BOOST_MULTIo, 12)
+
+label(code)
+label(return vf_s_boost_multi vf_s_boost_min i_base_sboost_addr)
+
+INJECT_S_BOOST_MULTIo:
+  readmem(INJECT_S_BOOST_MULTI, 12)
+
+newmem:
+  mov [i_base_sboost_addr], rdi
+  vmovss xmm14, [vf_s_boost_multi]
+  vmulss xmm6, xmm6, xmm14
+
+code:
+  addss xmm1,xmm6
+
+  //
+  pushfq
+  vmovss xmm15, [vf_s_boost_min]
+  vucomiss xmm1, xmm15
+  jae @F
+  movaps xmm1, xmm15
+
+@@:
+  popfq
+  //
+
+  //minss xmm1,[rdi+000001A0]
+  reassemble(INJECT_S_BOOST_MULTI+4)
+  jmp return
+align 10 cc
+  vf_s_boost_multi:
+  dd (float)1.5
+  vf_s_boost_min:
+  dd (float)300
+  i_base_sboost_addr:
+  dq 0
+
+INJECT_S_BOOST_MULTI:
+  jmp newmem
+  nop 7
+return:
+registersymbol(INJECT_S_BOOST_MULTI vf_s_boost_multi vf_s_boost_min i_base_sboost_addr)
+registersymbol(INJECT_S_BOOST_MULTIo)
+[DISABLE]
+
+INJECT_S_BOOST_MULTI:
+  //db F3 0F 58 CE F3 0F 5D 8F A0 01 00 00
+  readmem(INJECT_S_BOOST_MULTIo, 12)
+
+unregistersymbol(INJECT_S_BOOST_MULTI vf_s_boost_multi vf_s_boost_min i_base_sboost_addr)
+dealloc(newmem)
+unregistersymbol(INJECT_S_BOOST_MULTIo)
+dealloc(INJECT_S_BOOST_MULTIo)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+65F7A7
+
+ed9.exe+65F774: 72 1E                    - jb ed9.exe+65F794
+ed9.exe+65F776: 41 F6 80 15 01 00 00 04  - test byte ptr [r8+00000115],04
+ed9.exe+65F77E: 75 14                    - jne ed9.exe+65F794
+ed9.exe+65F780: 48 8B 0D E1 FB 54 00     - mov rcx,[ed9.exe+BAF368]
+ed9.exe+65F787: 45 33 C0                 - xor r8d,r8d
+ed9.exe+65F78A: BA 1A 00 00 00           - mov edx,0000001A
+ed9.exe+65F78F: E8 9C 4C 9D FF           - call ed9.exe+34430
+ed9.exe+65F794: F3 0F 10 97 A4 01 00 00  - movss xmm2,[rdi+000001A4]
+ed9.exe+65F79C: F3 0F 10 1D 88 96 3E 00  - movss xmm3,[ed9.exe+A48E2C]
+ed9.exe+65F7A4: 0F 28 CA                 - movaps xmm1,xmm2
+// ---------- INJECTING HERE ----------
+ed9.exe+65F7A7: F3 0F 58 CE              - addss xmm1,xmm6
+// ---------- DONE INJECTING  ----------
+ed9.exe+65F7AB: F3 0F 5D 8F A0 01 00 00  - minss xmm1,[rdi+000001A0]
+ed9.exe+65F7B3: 0F 28 C1                 - movaps xmm0,xmm1
+ed9.exe+65F7B6: F3 0F 58 C3              - addss xmm0,xmm3
+ed9.exe+65F7BA: 0F 2F D0                 - comiss xmm2,xmm0
+ed9.exe+65F7BD: 77 09                    - ja ed9.exe+65F7C8
+ed9.exe+65F7BF: F3 0F 58 D3              - addss xmm2,xmm3
+ed9.exe+65F7C3: 0F 2F CA                 - comiss xmm1,xmm2
+ed9.exe+65F7C6: 76 07                    - jna ed9.exe+65F7CF
+ed9.exe+65F7C8: C6 87 A8 01 00 00 01     - mov byte ptr [rdi+000001A8],01
+ed9.exe+65F7CF: 80 BF 90 01 00 00 00     - cmp byte ptr [rdi+00000190],00
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>20</ID>
+              <Description>"multiplier"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>Float</VariableType>
+              <Address>vf_s_boost_multi</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>21</ID>
+              <Description>"min. value"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>Float</VariableType>
+              <Address>vf_s_boost_min</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>22</ID>
+              <Description>"value"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>Float</VariableType>
+              <Address>i_base_sboost_addr</Address>
+              <Offsets>
+                <Offset>1A4</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>23</ID>
+              <Description>"晶片增幅量表減少倍率 / Battle: S-Boost dec. multiplier"</Description>
+              <Options moHideChildren="1"/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{ Game   : ed9.exe
+  Version: 
+  Date   : 2025-01-27
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECTS_BOOST_DEC_MULTI,ed9.exe,F3 0F 5C C8 F3 48 0F 2C D2) // should be unique
+alloc(newmem,$1000,INJECTS_BOOST_DEC_MULTI)
+
+label(code)
+label(return vf_s_boost_dec_multi)
+
+newmem:
+  vmovss xmm15, [vf_s_boost_dec_multi]
+  vmulss xmm0, xmm0, xmm15
+
+code:
+  subss xmm1,xmm0
+
+  //
+  pushfq
+  vmovss xmm15, [vf_s_boost_min]
+  vucomiss xmm1, xmm15
+  jae @F
+  movaps xmm1, xmm15
+
+@@:
+  popfq
+  //
+
+  cvttss2si rdx,xmm2
+  jmp return
+align 10 cc
+  vf_s_boost_dec_multi:
+  dd (float)0.5
+
+INJECTS_BOOST_DEC_MULTI:
+  jmp newmem
+  nop 4
+return:
+registersymbol(INJECTS_BOOST_DEC_MULTI vf_s_boost_dec_multi)
+
+[DISABLE]
+
+INJECTS_BOOST_DEC_MULTI:
+  db F3 0F 5C C8 F3 48 0F 2C D2
+
+unregistersymbol(INJECTS_BOOST_DEC_MULTI vf_s_boost_dec_multi)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+65F85D
+
+ed9.exe+65F832: 48 83 EC 20              - sub rsp,20
+ed9.exe+65F836: 0F 28 C1                 - movaps xmm0,xmm1
+ed9.exe+65F839: 0F 57 DB                 - xorps xmm3,xmm3
+ed9.exe+65F83C: 0F 2F D8                 - comiss xmm3,xmm0
+ed9.exe+65F83F: 48 8B F9                 - mov rdi,rcx
+ed9.exe+65F842: 0F 83 98 00 00 00        - jae ed9.exe+65F8E0
+ed9.exe+65F848: F3 0F 10 91 A4 01 00 00  - movss xmm2,[rcx+000001A4]
+ed9.exe+65F850: B8 1F 85 EB 51           - mov eax,51EB851F
+ed9.exe+65F855: 0F 28 CA                 - movaps xmm1,xmm2
+ed9.exe+65F858: 48 89 74 24 38           - mov [rsp+38],rsi
+// ---------- INJECTING HERE ----------
+ed9.exe+65F85D: F3 0F 5C C8              - subss xmm1,xmm0
+// ---------- DONE INJECTING  ----------
+ed9.exe+65F861: F3 48 0F 2C D2           - cvttss2si rdx,xmm2
+ed9.exe+65F866: F3 0F 5F CB              - maxss xmm1,xmm3
+ed9.exe+65F86A: F3 0F 10 1D BA 95 3E 00  - movss xmm3,[ed9.exe+A48E2C]
+ed9.exe+65F872: F7 E2                    - mul edx
+ed9.exe+65F874: 0F 28 C1                 - movaps xmm0,xmm1
+ed9.exe+65F877: F3 0F 58 C3              - addss xmm0,xmm3
+ed9.exe+65F87B: 8B F2                    - mov esi,edx
+ed9.exe+65F87D: C1 EE 05                 - shr esi,05
+ed9.exe+65F880: 0F 2F D0                 - comiss xmm2,xmm0
+ed9.exe+65F883: 77 09                    - ja ed9.exe+65F88E
+}
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>24</ID>
+                  <Description>"multiplier"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>C08000</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>vf_s_boost_dec_multi</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>25</ID>
+          <Description>"蓄力量表倍率 / Battle: Charge multiplier"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ed9.exe
+  Version: 
+  Date   : 2025-01-27
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_CHARGE_MULTI,ed9.exe,F3 0F 58 83 A0 03 00 00 F3) // should be unique
+alloc(newmem,$1000,INJECT_CHARGE_MULTI)
+
+label(code)
+label(return vf_charge_multi i_base_charge_addr)
+
+newmem:
+  mov [i_base_charge_addr], rbx
+  vxorps xmm14, xmm14, xmm14
+
+  vcomiss xmm0, xmm14
+  jbe code
+
+  vmovss xmm14, [vf_charge_multi]
+  vmulss xmm0, xmm0, xmm14
+
+code:
+  addss xmm0,[rbx+000003A0]
+  jmp return
+align 10 cc
+  vf_charge_multi:
+  dd (float)3
+  dd 0
+  i_base_charge_addr:
+  dq 0
+
+INJECT_CHARGE_MULTI:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_CHARGE_MULTI vf_charge_multi i_base_charge_addr)
+
+[DISABLE]
+
+INJECT_CHARGE_MULTI:
+  db F3 0F 58 83 A0 03 00 00
+
+unregistersymbol(INJECT_CHARGE_MULTI vf_charge_multi i_base_charge_addr)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+C6F31
+
+ed9.exe+C6F05: 0F 5B C0                 - cvtdq2ps xmm0,xmm0
+ed9.exe+C6F08: F3 0F 59 C1              - mulss xmm0,xmm1
+ed9.exe+C6F0C: F3 0F 2C C8              - cvttss2si ecx,xmm0
+ed9.exe+C6F10: 48 8B 05 21 CA B1 00     - mov rax,[ed9.exe+BE3938]
+ed9.exe+C6F17: 0F 57 E4                 - xorps xmm4,xmm4
+ed9.exe+C6F1A: F6 80 16 01 00 00 08     - test byte ptr [rax+00000116],08
+ed9.exe+C6F21: 75 40                    - jne ed9.exe+C6F63
+ed9.exe+C6F23: C7 45 A8 00 00 00 00     - mov [rbp-58],00000000
+ed9.exe+C6F2A: 66 0F 6E C1              - movd xmm0,ecx
+ed9.exe+C6F2E: 0F 5B C0                 - cvtdq2ps xmm0,xmm0
+// ---------- INJECTING HERE ----------
+ed9.exe+C6F31: F3 0F 58 83 A0 03 00 00  - addss xmm0,[rbx+000003A0]
+// ---------- DONE INJECTING  ----------
+ed9.exe+C6F39: F3 0F 11 45 AC           - movss [rbp-54],xmm0
+ed9.exe+C6F3E: 48 8D 45 A8              - lea rax,[rbp-58]
+ed9.exe+C6F42: 48 8D 55 AC              - lea rdx,[rbp-54]
+ed9.exe+C6F46: 0F 2F E0                 - comiss xmm4,xmm0
+ed9.exe+C6F49: 48 0F 46 C2              - cmovbe rax,rdx
+ed9.exe+C6F4D: 48 8D 15 DC 13 93 00     - lea rdx,[ed9.exe+9F8330]
+ed9.exe+C6F54: 0F 2F C2                 - comiss xmm0,xmm2
+ed9.exe+C6F57: 48 0F 47 C2              - cmova rax,rdx
+ed9.exe+C6F5B: 8B 00                    - mov eax,[rax]
+ed9.exe+C6F5D: 89 83 A0 03 00 00        - mov [rbx+000003A0],eax
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>26</ID>
+              <Description>"multiplier"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>Float</VariableType>
+              <Address>vf_charge_multi</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>27</ID>
+              <Description>"value"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>Float</VariableType>
+              <Address>i_base_charge_addr</Address>
+              <Offsets>
+                <Offset>3A0</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>28</ID>
+          <Description>"取得或設定選擇中道具的數量 / Get or set focused item count"</Description>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ed9.exe
+  Version: 
+  Date   : 2025-01-28
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_ITEM_CNT,ed9.exe,0F B7 94 88 ?? ?? ?? 00 85 D2 0F 95 C0 48 83 C4 38 C3 CC) // should be unique
+alloc(newmem,$1000,INJECT_GET_ITEM_CNT)
+
+alloc(INJECT_GET_ITEM_CNTo,8)
+
+label(code)
+label(return i_base_item_addr i_min_item_threshold i_set_item_cnt_to i_minus_item_cnt)
+
+INJECT_GET_ITEM_CNTo:
+  readmem(INJECT_GET_ITEM_CNT, 8)
+
+newmem:
+  push rbx
+  xor rdx, rdx
+  mov edx, [INJECT_GET_ITEM_CNTo+4]
+  lea rdx, [rax+rdx]
+  lea rdx, [rdx+rcx*4] // [rax+rcx*4+001BB4C0] = [rax+rcx*4+rdx]
+  mov [i_base_item_addr], rdx
+  mov bx, [i_minus_item_cnt]
+  je force_set
+  mov bx, [i_min_item_threshold]
+  cmp word ptr [rdx], bx
+  jb endp
+
+  mov bx, [i_set_item_cnt_to]
+  cmp word ptr [rdx], bx
+  jae endp
+  jmp force_set_done
+force_set:
+  mov bx, [i_set_item_cnt_to]
+
+force_set_done:
+  mov [rdx], bx
+
+endp:
+  pop rbx
+
+
+
+code:
+  //movzx edx,word ptr [rax+rcx*4+001BB4C0]
+  readmem(INJECT_GET_ITEM_CNT, 8)
+  jmp return
+align 10 cc
+  i_base_item_addr:
+  dq 0
+  i_min_item_threshold:
+  dw 2
+  i_set_item_cnt_to:
+  dw 50
+  i_minus_item_cnt:
+  dw 63
+
+
+
+INJECT_GET_ITEM_CNT:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_GET_ITEM_CNT i_base_item_addr i_min_item_threshold i_set_item_cnt_to i_minus_item_cnt)
+registersymbol(INJECT_GET_ITEM_CNTo)
+[DISABLE]
+
+INJECT_GET_ITEM_CNT:
+  //db 0F B7 94 88 C0 B4 1B 00
+  readmem(INJECT_GET_ITEM_CNTo, 8)
+
+unregistersymbol(INJECT_GET_ITEM_CNT i_base_item_addr i_min_item_threshold i_set_item_cnt_to i_minus_item_cnt)
+dealloc(newmem)
+
+unregistersymbol(INJECT_GET_ITEM_CNTo)
+dealloc(INJECT_GET_ITEM_CNTo)
+{
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+1815FB
+
+ed9.exe+1815D3: 3D 3F 01 00 00           - cmp eax,0000013F
+ed9.exe+1815D8: 75 17                    - jne ed9.exe+1815F1
+ed9.exe+1815DA: 48 8B 05 4F 23 A6 00     - mov rax,[ed9.exe+BE3930]
+ed9.exe+1815E1: 8B 90 94 79 29 00        - mov edx,[rax+00297994]
+ed9.exe+1815E7: 85 D2                    - test edx,edx
+ed9.exe+1815E9: 0F 95 C0                 - setne al
+ed9.exe+1815EC: 48 83 C4 38              - add rsp,38
+ed9.exe+1815F0: C3                       - ret 
+ed9.exe+1815F1: 48 8B C8                 - mov rcx,rax
+ed9.exe+1815F4: 48 8B 05 35 23 A6 00     - mov rax,[ed9.exe+BE3930]
+// ---------- INJECTING HERE ----------
+ed9.exe+1815FB: 0F B7 94 88 C0 B4 1B 00  - movzx edx,word ptr [rax+rcx*4+001BB4C0]
+// ---------- DONE INJECTING  ----------
+ed9.exe+181603: 85 D2                    - test edx,edx
+ed9.exe+181605: 0F 95 C0                 - setne al
+ed9.exe+181608: 48 83 C4 38              - add rsp,38
+ed9.exe+18160C: C3                       - ret 
+ed9.exe+18160D: CC                       - int 3 
+ed9.exe+18160E: CC                       - int 3 
+ed9.exe+18160F: CC                       - int 3 
+ed9.exe+181610: 48 89 5C 24 10           - mov [rsp+10],rbx
+ed9.exe+181615: 57                       - push rdi
+ed9.exe+181616: 48 83 EC 30              - sub rsp,30
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>29</ID>
+              <Description>"開啟道具選單 / Usage: item menu"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>30</ID>
+              <Description>"只限未裝備之非重要道具 / Unequipped item &amp; non-important only"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>31</ID>
+              <Description>"count"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_base_item_addr</Address>
+              <Offsets>
+                <Offset>0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>32</ID>
+              <Description>"??"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_base_item_addr</Address>
+              <Offsets>
+                <Offset>2</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>33</ID>
+              <Description>"更新道具數量 / Update item stock"</Description>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>34</ID>
+                  <Description>"原本數量要大於等於 / item stock # must &gt;="</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>C08000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_min_item_threshold</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>35</ID>
+                  <Description>"如果是此數量則強制設定 / Force set to count if current stock="</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>C08000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_minus_item_cnt</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>36</ID>
+                  <Description>"設定數量為 / Set stock # to"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>C08000</Color>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>i_set_item_cnt_to</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>37</ID>
+          <Description>"更新道具數量：整頁更新 / Update item stock for whole sheet"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ed9.exe
+  Version: 
+  Date   : 2025-01-30
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_SET_ITEM_CNT_INC_IMP,ed9.exe,0F B7 9C 88 ?? ?? ?? 00 48 8B 47 20 48) // should be unique
+alloc(newmem,$1000,INJECT_SET_ITEM_CNT_INC_IMP)
+
+alloc(INJECT_SET_ITEM_CNT_INC_IMPo, 8)
+
+label(code)
+label(return i_min_item_cnt_page i_target_item_cnt_page)
+
+INJECT_SET_ITEM_CNT_INC_IMPo:
+  readmem(INJECT_SET_ITEM_CNT_INC_IMP, 8)
+
+newmem:
+  push r15
+  push rbx
+  db 4C 8D BC 88
+  readmem(INJECT_SET_ITEM_CNT_INC_IMP+4, 4)
+  mov bx, [i_min_item_cnt_page]
+  cmp word ptr [r15], bx
+  jb endp
+  mov bx, [i_target_item_cnt_page]
+  cmp word ptr [r15], bx
+  jae endp
+  mov word ptr [r15], bx
+
+
+endp:
+  pop rbx
+  pop r15
+
+code:
+  //movzx ebx,word ptr [rax+rcx*4+001BB4C0]
+  readmem(INJECT_SET_ITEM_CNT_INC_IMP, 8)
+  jmp return
+align 10 cc
+  i_min_item_cnt_page:
+  dd A
+  i_target_item_cnt_page:
+  dd 50
+
+
+INJECT_SET_ITEM_CNT_INC_IMP:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_SET_ITEM_CNT_INC_IMP i_min_item_cnt_page i_target_item_cnt_page)
+registersymbol(INJECT_SET_ITEM_CNT_INC_IMPo)
+[DISABLE]
+
+INJECT_SET_ITEM_CNT_INC_IMP:
+  //db 0F B7 9C 88 C0 B4 1B 00
+  readmem(INJECT_SET_ITEM_CNT_INC_IMPo, 8)
+
+unregistersymbol(INJECT_SET_ITEM_CNT_INC_IMP i_min_item_cnt_page i_target_item_cnt_page)
+dealloc(newmem)
+unregistersymbol(INJECT_SET_ITEM_CNT_INC_IMPo)
+dealloc(INJECT_SET_ITEM_CNT_INC_IMPo)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+610785
+
+ed9.exe+610755: 48 8B 05 D4 31 5D 00     - mov rax,[ed9.exe+BE3930]
+ed9.exe+61075C: 8B 9C 88 70 79 29 00     - mov ebx,[rax+rcx*4+00297970]
+ed9.exe+610763: EB 28                    - jmp ed9.exe+61078D
+ed9.exe+610765: 3D 3F 01 00 00           - cmp eax,0000013F
+ed9.exe+61076A: 75 0F                    - jne ed9.exe+61077B
+ed9.exe+61076C: 48 8B 05 BD 31 5D 00     - mov rax,[ed9.exe+BE3930]
+ed9.exe+610773: 8B 98 94 79 29 00        - mov ebx,[rax+00297994]
+ed9.exe+610779: EB 12                    - jmp ed9.exe+61078D
+ed9.exe+61077B: 48 8B C8                 - mov rcx,rax
+ed9.exe+61077E: 48 8B 05 AB 31 5D 00     - mov rax,[ed9.exe+BE3930]
+// ---------- INJECTING HERE ----------
+ed9.exe+610785: 0F B7 9C 88 C0 B4 1B 00  - movzx ebx,word ptr [rax+rcx*4+001BB4C0]
+// ---------- DONE INJECTING  ----------
+ed9.exe+61078D: 48 8B 47 20              - mov rax,[rdi+20]
+ed9.exe+610791: 48 85 C0                 - test rax,rax
+ed9.exe+610794: 74 3B                    - je ed9.exe+6107D1
+ed9.exe+610796: 09 A8 84 01 00 00        - or [rax+00000184],ebp
+ed9.exe+61079C: 48 8B 47 10              - mov rax,[rdi+10]
+ed9.exe+6107A0: 0F B6 48 19              - movzx ecx,byte ptr [rax+19]
+ed9.exe+6107A4: 80 F9 19                 - cmp cl,19
+ed9.exe+6107A7: 77 0A                    - ja ed9.exe+6107B3
+ed9.exe+6107A9: BA 00 7C E1 03           - mov edx,03E17C00
+ed9.exe+6107AE: 0F A3 CA                 - bt edx,ecx
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>38</ID>
+              <Description>"注意：重要道具也會影響 / Notice: affects important items"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>39</ID>
+              <Description>"原本數量要大於等於 / item stock # must &gt;="</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_min_item_cnt_page</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>40</ID>
+              <Description>"設定數量為 / Set stock # to"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_target_item_cnt_page</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>41</ID>
+          <Description>"使用及裝備道具時數量不減 / Item use or equip: stock no decrease"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ed9.exe
+  Version: 
+  Date   : 2025-01-31
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_ITEM_USE,ed9.exe,2B C6 48 8B 74 24 48) // should be unique
+alloc(newmem,$1000,INJECT_ITEM_USE)
+
+label(code)
+label(return i_item_dec_min_chk_cnt)
+
+newmem:
+  push rcx
+
+  movzx ecx, word ptr [i_item_dec_min_chk_cnt]
+  cmp eax, ecx
+  jb endp
+
+  cmp esi, 0
+  jl endp
+  xor esi, esi
+
+endp:
+  pop rcx
+
+code:
+  sub eax,esi
+  mov rsi,[rsp+48]
+  jmp return
+align 10 cc
+  i_item_dec_min_chk_cnt:
+  dw 2
+
+INJECT_ITEM_USE:
+  jmp newmem
+  nop 2
+return:
+registersymbol(INJECT_ITEM_USE i_item_dec_min_chk_cnt)
+
+[DISABLE]
+
+INJECT_ITEM_USE:
+  db 2B C6 48 8B 74 24 48
+
+unregistersymbol(INJECT_ITEM_USE i_item_dec_min_chk_cnt)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+51108E
+
+ed9.exe+511066: B0 01                 - mov al,01
+ed9.exe+511068: 89 97 94 79 29 00     - mov [rdi+00297994],edx
+ed9.exe+51106E: 48 8B 5C 24 40        - mov rbx,[rsp+40]
+ed9.exe+511073: 48 8B 74 24 48        - mov rsi,[rsp+48]
+ed9.exe+511078: 48 83 C4 30           - add rsp,30
+ed9.exe+51107C: 5F                    - pop rdi
+ed9.exe+51107D: C3                    - ret 
+ed9.exe+51107E: 48 8D 0C 9F           - lea rcx,[rdi+rbx*4]
+ed9.exe+511082: 48 8B 5C 24 40        - mov rbx,[rsp+40]
+ed9.exe+511087: 0F B7 81 C0 B4 1B 00  - movzx eax,word ptr [rcx+001BB4C0]
+// ---------- INJECTING HERE ----------
+ed9.exe+51108E: 2B C6                 - sub eax,esi
+// ---------- DONE INJECTING  ----------
+ed9.exe+511090: 48 8B 74 24 48        - mov rsi,[rsp+48]
+ed9.exe+511095: 85 C0                 - test eax,eax
+ed9.exe+511097: 66 0F 4F D0           - cmovg dx,ax
+ed9.exe+51109B: B0 01                 - mov al,01
+ed9.exe+51109D: 66 89 91 C0 B4 1B 00  - mov [rcx+001BB4C0],dx
+ed9.exe+5110A4: 48 83 C4 30           - add rsp,30
+ed9.exe+5110A8: 5F                    - pop rdi
+ed9.exe+5110A9: C3                    - ret 
+ed9.exe+5110AA: CC                    - int 3 
+ed9.exe+5110AB: CC                    - int 3 
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>42</ID>
+              <Description>"道具數量需不小於此值才觸發 / original item stock must &gt;="</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_item_dec_min_chk_cnt</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>43</ID>
+          <Description>"取得所有結晶迴路、設定最少50個 / Get all quartz"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ed9.exe
+  Version: 
+  Date   : 2025-01-29
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_ALL_QUARTZ,ed9.exe,0F B7 94 88 ?? ?? ?? 00 85 D2 75 08 85 FF 0F 84 ?? ?? ?? ?? 48 8B 0D) // should be unique
+alloc(newmem,$1000,INJECT_GET_ALL_QUARTZ)
+
+alloc(INJECT_GET_ALL_QUARTZo, 8)
+
+label(code)
+label(return)
+
+INJECT_GET_ALL_QUARTZo:
+  readmem(INJECT_GET_ALL_QUARTZ, 8)
+
+newmem:
+  push r15
+  push r14
+  xor r14, r14
+
+  lea r15, [rax+rcx*4]
+  mov r14d, [INJECT_GET_ALL_QUARTZo+4]
+  lea r15, [r15+r14]
+
+  cmp word ptr [r15], 34
+  jae endp
+  mov word ptr [r15], 34
+
+endp:
+  pop r14
+  pop r15
+
+code:
+  movzx edx,word ptr [rax+rcx*4+001BB4C0]
+  jmp return
+
+INJECT_GET_ALL_QUARTZ:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_GET_ALL_QUARTZ)
+registersymbol(INJECT_GET_ALL_QUARTZo)
+[DISABLE]
+
+INJECT_GET_ALL_QUARTZ:
+  //db 0F B7 94 88 C0 B4 1B 00
+  readmem(INJECT_GET_ALL_QUARTZo, 8)
+unregistersymbol(INJECT_GET_ALL_QUARTZ)
+dealloc(newmem)
+unregistersymbol(INJECT_GET_ALL_QUARTZo)
+dealloc(INJECT_GET_ALL_QUARTZo)
+{
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+1F0CF7
+
+ed9.exe+1F0CCC: 77 12                    - ja ed9.exe+1F0CE0
+ed9.exe+1F0CCE: 8B C8                    - mov ecx,eax
+ed9.exe+1F0CD0: 48 8B 05 59 2C 9F 00     - mov rax,[ed9.exe+BE3930]
+ed9.exe+1F0CD7: 8B 94 88 70 79 29 00     - mov edx,[rax+rcx*4+00297970]
+ed9.exe+1F0CDE: EB 1F                    - jmp ed9.exe+1F0CFF
+ed9.exe+1F0CE0: 48 8B 05 49 2C 9F 00     - mov rax,[ed9.exe+BE3930]
+ed9.exe+1F0CE7: 81 F9 3F 01 00 00        - cmp ecx,0000013F
+ed9.exe+1F0CED: 75 08                    - jne ed9.exe+1F0CF7
+ed9.exe+1F0CEF: 8B 90 94 79 29 00        - mov edx,[rax+00297994]
+ed9.exe+1F0CF5: EB 08                    - jmp ed9.exe+1F0CFF
+// ---------- INJECTING HERE ----------
+ed9.exe+1F0CF7: 0F B7 94 88 C0 B4 1B 00  - movzx edx,word ptr [rax+rcx*4+001BB4C0]
+// ---------- DONE INJECTING  ----------
+ed9.exe+1F0CFF: 85 D2                    - test edx,edx
+ed9.exe+1F0D01: 75 08                    - jne ed9.exe+1F0D0B
+ed9.exe+1F0D03: 85 FF                    - test edi,edi
+ed9.exe+1F0D05: 0F 84 1D 01 00 00        - je ed9.exe+1F0E28
+ed9.exe+1F0D0B: 48 8B 0D 5E 2C 9F 00     - mov rcx,[ed9.exe+BE3970]
+ed9.exe+1F0D12: 48 85 C9                 - test rcx,rcx
+ed9.exe+1F0D15: 74 10                    - je ed9.exe+1F0D27
+ed9.exe+1F0D17: 48 83 C1 08              - add rcx,08
+ed9.exe+1F0D1B: BA 50 00 00 00           - mov edx,00000050
+ed9.exe+1F0D20: E8 DB 06 4E 00           - call ed9.exe+6D1400
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>44</ID>
+              <Description>"於裝備結晶迴路畫面 中選擇結晶 / Usage: change equipped quartz"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>45</ID>
+          <Description>"取得空洞核心資料 / Get master quartz data"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ed9.exe
+  Version: 
+  Date   : 2025-01-28
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_QUARTZ_DATA,ed9.exe,8B 59 04 4C 8B 64 24 50) // should be unique
+alloc(newmem,$1000,INJECT_GET_QUARTZ_DATA)
+
+label(code)
+label(return i_base_quartz_addr)
+
+newmem:
+  mov [i_base_quartz_addr], rcx
+
+code:
+  mov ebx,[rcx+04]
+  mov r12,[rsp+50]
+  jmp return
+align 10 cc
+  i_base_quartz_addr:
+  dq 0
+
+INJECT_GET_QUARTZ_DATA:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_GET_QUARTZ_DATA i_base_quartz_addr)
+
+[DISABLE]
+
+INJECT_GET_QUARTZ_DATA:
+  db 8B 59 04 4C 8B 64 24 50
+
+unregistersymbol(INJECT_GET_QUARTZ_DATA i_base_quartz_addr)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+1E58AA
+
+ed9.exe+1E5886: 4C 8B 7C 24 20           - mov r15,[rsp+20]
+ed9.exe+1E588B: 48 85 C0                 - test rax,rax
+ed9.exe+1E588E: 74 1D                    - je ed9.exe+1E58AD
+ed9.exe+1E5890: 48 0F BE 40 0D           - movsx rax,byte ptr [rax+0D]
+ed9.exe+1E5895: 84 C0                    - test al,al
+ed9.exe+1E5897: 78 14                    - js ed9.exe+1E58AD
+ed9.exe+1E5899: 49 8D 8C 24 E0 02 1C 00  - lea rcx,[r12+001C02E0]
+ed9.exe+1E58A1: 48 8D 0C C1              - lea rcx,[rcx+rax*8]
+ed9.exe+1E58A5: 48 85 C9                 - test rcx,rcx
+ed9.exe+1E58A8: 74 03                    - je ed9.exe+1E58AD
+// ---------- INJECTING HERE ----------
+ed9.exe+1E58AA: 8B 59 04                 - mov ebx,[rcx+04]
+// ---------- DONE INJECTING  ----------
+ed9.exe+1E58AD: 4C 8B 64 24 50           - mov r12,[rsp+50]
+ed9.exe+1E58B2: 2B DD                    - sub ebx,ebp
+ed9.exe+1E58B4: 48 8B 6C 24 40           - mov rbp,[rsp+40]
+ed9.exe+1E58B9: 85 FF                    - test edi,edi
+ed9.exe+1E58BB: 7F 10                    - jg ed9.exe+1E58CD
+ed9.exe+1E58BD: BB 01 00 00 00           - mov ebx,00000001
+ed9.exe+1E58C2: 8B FB                    - mov edi,ebx
+ed9.exe+1E58C4: EB 07                    - jmp ed9.exe+1E58CD
+ed9.exe+1E58C6: BF 01 00 00 00           - mov edi,00000001
+ed9.exe+1E58CB: 33 DB                    - xor ebx,ebx
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>46</ID>
+              <Description>"Lv"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_quartz_addr</Address>
+              <Offsets>
+                <Offset>0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>47</ID>
+              <Description>"EXP"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_quartz_addr</Address>
+              <Offsets>
+                <Offset>4</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>48</ID>
+          <Description>"釣果記錄 / Get fishing data"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ed9.exe
+  Version: 
+  Date   : 2025-01-30
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_FISHING_SUMMARY,ed9.exe,74 2A 44 8B 40 04) // should be unique
+alloc(newmem,$1000,INJECT_GET_FISHING_SUMMARY)
+
+label(code)
+label(return i_base_fishing_data_addr)
+
+newmem:
+  mov [i_base_fishing_data_addr], rax
+
+code:
+  //je ed9.exe+4C935E
+  reassemble(INJECT_GET_FISHING_SUMMARY)
+  mov r8d,[rax+04]
+  jmp return
+align 10 cc
+  i_base_fishing_data_addr:
+  dq 0
+
+INJECT_GET_FISHING_SUMMARY:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT_GET_FISHING_SUMMARY i_base_fishing_data_addr)
+
+[DISABLE]
+
+INJECT_GET_FISHING_SUMMARY:
+  db 74 2A 44 8B 40 04
+
+unregistersymbol(INJECT_GET_FISHING_SUMMARY i_base_fishing_data_addr)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+4C9332
+
+ed9.exe+4C9303: 8B D7                 - mov edx,edi
+ed9.exe+4C9305: 48 8B 0D 24 A6 71 00  - mov rcx,[ed9.exe+BE3930]
+ed9.exe+4C930C: E8 2F 96 04 00        - call ed9.exe+512940
+ed9.exe+4C9311: 48 8B D8              - mov rbx,rax
+ed9.exe+4C9314: 48 8B 8E 80 01 00 00  - mov rcx,[rsi+00000180]
+ed9.exe+4C931B: BF FE FF FF FF        - mov edi,FFFFFFFE
+ed9.exe+4C9320: 48 85 C9              - test rcx,rcx
+ed9.exe+4C9323: 74 39                 - je ed9.exe+4C935E
+ed9.exe+4C9325: 21 B9 84 01 00 00     - and [rcx+00000184],edi
+ed9.exe+4C932B: 4C 39 BE 88 01 00 00  - cmp [rsi+00000188],r15
+// ---------- INJECTING HERE ----------
+ed9.exe+4C9332: 74 2A                 - je ed9.exe+4C935E
+// ---------- DONE INJECTING  ----------
+ed9.exe+4C9334: 44 8B 40 04           - mov r8d,[rax+04]
+ed9.exe+4C9338: 48 8D 15 41 E9 52 00  - lea rdx,[ed9.exe+9F7C80]
+ed9.exe+4C933F: 48 8D 4D C8           - lea rcx,[rbp-38]
+ed9.exe+4C9343: E8 48 9B B7 FF        - call ed9.exe+42E90
+ed9.exe+4C9348: 90                    - nop 
+ed9.exe+4C9349: 48 8D 55 C8           - lea rdx,[rbp-38]
+ed9.exe+4C934D: 48 8B 8E 88 01 00 00  - mov rcx,[rsi+00000188]
+ed9.exe+4C9354: E8 67 AB 1A 00        - call ed9.exe+673EC0
+ed9.exe+4C9359: 90                    - nop 
+ed9.exe+4C935A: C6 45 C8 00           - mov byte ptr [rbp-38],00
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>49</ID>
+              <Description>"最大記錄 / Max record"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>Float</VariableType>
+              <Address>i_base_fishing_data_addr</Address>
+              <Offsets>
+                <Offset>0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>50</ID>
+              <Description>"釣果數量 / Fish caught"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_fishing_data_addr</Address>
+              <Offsets>
+                <Offset>4</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>51</ID>
+              <Description>"記錄保持人 / Record holder"</Description>
+              <DropDownListLink>Char-ID</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_base_fishing_data_addr</Address>
+              <Offsets>
+                <Offset>8</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>52</ID>
+              <Description>"啟用 / Enabled"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_base_fishing_data_addr</Address>
+              <Offsets>
+                <Offset>A</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>53</ID>
+          <Description>"強制開啟釣果全記錄 / Force enable all fishing records"</Description>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>54</ID>
+              <Description>"極可能造成成就問題, 或是遊戲當機 / 後續進度問題!!"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>55</ID>
+              <Description>"It may cause achievement issues, game crash or game progress problems!!"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>56</ID>
+              <Description>"啟用 / Enable"</Description>
+              <Options moHideChildren="1"/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{ Game   : ed9.exe
+  Version: 
+  Date   : 2025-01-30
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_FORCE_OPEN_FISH_RECORD,ed9.exe,F6 40 0A 01 74 02) // should be unique
+alloc(newmem,$1000,INJECT_FORCE_OPEN_FISH_RECORD)
+
+label(code)
+label(return)
+
+newmem:
+  cmp byte ptr [rax+0A], 1
+  je code
+  mov byte ptr [rax+0A], 1
+  vmovss xmm14, [vf_1]
+  vmovss [rax], xmm14
+  mov dword ptr [rax+4], 1
+  mov word ptr [rax+8], 1
+
+code:
+  test byte ptr [rax+0A],01
+  reassemble(INJECT_FORCE_OPEN_FISH_RECORD+4)
+  //je ed9.exe+4C8577
+  jmp return
+align 10 cc
+  vf_1:
+  dd (float)1
+
+INJECT_FORCE_OPEN_FISH_RECORD:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT_FORCE_OPEN_FISH_RECORD)
+
+[DISABLE]
+
+INJECT_FORCE_OPEN_FISH_RECORD:
+  db F6 40 0A 01 74 02
+
+unregistersymbol(INJECT_FORCE_OPEN_FISH_RECORD)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+4C856F
+
+ed9.exe+4C8551: 41 8B CF              - mov ecx,r15d
+ed9.exe+4C8554: 0F AF CB              - imul ecx,ebx
+ed9.exe+4C8557: 49 03 CC              - add rcx,r12
+ed9.exe+4C855A: 49 03 CE              - add rcx,r14
+ed9.exe+4C855D: 74 18                 - je ed9.exe+4C8577
+ed9.exe+4C855F: 0F B7 11              - movzx edx,word ptr [rcx]
+ed9.exe+4C8562: 49 8B CD              - mov rcx,r13
+ed9.exe+4C8565: E8 D6 A3 04 00        - call ed9.exe+512940
+ed9.exe+4C856A: 48 85 C0              - test rax,rax
+ed9.exe+4C856D: 74 08                 - je ed9.exe+4C8577
+// ---------- INJECTING HERE ----------
+ed9.exe+4C856F: F6 40 0A 01           - test byte ptr [rax+0A],01
+// ---------- DONE INJECTING  ----------
+ed9.exe+4C8573: 74 02                 - je ed9.exe+4C8577
+ed9.exe+4C8575: FF C6                 - inc esi
+ed9.exe+4C8577: FF C3                 - inc ebx
+ed9.exe+4C8579: 3B DD                 - cmp ebx,ebp
+ed9.exe+4C857B: 72 D4                 - jb ed9.exe+4C8551
+ed9.exe+4C857D: 45 33 E4              - xor r12d,r12d
+ed9.exe+4C8580: 8B D6                 - mov edx,esi
+ed9.exe+4C8582: 48 8B 8F F8 00 00 00  - mov rcx,[rdi+000000F8]
+ed9.exe+4C8589: E8 A2 5D 22 00        - call ed9.exe+6EE330
+ed9.exe+4C858E: 8D 55 FF              - lea edx,[rbp-01]
+}
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>57</ID>
+                  <Description>"開啟釣果畫面 / Open fishing records"</Description>
+                  <Color>8000FF</Color>
+                  <GroupHeader>1</GroupHeader>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>58</ID>
+          <Description>"Z.O.C. 恢復速度倍率 / Z.O.C. recover multiplier"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ed9.exe
+  Version: 
+  Date   : 2025-01-30
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_ZOC_MULTI,ed9.exe,F3 0F 58 C1 F3 41 0F 5D C4) // should be unique
+alloc(newmem,$1000,INJECT_ZOC_MULTI)
+
+label(code)
+label(return vf_zoc_multi)
+
+newmem:
+  vmovss xmm14, [vf_zoc_multi]
+  vmulss xmm0, xmm0, xmm14
+
+code:
+  addss xmm0,xmm1
+  minss xmm0,xmm12
+  jmp return
+align 10 cc
+  vf_zoc_multi:
+  dd (float)10.5
+
+INJECT_ZOC_MULTI:
+  jmp newmem
+  nop 4
+return:
+registersymbol(INJECT_ZOC_MULTI vf_zoc_multi)
+
+[DISABLE]
+
+INJECT_ZOC_MULTI:
+  db F3 0F 58 C1 F3 41 0F 5D C4
+
+unregistersymbol(INJECT_ZOC_MULTI vf_zoc_multi)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+32782D
+
+ed9.exe+3277F9: 0F 2F 81 2C 02 00 00     - comiss xmm0,[rcx+0000022C]
+ed9.exe+327800: 72 3C                    - jb ed9.exe+32783E
+ed9.exe+327802: F3 0F 10 81 18 02 00 00  - movss xmm0,[rcx+00000218]
+ed9.exe+32780A: 0F 2F 81 14 02 00 00     - comiss xmm0,[rcx+00000214]
+ed9.exe+327811: 72 2B                    - jb ed9.exe+32783E
+ed9.exe+327813: F3 0F 10 8F 8C 04 00 00  - movss xmm1,[rdi+0000048C]
+ed9.exe+32781B: 44 0F 2F E1              - comiss xmm12,xmm1
+ed9.exe+32781F: 76 1D                    - jna ed9.exe+32783E
+ed9.exe+327821: 41 0F 28 C3              - movaps xmm0,xmm11
+ed9.exe+327825: F3 0F 5E 05 67 20 72 00  - divss xmm0,[ed9.exe+A49894]
+// ---------- INJECTING HERE ----------
+ed9.exe+32782D: F3 0F 58 C1              - addss xmm0,xmm1
+// ---------- DONE INJECTING  ----------
+ed9.exe+327831: F3 41 0F 5D C4           - minss xmm0,xmm12
+ed9.exe+327836: F3 0F 11 87 8C 04 00 00  - movss [rdi+0000048C],xmm0
+ed9.exe+32783E: 48 8B 05 F3 C0 8B 00     - mov rax,[ed9.exe+BE3938]
+ed9.exe+327845: F6 80 1F 01 00 00 08     - test byte ptr [rax+0000011F],08
+ed9.exe+32784C: 74 72                    - je ed9.exe+3278C0
+ed9.exe+32784E: 48 8B 05 2B 7B 88 00     - mov rax,[ed9.exe+BAF380]
+ed9.exe+327855: F3 0F 10 35 83 1F 72 00  - movss xmm6,[ed9.exe+A497E0]
+ed9.exe+32785D: C6 87 BF 04 00 00 01     - mov byte ptr [rdi+000004BF],01
+ed9.exe+327864: 0F 28 CE                 - movaps xmm1,xmm6
+ed9.exe+327867: 48 8B 88 88 3A 00 00     - mov rcx,[rax+00003A88]
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>59</ID>
+              <Description>"multiplier"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>C08000</Color>
+              <VariableType>Float</VariableType>
+              <Address>vf_zoc_multi</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>60</ID>
+          <Description>"駭入時停止計時 / Stop hacking timer"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ed9.exe
+  Version: 
+  Date   : 2025-01-29
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_TREASURE_GAME_TIMER,ed9.exe,F3 0F ?? ?? F3 41 0F ?? ?? F3 0F ?? ?? ?? F3 48) // should be unique
+
+alloc(INJECT_TREASURE_GAME_TIMERo, 4)
+
+INJECT_TREASURE_GAME_TIMERo:
+  readmem(INJECT_TREASURE_GAME_TIMER, 4)
+
+INJECT_TREASURE_GAME_TIMER:
+  nop 4
+registersymbol(INJECT_TREASURE_GAME_TIMER)
+registersymbol(INJECT_TREASURE_GAME_TIMERo)
+[DISABLE]
+
+INJECT_TREASURE_GAME_TIMER:
+  //db F3 0F 5C C1 //F3 41 0F 5F C0
+  readmem(INJECT_TREASURE_GAME_TIMERo, 4)
+unregistersymbol(INJECT_TREASURE_GAME_TIMER)
+unregistersymbol(INJECT_TREASURE_GAME_TIMERo)
+dealloc(INJECT_TREASURE_GAME_TIMERo)
+{
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+653EC3
+
+ed9.exe+653E99: 48 81 EC A0 00 00 00        - sub rsp,000000A0
+ed9.exe+653EA0: 0F 29 78 D8                 - movaps [rax-28],xmm7
+ed9.exe+653EA4: 44 0F 29 40 C8              - movaps [rax-38],xmm8
+ed9.exe+653EA9: 44 0F 29 50 B8              - movaps [rax-48],xmm10
+ed9.exe+653EAE: 48 8B F1                    - mov rsi,rcx
+ed9.exe+653EB1: F3 0F 10 79 08              - movss xmm7,[rcx+08]
+ed9.exe+653EB6: 0F 28 C7                    - movaps xmm0,xmm7
+ed9.exe+653EB9: 45 0F 57 C0                 - xorps xmm8,xmm8
+ed9.exe+653EBD: 80 79 40 00                 - cmp byte ptr [rcx+40],00
+ed9.exe+653EC1: 75 0E                       - jne ed9.exe+653ED1
+// ---------- INJECTING HERE ----------
+ed9.exe+653EC3: F3 0F 5C C1                 - subss xmm0,xmm1
+// ---------- DONE INJECTING  ----------
+ed9.exe+653EC7: F3 41 0F 5F C0              - maxss xmm0,xmm8
+ed9.exe+653ECC: F3 0F 11 41 08              - movss [rcx+08],xmm0
+ed9.exe+653ED1: F3 48 0F 2C E8              - cvttss2si rbp,xmm0
+ed9.exe+653ED6: B8 89 88 88 88              - mov eax,88888889
+ed9.exe+653EDB: F7 E5                       - mul ebp
+ed9.exe+653EDD: 8B FA                       - mov edi,edx
+ed9.exe+653EDF: C1 EF 05                    - shr edi,05
+ed9.exe+653EE2: 6B C7 3C                    - imul eax,edi,3C
+ed9.exe+653EE5: 2B E8                       - sub ebp,eax
+ed9.exe+653EE7: F3 44 0F 10 15 B4 53 3F 00  - movss xmm10,[ed9.exe+A492A4]
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>61</ID>
+          <Description>"駭入．防壁解除時間無限 / inf. barrier cracking time"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ed9.exe
+  Version: 
+  Date   : 2025-02-02
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_INF_CRACKING_TIME,ed9.exe,F3 0F 5C C1 0F 29 74 24 60) // should be unique
+
+
+INJECT_INF_CRACKING_TIME:
+  nop 4
+registersymbol(INJECT_INF_CRACKING_TIME)
+
+[DISABLE]
+
+INJECT_INF_CRACKING_TIME:
+  db F3 0F 5C C1
+
+unregistersymbol(INJECT_INF_CRACKING_TIME)
+
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+483956
+
+ed9.exe+483939: 75 D7                    - jne ed9.exe+483912
+ed9.exe+48393B: EB 9F                    - jmp ed9.exe+4838DC
+ed9.exe+48393D: CC                       - int 3 
+ed9.exe+48393E: CC                       - int 3 
+ed9.exe+48393F: CC                       - int 3 
+ed9.exe+483940: 40 53                    - push rbx
+ed9.exe+483942: 41 56                    - push r14
+ed9.exe+483944: 48 81 EC 88 00 00 00     - sub rsp,00000088
+ed9.exe+48394B: F3 0F 10 81 D4 00 00 00  - movss xmm0,[rcx+000000D4]
+ed9.exe+483953: 4C 8B F1                 - mov r14,rcx
+// ---------- INJECTING HERE ----------
+ed9.exe+483956: F3 0F 5C C1              - subss xmm0,xmm1
+// ---------- DONE INJECTING  ----------
+ed9.exe+48395A: 0F 29 74 24 60           - movaps [rsp+60],xmm6
+ed9.exe+48395F: 0F 57 F6                 - xorps xmm6,xmm6
+ed9.exe+483962: 0F 2F F0                 - comiss xmm6,xmm0
+ed9.exe+483965: F3 0F 11 81 D4 00 00 00  - movss [rcx+000000D4],xmm0
+ed9.exe+48396D: 72 45                    - jb ed9.exe+4839B4
+ed9.exe+48396F: 4C 8B 49 70              - mov r9,[rcx+70]
+ed9.exe+483973: 4D 85 C9                 - test r9,r9
+ed9.exe+483976: 74 1B                    - je ed9.exe+483993
+ed9.exe+483978: 48 63 41 64              - movsxd  rax,dword ptr [rcx+64]
+ed9.exe+48397C: 41 B8 04 00 00 00        - mov r8d,00000004
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>62</ID>
+          <Description>"取得米拉和耀石資訊 / get mira"</Description>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ed9.exe
+  Version: 
+  Date   : 2025-01-28
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_MIRA,ed9.exe,8B 90 ?? ?? ?? 00 48 8B 8B ?? ?? ?? 00 48 85 C9 75 38 48 8D ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? B9) // should be unique
+alloc(newmem,$1000,INJECT_GET_MIRA)
+
+alloc(INJECT_GET_MIRAo,6)
+
+label(code)
+label(return i_base_mira_addr i_hour i_min i_sec)
+
+INJECT_GET_MIRAo:
+  readmem(INJECT_GET_MIRA, 6)
+
+newmem:
+
+  xor rdx, rdx
+  mov edx, [INJECT_GET_MIRAo+2]
+  lea rdx, [rax+rdx]
+  mov [i_base_mira_addr], rdx
+
+  xor rdx, rdx
+
+
+code:
+  //mov edx,[rax+00297990]
+  readmem(INJECT_GET_MIRA, 6)
+  jmp return
+align 10 cc
+  i_base_mira_addr:
+  dq 0
+  vd_3600:
+  dq (double)3600
+  vd_60:
+  dq (double)60
+  i_hour:
+  dq 0
+  i_min:
+  dq 0
+  i_sec:
+  dq 0
+
+INJECT_GET_MIRA:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT_GET_MIRA i_base_mira_addr i_hour i_min i_sec)
+registersymbol(INJECT_GET_MIRAo)
+[DISABLE]
+
+INJECT_GET_MIRA:
+  //db 8B 90 90 79 29 00
+  readmem(INJECT_GET_MIRAo, 6)
+
+unregistersymbol(INJECT_GET_MIRA i_base_mira_addr i_hour i_min i_sec)
+dealloc(newmem)
+
+unregistersymbol(INJECT_GET_MIRAo)
+dealloc(INJECT_GET_MIRAo)
+{
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+148EDE
+
+ed9.exe+148EB2: 48 8D 14 40           - lea rdx,[rax+rax*2]
+ed9.exe+148EB6: 45 33 C0              - xor r8d,r8d
+ed9.exe+148EB9: 41 8B 54 96 50        - mov edx,[r14+rdx*4+50]
+ed9.exe+148EBE: 49 8B 0E              - mov rcx,[r14]
+ed9.exe+148EC1: 41 FF D1              - call r9
+ed9.exe+148EC4: 49 63 86 84 00 00 00  - movsxd  rax,dword ptr [r14+00000084]
+ed9.exe+148ECB: 48 83 C0 07           - add rax,07
+ed9.exe+148ECF: 48 8D 04 40           - lea rax,[rax+rax*2]
+ed9.exe+148ED3: 41 89 34 86           - mov [r14+rax*4],esi
+ed9.exe+148ED7: 48 8B 05 4A BA A9 00  - mov rax,[ed9.exe+BE4928]
+// ---------- INJECTING HERE ----------
+ed9.exe+148EDE: 8B 90 90 79 29 00     - mov edx,[rax+00297990]
+// ---------- DONE INJECTING  ----------
+ed9.exe+148EE4: 48 8B 8B 08 06 00 00  - mov rcx,[rbx+00000608]
+ed9.exe+148EEB: 48 85 C9              - test rcx,rcx
+ed9.exe+148EEE: 75 38                 - jne ed9.exe+148F28
+ed9.exe+148EF0: 48 8D 05 A1 6B 8B 00  - lea rax,[ed9.exe+9FFA98]
+ed9.exe+148EF7: 48 89 44 24 28        - mov [rsp+28],rax
+ed9.exe+148EFC: 48 8D 05 BD 6B 8B 00  - lea rax,[ed9.exe+9FFAC0]
+ed9.exe+148F03: 48 89 44 24 20        - mov [rsp+20],rax
+ed9.exe+148F08: 4C 8D 0D 31 62 8B 00  - lea r9,[ed9.exe+9FF140]
+ed9.exe+148F0F: 41 B8 B9 12 00 00     - mov r8d,000012B9
+ed9.exe+148F15: 48 8D 15 8C 64 8B 00  - lea rdx,[ed9.exe+9FF3A8]
+ed9.exe+148F1C - B9 03000000           - mov ecx,00000003
+
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>63</ID>
+              <Description>"開啟選單 / Usage: menu"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>64</ID>
+              <Description>"地 / Earth"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_mira_addr</Address>
+              <Offsets>
+                <Offset>-20</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>65</ID>
+              <Description>"水 / Water"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_mira_addr</Address>
+              <Offsets>
+                <Offset>-1C</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>66</ID>
+              <Description>"火 / Fire"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_mira_addr</Address>
+              <Offsets>
+                <Offset>-18</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>67</ID>
+              <Description>"風 / Wind"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_mira_addr</Address>
+              <Offsets>
+                <Offset>-14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>68</ID>
+              <Description>"時 / Time"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_mira_addr</Address>
+              <Offsets>
+                <Offset>-10</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>69</ID>
+              <Description>"空 / Space"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_mira_addr</Address>
+              <Offsets>
+                <Offset>-C</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>70</ID>
+              <Description>"幻 / Mirage"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_mira_addr</Address>
+              <Offsets>
+                <Offset>-8</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>71</ID>
+              <Description>"耀金石塊 /  Exchange"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_mira_addr</Address>
+              <Offsets>
+                <Offset>-4</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>72</ID>
+              <Description>"米拉 / Mira"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_mira_addr</Address>
+              <Offsets>
+                <Offset>0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>73</ID>
+              <Description>"G-Token"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_mira_addr</Address>
+              <Offsets>
+                <Offset>4</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>74</ID>
+              <Description>"籌碼 / Medal"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_mira_addr</Address>
+              <Offsets>
+                <Offset>8</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>75</ID>
+              <Description>"美食點數 / Gourmet pt"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_mira_addr</Address>
+              <Offsets>
+                <Offset>10</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>76</ID>
+              <Description>"遊戲時間 / Playing time"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>Double</VariableType>
+              <Address>i_base_mira_addr</Address>
+              <Offsets>
+                <Offset>18</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>77</ID>
+          <Description>"取得目前遊戲時數 / Get readable game time"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ed9.exe
+  Version: 
+  Date   : 2025-01-31
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_CALC_GAME_TIME,ed9.exe,F2 0F 58 83 ?? ?? ?? 00 F2 0F 11 ?? ?? ?? ?? 00 48) // should be unique
+alloc(newmem,$1000,INJECT_CALC_GAME_TIME)
+
+alloc(INJECT_CALC_GAME_TIMEo, 8)
+
+label(code)
+label(return)
+label(vf_p_hours vf_p_minutes vf_p_seconds)
+
+INJECT_CALC_GAME_TIMEo:
+  readmem(INJECT_CALC_GAME_TIME, 8)
+
+newmem:
+  push r15
+  push r14
+  movaps [temp12], xmm12
+
+  xor r14, r14
+  mov r14d, [INJECT_CALC_GAME_TIMEo+4]
+  lea r15, [rbx+r14]
+
+  vmovsd xmm12, [r15]
+  vmovsd xmm13, [const_3600]
+  vdivsd xmm14, xmm12, xmm13
+  vroundsd xmm14, xmm14, xmm14, 1
+  vmovsd [vf_p_hours], xmm14
+
+  vmulsd xmm14, xmm14, xmm13
+  vsubsd xmm12, xmm12, xmm14
+  vmovsd xmm13, [const_60]
+  vdivsd xmm12, xmm12, xmm13
+  vroundsd xmm12, xmm12, xmm12, 1
+  vmovsd [vf_p_minutes], xmm12
+
+  vmovsd xmm12, [r15]
+  vmovsd xmm13, [const_3600]
+  vdivsd xmm12, xmm12, xmm13
+
+  vroundsd xmm14, xmm12, xmm12, 0
+  vsubsd xmm12, xmm12, xmm14
+  vmovsd xmm13, [const_60]
+  vmulsd xmm12, xmm12, xmm13
+  vroundsd xmm14, xmm12, xmm12, 1
+  vsubsd xmm12, xmm12, xmm14
+  vmulsd xmm12, xmm12, xmm13
+  vroundsd xmm12, xmm12, xmm12, 1
+  vmovsd [vf_p_seconds], xmm12
+
+
+  movaps xmm12, [temp12]
+  pop r14
+  pop r15
+
+code:
+  //addsd xmm0,[rbx+002979A8]
+  readmem(INJECT_CALC_GAME_TIME, 8)
+  jmp return
+align 10 cc
+  temp12:
+  dq 0 0
+  temp13:
+  dq 0 0
+  temp14:
+  dq 0 0
+  vf_p_seconds:
+  dq 0
+  vf_p_minutes:
+  dq 0
+  vf_p_hours:
+  dq 0
+  const_3600:
+  dq (double)3600
+  const_60:
+  dq (double)60
+  const_216000:
+  dq (double)216000
+
+INJECT_CALC_GAME_TIME:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_CALC_GAME_TIME)
+registersymbol(vf_p_hours vf_p_minutes vf_p_seconds)
+registersymbol(INJECT_CALC_GAME_TIMEo)
+[DISABLE]
+
+INJECT_CALC_GAME_TIME:
+  //db F2 0F 58 83 A8 79 29 00
+  readmem(INJECT_CALC_GAME_TIMEo, 8)
+
+unregistersymbol(INJECT_CALC_GAME_TIME)
+unregistersymbol(vf_p_hours vf_p_minutes vf_p_seconds)
+dealloc(newmem)
+unregistersymbol(INJECT_CALC_GAME_TIMEo)
+dealloc(INJECT_CALC_GAME_TIMEo)
+{
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+5081F0
+
+ed9.exe+5081C1: 83 7C 81 08 13           - cmp dword ptr [rcx+rax*4+08],13
+ed9.exe+5081C6: 75 21                    - jne ed9.exe+5081E9
+ed9.exe+5081C8: 48 8B 0D F9 71 6A 00     - mov rcx,[ed9.exe+BAF3C8]
+ed9.exe+5081CF: E8 3C DC 1A 00           - call ed9.exe+6B5E10
+ed9.exe+5081D4: 48 8B 8B A8 B0 7C 00     - mov rcx,[rbx+007CB0A8]
+ed9.exe+5081DB: 33 D2                    - xor edx,edx
+ed9.exe+5081DD: E8 2E DC 00 00           - call ed9.exe+515E10
+ed9.exe+5081E2: C6 83 EC B0 7C 00 00     - mov byte ptr [rbx+007CB0EC],00
+ed9.exe+5081E9: 0F 57 C0                 - xorps xmm0,xmm0
+ed9.exe+5081EC: F3 0F 5A C6              - cvtss2sd xmm0,xmm6
+// ---------- INJECTING HERE ----------
+ed9.exe+5081F0: F2 0F 58 83 A8 79 29 00  - addsd xmm0,[rbx+002979A8]
+// ---------- DONE INJECTING  ----------
+ed9.exe+5081F8: F2 0F 11 83 A8 79 29 00  - movsd [rbx+002979A8],xmm0
+ed9.exe+508200: 48 8B 0D 11 99 6C 00     - mov rcx,[ed9.exe+BD1B18]
+ed9.exe+508207: E8 94 DF ED FF           - call ed9.exe+3E61A0
+ed9.exe+50820C: F3 0F 10 8B E8 B0 7C 00  - movss xmm1,[rbx+007CB0E8]
+ed9.exe+508214: F3 0F 5E F0              - divss xmm6,xmm0
+ed9.exe+508218: 0F 57 C0                 - xorps xmm0,xmm0
+ed9.exe+50821B: F3 0F 5C CE              - subss xmm1,xmm6
+ed9.exe+50821F: 0F 28 74 24 20           - movaps xmm6,[rsp+20]
+ed9.exe+508224: F3 0F 5F C8              - maxss xmm1,xmm0
+ed9.exe+508228: F3 0F 11 8B E8 B0 7C 00  - movss [rbx+007CB0E8],xmm1
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>78</ID>
+              <Description>"時數 / Hours"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>808080</Color>
+              <VariableType>Double</VariableType>
+              <Address>vf_p_hours</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>79</ID>
+              <Description>"分 / Minutes"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>808080</Color>
+              <VariableType>Double</VariableType>
+              <Address>vf_p_minutes</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>80</ID>
+              <Description>"秒 / Seconds"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>808080</Color>
+              <VariableType>Double</VariableType>
+              <Address>vf_p_seconds</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>81</ID>
+          <Description>"取得目前連結度 / Get current connect value"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ed9.exe
+  Version: 
+  Date   : 2025-01-29
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_RELATIONS,ed9.exe,0F B7 84 47 ?? ?? ?? 00 48) // should be unique
+alloc(newmem,$1000,INJECT_GET_RELATIONS)
+
+alloc(INJECT_GET_RELATIONSo, 8)
+
+label(code)
+label(return i_base_rel_addr)
+
+INJECT_GET_RELATIONSo:
+  readmem(INJECT_GET_RELATIONS, 8)
+
+newmem:
+  push r15
+  db 4C 8D BC 47
+  readmem(INJECT_GET_RELATIONS+4, 4)
+  mov [i_base_rel_addr], r15
+
+  pop r15
+
+code:
+  //movzx eax,word ptr [rdi+rax*2+00295AB0]
+  readmem(INJECT_GET_RELATIONS, 8)
+  jmp return
+align 10 cc
+  i_base_rel_addr:
+  dq 0
+
+INJECT_GET_RELATIONS:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_GET_RELATIONS i_base_rel_addr)
+registersymbol(INJECT_GET_RELATIONSo)
+[DISABLE]
+
+INJECT_GET_RELATIONS:
+  //db 0F B7 84 47 B0 5A 29 00
+  readmem(INJECT_GET_RELATIONSo, 8)
+
+unregistersymbol(INJECT_GET_RELATIONS i_base_rel_addr)
+dealloc(newmem)
+unregistersymbol(INJECT_GET_RELATIONSo)
+dealloc(INJECT_GET_RELATIONSo)
+{
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+512125
+
+ed9.exe+512103: B9 03 00 00 00           - mov ecx,00000003
+ed9.exe+512108: E8 43 58 15 00           - call ed9.exe+667950
+ed9.exe+51210D: 33 C0                    - xor eax,eax
+ed9.exe+51210F: 48 8B 5C 24 40           - mov rbx,[rsp+40]
+ed9.exe+512114: 48 83 C4 30              - add rsp,30
+ed9.exe+512118: 5F                       - pop rdi
+ed9.exe+512119: C3                       - ret 
+ed9.exe+51211A: 42 0F B7 44 02 02        - movzx eax,word ptr [rdx+r8+02]
+ed9.exe+512120: 83 F8 20                 - cmp eax,20
+ed9.exe+512123: 73 C5                    - jae ed9.exe+5120EA
+// ---------- INJECTING HERE ----------
+ed9.exe+512125: 0F B7 84 47 B0 5A 29 00  - movzx eax,word ptr [rdi+rax*2+00295AB0]
+// ---------- DONE INJECTING  ----------
+ed9.exe+51212D: 48 8B 5C 24 40           - mov rbx,[rsp+40]
+ed9.exe+512132: 48 83 C4 30              - add rsp,30
+ed9.exe+512136: 5F                       - pop rdi
+ed9.exe+512137: C3                       - ret 
+ed9.exe+512138: CC                       - int 3 
+ed9.exe+512139: CC                       - int 3 
+ed9.exe+51213A: CC                       - int 3 
+ed9.exe+51213B: CC                       - int 3 
+ed9.exe+51213C: CC                       - int 3 
+ed9.exe+51213D: CC                       - int 3 
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>82</ID>
+              <Description>"value"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_base_rel_addr</Address>
+              <Offsets>
+                <Offset>0</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>83</ID>
+          <Description>"任務中進行追蹤不易被發現 / more undetected tracking (found) during quests"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ed9.exe
+  Version: 
+  Date   : 2025-01-31
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_TRACKING_GAUGE,ed9.exe,F3 0F 58 B3 ?? 0? 00 00 F3 41) // should be unique
+alloc(newmem,$1000,INJECT_TRACKING_GAUGE)
+
+alloc(INJECT_TRACKING_GAUGEo, 8)
+
+label(code)
+label(return)
+
+INJECT_TRACKING_GAUGEo:
+  readmem(INJECT_TRACKING_GAUGE, 8)
+
+newmem:
+  vmovss xmm14, [vf_03]
+
+  db C5 7A 10 BB
+  readmem(INJECT_TRACKING_GAUGE+4, 4)
+
+  vucomiss xmm14, xmm15
+  jae code
+
+  db F3 44 0F 11 B3
+  readmem(INJECT_TRACKING_GAUGE+4, 4)
+
+code:
+  reassemble(INJECT_TRACKING_GAUGE)
+  jmp return
+align 10 cc
+  vf_03:
+  dd (float)0.3
+
+INJECT_TRACKING_GAUGE:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_TRACKING_GAUGE)
+registersymbol(INJECT_TRACKING_GAUGEo)
+
+[DISABLE]
+
+INJECT_TRACKING_GAUGE:
+  //db F3 0F 58 B3 D4 00 00 00
+  readmem(INJECT_TRACKING_GAUGEo, 8)
+
+unregistersymbol(INJECT_TRACKING_GAUGE)
+dealloc(newmem)
+unregistersymbol(INJECT_TRACKING_GAUGEo)
+dealloc(INJECT_TRACKING_GAUGEo)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+5EB2DF
+
+ed9.exe+5EB2AF: F3 0F 10 35 B1 EB 45 00     - movss xmm6,[ed9.exe+A49E68]
+ed9.exe+5EB2B7: EB 21                       - jmp ed9.exe+5EB2DA
+ed9.exe+5EB2B9: 48 63 43 7C                 - movsxd  rax,dword ptr [rbx+7C]
+ed9.exe+5EB2BD: 48 8D 0C 40                 - lea rcx,[rax+rax*2]
+ed9.exe+5EB2C1: 83 7C 8B 48 01              - cmp dword ptr [rbx+rcx*4+48],01
+ed9.exe+5EB2C6: 74 0A                       - je ed9.exe+5EB2D2
+ed9.exe+5EB2C8: F3 0F 10 35 A8 EB 45 00     - movss xmm6,[ed9.exe+A49E78]
+ed9.exe+5EB2D0: EB 08                       - jmp ed9.exe+5EB2DA
+ed9.exe+5EB2D2: F3 0F 10 35 92 EB 45 00     - movss xmm6,[ed9.exe+A49E6C]
+ed9.exe+5EB2DA: F3 41 0F 59 F3              - mulss xmm6,xmm11
+// ---------- INJECTING HERE ----------
+ed9.exe+5EB2DF: F3 0F 58 B3 D4 00 00 00     - addss xmm6,[rbx+000000D4]
+// ---------- DONE INJECTING  ----------
+ed9.exe+5EB2E7: F3 41 0F 5D F2              - minss xmm6,xmm10
+ed9.exe+5EB2EC: 44 0F 28 94 24 80 00 00 00  - movaps xmm10,[rsp+00000080]
+ed9.exe+5EB2F5: F3 0F 5F FE                 - maxss xmm7,xmm6
+ed9.exe+5EB2F9: 0F 28 B4 24 C0 00 00 00     - movaps xmm6,[rsp+000000C0]
+ed9.exe+5EB301: F3 0F 11 BB D4 00 00 00     - movss [rbx+000000D4],xmm7
+ed9.exe+5EB309: 0F 28 BC 24 B0 00 00 00     - movaps xmm7,[rsp+000000B0]
+ed9.exe+5EB311: 48 8B 9C 24 E8 00 00 00     - mov rbx,[rsp+000000E8]
+ed9.exe+5EB319: 44 0F 28 5C 24 70           - movaps xmm11,[rsp+70]
+ed9.exe+5EB31F: 48 81 C4 D0 00 00 00        - add rsp,000000D0
+ed9.exe+5EB326: 5F                          - pop rdi
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>84</ID>
+          <Description>"取得進行中的成就 / Get in-progress achievement"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+{$lua}
+if _kuro_2_customInt == nil then
+
+registerCustomTypeAutoAssembler([[
+alloc(TypeName,256)
+alloc(ByteSize,8)
+alloc(ConvertRoutine,1024)
+alloc(ConvertBackRoutine,1024)
+alloc(UsesFloat,1)
+
+TypeName:
+db 'Kueo2 integer',0
+
+ByteSize:
+dd 4
+
+UsesFloat:
+db 0
+
+ConvertRoutine:
+//at this point ecx contains the address where the bytes are stored
+//return with rax/eax
+xor rax,rax
+
+mov eax, dword ptr [rcx]
+and eax, 3FFFFFFF
+
+ret
+
+ConvertBackRoutine:
+//at this point edx contains the address to write the value to
+//and ecx contains the value
+
+push rax
+xor rax, rax
+mov eax, ecx
+or eax, 40000000
+mov dword ptr [rdx], eax
+pop rax
+ret
+
+]])
+
+_kuro_2_customInt = true
+end
+[DISABLE]
+
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>85</ID>
+              <Description>"開啟成就選單 / Open achievement menu"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>86</ID>
+              <Description>"修改數值可能影響成就取得 / Edit with caution"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87</ID>
+              <Description>"取得資料 / Get data; max 50"</Description>
+              <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{ Game   : ed9.exe
+  Version: 
+  Date   : 2025-01-28
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_ACHIEVEMENT,ed9.exe,8B 93 ?? ?? ?? 00 8B C2 C1) // should be unique
+alloc(newmem,$1000,INJECT_GET_ACHIEVEMENT)
+
+alloc(INJECT_GET_ACHIEVEMENTo, 6)
+
+label(code)
+label(return i_base_achi_addr)
+
+INJECT_GET_ACHIEVEMENTo:
+  readmem(INJECT_GET_ACHIEVEMENT, 6)
+
+newmem:
+  push r15
+  push r14
+  push rcx
+  xor ecx, ecx
+  mov dword ptr [i_idx], 0
+
+  mov ecx, [INJECT_GET_ACHIEVEMENTo+2]
+
+  lea r15, [rbx+rcx]
+loop1:
+  mov ecx, [i_idx]
+  mov r14, i_base_achi_addr
+  lea r14, [r14+rcx*8]
+  cmp qword ptr [r14], r15
+  je endp
+  cmp qword ptr [r14], 0
+  je write_it
+  jmp chk_next
+
+write_it:
+  mov [r14], r15
+  jmp endp
+  db EB 3B 54
+  db 68 69 73 20 74
+  db 61 62 6C 65 20 63 6F 6D 65 73 20 66 72 6F 6D 20 68 74
+  db 74 70 73 3A 2F
+  db 2F 6F 70 65 6E 63 68 65
+  db 61 74 74 61 62 6C 65 73
+  db 2E 63 6F 6D
+  db 20 2F 20 43 45 20 37 2E 34 2B
+chk_next:
+  inc dword ptr [i_idx]
+  cmp dword ptr [i_idx], 33
+  jb loop1
+
+endp:
+  pop rcx
+  pop r14
+  pop r15
+
+code:
+  //mov edx,[rbx+00012110]
+  reassemble(INJECT_GET_ACHIEVEMENT)
+  jmp return
+align 10 cc
+  i_idx:
+  dd 0 0
+  i_base_achi_addr:
+  dq 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+  align 100 0
+  db 0
+
+INJECT_GET_ACHIEVEMENT:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT_GET_ACHIEVEMENT i_base_achi_addr)
+registersymbol(INJECT_GET_ACHIEVEMENTo)
+
+[DISABLE]
+
+INJECT_GET_ACHIEVEMENT:
+  //db 8B 93 10 21 01 00
+  readmem(INJECT_GET_ACHIEVEMENTo, 6)
+
+unregistersymbol(INJECT_GET_ACHIEVEMENT i_base_achi_addr)
+dealloc(newmem)
+unregistersymbol(INJECT_GET_ACHIEVEMENTo)
+dealloc(INJECT_GET_ACHIEVEMENTo)
+{
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+18ACFC
+
+ed9.exe+18ACCD: 81 F9 00 01 00 00        - cmp ecx,00000100
+ed9.exe+18ACD3: 72 23                    - jb ed9.exe+18ACF8
+ed9.exe+18ACD5: 4C 8D 0D 7C 98 89 00     - lea r9,[ed9.exe+A24558]
+ed9.exe+18ACDC: 41 B8 8E 02 00 00        - mov r8d,0000028E
+ed9.exe+18ACE2: 48 8D 15 47 97 89 00     - lea rdx,[ed9.exe+A24430]
+ed9.exe+18ACE9: B9 03 00 00 00           - mov ecx,00000003
+ed9.exe+18ACEE: E8 5D CC 4D 00           - call ed9.exe+667950
+ed9.exe+18ACF3: 8B 4E 08                 - mov ecx,[rsi+08]
+ed9.exe+18ACF6: EB 04                    - jmp ed9.exe+18ACFC
+ed9.exe+18ACF8: 48 8D 1C 8B              - lea rbx,[rbx+rcx*4]
+// ---------- INJECTING HERE ----------
+ed9.exe+18ACFC: 8B 93 10 21 01 00        - mov edx,[rbx+00012110]
+// ---------- DONE INJECTING  ----------
+ed9.exe+18AD02: 8B C2                    - mov eax,edx
+ed9.exe+18AD04: C1 E8 1E                 - shr eax,1E
+ed9.exe+18AD07: 83 F8 01                 - cmp eax,01
+ed9.exe+18AD0A: 75 10                    - jne ed9.exe+18AD1C
+ed9.exe+18AD0C: 44 8D 3C 95 00 00 00 00  - lea r15d,[rdx*4+00000000]
+ed9.exe+18AD14: 41 C1 FF 02              - sar r15d,02
+ed9.exe+18AD18: 33 DB                    - xor ebx,ebx
+ed9.exe+18AD1A: EB 1C                    - jmp ed9.exe+18AD38
+ed9.exe+18AD1C: 33 DB                    - xor ebx,ebx
+ed9.exe+18AD1E: 83 F8 02                 - cmp eax,02
+}
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>88</ID>
+                  <Description>"#1"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>89</ID>
+                  <Description>"#2"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+8</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>90</ID>
+                  <Description>"#3"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+10</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>91</ID>
+                  <Description>"#4"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+18</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>92</ID>
+                  <Description>"#5"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+20</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>93</ID>
+                  <Description>"#6"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+28</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>94</ID>
+                  <Description>"#7"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+30</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>95</ID>
+                  <Description>"#8"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+38</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>96</ID>
+                  <Description>"#9"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+40</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>97</ID>
+                  <Description>"#10"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+48</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>98</ID>
+                  <Description>"#11"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+50</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>99</ID>
+                  <Description>"#12"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+58</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>100</ID>
+                  <Description>"#13"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+60</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>101</ID>
+                  <Description>"#14"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+68</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>102</ID>
+                  <Description>"#15"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+70</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>103</ID>
+                  <Description>"#16"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+78</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>104</ID>
+                  <Description>"#17"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+80</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>105</ID>
+                  <Description>"#18"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+88</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>106</ID>
+                  <Description>"#19"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+90</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>107</ID>
+                  <Description>"#20"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+98</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>108</ID>
+                  <Description>"#21"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+A0</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>109</ID>
+                  <Description>"#22"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+A8</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>110</ID>
+                  <Description>"#23"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+B0</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>111</ID>
+                  <Description>"#24"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+B8</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>112</ID>
+                  <Description>"#25"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+C0</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>113</ID>
+                  <Description>"#26"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+C8</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>114</ID>
+                  <Description>"#27"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+D0</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>115</ID>
+                  <Description>"#28"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+D8</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>116</ID>
+                  <Description>"#29"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+E0</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>117</ID>
+                  <Description>"#30"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+E8</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>118</ID>
+                  <Description>"#31"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+F0</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>119</ID>
+                  <Description>"#32"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+F8</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>120</ID>
+                  <Description>"#33"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+100</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>121</ID>
+                  <Description>"#34"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+108</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>122</ID>
+                  <Description>"#35"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+110</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>123</ID>
+                  <Description>"#36"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+118</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>124</ID>
+                  <Description>"#37"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+120</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>125</ID>
+                  <Description>"#38"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+128</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>126</ID>
+                  <Description>"#39"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+130</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>127</ID>
+                  <Description>"#40"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+138</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>128</ID>
+                  <Description>"#41"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+140</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>129</ID>
+                  <Description>"#42"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+148</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>130</ID>
+                  <Description>"#43"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+150</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>131</ID>
+                  <Description>"#44"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+158</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>132</ID>
+                  <Description>"#45"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+160</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>133</ID>
+                  <Description>"#46"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+168</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>134</ID>
+                  <Description>"#47"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+170</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>135</ID>
+                  <Description>"#48"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+178</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>136</ID>
+                  <Description>"#49"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+180</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>137</ID>
+                  <Description>"#50"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_achi_addr+188</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>138</ID>
+          <Description>"Connect至少為1 / keep connect at least 1"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ed9.exe
+  Version: 
+  Date   : 2025-01-29
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_INF_CONNECT,ed9.exe,43 FF 25 FF FF FF 3F) // should be unique
+alloc(newmem,$1000,INJECT_INF_CONNECT)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  and eax,3FFFFFFF
+  //
+  pushfq
+  cmp eax, 1
+  jae endp
+  mov eax, 1
+
+endp:
+  popfq
+  //
+  jmp return
+
+INJECT_INF_CONNECT+02:
+  jmp newmem
+return:
+registersymbol(INJECT_INF_CONNECT)
+
+[DISABLE]
+
+INJECT_INF_CONNECT+02:
+  db 25 FF FF FF 3F
+
+unregistersymbol(INJECT_INF_CONNECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+40E731
+
+ed9.exe+40E70C: 75 0C                 - jne ed9.exe+40E71A
+ed9.exe+40E70E: 8D 1C 85 00 00 00 00  - lea ebx,[rax*4+00000000]
+ed9.exe+40E715: C1 FB 02              - sar ebx,02
+ed9.exe+40E718: EB 14                 - jmp ed9.exe+40E72E
+ed9.exe+40E71A: 83 F9 02              - cmp ecx,02
+ed9.exe+40E71D: 75 0F                 - jne ed9.exe+40E72E
+ed9.exe+40E71F: 8D 04 85 00 00 00 00  - lea eax,[rax*4+00000000]
+ed9.exe+40E726: 66 0F 6E C0           - movd xmm0,eax
+ed9.exe+40E72A: F3 0F 2C D8           - cvttss2si ebx,xmm0
+ed9.exe+40E72E: 8D 43 FF              - lea eax,[rbx-01]
+// ---------- INJECTING HERE ----------
+ed9.exe+40E731: 25 FF FF FF 3F        - and eax,3FFFFFFF
+// ---------- DONE INJECTING  ----------
+ed9.exe+40E736: 0F BA E8 1E           - bts eax,1E
+ed9.exe+40E73A: 89 82 54 21 01 00     - mov [rdx+00012154],eax
+ed9.exe+40E740: 4C 8B 8F C8 00 00 00  - mov r9,[rdi+000000C8]
+ed9.exe+40E747: 4D 85 C9              - test r9,r9
+ed9.exe+40E74A: 74 1E                 - je ed9.exe+40E76A
+ed9.exe+40E74C: 48 63 87 BC 00 00 00  - movsxd  rax,dword ptr [rdi+000000BC]
+ed9.exe+40E753: 48 8D 14 40           - lea rdx,[rax+rax*2]
+ed9.exe+40E757: 41 B8 0D 00 00 00     - mov r8d,0000000D
+ed9.exe+40E75D: 8B 94 97 88 00 00 00  - mov edx,[rdi+rdx*4+00000088]
+ed9.exe+40E764: 48 8B 0F              - mov rcx,[rdi]
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>139</ID>
+          <Description>"角色狀態檢視 / Char. viewer"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ed9.exe
+  Version: 
+  Date   : 2025-01-30
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_CHAR_VIEWER,ed9.exe,8B 4F 0C 89 4B 04) // should be unique
+alloc(newmem,$1000,INJECT_CHAR_VIEWER)
+
+label(code)
+label(return i_base_char_data_addr)
+
+newmem:
+  mov [i_base_char_data_addr], rdi
+
+code:
+  mov ecx,[rdi+0C]
+  mov [rbx+04],ecx
+  jmp return
+align 10 cc
+  i_base_char_data_addr:
+  dq 0
+
+INJECT_CHAR_VIEWER:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT_CHAR_VIEWER i_base_char_data_addr)
+
+[DISABLE]
+
+INJECT_CHAR_VIEWER:
+  db 8B 4F 0C 89 4B 04
+
+unregistersymbol(INJECT_CHAR_VIEWER i_base_char_data_addr)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+645D49
+
+ed9.exe+645D24: 48 8B 74 24 40     - mov rsi,[rsp+40]
+ed9.exe+645D29: 48 8B F8           - mov rdi,rax
+ed9.exe+645D2C: 48 8B 6C 24 38     - mov rbp,[rsp+38]
+ed9.exe+645D31: 48 85 C0           - test rax,rax
+ed9.exe+645D34: 0F 84 E3 05 00 00  - je ed9.exe+64631D
+ed9.exe+645D3A: 33 D2              - xor edx,edx
+ed9.exe+645D3C: 48 8B C8           - mov rcx,rax
+ed9.exe+645D3F: E8 5C D9 A9 FF     - call ed9.exe+E36A0
+ed9.exe+645D44: 8B 4F 04           - mov ecx,[rdi+04]
+ed9.exe+645D47: 89 0B              - mov [rbx],ecx
+// ---------- INJECTING HERE ----------
+ed9.exe+645D49: 8B 4F 0C           - mov ecx,[rdi+0C]
+// ---------- DONE INJECTING  ----------
+ed9.exe+645D4C: 89 4B 04           - mov [rbx+04],ecx
+ed9.exe+645D4F: 8B 47 10           - mov eax,[rdi+10]
+ed9.exe+645D52: 89 43 10           - mov [rbx+10],eax
+ed9.exe+645D55: 8B 47 18           - mov eax,[rdi+18]
+ed9.exe+645D58: 89 43 08           - mov [rbx+08],eax
+ed9.exe+645D5B: 8B 47 1C           - mov eax,[rdi+1C]
+ed9.exe+645D5E: 89 43 14           - mov [rbx+14],eax
+ed9.exe+645D61: 8B 47 20           - mov eax,[rdi+20]
+ed9.exe+645D64: 89 43 0C           - mov [rbx+0C],eax
+ed9.exe+645D67: 8B 47 24           - mov eax,[rdi+24]
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>140</ID>
+              <Description>"開啟角色單獨狀態畫面 / Open single char. status window"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>141</ID>
+              <Description>"ID"</Description>
+              <DropDownListLink>Char-ID</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_base_char_data_addr</Address>
+              <Offsets>
+                <Offset>0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>142</ID>
+              <Description>"??"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_base_char_data_addr</Address>
+              <Offsets>
+                <Offset>2</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>143</ID>
+              <Description>"Level"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_char_data_addr</Address>
+              <Offsets>
+                <Offset>4</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>144</ID>
+              <Description>"EXP"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_char_data_addr</Address>
+              <Offsets>
+                <Offset>8</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>145</ID>
+              <Description>"HP"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_char_data_addr</Address>
+              <Offsets>
+                <Offset>C</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>146</ID>
+              <Description>"Max HP"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_char_data_addr</Address>
+              <Offsets>
+                <Offset>10</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>147</ID>
+              <Description>"??"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_char_data_addr</Address>
+              <Offsets>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>148</ID>
+              <Description>"EP"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_char_data_addr</Address>
+              <Offsets>
+                <Offset>18</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>149</ID>
+              <Description>"Max EP"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_char_data_addr</Address>
+              <Offsets>
+                <Offset>1C</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>150</ID>
+              <Description>"CP"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_char_data_addr</Address>
+              <Offsets>
+                <Offset>20</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>151</ID>
+              <Description>"Max CP"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_char_data_addr</Address>
+              <Offsets>
+                <Offset>24</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>152</ID>
+              <Description>"STR"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_char_data_addr</Address>
+              <Offsets>
+                <Offset>28</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>153</ID>
+              <Description>"DEF"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_char_data_addr</Address>
+              <Offsets>
+                <Offset>2C</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>154</ID>
+              <Description>"ATS"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_char_data_addr</Address>
+              <Offsets>
+                <Offset>30</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>155</ID>
+              <Description>"ADF"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_char_data_addr</Address>
+              <Offsets>
+                <Offset>34</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>156</ID>
+              <Description>"SPD"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_char_data_addr</Address>
+              <Offsets>
+                <Offset>38</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>157</ID>
+              <Description>"AGL"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_char_data_addr</Address>
+              <Offsets>
+                <Offset>3C</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>158</ID>
+              <Description>"DEX"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_char_data_addr</Address>
+              <Offsets>
+                <Offset>40</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>159</ID>
+              <Description>"MOV"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_char_data_addr</Address>
+              <Offsets>
+                <Offset>44</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>160</ID>
+              <Description>"RNG"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_char_data_addr</Address>
+              <Offsets>
+                <Offset>48</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>161</ID>
+              <Description>"??"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_char_data_addr</Address>
+              <Offsets>
+                <Offset>50</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>162</ID>
+              <Description>"??"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_char_data_addr</Address>
+              <Offsets>
+                <Offset>54</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>163</ID>
+              <Description>"??"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_char_data_addr</Address>
+              <Offsets>
+                <Offset>58</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>164</ID>
+              <Description>"??"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_char_data_addr</Address>
+              <Offsets>
+                <Offset>5C</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>165</ID>
+              <Description>"命中率+ / Hit%"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_char_data_addr</Address>
+              <Offsets>
+                <Offset>64</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>166</ID>
+              <Description>"迴避率+ / Eva%"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_char_data_addr</Address>
+              <Offsets>
+                <Offset>68</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>167</ID>
+              <Description>"魔法迴避率+ / mag eva%"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_char_data_addr</Address>
+              <Offsets>
+                <Offset>6C</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>168</ID>
+              <Description>"必殺率+ / Cri%"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_char_data_addr</Address>
+              <Offsets>
+                <Offset>70</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>169</ID>
+              <Description>"Weapon ID"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_char_data_addr</Address>
+              <Offsets>
+                <Offset>39C</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>170</ID>
+              <Description>"Sub Weapon ID"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_char_data_addr</Address>
+              <Offsets>
+                <Offset>3A0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>171</ID>
+              <Description>"Armor ID"</Description>
+              <DropDownListLink>Item-ID</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_char_data_addr</Address>
+              <Offsets>
+                <Offset>3A4</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>172</ID>
+              <Description>"Shoes ID"</Description>
+              <DropDownListLink>Item-ID</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_char_data_addr</Address>
+              <Offsets>
+                <Offset>3A8</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>173</ID>
+              <Description>"Slot 1 ID"</Description>
+              <DropDownListLink>Item-ID</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_char_data_addr</Address>
+              <Offsets>
+                <Offset>3AC</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>174</ID>
+              <Description>"Slot 2 ID"</Description>
+              <DropDownListLink>Item-ID</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_char_data_addr</Address>
+              <Offsets>
+                <Offset>3B0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>175</ID>
+              <Description>"服裝ID / Costume ID"</Description>
+              <DropDownListLink>Item-ID</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>i_base_char_data_addr</Address>
+              <Offsets>
+                <Offset>3B4</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>176</ID>
+          <Description>"取得LGC資料 / Get LGC Data"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ed9.exe
+  Version: 
+  Date   : 2025-01-28
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+//41 ?? ?? ?? ?? 01 00 ?? ?? 48 ?? ?? ?? ?? 00 00 C1
+aobscanmodule(INJECT_GET_LGC_DATA,ed9.exe,41 8B AF ?? ?? ?? 00 ?? ?? 48) // should be unique
+alloc(newmem,$1000,INJECT_GET_LGC_DATA)
+
+alloc(INJECT_GET_LGC_DATAo, 7)
+
+label(code)
+label(return i_base_lgc_addr i_base_lgc_offset)
+
+INJECT_GET_LGC_DATAo:
+  readmem(INJECT_GET_LGC_DATA, 7)
+
+newmem:
+  mov [i_base_lgc_addr], r15
+  xor rcx, rcx
+  mov ecx, [INJECT_GET_LGC_DATAo+3]
+  mov [i_base_lgc_offset], rcx
+
+code:
+  reassemble(INJECT_GET_LGC_DATA)
+  //mov ebp,[r15+00012148]
+  jmp return
+align 10 cc
+  i_base_lgc_addr:
+  dq 0
+  i_base_lgc_offset:
+  dq 0
+
+INJECT_GET_LGC_DATA:
+  jmp newmem
+  nop 2
+return:
+registersymbol(INJECT_GET_LGC_DATA i_base_lgc_addr i_base_lgc_offset)
+registersymbol(INJECT_GET_LGC_DATAo)
+[DISABLE]
+
+INJECT_GET_LGC_DATA:
+  //db 41 8B AF 48 21 01 00
+  readmem(INJECT_GET_LGC_DATAo, 7)
+
+unregistersymbol(INJECT_GET_LGC_DATA i_base_lgc_addr i_base_lgc_offset)
+dealloc(newmem)
+unregistersymbol(INJECT_GET_LGC_DATAo)
+dealloc(INJECT_GET_LGC_DATAo)
+{
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+5ED108
+
+ed9.exe+5ED0D7: 48 8B 05 62 CF 52 00     - mov rax,[ed9.exe+B1A040]
+ed9.exe+5ED0DE: 48 33 C4                 - xor rax,rsp
+ed9.exe+5ED0E1: 48 89 84 24 08 02 00 00  - mov [rsp+00000208],rax
+ed9.exe+5ED0E9: 4C 8B 3D 48 68 5F 00     - mov r15,[ed9.exe+BE3938]
+ed9.exe+5ED0F0: 48 8B D9                 - mov rbx,rcx
+ed9.exe+5ED0F3: 48 8B 05 6E 67 5F 00     - mov rax,[addr_1_base]
+ed9.exe+5ED0FA: 45 8B E8                 - mov r13d,r8d
+ed9.exe+5ED0FD: 48 89 11                 - mov [rcx],rdx
+ed9.exe+5ED100: 48 8B F2                 - mov rsi,rdx
+ed9.exe+5ED103: 44 89 4C 24 40           - mov [rsp+40],r9d
+// ---------- INJECTING HERE ----------
+ed9.exe+5ED108: 41 8B AF 48 21 01 00     - mov ebp,[r15+00012148]
+// ---------- DONE INJECTING  ----------
+ed9.exe+5ED10F: 8B FD                    - mov edi,ebp
+ed9.exe+5ED111: 48 8B 88 A0 08 00 00     - mov rcx,[rax+000008A0]
+ed9.exe+5ED118: C1 EF 1E                 - shr edi,1E
+ed9.exe+5ED11B: 4C 8B 71 08              - mov r14,[rcx+08]
+ed9.exe+5ED11F: 83 FF 01                 - cmp edi,01
+ed9.exe+5ED122: 75 0E                    - jne ed9.exe+5ED132
+ed9.exe+5ED124: 44 8D 04 AD 00 00 00 00  - lea r8d,[rbp*4+00000000]
+ed9.exe+5ED12C: 41 C1 F8 02              - sar r8d,02
+ed9.exe+5ED130: EB 1A                    - jmp ed9.exe+5ED14C
+ed9.exe+5ED132: 83 FF 02                 - cmp edi,02
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>177</ID>
+              <Description>"開啟選單 / Usage: menu [LT]+[RT]"</Description>
+              <Color>8000FF</Color>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>178</ID>
+              <Description>"Law"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>Custom</VariableType>
+              <CustomType>Kueo2 integer</CustomType>
+              <Address>i_base_lgc_addr</Address>
+              <Offsets>
+                <Offset>[i_base_lgc_offset]</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>179</ID>
+              <Description>"Gray"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>Custom</VariableType>
+              <CustomType>Kueo2 integer</CustomType>
+              <Address>i_base_lgc_addr</Address>
+              <Offsets>
+                <Offset>[i_base_lgc_offset]+4</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>180</ID>
+              <Description>"Chaos"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>Custom</VariableType>
+              <CustomType>Kueo2 integer</CustomType>
+              <Address>i_base_lgc_addr</Address>
+              <Offsets>
+                <Offset>[i_base_lgc_offset]+8</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>181</ID>
+              <Description>"Connect"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>Custom</VariableType>
+              <CustomType>Kueo2 integer</CustomType>
+              <Address>i_base_lgc_addr</Address>
+              <Offsets>
+                <Offset>[i_base_lgc_offset]+C</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>182</ID>
+              <Description>"??"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>Custom</VariableType>
+              <CustomType>Kueo2 integer</CustomType>
+              <Address>i_base_lgc_addr</Address>
+              <Offsets>
+                <Offset>[i_base_lgc_offset]+10</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>183</ID>
+              <Description>"SP"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>Custom</VariableType>
+              <CustomType>Kueo2 integer</CustomType>
+              <Address>i_base_lgc_addr</Address>
+              <Offsets>
+                <Offset>[i_base_lgc_offset]+30</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>184</ID>
+              <Description>"??"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>Custom</VariableType>
+              <CustomType>Kueo2 integer</CustomType>
+              <Address>i_base_lgc_addr</Address>
+              <Offsets>
+                <Offset>[i_base_lgc_offset]+48</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>185</ID>
+              <Description>"Grim Garten"</Description>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>186</ID>
+                  <Description>"Field kills"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_lgc_addr</Address>
+                  <Offsets>
+                    <Offset>[i_base_lgc_offset]+29C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>187</ID>
+                  <Description>"Command kills"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_lgc_addr</Address>
+                  <Offsets>
+                    <Offset>[i_base_lgc_offset]+2A0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>188</ID>
+                  <Description>"S-Craft"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_lgc_addr</Address>
+                  <Offsets>
+                    <Offset>[i_base_lgc_offset]+2A4</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>189</ID>
+                  <Description>"Quick Magic"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_lgc_addr</Address>
+                  <Offsets>
+                    <Offset>[i_base_lgc_offset]+2A8</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>190</ID>
+                  <Description>"Charged attack"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_lgc_addr</Address>
+                  <Offsets>
+                    <Offset>[i_base_lgc_offset]+2AC</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>191</ID>
+                  <Description>"??"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_lgc_addr</Address>
+                  <Offsets>
+                    <Offset>[i_base_lgc_offset]+2B0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>192</ID>
+                  <Description>"Max total damage"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_lgc_addr</Address>
+                  <Offsets>
+                    <Offset>[i_base_lgc_offset]+2B4</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>193</ID>
+                  <Description>"??"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>FF8080</Color>
+                  <VariableType>Custom</VariableType>
+                  <CustomType>Kueo2 integer</CustomType>
+                  <Address>i_base_lgc_addr</Address>
+                  <Offsets>
+                    <Offset>[i_base_lgc_offset]+2B8</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>194</ID>
+          <Description>"自製料理 / Cooking list"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ed9.exe
+  Version: 
+  Date   : 2025-01-30
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_GET_COOKING_LIST,ed9.exe,0F B7 84 C7 ?? ?? ?? 00 48) // should be unique
+alloc(newmem,$1000,INJECT_GET_COOKING_LIST)
+
+alloc(INJECT_GET_COOKING_LISTo, 8)
+
+label(code)
+label(return i_base_cooking_list_addr)
+
+INJECT_GET_COOKING_LISTo:
+  readmem(INJECT_GET_COOKING_LIST, 8)
+
+newmem:
+  push r15
+  push r14
+  xor r14, r14
+  mov r14d, [INJECT_GET_COOKING_LISTo+4]
+  lea r15, [rdi+rax*8]
+  lea r15, [r15+r14]
+  mov [i_base_cooking_list_addr], r15
+
+
+endp:
+  pop r14
+  pop r15
+
+code:
+  //movzx eax,word ptr [rdi+rax*8+00296AF2]
+  readmem(INJECT_GET_COOKING_LIST, 8)
+  jmp return
+align 10 cc
+  i_base_cooking_list_addr:
+  dq 0
+
+INJECT_GET_COOKING_LIST:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_GET_COOKING_LIST i_base_cooking_list_addr)
+registersymbol(INJECT_GET_COOKING_LISTo)
+
+[DISABLE]
+
+INJECT_GET_COOKING_LIST:
+  //db 0F B7 84 C7 F2 6A 29 00
+  readmem(INJECT_GET_COOKING_LISTo, 8)
+
+unregistersymbol(INJECT_GET_COOKING_LIST i_base_cooking_list_addr)
+dealloc(newmem)
+unregistersymbol(INJECT_GET_COOKING_LISTo)
+dealloc(INJECT_GET_COOKING_LISTo)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+51276A
+
+ed9.exe+512748: E8 03 52 15 00           - call ed9.exe+667950
+ed9.exe+51274D: 33 C0                    - xor eax,eax
+ed9.exe+51274F: 48 8B 5C 24 40           - mov rbx,[rsp+40]
+ed9.exe+512754: 48 83 C4 30              - add rsp,30
+ed9.exe+512758: 5F                       - pop rdi
+ed9.exe+512759: C3                       - ret 
+ed9.exe+51275A: 42 0F B7 44 11 02        - movzx eax,word ptr [rcx+r10+02]
+ed9.exe+512760: B9 00 01 00 00           - mov ecx,00000100
+ed9.exe+512765: 66 3B C1                 - cmp ax,cx
+ed9.exe+512768: 73 C1                    - jae ed9.exe+51272B
+// ---------- INJECTING HERE ----------
+ed9.exe+51276A: 0F B7 84 C7 F2 6A 29 00  - movzx eax,word ptr [rdi+rax*8+00296AF2]
+// ---------- DONE INJECTING  ----------
+ed9.exe+512772: 48 8B 5C 24 40           - mov rbx,[rsp+40]
+ed9.exe+512777: 48 83 C4 30              - add rsp,30
+ed9.exe+51277B: 5F                       - pop rdi
+ed9.exe+51277C: C3                       - ret 
+ed9.exe+51277D: CC                       - int 3 
+ed9.exe+51277E: CC                       - int 3 
+ed9.exe+51277F: CC                       - int 3 
+ed9.exe+512780: 48 89 5C 24 08           - mov [rsp+08],rbx
+ed9.exe+512785: 57                       - push rdi
+ed9.exe+512786: 48 83 EC 20              - sub rsp,20
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>195</ID>
+              <Description>"烹飪次數 / Cooking count"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_base_cooking_list_addr</Address>
+              <Offsets>
+                <Offset>-2</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>196</ID>
+              <Description>"食用次數 / Times consumed"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>FF8080</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>i_base_cooking_list_addr</Address>
+              <Offsets>
+                <Offset>0</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>197</ID>
+          <Description>"服裝更換：啟用紳士視角 / Costume: enable Ecchi perspective"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : ed9.exe
+  Version: 
+  Date   : 2025-01-30
+  Author : bbfox@https://opencheattables.com
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT_Ecchi_Perspective,ed9.exe,F3 0F 5D C8 F3 0F 5F D1 F3 0F 11) // should be unique
+alloc(newmem,$1000,INJECT_Ecchi_Perspective)
+
+label(code)
+label(return)
+
+newmem:
+  vmovss xmm2, [vf_m131]
+
+code:
+  minss xmm1,xmm0
+  maxss xmm2,xmm1
+  jmp return
+align 10 cc
+  vf_m131:
+  dd (float)-1.40
+
+INJECT_Ecchi_Perspective:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT_Ecchi_Perspective)
+
+[DISABLE]
+
+INJECT_Ecchi_Perspective:
+  db F3 0F 5D C8 F3 0F 5F D1
+
+unregistersymbol(INJECT_Ecchi_Perspective)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: ed9.exe+173F39
+
+ed9.exe+173F00: F3 0F 10 8B 18 04 00 00        - movss xmm1,[rbx+00000418]
+ed9.exe+173F08: F3 0F 10 93 30 03 00 00        - movss xmm2,[rbx+00000330]
+ed9.exe+173F10: F3 41 0F 59 C1                 - mulss xmm0,xmm9
+ed9.exe+173F15: F3 41 0F 59 D2                 - mulss xmm2,xmm10
+ed9.exe+173F1A: F3 41 0F 59 C2                 - mulss xmm0,xmm10
+ed9.exe+173F1F: F3 0F 59 C7                    - mulss xmm0,xmm7
+ed9.exe+173F23: F3 41 0F 59 C4                 - mulss xmm0,xmm12
+ed9.exe+173F28: F3 0F 5C C8                    - subss xmm1,xmm0
+ed9.exe+173F2C: F3 0F 10 83 34 03 00 00        - movss xmm0,[rbx+00000334]
+ed9.exe+173F34: F3 41 0F 59 C2                 - mulss xmm0,xmm10
+// ---------- INJECTING HERE ----------
+ed9.exe+173F39: F3 0F 5D C8                    - minss xmm1,xmm0
+// ---------- DONE INJECTING  ----------
+ed9.exe+173F3D: F3 0F 5F D1                    - maxss xmm2,xmm1
+ed9.exe+173F41: F3 0F 11 93 18 04 00 00        - movss [rbx+00000418],xmm2
+ed9.exe+173F49: 41 0F 28 F3                    - movaps xmm6,xmm11
+ed9.exe+173F4D: 45 0F 28 F3                    - movaps xmm14,xmm11
+ed9.exe+173F51: F3 0F 11 74 24 50              - movss [rsp+50],xmm6
+ed9.exe+173F57: E8 F4 3B 55 00                 - call ed9.exe+6C7B50
+ed9.exe+173F5C: 48 8B 0D 3D CB A6 00           - mov rcx,[ed9.exe+BE0AA0]
+ed9.exe+173F63: 48 B8 A5 55 47 74 98 27 20 DF  - mov rax,DF202798744755A5
+ed9.exe+173F6D: 48 8B 15 14 CB A6 00           - mov rdx,[ed9.exe+BE0A88]
+ed9.exe+173F74: 48 23 C8                       - and rcx,rax
+}
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>198</ID>
+      <Description>"英雄傳說 界之軌跡 -告別塞姆利亞- v1.02  /  https://opencheattables.com / CE 7.6"</Description>
+      <Options moHideChildren="1"/>
+      <Color>00AA00</Color>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>199</ID>
+          <Description>"Char-ID"</Description>
+          <DropDownList DisplayValueAsItem="1">0:范恩/ Van Arkride
+1:亞妮艾絲 / Agnès Claudel
+2:菲莉 / Feri Al-Fayed
+3:亞倫 / Aaron Wei
+4:卡特爾 / Quatre Salision
+5:貝爾加德 / Bergard Zeman
+6:莉婕特 / Risette Twining
+7:瓦爾特 / Walter Kron
+8:陣 / Zin Vathek
+9:金凱德 / Rene Kincaid
+10:茱迪絲 / Judith Ranster
+11:艾蕾因 / Elaine Auclair
+12:靜名 / Shizuna Rem Misurugi
+13:黑鐵 / Kurogane
+14:露克蕾琪亞 / Lucrezia Isselee
+15:魔裝鬼
+17:斯溫 / Swin Abel
+18:娜狄雅 / Nadia Rayne
+19:蕾恩 / Renne Bright
+20:黎恩 / Rean Schwarzer
+21:亞爾緹娜 / Altina Orion
+22:克洛 / Crow Armbrust
+23:凱文 / Kevin Graham
+24:盧法斯 / Rufus A
+62:莉夏 / Rixia Mao
+63:菲 / Fie Claussell
+97:王者之劍XD / Excalibur XD
+104:賀伍德 / Ellroy Harwood
+107:曹
+108:艾爾維斯
+149:卡希姆 / Kasim Al-Fayed
+151:塞莉絲 / Celis Ortesia
+152:里翁 / Rion Balthazar
+159:約爾妲 / Jolda Eldarion
+160:高朗
+169:托娃 / Towa Herschel
+173:拉碧絲 / Lapis Rosenberg
+</DropDownList>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>200</ID>
+          <Description>"Item-ID"</Description>
+          <DropDownList DisplayValueAsItem="1">0:Empty
+1037:(armor)時光夾克+
+1235:(shoes)本篤長靴
+1236:(shoes)斯托雷加末日款
+1237:(shoes)斯托雷加末日款+
+1641:北風之星
+1709:大師護目鏡
+1748:地下萬事屋之魂
+1749:界之寶珠
+1753:企鵝吊飾
+</DropDownList>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+  <LuaScript>--[[
+[ENABLE]
+{$lua}
+if syntaxcheck then return end
+]]--
+-- **デバッグモードの設定 (デフォルト: 無効)**
+local debugMode = false
+
+-- AOBScanModule関数
+if not AOBScanModule then
+    function AOBScanModule(moduleName, signature, scanOptions)
+        local baseAddr = nil
+        local maxAddr = 0
+        local modList
+
+        synchronize(function()
+            modList = enumModules()
+        end)
+
+        for _, mod in ipairs(modList) do
+            if string.lower(mod.Name) == string.lower(moduleName) then
+                baseAddr = mod.Address
+                maxAddr = baseAddr + mod.Size
+                break
+            end
+        end
+
+        if not baseAddr then
+            if debugMode then print("✖️ Error: Module " .. moduleName .. " not found!") end
+            return nil
+        end
+
+        if debugMode then
+            print(string.format("✔️ %s Base Address: 0x%X", moduleName, baseAddr))
+            print(string.format("📐 Scanning Range: 0x%X - 0x%X", baseAddr, maxAddr))
+        end
+
+        local ms = createMemScan()
+
+        synchronize(function()
+            ms.firstScan(
+                soExactValue,
+                vtByteArray,
+                nil,
+                signature,
+                nil,
+                baseAddr,
+                maxAddr,
+                scanOptions or "+X+R",
+                fsmNotAligned,
+                "1",
+                true,
+                true,
+                false,
+                false
+            )
+        end)
+
+        ms.waitTillDone()
+
+        local results = createFoundList(ms)
+        results.initialize()
+
+        local addr
+        synchronize(function()
+            if results.getCount() &gt; 0 then
+                addr = results[0]
+            end
+        end)
+
+        if addr then
+            if debugMode then print("🎯 AOB found at: 0x" .. addr) end
+        else
+            if debugMode then print("✖️ AOB not found in " .. moduleName) end
+        end
+
+        results.destroy()
+        ms.destroy()
+        return addr
+    end
+end
+
+registerLuaFunctionHighlight('AOBScanModule')
+
+--[[
+test AOBScanModule()
+local aob_addr_str = AOBScanModule("???.exe", "48 8B 05 ?? ?? ?? ?? 33 ED 48 8B 88", "+X+R")
+if aob_addr_str then
+    print("✔️ Final AOB Address: 0x" .. aob_addr_str)
+else
+    print("✖️ AOB not found in ???.exe")
+end
+]]--
+
+-- Lua scripts that table checkbox will not be checked with "NO_ACTIVATE" in comment/script body
+if not onMemRecPostExecute then
+    function onMemRecPostExecute(memoryrecord, newState, succeeded)
+        if memoryrecord.Type == vtAutoAssembler and memoryrecord.Script:find("NO_ACTIVATE") and newState and succeeded then
+            synchronize(function()
+                memoryrecord.disableWithoutExecute()
+            end)
+        end
+    end
+end
+
+-- Memory record IDs now allowed to be 'locked'
+IDs = {999999, 9999999}
+
+-- Determine event trigger sequence
+if not contains then
+    function contains(table, val)
+       for i = 1, #table do
+          if table[i] == val then
+             return true
+          end
+       end
+       return false
+    end
+end
+
+if not onMemRecPreExecute then
+    function onMemRecPreExecute(memoryrecord, newstate)
+        if contains(IDs, memoryrecord.ID) and newstate then
+            synchronize(function()
+                if not memoryrecord.OnActivate then
+                    memoryrecord.OnActivate = function(memoryrecord, before, currentstate)
+                        return false
+                    end
+                end
+            end)
+        end
+    end
+end
+
+-- Utility Functions
+-- Clear lua engine log
+if not clearLuaLog then
+    function clearLuaLog()
+        synchronize(function()
+          getLuaEngine().MenuItem5.doClick()
+        end)
+    end
+end
+registerLuaFunctionHighlight('clearLuaLog')
+
+-- Close lua engine log
+if not closeLuaEngine then
+    function closeLuaEngine()
+        synchronize(function()
+          getLuaEngine().Close()
+        end)
+    end
+end
+registerLuaFunctionHighlight('closeLuaEngine')
+
+-- Clear lua engine log &amp; close lua engine
+if not closeLuaEngine2 then
+    function closeLuaEngine2()
+        synchronize(function()
+          getLuaEngine().MenuItem5.doClick()
+          getLuaEngine().Close()
+        end)
+    end
+end
+registerLuaFunctionHighlight('closeLuaEngine2')
+
+synchronize(function() AddressList.Header.OnSectionClick = nil end)
+--[[
+[DISABLE]
+{$lua}
+
+if AOBScanModule then
+    AOBScanModule = nil
+end
+if onMemRecPostExecute then
+    onMemRecPostExecute = nil
+end
+if onMemRecPreExecute then
+    onMemRecPreExecute = nil
+end
+if clearLuaLog then
+    clearLuaLog = nil
+end
+if closeLuaEngine then
+    closeLuaEngine = nil
+end
+if closeLuaEngine2 then
+    closeLuaEngine2 = nil
+end
+]]--
+</LuaScript>
+</CheatTable>
