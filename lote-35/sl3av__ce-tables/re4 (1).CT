@@ -1,0 +1,1845 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>14</ID>
+      <Description>"Remove protection"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : re4.exe
+  Version: ‎Sunday, ‎March ‎19, ‎2023 11:28:19 PM
+  Date   : 2023-03-24
+  Author : praydog
+
+  This script says the N word.
+}
+
+[ENABLE]
+
+aobscanmodule(RE8Func,re4.exe, 40 53 56 57 48 83 EC 20 48 8B 15 * * * * 48 ) // should be unique
+aobscanmodule(conditional_jmp_block,re4.exe, 48 8B 8D D0 03 00 00 48 29 C1 75 ) // should be unique\
+
+RE8Func:
+db C3
+
+conditional_jmp_block+A:
+db EB
+
+registersymbol(RE8Func)
+registersymbol(conditional_jmp_block)
+
+[DISABLE]
+unregistersymbol(RE8Func)
+unregistersymbol(conditional_jmp_block)
+
+RE8Func:
+db 40
+
+conditional_jmp_block+A:
+db 75
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>3</ID>
+      <Description>"Infinite Ammo (No Reload)"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : re4.exe
+  Version: ‎Sunday, ‎March ‎19, ‎2023 11:28:19 PM
+  Date   : 2023-03-24
+  Author : makotech222
+
+  Infinite Ammo without reload
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,re4.exe,89 5F 44 48 8B 5C 24 30 48 8B 6C) // should be unique
+alloc(newmem,$1000,INJECT)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  add ebx, #1
+  mov [rdi+44],ebx
+  mov rbx,[rsp+30]
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db 89 5F 44 48 8B 5C 24 30
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: re4.exe+1ACE646
+
+re4.exe+1ACE625: E8 26 A8 F8 FF  - call re4.exe+1A58E50
+re4.exe+1ACE62A: 3B D8           - cmp ebx,eax
+re4.exe+1ACE62C: 7E 0D           - jle re4.exe+1ACE63B
+re4.exe+1ACE62E: 48 8B D7        - mov rdx,rdi
+re4.exe+1ACE631: 48 8B CD        - mov rcx,rbp
+re4.exe+1ACE634: E8 17 A8 F8 FF  - call re4.exe+1A58E50
+re4.exe+1ACE639: 8B D8           - mov ebx,eax
+re4.exe+1ACE63B: 85 DB           - test ebx,ebx
+re4.exe+1ACE63D: 41 0F 48 DE     - cmovs ebx,r14d
+re4.exe+1ACE641: 4C 8B 74 24 38  - mov r14,[rsp+38]
+// ---------- INJECTING HERE ----------
+re4.exe+1ACE646: 89 5F 44        - mov [rdi+44],ebx
+// ---------- DONE INJECTING  ----------
+re4.exe+1ACE649: 48 8B 5C 24 30  - mov rbx,[rsp+30]
+re4.exe+1ACE64E: 48 8B 6C 24 40  - mov rbp,[rsp+40]
+re4.exe+1ACE653: 48 8B 74 24 48  - mov rsi,[rsp+48]
+re4.exe+1ACE658: 48 83 C4 20     - add rsp,20
+re4.exe+1ACE65C: 5F              - pop rdi
+re4.exe+1ACE65D: C3              - ret 
+re4.exe+1ACE65E: CC              - int 3 
+re4.exe+1ACE65F: CC              - int 3 
+re4.exe+1ACE660: 48 89 5C 24 08  - mov [rsp+08],rbx
+re4.exe+1ACE665: 57              - push rdi
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>13</ID>
+      <Description>"Infinite Spinels"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : re4.exe
+  Version: ‎Friday, ‎March ‎24, ‎2023 3:19:02 AM
+  Date   : 2023-04-07
+  Author : gir489
+
+  Infinite Spinels
+}
+
+[ENABLE]
+
+aobscanmodule(ReadSpinel,re4.exe,49 8B 96 00 02 00 00 44 8B 40 20) // should be unique
+alloc(newmem,$1000,ReadSpinel)
+
+label(code)
+label(return)
+
+newmem:
+  mov [rax+20],#99
+
+code:
+  mov rdx,[r14+00000200]
+  jmp return
+
+ReadSpinel:
+  jmp newmem
+  nop 2
+return:
+registersymbol(ReadSpinel)
+
+[DISABLE]
+
+ReadSpinel:
+  db 49 8B 96 00 02 00 00
+
+unregistersymbol(ReadSpinel)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: re4.exe+32760F6
+
+re4.exe+32760C0: 49 83 C7 08              - add r15,08
+re4.exe+32760C4: 49 83 EC 01              - sub r12,01
+re4.exe+32760C8: 89 AC 24 B8 00 00 00     - mov [rsp+000000B8],ebp
+re4.exe+32760CF: 4C 89 64 24 48           - mov [rsp+48],r12
+re4.exe+32760D4: BF 00 00 00 00           - mov edi,00000000
+re4.exe+32760D9: 4C 89 7C 24 40           - mov [rsp+40],r15
+re4.exe+32760DE: 0F 85 9C FC FF FF        - jne re4.exe+3275D80
+re4.exe+32760E4: 4C 8B B4 24 A8 00 00 00  - mov r14,[rsp+000000A8]
+re4.exe+32760EC: 48 8B 05 E5 3F FA 09     - mov rax,[re4.exe+D21A0D8]
+re4.exe+32760F3: 48 8B CE                 - mov rcx,rsi
+// ---------- INJECTING HERE ----------
+re4.exe+32760F6: 49 8B 96 00 02 00 00     - mov rdx,[r14+00000200]
+// ---------- DONE INJECTING  ----------
+re4.exe+32760FD: 44 8B 40 20              - mov r8d,[rax+20]
+re4.exe+3276101: E8 BA 3A B9 FE           - call re4.exe+1E09BC0
+re4.exe+3276106: 48 8B 05 FB 3B FA 09     - mov rax,[re4.exe+D219D08]
+re4.exe+327610D: 48 8B CE                 - mov rcx,rsi
+re4.exe+3276110: 49 8B 96 08 02 00 00     - mov rdx,[r14+00000208]
+re4.exe+3276117: C6 44 24 20 00           - mov byte ptr [rsp+20],00
+re4.exe+327611C: 44 8B 40 10              - mov r8d,[rax+10]
+re4.exe+3276120: 45 8B C8                 - mov r9d,r8d
+re4.exe+3276123: 48 8B 52 18              - mov rdx,[rdx+18]
+re4.exe+3276127: E8 74 10 06 FF           - call re4.exe+22D71A0
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>16</ID>
+      <Description>"Infinite Items"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : re4.exe
+  Version: ‎Friday, ‎March ‎24, ‎2023 3:19:02 AM
+  Date   : 2023-03-25
+  Author : gir489
+
+  Infinite Items
+}
+
+[ENABLE]
+
+aobscanmodule(ChangeItemCallback,re4.exe,48 8B 42 10 48 85 C0 74 0A 8B) // should be unique
+aobscanmodule(QuestItemDecrementReturnAddress,re4.exe,48 8B 43 18 4C 8B 40 10) // should be unique
+aobscanmodule(QuestItemIncrementReturnAddress,re4.exe,0F B6 5C 24 ? BF 81) // should be unique
+alloc(newmem,$1000,ChangeItemCallback)
+
+label(return)
+
+newmem:
+mov rax,QuestItemDecrementReturnAddress
+cmp [rsp],rax
+je @f
+mov rax,QuestItemIncrementReturnAddress
+cmp [rsp],rax
+je @f
+ret
+@@:
+mov rax,[rdx+10]
+test rax,rax
+jmp return
+
+ChangeItemCallback:
+  jmp newmem
+  nop 2
+return:
+registersymbol(ChangeItemCallback)
+
+[DISABLE]
+
+ChangeItemCallback:
+  db 48 8B 42 10 48 85 C0
+
+unregistersymbol(ChangeItemCallback)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: re4.exe+15F0C70
+
+re4.exe+15F0C58: 84 DB           - test bl,bl
+re4.exe+15F0C5A: 48 8B 5C 24 58  - mov rbx,[rsp+58]
+re4.exe+15F0C5F: 0F 95 C0        - setne al
+re4.exe+15F0C62: 48 83 C4 20     - add rsp,20
+re4.exe+15F0C66: 41 5F           - pop r15
+re4.exe+15F0C68: 41 5E           - pop r14
+re4.exe+15F0C6A: 41 5D           - pop r13
+re4.exe+15F0C6C: 41 5C           - pop r12
+re4.exe+15F0C6E: 5F              - pop rdi
+re4.exe+15F0C6F: C3              - ret 
+// ---------- INJECTING HERE ----------
+re4.exe+15F0C70: 48 8B 42 10     - mov rax,[rdx+10]
+// ---------- DONE INJECTING  ----------
+re4.exe+15F0C74: 48 85 C0        - test rax,rax
+re4.exe+15F0C77: 74 0A           - je re4.exe+15F0C83
+re4.exe+15F0C79: 8B 40 14        - mov eax,[rax+14]
+re4.exe+15F0C7C: 44 3B C0        - cmp r8d,eax
+re4.exe+15F0C7F: 44 0F 4F C0     - cmovg r8d,eax
+re4.exe+15F0C83: 33 C0           - xor eax,eax
+re4.exe+15F0C85: 45 85 C0        - test r8d,r8d
+re4.exe+15F0C88: 44 0F 48 C0     - cmovs r8d,eax
+re4.exe+15F0C8C: 44 89 42 34     - mov [rdx+34],r8d
+re4.exe+15F0C90: C3              - ret 
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>136</ID>
+      <Description>"Manipulate Current Selected Item"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>// Game Executable   : re4.exe
+// Author            : gir489
+// Executable Version: 1.0.5.0
+// MD5 Signature     : 942BA056C69684FF07EB85260499A0F7
+// EXE Compile Date  : April 17, 2023 12:32 PM
+// Sign Date         : ‎Monday, ‎April ‎17, ‎2023 1꞉20꞉23 PM
+// Script Date       : April 24, 2023 09:17 AM
+[ENABLE]
+
+aobscanmodule(AttachCaseCurrentItemSelectedPointerAOB,re4.exe,8B 4E 34 48 85 C0) // should be unique
+alloc(newmem,$1000,AttachCaseCurrentItemSelectedPointerAOB)
+alloc(AttachCaseCurrentItemSelectedPointer,8)
+registersymbol(AttachCaseCurrentItemSelectedPointer)
+registersymbol(AttachCaseCurrentItemSelectedPointerAOB)
+label(return)
+
+newmem:
+mov rcx, FFFFFFFFFFFFFFFF
+cmp [rsp+D8],rcx //Weapons
+jne @f
+    mov [AttachCaseCurrentItemSelectedPointer], rsi
+@@:
+cmp [rsp+98],rcx //Items
+jne @f
+    mov [AttachCaseCurrentItemSelectedPointer], rsi
+@@:
+  mov rcx,[rsi+34] //Original code will purge the RCX register of our contamination.
+  test rax,rax
+  jmp return
+
+AttachCaseCurrentItemSelectedPointerAOB:
+  jmp newmem
+  nop
+return:
+registersymbol(AttachCaseCurrentItemSelectedPointer)
+
+AttachCaseCurrentItemSelectedPointer:
+dq 0
+
+[DISABLE]
+
+AttachCaseCurrentItemSelectedPointerAOB:
+  db 8B 4E 34 48 85 C0
+
+unregistersymbol(AttachCaseCurrentItemSelectedPointer)
+unregistersymbol(AttachCaseCurrentItemSelectedPointerAOB)
+dealloc(newmem)
+dealloc(AttachCaseCurrentItemSelectedPointer)
+
+{
+// ORIGINAL CODE - INJECTION POINT: AttachCaseCurrentItemSelectedPointerAOB
+
+re4.exe+246171A: 8B 05 EC E8 DF 0A     - mov eax,[re4.exe+D26000C]
+re4.exe+2461720: 89 43 30              - mov [rbx+30],eax
+re4.exe+2461723: C7 43 34 FF FF FF FF  - mov [rbx+34],FFFFFFFF
+re4.exe+246172A: 48 85 F6              - test rsi,rsi
+re4.exe+246172D: 74 78                 - je re4.exe+24617A7
+re4.exe+246172F: 0F B7 4E 1C           - movzx ecx,word ptr [rsi+1C]
+re4.exe+2461733: 0F B7 56 1E           - movzx edx,word ptr [rsi+1E]
+re4.exe+2461737: 4C 8B 46 20           - mov r8,[rsi+20]
+re4.exe+246173B: 8B 46 18              - mov eax,[rsi+18]
+re4.exe+246173E: 66 89 4B 1C           - mov [rbx+1C],cx
+re4.exe+2461742: 48 8B CD              - mov rcx,rbp
+re4.exe+2461745: 66 89 53 1E           - mov [rbx+1E],dx
+re4.exe+2461749: 48 8B D3              - mov rdx,rbx
+re4.exe+246174C: 4C 89 43 20           - mov [rbx+20],r8
+re4.exe+2461750: 89 43 18              - mov [rbx+18],eax
+re4.exe+2461753: 44 8B 46 28           - mov r8d,[rsi+28]
+re4.exe+2461757: E8 E4 04 0A 00        - call re4.exe+2501C40
+re4.exe+246175C: 8B 46 2C              - mov eax,[rsi+2C]
+re4.exe+246175F: 89 43 2C              - mov [rbx+2C],eax
+re4.exe+2461762: 48 8B 43 10           - mov rax,[rbx+10]
+// ---------- INJECTING HERE ----------
+re4.exe+2461766: 8B 4E 34              - mov ecx,[rsi+34]
+// ---------- DONE INJECTING  ----------
+re4.exe+2461769: 48 85 C0              - test rax,rax
+re4.exe+246176C: 74 08                 - je re4.exe+2461776
+re4.exe+246176E: 8B 40 14              - mov eax,[rax+14]
+re4.exe+2461771: 3B C8                 - cmp ecx,eax
+re4.exe+2461773: 0F 4F C8              - cmovg ecx,eax
+re4.exe+2461776: 33 C0                 - xor eax,eax
+re4.exe+2461778: 85 C9                 - test ecx,ecx
+re4.exe+246177A: 0F 48 C8              - cmovs ecx,eax
+re4.exe+246177D: 89 4B 34              - mov [rbx+34],ecx
+re4.exe+2461780: 8B 7E 30              - mov edi,[rsi+30]
+re4.exe+2461783: 85 FF                 - test edi,edi
+re4.exe+2461785: 0F 48 F8              - cmovs edi,eax
+re4.exe+2461788: 48 8B D3              - mov rdx,rbx
+re4.exe+246178B: 48 8B CD              - mov rcx,rbp
+re4.exe+246178E: E8 CD 21 05 00        - call re4.exe+24B3960
+re4.exe+2461793: 3B F8                 - cmp edi,eax
+re4.exe+2461795: 7E 0D                 - jle re4.exe+24617A4
+re4.exe+2461797: 48 8B D3              - mov rdx,rbx
+re4.exe+246179A: 48 8B CD              - mov rcx,rbp
+re4.exe+246179D: E8 BE 21 05 00        - call re4.exe+24B3960
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>137</ID>
+          <Description>"Item"</Description>
+          <DropDownList DescriptionOnly="1" DisplayValueAsItem="1">112800000:Handgun Ammo
+112801600:Magnum Ammo
+112803200:Shotgun Ammo
+112804800:Rifle Ammo
+112806400:Submachine Gun Ammo
+112808000:Bolts
+112320000:Explosive Arrows
+114400000:Green Herb
+114401600:Red Herb
+114403200:Yellow Herb
+114404800:Mixed Herb (G+G)
+114406400:Mixed Herb (G+G+G)
+114408000:Mixed Herb (R+G)
+114409600:Mixed Herb (G+Y)
+114411200:Mixed Herb (R+Y)
+114412800:Mixed Herb (G+R+Y)
+114414400:Mixed Herb (G+G+Y)
+114416000:First Aid Spray
+114417600:Black Bass
+114419200:Lunker Bass
+114420800:Black Bass (L)
+114422400:Viper
+114424000:Rhinoceros Beetle
+116000000:Scope
+116001600:Red9 Stock
+116003200:High-power Scope
+116004800:Biosensor Scope
+116006400:TMP Stock
+116008000:Laser
+116009600:Matilda Stock
+117600000:Gunpowder
+117601600:Resources (L)
+117603200:Attachable Mines
+117606400:Resources (S)
+119203200:Hexagonal Emblem
+119204800:Insigina Key
+119206400:Halo Wheel
+119209600:Crimson Lantern
+119211200:Level 1 Keycard
+119212800:Level 2 Keycard
+119214400:Level 3 Keycard
+119217600:Crystal Marble
+119219200:Wrench
+119220800:Salazar Family Insigina
+119222400:Lion Head
+119224000:Goat Head
+119225600:Serpant Head
+119230400:Blasphemer's Head
+119232000:Apostate's Head
+119235200:Wooden Cog
+119236800:Dynamite
+119238400:Luis's Key
+119244800:Small Key
+119246400:Checkpoint Crank
+119248000:Hexagon Piece A
+119249600:Hexagon Piece B
+119251200:Hexagon Piece C
+119254400:Dungeon Key
+119256000:Old Wayshrine Key
+119257600:Church Insignia
+119259200:Water Scooter Key
+119260800:Golden Sword
+119262400:Iron Sword
+119265600:Lithographic Stone A
+119267200:Lithographic Stone B
+119268800:Lithographic Stone C
+119273600:Boat Fuel
+119275200:Bunch of Keys
+119276800:Cubic Device
+119278400:Blodied Sword
+119280000:Rusted Sword
+119281600:Hunter's Lodge Key
+119283200:Unicorn Horn
+119284800:Blue Dial
+119286400:Silver Token
+119288000:Gold Token
+119289600:Wooden Planks
+120801600:Pearl Pendant
+120803200:Dirty Pearl Pendant
+120809600:Brass Pocket Watch
+120812800:Elegant Headdress
+120814400:Antique Pipe
+120816000:Pearl Bangle
+120817600:Red Gemstone Ring
+120819200:Gold Bangle
+120820800:Illuminados Pendant
+120822400:Mirror with Pearls &amp; Rubies
+120824000:Golden Hourglass
+120825600:Elegant Perfume Bottle
+120827200:Elegant Chessboard
+120828800:Staff of Royalty
+120830400:Ruby
+120832000:Emerald
+120833600:Sapphire
+120835200:Yellow Diamond
+120838400:Alexandrite
+120840000:Gold Bar
+120841600:Gold Bar (L)
+120843200:Gold Ingot
+120844800:Depraved Idol
+120846400:Vintage Compass
+120848000:Justitia Statue
+120849600:Cyrstal Ore
+120851200:Ornate Beetle
+120852800:Méndez's False Eye
+120854400:Gold Monocle
+120856000:Lip Rouge
+120857600:Red Beryl
+120860800:Antique Camera
+120864000:Velvet Blue
+120865600:Scratched Emerald
+120867200:Exclusive Upgrade Ticket
+120960000:Exclusive Upgrade Ticket (Paid)
+122400000:Elegant Mask
+122401600:Flagon
+122403200:Butterfly Lamp
+122404800:Elegant Crown
+122406400:Golden Lynx
+122408000:Extravagant Clock
+122409600:Splendid Bangle
+122411200:Chalice of Atonement
+122412800:Ornate Necklace
+122416000:Elegant Bangle
+274835456:SG-09 R
+274837056:Punsiher
+274838656:Red9
+274840256:Blacktail
+274841856:Matilda
+274995456:W-870
+274997056:Riot Gun
+274998656:Striker
+275155456:TMP
+275157056:Chicago Sweeper
+275158656:LE 5
+275475456:SR M1903
+275477056:Stingray
+275478656:CQBR Assault Rifle
+275635456:Broken Butterfly
+275637056:Killer7
+275638656:Handcannon
+275795456:Bolt Thrower
+276275456:Rocket Launcher
+276277056:Rocket Launcher (Special)
+276278656:Infinite Rocket Launcher
+276435456:Combat Knife
+276437056:Fighting Knife
+276438656:Kitchen Knife
+276440256:Boot Knife
+276445056:Primal Knife
+277075456:Hand Grenade
+277077056:Heavy Grenade
+277078656:Flash Grenade
+277080256:Chicken Egg
+277081856:Brown Chicken Egg
+277083456:Gold Chicken Egg
+278035456:Sentinel Nine
+278037056:Skull Shaker
+278521856:EJF-338 Compound Bow
+</DropDownList>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>AttachCaseCurrentItemSelectedPointer</Address>
+          <Offsets>
+            <Offset>28</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>138</ID>
+          <Description>"Value"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>4 Bytes</VariableType>
+          <Address>AttachCaseCurrentItemSelectedPointer</Address>
+          <Offsets>
+            <Offset>34</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>139</ID>
+          <Description>"Weapon Manipulation"</Description>
+          <Options moHideChildren="1"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>140</ID>
+              <Description>"Condition"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>AttachCaseCurrentItemSelectedPointer</Address>
+              <Offsets>
+                <Offset>30</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>141</ID>
+              <Description>"Ammo Type"</Description>
+              <DropDownList DescriptionOnly="1" DisplayValueAsItem="1">112803200:Shotgun Ammo
+112804800:Rifle Ammo
+112801600:Magnum Ammo
+112800000:Handgun Ammo
+112808000:Bolts
+112806400:Submachine Gun Ammo
+4294967295:No Ammo
+674855176:Item
+</DropDownList>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>AttachCaseCurrentItemSelectedPointer</Address>
+              <Offsets>
+                <Offset>40</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>142</ID>
+              <Description>"Ammo Loaded"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>AttachCaseCurrentItemSelectedPointer</Address>
+              <Offsets>
+                <Offset>44</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>143</ID>
+              <Description>"+1 (Pistol)"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>AttachCaseCurrentItemSelectedPointer</Address>
+              <Offsets>
+                <Offset>48</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>144</ID>
+              <Description>"Edit Specs"</Description>
+              <Options moHideChildren="1"/>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>145</ID>
+                  <Description>"Power"</Description>
+                  <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00:Lv.1
+01 00 00 00 00 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 01 00 00 00:Lv.2
+02 00 00 00 00 00 00 00 02 00 00 00 02 00 00 00 02 00 00 00 02 00 00 00:Lv.3
+03 00 00 00 00 00 00 00 03 00 00 00 03 00 00 00 03 00 00 00 03 00 00 00:Lv.4
+04 00 00 00 00 00 00 00 04 00 00 00 04 00 00 00 04 00 00 00 04 00 00 00:Lv.MAX
+</DropDownList>
+                  <ShowAsHex>1</ShowAsHex>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Array of byte</VariableType>
+                  <ByteLength>24</ByteLength>
+                  <Address>AttachCaseCurrentItemSelectedPointer</Address>
+                  <Offsets>
+                    <Offset>10</Offset>
+                    <Offset>20</Offset>
+                    <Offset>40</Offset>
+                    <Offset>58</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>146</ID>
+                  <Description>"Ammo Capacity"</Description>
+                  <Options moHideChildren="1" moRecursiveSetValue="1"/>
+                  <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">0:Lv.1
+1:Lv.2
+2:Lv.3
+3:Lv.4
+4:Lv.MAX
+</DropDownList>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>AttachCaseCurrentItemSelectedPointer</Address>
+                  <Offsets>
+                    <Offset>10</Offset>
+                    <Offset>28</Offset>
+                    <Offset>40</Offset>
+                    <Offset>58</Offset>
+                  </Offsets>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>147</ID>
+                      <Description>"Ammo Capacity (Actual)"</Description>
+                      <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">0:Lv.1
+1:Lv.2
+2:Lv.3
+3:Lv.4
+4:Lv.MAX
+</DropDownList>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>AttachCaseCurrentItemSelectedPointer</Address>
+                      <Offsets>
+                        <Offset>4C</Offset>
+                        <Offset>28</Offset>
+                        <Offset>40</Offset>
+                        <Offset>58</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>148</ID>
+                  <Description>"Reload Speed (Display)"</Description>
+                  <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">0:Lv.1
+1:Lv.2
+2:Lv.3
+3:Lv.4
+4:Lv.MAX
+</DropDownList>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>AttachCaseCurrentItemSelectedPointer</Address>
+                  <Offsets>
+                    <Offset>10</Offset>
+                    <Offset>90</Offset>
+                    <Offset>40</Offset>
+                    <Offset>58</Offset>
+                  </Offsets>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>149</ID>
+                      <Description>"Reload Speed (Actual) [Magazine Loaded]"</Description>
+                      <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">0:Lv.1
+1:Lv.2
+2:Lv.3
+3:Lv.4
+4:Lv.MAX
+</DropDownList>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>AttachCaseCurrentItemSelectedPointer</Address>
+                      <Offsets>
+                        <Offset>2C</Offset>
+                        <Offset>90</Offset>
+                        <Offset>40</Offset>
+                        <Offset>58</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>150</ID>
+                      <Description>"Reload Speed (Actual) [Cartridge Insert]"</Description>
+                      <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">0:Lv.1
+1:Lv.2
+2:Lv.3
+3:Lv.4
+4:Lv.MAX
+</DropDownList>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>AttachCaseCurrentItemSelectedPointer</Address>
+                      <Offsets>
+                        <Offset>28</Offset>
+                        <Offset>90</Offset>
+                        <Offset>40</Offset>
+                        <Offset>58</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>151</ID>
+                  <Description>"Rate of Fire"</Description>
+                  <Options moHideChildren="1" moRecursiveSetValue="1"/>
+                  <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">0:Lv.1
+1:Lv.2
+2:Lv.3
+3:Lv.4
+4:Lv.MAX
+</DropDownList>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>AttachCaseCurrentItemSelectedPointer</Address>
+                  <Offsets>
+                    <Offset>10</Offset>
+                    <Offset>98</Offset>
+                    <Offset>40</Offset>
+                    <Offset>58</Offset>
+                  </Offsets>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>152</ID>
+                      <Description>"Rate of Fire"</Description>
+                      <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">0:Lv.1
+1:Lv.2
+2:Lv.3
+3:Lv.4
+4:Lv.MAX
+</DropDownList>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>AttachCaseCurrentItemSelectedPointer</Address>
+                      <Offsets>
+                        <Offset>34</Offset>
+                        <Offset>98</Offset>
+                        <Offset>40</Offset>
+                        <Offset>58</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>153</ID>
+                  <Description>"Exclusive"</Description>
+                  <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">0:Off
+1:On
+</DropDownList>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>AttachCaseCurrentItemSelectedPointer</Address>
+                  <Offsets>
+                    <Offset>10</Offset>
+                    <Offset>40</Offset>
+                    <Offset>28</Offset>
+                    <Offset>58</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>19</ID>
+      <Description>"Infinite Armor"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : re4.exe
+  Version: ‎Sunday, ‎March ‎19, ‎2023 11:28:19 PM
+  Date   : 2023-03-26
+  Author : gir489
+
+  Infinite Armor
+}
+
+[ENABLE]
+
+aobscanmodule(ReadStatForScreenRendering,re4.exe,8B 7E 30 85 FF) // should be unique
+aobscanmodule(ArmorReturnAddress,re4.exe,48 8B D8 BF 7E 00 00 00) // should be unique
+alloc(newmem,$1000,ReadStatForScreenRendering)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+cmp [rsp+58],ArmorReturnAddress
+jne @f
+mov [rsi+30],#1000
+@@:
+  mov edi,[rsi+30]
+  test edi,edi
+  jmp return
+
+ReadStatForScreenRendering:
+  jmp newmem
+return:
+registersymbol(ReadStatForScreenRendering)
+
+[DISABLE]
+
+ReadStatForScreenRendering:
+  db 8B 7E 30 85 FF
+
+unregistersymbol(ReadStatForScreenRendering)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: re4.exe+156BB20
+
+re4.exe+156BB06: E9 F5 44 A6 FE  - jmp 13FFD0000
+re4.exe+156BB0B: 90              - nop 
+re4.exe+156BB0C: 74 08           - je re4.exe+156BB16
+re4.exe+156BB0E: 8B 40 14        - mov eax,[rax+14]
+re4.exe+156BB11: 3B C8           - cmp ecx,eax
+re4.exe+156BB13: 0F 4F C8        - cmovg ecx,eax
+re4.exe+156BB16: 33 C0           - xor eax,eax
+re4.exe+156BB18: 85 C9           - test ecx,ecx
+re4.exe+156BB1A: 0F 48 C8        - cmovs ecx,eax
+re4.exe+156BB1D: 89 4B 34        - mov [rbx+34],ecx
+// ---------- INJECTING HERE ----------
+re4.exe+156BB20: 8B 7E 30        - mov edi,[rsi+30]
+// ---------- DONE INJECTING  ----------
+re4.exe+156BB23: 85 FF           - test edi,edi
+re4.exe+156BB25: 0F 48 F8        - cmovs edi,eax
+re4.exe+156BB28: 48 8B D3        - mov rdx,rbx
+re4.exe+156BB2B: 48 8B CD        - mov rcx,rbp
+re4.exe+156BB2E: E8 FD 5F 04 00  - call re4.exe+15B1B30
+re4.exe+156BB33: 3B F8           - cmp edi,eax
+re4.exe+156BB35: 7E 0D           - jle re4.exe+156BB44
+re4.exe+156BB37: 48 8B D3        - mov rdx,rbx
+re4.exe+156BB3A: 48 8B CD        - mov rcx,rbp
+re4.exe+156BB3D: E8 EE 5F 04 00  - call re4.exe+15B1B30
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>30</ID>
+      <Description>"No Spread + No Recoil"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>// Game Executable   : re4.exe
+// Author            : gir489
+// Executable Version: 1.0.5.0
+// MD5 Signature     : 942BA056C69684FF07EB85260499A0F7
+// EXE Compile Date  : April 17, 2023 12:32 PM
+// Sign Date         : ‎Monday, ‎April ‎17, ‎2023 1꞉20꞉23 PM
+// Script Date       : April 23, 2023 11:05 PM
+[ENABLE]
+
+aobscanmodule(SetSpreadBias,re4.exe,F3 0F 11 8A 60 01 00 00 F3 0F 10 41) // should be unique
+aobscanmodule(DoRecoil,re4.exe,0F 85 A1 03 00 00 49)
+registersymbol(SetSpreadBias)
+
+SetSpreadBias+3:
+  db A2 //xmm4
+
+DoRecoil:
+  db 90 E9
+
+[DISABLE]
+unregistersymbol(SetSpreadBias)
+
+SetSpreadBias+3:
+  db 8A //xmm1
+
+DoRecoil:
+  db 0F 85
+
+{
+// ORIGINAL CODE - INJECTION POINT: SetSpreadBias
+
+re4.exe+2F90E55: 0F 5A C0                       - cvtps2pd xmm0,xmm0
+re4.exe+2F90E58: 66 0F 5A E1                    - cvtpd2ps xmm4,xmm1
+re4.exe+2F90E5C: F3 0F 10 8A A8 01 00 00        - movss xmm1,[rdx+000001A8]
+re4.exe+2F90E64: 0F 5A C9                       - cvtps2pd xmm1,xmm1
+re4.exe+2F90E67: F3 0F 11 64 24 20              - movss [rsp+20],xmm4
+re4.exe+2F90E6D: F2 0F 58 C8                    - addsd xmm1,xmm0
+re4.exe+2F90E71: 66 0F 5A D9                    - cvtpd2ps xmm3,xmm1
+re4.exe+2F90E75: 0F 2F D3                       - comiss xmm2,xmm3
+re4.exe+2F90E78: F3 0F 11 5C 24 18              - movss [rsp+18],xmm3
+re4.exe+2F90E7E: 76 07                          - jna re4.exe+2F90E87
+re4.exe+2F90E80: 48 8D 44 24 10                 - lea rax,[rsp+10]
+re4.exe+2F90E85: EB 11                          - jmp re4.exe+2F90E98
+re4.exe+2F90E87: 0F 2F E3                       - comiss xmm4,xmm3
+re4.exe+2F90E8A: 48 8D 44 24 18                 - lea rax,[rsp+18]
+re4.exe+2F90E8F: 4C 8D 44 24 20                 - lea r8,[rsp+20]
+re4.exe+2F90E94: 49 0F 46 C0                    - cmovbe rax,r8
+re4.exe+2F90E98: F3 0F 10 00                    - movss xmm0,[rax]
+re4.exe+2F90E9C: 0F 5A C0                       - cvtps2pd xmm0,xmm0
+re4.exe+2F90E9F: 66 0F 5A C8                    - cvtpd2ps xmm1,xmm0
+re4.exe+2F90EA3: C7 82 A8 01 00 00 00 00 00 00  - mov [rdx+000001A8],00000000
+// ---------- INJECTING HERE ----------
+re4.exe+2F90EAD: F3 0F 11 8A 60 01 00 00        - movss [rdx+00000160],xmm1
+// ---------- DONE INJECTING  ----------
+re4.exe+2F90EB5: F3 0F 10 41 14                 - movss xmm0,[rcx+14]
+re4.exe+2F90EBA: 0F 5A D9                       - cvtps2pd xmm3,xmm1
+re4.exe+2F90EBD: F3 0F 10 49 10                 - movss xmm1,[rcx+10]
+re4.exe+2F90EC2: 0F 5A C9                       - cvtps2pd xmm1,xmm1
+re4.exe+2F90EC5: 0F 5A C0                       - cvtps2pd xmm0,xmm0
+re4.exe+2F90EC8: F2 0F 58 C8                    - addsd xmm1,xmm0
+re4.exe+2F90ECC: 66 0F 5A C9                    - cvtpd2ps xmm1,xmm1
+re4.exe+2F90ED0: 0F 5A D1                       - cvtps2pd xmm2,xmm1
+re4.exe+2F90ED3: 66 0F 2F D3                    - comisd xmm2,xmm3
+re4.exe+2F90ED7: 77 07                          - ja re4.exe+2F90EE0
+re4.exe+2F90ED9: C6 82 64 01 00 00 01           - mov byte ptr [rdx+00000164],01
+re4.exe+2F90EE0: F3 0F 10 8A 60 01 00 00        - movss xmm1,[rdx+00000160]
+re4.exe+2F90EE8: F3 0F 10 41 24                 - movss xmm0,[rcx+24]
+re4.exe+2F90EED: 0F 5A C9                       - cvtps2pd xmm1,xmm1
+re4.exe+2F90EF0: 0F 5A C0                       - cvtps2pd xmm0,xmm0
+re4.exe+2F90EF3: 66 0F 2F C8                    - comisd xmm1,xmm0
+re4.exe+2F90EF7: 73 07                          - jae re4.exe+2F90F00
+re4.exe+2F90EF9: C6 82 64 01 00 00 00           - mov byte ptr [rdx+00000164],00
+re4.exe+2F90F00: C3                             - ret
+re4.exe+2F90F01: CC                             - int 3
+}
+
+{
+// ORIGINAL CODE - INJECTION POINT: DoRecoil
+
+re4.exe+1DDFB6A: 48 8B CF                 - mov rcx,rdi
+re4.exe+1DDFB6D: 4C 89 74 24 20           - mov [rsp+20],r14
+re4.exe+1DDFB72: F3 0F 10 40 60           - movss xmm0,[rax+60]
+re4.exe+1DDFB77: F3 0F 10 48 64           - movss xmm1,[rax+64]
+re4.exe+1DDFB7C: F3 0F 10 50 68           - movss xmm2,[rax+68]
+re4.exe+1DDFB81: F3 0F 11 45 E7           - movss [rbp-19],xmm0
+re4.exe+1DDFB86: F3 0F 11 4D EB           - movss [rbp-15],xmm1
+re4.exe+1DDFB8B: F3 0F 11 55 EF           - movss [rbp-11],xmm2
+re4.exe+1DDFB90: F3 0F 10 80 20 01 00 00  - movss xmm0,[rax+00000120]
+re4.exe+1DDFB98: F3 0F 10 88 24 01 00 00  - movss xmm1,[rax+00000124]
+re4.exe+1DDFBA0: F3 0F 10 90 28 01 00 00  - movss xmm2,[rax+00000128]
+re4.exe+1DDFBA8: F3 0F 11 45 D7           - movss [rbp-29],xmm0
+re4.exe+1DDFBAD: F3 0F 11 4D DB           - movss [rbp-25],xmm1
+re4.exe+1DDFBB2: F3 0F 11 55 DF           - movss [rbp-21],xmm2
+re4.exe+1DDFBB7: E8 44 57 50 00           - call re4.exe+22E5300
+re4.exe+1DDFBBC: 49 8B 97 40 01 00 00     - mov rdx,[r15+00000140]
+re4.exe+1DDFBC3: 45 33 C0                 - xor r8d,r8d
+re4.exe+1DDFBC6: 48 8B CF                 - mov rcx,rdi
+re4.exe+1DDFBC9: E8 B2 D1 5E 01           - call re4.exe+33CCD80
+re4.exe+1DDFBCE: 84 C0                    - test al,al
+// ---------- INJECTING HERE ----------
+re4.exe+1DDFBD0: 0F 85 A1 03 00 00        - jne re4.exe+1DDFF77
+// ---------- DONE INJECTING  ----------
+re4.exe+1DDFBD6: 49 8B 87 40 01 00 00     - mov rax,[r15+00000140]
+re4.exe+1DDFBDD: 48 8B 88 88 01 00 00     - mov rcx,[rax+00000188]
+re4.exe+1DDFBE4: 48 85 C9                 - test rcx,rcx
+re4.exe+1DDFBE7: 74 0B                    - je re4.exe+1DDFBF4
+re4.exe+1DDFBE9: 48 83 79 10 00           - cmp qword ptr [rcx+10],00
+re4.exe+1DDFBEE: 74 04                    - je re4.exe+1DDFBF4
+re4.exe+1DDFBF0: 32 C0                    - xor al,al
+re4.exe+1DDFBF2: EB 02                    - jmp re4.exe+1DDFBF6
+re4.exe+1DDFBF4: B0 01                    - mov al,01
+re4.exe+1DDFBF6: 0F B6 C0                 - movzx eax,al
+re4.exe+1DDFBF9: 85 C0                    - test eax,eax
+re4.exe+1DDFBFB: 0F 85 76 03 00 00        - jne re4.exe+1DDFF77
+re4.exe+1DDFC01: 4C 89 A4 24 A8 00 00 00  - mov [rsp+000000A8],r12
+re4.exe+1DDFC09: 4C 89 AC 24 A0 00 00 00  - mov [rsp+000000A0],r13
+re4.exe+1DDFC11: 4D 85 F6                 - test r14,r14
+re4.exe+1DDFC14: 74 07                    - je re4.exe+1DDFC1D
+re4.exe+1DDFC16: 49 83 7E 10 00           - cmp qword ptr [r14+10],00
+re4.exe+1DDFC1B: 75 02                    - jne re4.exe+1DDFC1F
+re4.exe+1DDFC1D: B0 01                    - mov al,01
+re4.exe+1DDFC1F: 0F B6 C0                 - movzx eax,al
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>26</ID>
+      <Description>"Always first save"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : re4.exe
+  Version: ‎Sunday, ‎March ‎19, ‎2023 11:28:19 PM
+  Date   : 2023-03-26
+  Author : gir489
+
+  Always be first save.
+}
+
+[ENABLE]
+
+aobscanmodule(GetSaveNum,re4.exe,01 7B 4C 48 8D 44 24 60) // should be unique
+alloc(newmem,$1000,GetSaveNum)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  mov [rbx+4C],#1
+  lea rax,[rsp+60]
+  jmp return
+
+GetSaveNum:
+  jmp newmem
+  nop 3
+return:
+registersymbol(GetSaveNum)
+
+[DISABLE]
+
+GetSaveNum:
+  db 01 7B 4C 48 8D 44 24 60
+
+unregistersymbol(GetSaveNum)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: re4.exe+298813B
+
+re4.exe+298811A: 44 8B C6           - mov r8d,esi
+re4.exe+298811D: C6 44 24 20 00     - mov byte ptr [rsp+20],00
+re4.exe+2988122: 48 8B CD           - mov rcx,rbp
+re4.exe+2988125: 84 C0              - test al,al
+re4.exe+2988127: 75 05              - jne re4.exe+298812E
+re4.exe+2988129: 44 8B CF           - mov r9d,edi
+re4.exe+298812C: EB 08              - jmp re4.exe+2988136
+re4.exe+298812E: 44 8B 4C 24 60     - mov r9d,[rsp+60]
+re4.exe+2988133: 44 03 CF           - add r9d,edi
+re4.exe+2988136: E8 D5 B6 42 00     - call re4.exe+2DB3810
+// ---------- INJECTING HERE ----------
+re4.exe+298813B: 01 7B 4C           - add [rbx+4C],edi
+// ---------- DONE INJECTING  ----------
+re4.exe+298813E: 48 8D 44 24 60     - lea rax,[rsp+60]
+re4.exe+2988143: 8B 53 4C           - mov edx,[rbx+4C]
+re4.exe+2988146: 4C 8D 44 24 68     - lea r8,[rsp+68]
+re4.exe+298814B: 8B 0D B3 69 8B 0A  - mov ecx,[re4.exe+D23EB04]
+re4.exe+2988151: 3B D1              - cmp edx,ecx
+re4.exe+2988153: 89 4C 24 68        - mov [rsp+68],ecx
+re4.exe+2988157: 49 0F 4D C0        - cmovge rax,r8
+re4.exe+298815B: 89 54 24 60        - mov [rsp+60],edx
+re4.exe+298815F: 8B 00              - mov eax,[rax]
+re4.exe+2988161: 89 43 4C           - mov [rbx+4C],eax
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>124</ID>
+      <Description>"Easy Craft"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : re4.exe
+  Version: ‎Sunday, ‎March ‎19, ‎2023 11:28:19 PM
+  Date   : 2023-04-04
+  Author : gir489
+
+  Easy Craft
+}
+
+[ENABLE]
+aobscanmodule(GetNumberOfCraftComponentsRequired,re4.exe,8B 5A 14 33 FF) // should be unique
+
+GetNumberOfCraftComponentsRequired:
+mov ebx, r9d
+
+[DISABLE]
+
+GetNumberOfCraftComponentsRequired:
+  db 8B 5A 14
+
+{
+// ORIGINAL CODE - INJECTION POINT: re4.exe+F1AD2A
+
+re4.exe+F1AD19: CC                    - int 3 
+re4.exe+F1AD1A: CC                    - int 3 
+re4.exe+F1AD1B: CC                    - int 3 
+re4.exe+F1AD1C: CC                    - int 3 
+re4.exe+F1AD1D: CC                    - int 3 
+re4.exe+F1AD1E: CC                    - int 3 
+re4.exe+F1AD1F: CC                    - int 3 
+re4.exe+F1AD20: 48 89 5C 24 08        - mov [rsp+08],rbx
+re4.exe+F1AD25: 57                    - push rdi
+re4.exe+F1AD26: 48 83 EC 20           - sub rsp,20
+// ---------- INJECTING HERE ----------
+re4.exe+F1AD2A: 8B 5A 14              - mov ebx,[rdx+14]
+// ---------- DONE INJECTING  ----------
+re4.exe+F1AD2D: 33 FF                 - xor edi,edi
+re4.exe+F1AD2F: 81 7A 10 00 6F 02 07  - cmp [rdx+10],07026F00
+re4.exe+F1AD36: 8B C7                 - mov eax,edi
+re4.exe+F1AD38: 75 16                 - jne re4.exe+F1AD50
+re4.exe+F1AD3A: 48 8B 15 4F 4A 30 0C  - mov rdx,[re4.exe+D21F790]
+re4.exe+F1AD41: 41 B9 40 0D 03 00     - mov r9d,00030D40
+re4.exe+F1AD47: E8 14 E9 99 00        - call re4.exe+18B9660
+re4.exe+F1AD4C: F3 0F 2C C0           - cvttss2si eax,xmm0
+re4.exe+F1AD50: 03 C3                 - add eax,ebx
+re4.exe+F1AD52: 0F 48 C7              - cmovs eax,edi
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>125</ID>
+      <Description>"Lake Monster Dies in One Hit"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : re4.exe
+  Version: ‎Sunday, ‎March ‎19, ‎2023 11:28:19 PM
+  Date   : 2023-04-04
+  Author : gir489
+
+  Lake Monster Dies in One Hit
+}
+[ENABLE]
+{$lua}
+if (messageDialog("This script should only be used during the fight. If used elsewhere, it could corrupt your game. Are you sure you want to enable it now? Disable it after the fight is over.",mtConfirmation, mbYes, mbNo) == mrNo) then
+   abort()
+end
+{$asm}
+aobscanmodule(ReadMonstersHealth,re4.exe,83 78 14 00 0F 9E C0 84 C0 0F 85 E4) // should be unique
+alloc(newmem,$1000,ReadMonstersHealth)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  mov [rax+14],#10
+  cmp dword ptr [rax+14],00
+  setle al
+  jmp return
+
+ReadMonstersHealth:
+  jmp newmem
+  nop 2
+return:
+registersymbol(ReadMonstersHealth)
+[DISABLE]
+
+ReadMonstersHealth:
+  db 83 78 14 00 0F 9E C0
+
+unregistersymbol(ReadMonstersHealth)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: re4.exe+1CB1E8C
+
+re4.exe+1CB1E66: 45 33 C0              - xor r8d,r8d
+re4.exe+1CB1E69: 48 8B D0              - mov rdx,rax
+re4.exe+1CB1E6C: 48 8B CB              - mov rcx,rbx
+re4.exe+1CB1E6F: 48 8B F0              - mov rsi,rax
+re4.exe+1CB1E72: E8 F9 AE 70 01        - call re4.exe+33BCD70
+re4.exe+1CB1E77: 84 C0                 - test al,al
+re4.exe+1CB1E79: 0F 85 00 02 00 00     - jne re4.exe+1CB207F
+re4.exe+1CB1E7F: 48 8B 86 48 01 00 00  - mov rax,[rsi+00000148]
+re4.exe+1CB1E86: 80 78 18 00           - cmp byte ptr [rax+18],00
+re4.exe+1CB1E8A: 75 0F                 - jne re4.exe+1CB1E9B
+// ---------- INJECTING HERE ----------
+re4.exe+1CB1E8C: 83 78 14 00           - cmp dword ptr [rax+14],00
+// ---------- DONE INJECTING  ----------
+re4.exe+1CB1E90: 0F 9E C0              - setle al
+re4.exe+1CB1E93: 84 C0                 - test al,al
+re4.exe+1CB1E95: 0F 85 E4 01 00 00     - jne re4.exe+1CB207F
+re4.exe+1CB1E9B: 81 7E 38 48 0D 03 00  - cmp [rsi+38],00030D48
+re4.exe+1CB1EA2: 74 0F                 - je re4.exe+1CB1EB3
+re4.exe+1CB1EA4: 83 BE 80 02 00 00 02  - cmp dword ptr [rsi+00000280],02
+re4.exe+1CB1EAB: 0F 85 CE 01 00 00     - jne re4.exe+1CB207F
+re4.exe+1CB1EB1: EB 0D                 - jmp re4.exe+1CB1EC0
+re4.exe+1CB1EB3: 83 BE 80 02 00 00 00  - cmp dword ptr [rsi+00000280],00
+re4.exe+1CB1EBA: 0F 84 BF 01 00 00     - je re4.exe+1CB207F
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>133</ID>
+      <Description>"Unlocks and Ranking"</Description>
+      <Options moHideChildren="1"/>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>20</ID>
+          <Description>"Unlock All Extra Content"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : re4.exe
+  Version: ‎Friday, ‎March ‎24, ‎2023 3:19:02 AM
+  Date   : 2023-03-26
+  Author : gir489
+
+  Unlock All Extra Content
+}
+
+[ENABLE]
+aobscanmodule(CheckIsUnlockableUnlocked,re4.exe,75 25 44 8B C7 48 8B D6 48 8B CB E8 ? ? ? ? 80 78 14 00 ) // Generated by IDA SigMaker 7.0
+registersymbol(CheckIsUnlockableUnlocked)
+
+CheckIsUnlockableUnlocked:
+db EB
+
+
+[DISABLE]
+
+CheckIsUnlockableUnlocked:
+db 75
+
+unregistersymbol(CheckIsUnlockableUnlocked)
+
+{
+// ORIGINAL CODE - INJECTION POINT: re4.exe+14393B5
+
+re4.exe+143938C: 41 B8 D1 59 9A A1     - mov r8d,A19A59D1
+re4.exe+1439392: 48 8B D9              - mov rbx,rcx
+re4.exe+1439395: E8 06 63 3E 01        - call re4.exe+281F6A0
+re4.exe+143939A: 84 C0                 - test al,al
+re4.exe+143939C: 75 3E                 - jne re4.exe+14393DC
+re4.exe+143939E: 48 8B 15 DB A8 DF 0B  - mov rdx,[re4.exe+D233C80]
+re4.exe+14393A5: 41 B8 D1 59 9A A1     - mov r8d,A19A59D1
+re4.exe+14393AB: 48 8B CB              - mov rcx,rbx
+re4.exe+14393AE: E8 ED 62 3E 01        - call re4.exe+281F6A0
+re4.exe+14393B3: 84 C0                 - test al,al
+// ---------- INJECTING HERE ----------
+re4.exe+14393B5: 75 25                 - jne re4.exe+14393DC
+// ---------- DONE INJECTING  ----------
+re4.exe+14393B7: 44 8B C7              - mov r8d,edi
+re4.exe+14393BA: 48 8B D6              - mov rdx,rsi
+re4.exe+14393BD: 48 8B CB              - mov rcx,rbx
+re4.exe+14393C0: E8 7B 5C FE FF        - call re4.exe+141F040
+re4.exe+14393C5: 80 78 14 00           - cmp byte ptr [rax+14],00
+re4.exe+14393C9: 0F 95 C0              - setne al
+re4.exe+14393CC: 48 8B 5C 24 30        - mov rbx,[rsp+30]
+re4.exe+14393D1: 48 8B 74 24 38        - mov rsi,[rsp+38]
+re4.exe+14393D6: 48 83 C4 20           - add rsp,20
+re4.exe+14393DA: 5F                    - pop rdi
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>22</ID>
+          <Description>"Infinite Completion Points"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : re4.exe
+  Version: ‎Sunday, ‎March ‎19, ‎2023 11:28:19 PM
+  Date   : 2023-03-26
+  Author : gir489
+
+  Sets Completion Points to 999,999.
+}
+
+[ENABLE]
+
+aobscanmodule(ReadCompletionPoints,re4.exe,8B 9B A0 00 00 00 80) // should be unique
+alloc(newmem,$1000,ReadCompletionPoints)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  mov [rbx+000000A0],#999999
+  mov ebx,[rbx+000000A0]
+  jmp return
+
+ReadCompletionPoints:
+  jmp newmem
+  nop
+return:
+registersymbol(ReadCompletionPoints)
+
+[DISABLE]
+
+ReadCompletionPoints:
+  db 8B 9B A0 00 00 00
+
+unregistersymbol(ReadCompletionPoints)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: re4.exe+141F00B
+
+re4.exe+141EFE5: 48 89 74 24 18     - mov [rsp+18],rsi
+re4.exe+141EFEA: 57                 - push rdi
+re4.exe+141EFEB: 48 83 EC 20        - sub rsp,20
+re4.exe+141EFEF: 48 8B 72 78        - mov rsi,[rdx+78]
+re4.exe+141EFF3: 4C 8D 44 24 38     - lea r8,[rsp+38]
+re4.exe+141EFF8: 48 8B DA           - mov rbx,rdx
+re4.exe+141EFFB: C6 44 24 38 00     - mov byte ptr [rsp+38],00
+re4.exe+141F000: 48 8B D6           - mov rdx,rsi
+re4.exe+141F003: 48 8B F9           - mov rdi,rcx
+re4.exe+141F006: E8 D5 CF 21 02     - call re4.exe+363BFE0
+// ---------- INJECTING HERE ----------
+re4.exe+141F00B: 8B 9B A0 00 00 00  - mov ebx,[rbx+000000A0]
+// ---------- DONE INJECTING  ----------
+re4.exe+141F011: 80 7C 24 38 00     - cmp byte ptr [rsp+38],00
+re4.exe+141F016: 74 0B              - je re4.exe+141F023
+re4.exe+141F018: 48 8B D6           - mov rdx,rsi
+re4.exe+141F01B: 48 8B CF           - mov rcx,rdi
+re4.exe+141F01E: E8 ED CF 21 02     - call re4.exe+363C010
+re4.exe+141F023: 8B C3              - mov eax,ebx
+re4.exe+141F025: 48 8B 5C 24 30     - mov rbx,[rsp+30]
+re4.exe+141F02A: 48 8B 74 24 40     - mov rsi,[rsp+40]
+re4.exe+141F02F: 48 83 C4 20        - add rsp,20
+re4.exe+141F033: 5F                 - pop rdi
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>28</ID>
+          <Description>"Always Get S+"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : re4.exe
+  Version: ‎Sunday, ‎March ‎19, ‎2023 11:28:19 PM
+  Date   : 2023-03-27
+  Author : gir489
+
+  Always Get S+
+}
+
+[ENABLE]
+
+aobscanmodule(GetTotalPlayTime,re4.exe,48 0F 42 4C 24 78) // should be unique
+aobscanmodule(TimesSaved,re4.exe,8B 50 4C 3B D1) // should be unique
+aobscanmodule(TimesPlayed,re4.exe,8B 48 18 FF C1 3B) // should be unique
+registersymbol(TimesSaved)
+registersymbol(TimesPlayed)
+alloc(GetTotalPlayTimeNewMem,512,re4.exe)
+alloc(GetTimesSavedNewMem,512,re4.exe)
+alloc(GetTimesPlayedNewMem,512,re4.exe)
+alloc(NewResultTime, 8, re4.exe)
+registersymbol(NewResultTime)
+registersymbol(GetTotalPlayTime)
+label(GetTotalPlayTimeNewMemReturn)
+label(TimesSavedReturn)
+label(TimesPlayedReturn)
+
+GetTotalPlayTimeNewMem:
+  mov rcx,[NewResultTime]
+  mov [rsp+78], rcx
+  jmp GetTotalPlayTimeNewMemReturn
+
+GetTotalPlayTime:
+  jmp GetTotalPlayTimeNewMem
+  nop
+GetTotalPlayTimeNewMemReturn:
+
+NewResultTime:
+dq 3A6013980 //4 hours 20 minutes and 69 seconds converted to microseconds represented in hexadecimal.
+             //To calculate your own time, use wolframalpha.com, type in something like 1 hour 30 minutes to microsceonds. It will give you a result like 5.4×10^9 μs (microseconds). This needs to be expanded. Then type in expand 5.4×10^9. Click on the scientific notiation then it will give you the expanded result. Either convert it to hex and replace the inital value here, or set it in decimal format under Result Time.
+
+GetTimesSavedNewMem:
+  xor edx, edx
+  mov [rax+4C], edx
+  cmp edx,ecx
+  jmp TimesSavedReturn
+
+TimesSaved: //Zero out times saved.
+  jmp GetTimesSavedNewMem
+TimesSavedReturn:
+
+GetTimesPlayedNewMem:
+  xor rcx, rcx
+  mov [rax+18], rcx
+  inc ecx
+  jmp TimesPlayedReturn
+
+TimesPlayed: //Zero out times played.
+  jmp GetTimesPlayedNewMem
+TimesPlayedReturn:
+
+[DISABLE]
+
+GetTotalPlayTime:
+  db 48 0F 42 4C 24 78
+
+TimesSaved:
+  db 8B 50 4C 3B D1
+
+TimesPlayed:
+  db 8B 48 18 FF C1
+
+unregistersymbol(GetTotalPlayTime)
+unregistersymbol(TimesSaved)
+unregistersymbol(TimesPlayed)
+unregistersymbol(NewResultTime)
+dealloc(GetTotalPlayTimeNewMem)
+dealloc(NewResultTime)
+dealloc(GetTimesSavedNewMem)
+dealloc(GetTimesPlayedNewMem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: re4.exe+1086064
+
+re4.exe+108603A: 0F 11 44 24 70        - movups [rsp+70],xmm0
+re4.exe+108603F: 84 C0                 - test al,al
+re4.exe+1086041: 75 11                 - jne re4.exe+1086054
+re4.exe+1086043: 49 8B 4F 28           - mov rcx,[r15+28]
+re4.exe+1086047: 48 8B 05 12 BE 1A 0C  - mov rax,[re4.exe+D231E60]
+re4.exe+108604E: 48 89 41 18           - mov [rcx+18],rax
+re4.exe+1086052: EB 1A                 - jmp re4.exe+108606E
+re4.exe+1086054: 49 8B 57 28           - mov rdx,[r15+28]
+re4.exe+1086058: 48 8B 0D 01 BE 1A 0C  - mov rcx,[re4.exe+D231E60]
+re4.exe+108605F: 48 39 4C 24 78        - cmp [rsp+78],rcx
+// ---------- INJECTING HERE ----------
+re4.exe+1086064: 48 0F 42 4C 24 78     - cmovb rcx,[rsp+78]
+// ---------- DONE INJECTING  ----------
+re4.exe+108606A: 48 89 4A 18           - mov [rdx+18],rcx
+re4.exe+108606E: 48 8B 05 D3 DF 1A 0C  - mov rax,[re4.exe+D234048]
+re4.exe+1086075: 4D 8B 4F 30           - mov r9,[r15+30]
+re4.exe+1086079: 48 8B 48 18           - mov rcx,[rax+18]
+re4.exe+108607D: 48 8B 41 18           - mov rax,[rcx+18]
+re4.exe+1086081: 49 89 47 50           - mov [r15+50],rax
+re4.exe+1086085: 48 8B 05 24 08 1B 0C  - mov rax,[re4.exe+D2368B0]
+re4.exe+108608C: 8B 0D 6E 8A 1B 0C     - mov ecx,[re4.exe+D23EB00]
+re4.exe+1086092: 44 8B 05 6B 8A 1B 0C  - mov r8d,[re4.exe+D23EB04]
+re4.exe+1086099: 8B 50 4C              - mov edx,[rax+4C]
+}
+
+{
+// ORIGINAL CODE - INJECTION POINT: TimesSaved
+
+re4.exe+1086064: 48 0F 42 4C 24 78     - cmovb rcx,[rsp+78]
+re4.exe+108606A: 48 89 4A 18           - mov [rdx+18],rcx
+re4.exe+108606E: 48 8B 05 D3 DF 1A 0C  - mov rax,[re4.exe+D234048]
+re4.exe+1086075: 4D 8B 4F 30           - mov r9,[r15+30]
+re4.exe+1086079: 48 8B 48 18           - mov rcx,[rax+18]
+re4.exe+108607D: 48 8B 41 18           - mov rax,[rcx+18]
+re4.exe+1086081: 49 89 47 50           - mov [r15+50],rax
+re4.exe+1086085: 48 8B 05 24 08 1B 0C  - mov rax,[re4.exe+D2368B0]
+re4.exe+108608C: 8B 0D 6E 8A 1B 0C     - mov ecx,[re4.exe+D23EB00]
+re4.exe+1086092: 44 8B 05 6B 8A 1B 0C  - mov r8d,[re4.exe+D23EB04]
+// ---------- INJECTING HERE ----------
+TimesSaved: 8B 50 4C              - mov edx,[rax+4C]
+// ---------- DONE INJECTING  ----------
+re4.exe+108609C: 3B D1                 - cmp edx,ecx
+re4.exe+108609E: 7C 09                 - jl re4.exe+10860A9
+re4.exe+10860A0: 41 3B D0              - cmp edx,r8d
+re4.exe+10860A3: 41 8B C8              - mov ecx,r8d
+re4.exe+10860A6: 0F 4C CA              - cmovl ecx,edx
+re4.exe+10860A9: 41 89 49 14           - mov [r9+14],ecx
+re4.exe+10860AD: 48 8B 05 FC 07 1B 0C  - mov rax,[re4.exe+D2368B0]
+re4.exe+10860B4: 8B 15 E6 C4 18 0C     - mov edx,[re4.exe+D2125A0]
+re4.exe+10860BA: 4D 8B 4F 38           - mov r9,[r15+38]
+re4.exe+10860BE: 44 8B 05 DF C4 18 0C  - mov r8d,[re4.exe+D2125A4]
+}
+
+{
+// ORIGINAL CODE - INJECTION POINT: TimesPlayed
+
+re4.exe+10860A0: 41 3B D0              - cmp edx,r8d
+re4.exe+10860A3: 41 8B C8              - mov ecx,r8d
+re4.exe+10860A6: 0F 4C CA              - cmovl ecx,edx
+re4.exe+10860A9: 41 89 49 14           - mov [r9+14],ecx
+re4.exe+10860AD: 48 8B 05 FC 07 1B 0C  - mov rax,[re4.exe+D2368B0]
+re4.exe+10860B4: 8B 15 E6 C4 18 0C     - mov edx,[re4.exe+D2125A0]
+re4.exe+10860BA: 4D 8B 4F 38           - mov r9,[r15+38]
+re4.exe+10860BE: 44 8B 05 DF C4 18 0C  - mov r8d,[re4.exe+D2125A4]
+re4.exe+10860C5: 48 8B 88 D0 00 00 00  - mov rcx,[rax+000000D0]
+re4.exe+10860CC: 48 8B 41 10           - mov rax,[rcx+10]
+// ---------- INJECTING HERE ----------
+TimesPlayed: 8B 48 18              - mov ecx,[rax+18]
+// ---------- DONE INJECTING  ----------
+re4.exe+10860D3: FF C1                 - inc ecx
+re4.exe+10860D5: 3B CA                 - cmp ecx,edx
+re4.exe+10860D7: 7C 09                 - jl re4.exe+10860E2
+re4.exe+10860D9: 41 3B C8              - cmp ecx,r8d
+re4.exe+10860DC: 41 8B D0              - mov edx,r8d
+re4.exe+10860DF: 0F 4C D1              - cmovl edx,ecx
+re4.exe+10860E2: 41 89 51 14           - mov [r9+14],edx
+re4.exe+10860E6: 49 8B CE              - mov rcx,r14
+re4.exe+10860E9: 48 8B 15 70 03 0C 0C  - mov rdx,[re4.exe+D146460]
+re4.exe+10860F0: 41 B9 01 00 00 00     - mov r9d,00000001
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>127</ID>
+              <Description>"Result Time"</Description>
+              <DropDownList DescriptionOnly="1" DisplayValueAsItem="1">15670000000: 4 hours 20 minutes 69 seconds
+10750000000: 2 hours 59 minutes 10 seconds
+</DropDownList>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>8 Bytes</VariableType>
+              <Address>NewResultTime</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>126</ID>
+          <Description>"Unlock All Challenges"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>// Game Executable   : re4.exe
+// Author            : gir489
+// Executable Version: 1.0.5.0
+// MD5 Signature     : 942BA056C69684FF07EB85260499A0F7
+// EXE Compile Date  : April 17, 2023 12:32 PM
+// Sign Date         : ‎Monday, ‎April ‎17, ‎2023 1꞉20꞉23 PM
+// Script Date       : April 23, 2023 10:40 PM
+[ENABLE]
+aobscanmodule(IsChallengeUnlocked,re4.exe,48 8B 01 39 70 10 74 0E 48 FF C2 48 83 C1 08 49 3B D0 7C EC EB 08 40 38 68 14 ) // Generated by IDASigmaker 7.0
+aobscanmodule(UnlockChallenge,re4.exe,40 56 57 41 56 48 83 EC ? 45 8B F0 48 8B F2) // should be unique
+aobscanmodule(UnlockChallengeSetReturnValue,re4.exe,40 84 ED 48 8B 6C 24 ? 0F 95 C0 48 83 C4 40 41 5E 5F 5E C3 ) // should be unique
+assert(IsChallengeUnlocked-60, 48 89 5C 24 08)
+registersymbol(IsChallengeUnlocked)
+registersymbol(UnlockChallenge)
+registersymbol(UnlockChallengeSetReturnValue)
+
+IsChallengeUnlocked-60:
+jmp UnlockChallenge
+
+UnlockChallengeSetReturnValue+08:
+mov al,1
+nop
+
+[DISABLE]
+unregistersymbol(IsChallengeUnlocked)
+unregistersymbol(UnlockChallenge)
+unregistersymbol(UnlockChallengeSetReturnValue)
+dealloc(newmem)
+
+IsChallengeUnlocked-60:
+  db 48 89 5C 24 08
+
+UnlockChallengeSetReturnValue+08:
+  db 0F 95 C0
+
+{
+// ORIGINAL CODE - INJECTION POINT: re4.exe+1444A20
+
+re4.exe+1444A07: 48 83 C4 20     - add rsp,20
+re4.exe+1444A0B: 5F              - pop rdi
+re4.exe+1444A0C: C3              - ret
+re4.exe+1444A0D: 48 8B 5C 24 30  - mov rbx,[rsp+30]
+re4.exe+1444A12: 32 C0           - xor al,al
+re4.exe+1444A14: 48 8B 74 24 38  - mov rsi,[rsp+38]
+re4.exe+1444A19: 48 83 C4 20     - add rsp,20
+re4.exe+1444A1D: 5F              - pop rdi
+re4.exe+1444A1E: C3              - ret
+re4.exe+1444A1F: CC              - int 3
+// ---------- INJECTING HERE ----------
+re4.exe+1444A20: 48 89 5C 24 08  - mov [rsp+08],rbx
+// ---------- DONE INJECTING  ----------
+re4.exe+1444A25: 48 89 6C 24 10  - mov [rsp+10],rbp
+re4.exe+1444A2A: 48 89 74 24 18  - mov [rsp+18],rsi
+re4.exe+1444A2F: 57              - push rdi
+re4.exe+1444A30: 41 56           - push r14
+re4.exe+1444A32: 41 57           - push r15
+re4.exe+1444A34: 48 83 EC 20     - sub rsp,20
+re4.exe+1444A38: 48 8B 5A 68     - mov rbx,[rdx+68]
+re4.exe+1444A3C: 41 8B F0        - mov esi,r8d
+re4.exe+1444A3F: 48 8B FA        - mov rdi,rdx
+re4.exe+1444A42: 45 33 C0        - xor r8d,r8d
+}
+
+{
+// ORIGINAL CODE - INJECTION POINT: re4.exe+1497660
+
+re4.exe+1497656: CC                 - int 3
+re4.exe+1497657: CC                 - int 3
+re4.exe+1497658: CC                 - int 3
+re4.exe+1497659: CC                 - int 3
+re4.exe+149765A: CC                 - int 3
+re4.exe+149765B: CC                 - int 3
+re4.exe+149765C: CC                 - int 3
+re4.exe+149765D: CC                 - int 3
+re4.exe+149765E: CC                 - int 3
+re4.exe+149765F: CC                 - int 3
+// ---------- INJECTING HERE ----------
+UnlockChallenge: 40 56              - push rsi
+// ---------- DONE INJECTING  ----------
+re4.exe+1497662: 57                 - push rdi
+re4.exe+1497663: 41 56              - push r14
+re4.exe+1497665: 48 83 EC 30        - sub rsp,30
+re4.exe+1497669: 45 8B F0           - mov r14d,r8d
+re4.exe+149766C: 48 8B F2           - mov rsi,rdx
+re4.exe+149766F: 48 8B F9           - mov rdi,rcx
+re4.exe+1497672: E8 39 FC F8 00     - call re4.exe+24272B0
+re4.exe+1497677: 84 C0              - test al,al
+re4.exe+1497679: 0F 85 F9 01 00 00  - jne re4.exe+1497878
+re4.exe+149767F: 48 89 5C 24 50     - mov [rsp+50],rbx
+}
+
+{
+// ORIGINAL CODE - INJECTION POINT: re4.exe+149786C
+
+re4.exe+1497845: 7E 18                 - jle re4.exe+149785F
+re4.exe+1497847: 48 8B 05 F2 57 D9 0B  - mov rax,[re4.exe+D22D040]
+re4.exe+149784E: 48 8B 50 78           - mov rdx,[rax+78]
+re4.exe+1497852: 48 85 D2              - test rdx,rdx
+re4.exe+1497855: 74 08                 - je re4.exe+149785F
+re4.exe+1497857: 48 8B CF              - mov rcx,rdi
+re4.exe+149785A: E8 C1 21 AE 01        - call re4.exe+2F79A20
+re4.exe+149785F: 48 8B 5C 24 50        - mov rbx,[rsp+50]
+re4.exe+1497864: 40 84 ED              - test bpl,bpl
+re4.exe+1497867: 48 8B 6C 24 58        - mov rbp,[rsp+58]
+// ---------- INJECTING HERE ----------
+UnlockChallengeSetReturnValue: 0F 95 C0              - setne al
+// ---------- DONE INJECTING  ----------
+re4.exe+149786F: 48 83 C4 30           - add rsp,30
+re4.exe+1497873: 41 5E                 - pop r14
+re4.exe+1497875: 5F                    - pop rdi
+re4.exe+1497876: 5E                    - pop rsi
+re4.exe+1497877: C3                    - ret
+re4.exe+1497878: 32 C0                 - xor al,al
+re4.exe+149787A: 48 83 C4 30           - add rsp,30
+re4.exe+149787E: 41 5E                 - pop r14
+re4.exe+1497880: 5F                    - pop rdi
+re4.exe+1497881: 5E                    - pop rsi
+}
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>129</ID>
+      <Description>"The Mercenaries"</Description>
+      <Options moHideChildren="1"/>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>128</ID>
+          <Description>"Infinite Mayhem"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : re4.exe
+  Version: ‎Friday, ‎March ‎24, ‎2023 3:19:02 AM
+  Date   : 2023-04-08
+  Author : Cissa90
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(MayhemReducer,re4.exe,F2 0F 5C D9 66 0F 5A D3 0F 2F D0 F3 0F 11 53) // should be unique
+
+MayhemReducer:
+  nop 4
+
+[DISABLE]
+
+MayhemReducer:
+  db F2 0F 5C D9
+
+{
+// ORIGINAL CODE - INJECTION POINT: re4.exe+192D4F0
+
+re4.exe+192D4CD: F3 0F 2A C0           - cvtsi2ss xmm0,eax
+re4.exe+192D4D1: 0F 5A DB              - cvtps2pd xmm3,xmm3
+re4.exe+192D4D4: 0F 5A C8              - cvtps2pd xmm1,xmm0
+re4.exe+192D4D7: 0F 57 C0              - xorps xmm0,xmm0
+re4.exe+192D4DA: F2 0F 59 D1           - mulsd xmm2,xmm1
+re4.exe+192D4DE: F3 0F 5A C6           - cvtss2sd xmm0,xmm6
+re4.exe+192D4E2: F2 0F 58 D0           - addsd xmm2,xmm0
+re4.exe+192D4E6: 66 0F 5A C2           - cvtpd2ps xmm0,xmm2
+re4.exe+192D4EA: 0F 5A C8              - cvtps2pd xmm1,xmm0
+re4.exe+192D4ED: 0F 57 C0              - xorps xmm0,xmm0
+// ---------- INJECTING HERE ----------
+re4.exe+192D4F0: F2 0F 5C D9           - subsd xmm3,xmm1
+// ---------- DONE INJECTING  ----------
+re4.exe+192D4F4: 66 0F 5A D3           - cvtpd2ps xmm2,xmm3
+re4.exe+192D4F8: 0F 2F D0              - comiss xmm2,xmm0
+re4.exe+192D4FB: F3 0F 11 53 20        - movss [rbx+20],xmm2
+re4.exe+192D500: 0F 87 98 00 00 00     - ja re4.exe+192D59E
+re4.exe+192D506: 40 38 6B 60           - cmp [rbx+60],bpl
+re4.exe+192D50A: 75 45                 - jne re4.exe+192D551
+re4.exe+192D50C: 48 8B 05 85 6E 91 0B  - mov rax,[re4.exe+D244398]
+re4.exe+192D513: 48 8B 78 40           - mov rdi,[rax+40]
+re4.exe+192D517: 48 85 FF              - test rdi,rdi
+re4.exe+192D51A: 74 31                 - je re4.exe+192D54D
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>130</ID>
+          <Description>"Infinite Combo Time"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : re4.exe
+  Version: ‎Friday, ‎March ‎24, ‎2023 3:19:02 AM
+  Date   : 2023-04-08
+  Author : Cissa90
+
+  Infinite Combo Time
+}
+
+[ENABLE]
+
+aobscanmodule(ComboTimerIfStatement,re4.exe,7F 37 0F 5A C8) // should be unique
+
+ComboTimerIfStatement:
+  db EB
+
+[DISABLE]
+
+ComboTimerIfStatement:
+  db 7F
+
+unregistersymbol(ComboTimerIfStatement)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: re4.exe+1CB4BF6
+
+re4.exe+1CB4BDB: 77 14           - ja re4.exe+1CB4BF1
+re4.exe+1CB4BDD: 83 7F 30 00     - cmp dword ptr [rdi+30],00
+re4.exe+1CB4BE1: 7F 0E           - jg re4.exe+1CB4BF1
+re4.exe+1CB4BE3: 33 C9           - xor ecx,ecx
+re4.exe+1CB4BE5: 48 89 4F 24     - mov [rdi+24],rcx
+re4.exe+1CB4BE9: 89 4F 30        - mov [rdi+30],ecx
+re4.exe+1CB4BEC: 89 4F 20        - mov [rdi+20],ecx
+re4.exe+1CB4BEF: EB 66           - jmp re4.exe+1CB4C57
+re4.exe+1CB4BF1: 8B 47 30        - mov eax,[rdi+30]
+re4.exe+1CB4BF4: 85 C0           - test eax,eax
+// ---------- INJECTING HERE ----------
+re4.exe+1CB4BF6: 7F 37           - jg re4.exe+1CB4C2F
+// ---------- DONE INJECTING  ----------
+re4.exe+1CB4BF8: 0F 5A C8        - cvtps2pd xmm1,xmm0
+re4.exe+1CB4BFB: 0F 57 C0        - xorps xmm0,xmm0
+re4.exe+1CB4BFE: F3 0F 5A C6     - cvtss2sd xmm0,xmm6
+re4.exe+1CB4C02: F2 0F 58 C8     - addsd xmm1,xmm0
+re4.exe+1CB4C06: 0F 57 C0        - xorps xmm0,xmm0
+re4.exe+1CB4C09: F3 0F 5A C3     - cvtss2sd xmm0,xmm3
+re4.exe+1CB4C0D: 66 0F 5A C9     - cvtpd2ps xmm1,xmm1
+re4.exe+1CB4C11: 0F 5A D1        - cvtps2pd xmm2,xmm1
+re4.exe+1CB4C14: F3 0F 11 4F 24  - movss [rdi+24],xmm1
+re4.exe+1CB4C19: 66 0F 2F C2     - comisd xmm0,xmm2
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>131</ID>
+          <Description>"Set Mercenaries Timer"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>// Game Executable   : re4.exe
+// Author            : gir489
+// Executable Version: 1.0.5.0
+// MD5 Signature     : 942BA056C69684FF07EB85260499A0F7
+// EXE Compile Date  : April 17, 2023 12:32 PM
+// Sign Date         : ‎Monday, ‎April ‎17, ‎2023 1꞉20꞉23 PM
+// Script Date       : April 24, 2023 05:48 PM
+[ENABLE]
+aobscanmodule(aob_ReadMercsTimer,re4.exe,48 8B 43 08 48 85 D2 74 04 FF D0 EB 02 FF D0 48 83 C3 18 48 83 EF 01 75 E1 48 8B 7C 24 ? 48 8B 5C 24 ? 48 83 C4 20 5E C3 0F 57 C0 48 83 C4 20 5E C3 )
+registersymbol(aob_ReadMercsTimer)
+alloc(newmem_ReadMercsTimer,1024,re4.exe)
+alloc(MercsTimerInSeconds,4,re4.exe)
+label(return_ReadMercsTimer)
+
+newmem_ReadMercsTimer:
+  mov rcx,[rdx+F0]
+  mov rax,[MercsTimerInSeconds]
+  mov [rcx+18],rax
+  mov rcx,rsi
+  mov rax,[rbx+08]
+  test rdx,rdx
+  jmp return_ReadMercsTimer
+
+aob_ReadMercsTimer:
+  jmp newmem_ReadMercsTimer
+  nop 2
+return_ReadMercsTimer:
+
+registersymbol(MercsTimerInSeconds)
+
+MercsTimerInSeconds:
+dd (float)2385.000
+
+[DISABLE]
+aob_ReadMercsTimer:
+  db 48 8B 43 08 48 85 D2
+
+unregistersymbol(aob_ReadMercsTimer)
+dealloc(newmem_ReadMercsTimer)
+
+{
+// ORIGINAL CODE - INJECTION POINT: re4.exe+5709E6
+
+re4.exe+5709B5: 48 83 C4 30     - add rsp,30
+re4.exe+5709B9: 5B              - pop rbx
+re4.exe+5709BA: C3              - ret
+re4.exe+5709BB: CC              - int 3
+re4.exe+5709BC: CC              - int 3
+re4.exe+5709BD: CC              - int 3
+re4.exe+5709BE: CC              - int 3
+re4.exe+5709BF: CC              - int 3
+re4.exe+5709C0: 40 56           - push rsi
+re4.exe+5709C2: 48 83 EC 20     - sub rsp,20
+re4.exe+5709C6: 8B 42 10        - mov eax,[rdx+10]
+re4.exe+5709C9: 48 8B F1        - mov rsi,rcx
+re4.exe+5709CC: 85 C0           - test eax,eax
+re4.exe+5709CE: 74 3F           - je re4.exe+570A0F
+re4.exe+5709D0: 48 89 5C 24 30  - mov [rsp+30],rbx
+re4.exe+5709D5: 48 8D 5A 18     - lea rbx,[rdx+18]
+re4.exe+5709D9: 48 89 7C 24 38  - mov [rsp+38],rdi
+re4.exe+5709DE: 8B F8           - mov edi,eax
+re4.exe+5709E0: 48 8B 13        - mov rdx,[rbx]
+re4.exe+5709E3: 48 8B CE        - mov rcx,rsi
+// ---------- INJECTING HERE ----------
+re4.exe+5709E6: 48 8B 43 08     - mov rax,[rbx+08]
+// ---------- DONE INJECTING  ----------
+re4.exe+5709EA: 48 85 D2        - test rdx,rdx
+re4.exe+5709ED: 74 04           - je re4.exe+5709F3
+re4.exe+5709EF: FF D0           - call rax
+re4.exe+5709F1: EB 02           - jmp re4.exe+5709F5
+re4.exe+5709F3: FF D0           - call rax
+re4.exe+5709F5: 48 83 C3 18     - add rbx,18
+re4.exe+5709F9: 48 83 EF 01     - sub rdi,01
+re4.exe+5709FD: 75 E1           - jne re4.exe+5709E0
+re4.exe+5709FF: 48 8B 7C 24 38  - mov rdi,[rsp+38]
+re4.exe+570A04: 48 8B 5C 24 30  - mov rbx,[rsp+30]
+re4.exe+570A09: 48 83 C4 20     - add rsp,20
+re4.exe+570A0D: 5E              - pop rsi
+re4.exe+570A0E: C3              - ret
+re4.exe+570A0F: 0F 57 C0        - xorps xmm0,xmm0
+re4.exe+570A12: 48 83 C4 20     - add rsp,20
+re4.exe+570A16: 5E              - pop rsi
+re4.exe+570A17: C3              - ret
+re4.exe+570A18: CC              - int 3
+re4.exe+570A19: CC              - int 3
+re4.exe+570A1A: CC              - int 3
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>134</ID>
+              <Description>"Timer in Seconds"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>MercsTimerInSeconds</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="46">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>76</ID>
+      <Description>"Unlimited Resources"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : STVoyager-Win64-Shipping.exe
+  Version: 
+  Date   : 2026-02-22
+  Author : freya
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(NoDeuteriumDrain,STVoyager-Win64-Shipping.exe,44 89 78 10 8B 43 08) // should be unique
+alloc(newmem,$1000,NoDeuteriumDrain)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+//  mov [rax+10],r15d
+  mov r15d,#9999    // Force the value to 999,999
+  mov [rax+10],r15d   // Now it writes 999,999 instead of the real amount
+  mov eax,[rbx+08]
+  jmp return
+
+NoDeuteriumDrain:
+  jmp newmem
+  nop 2
+return:
+registersymbol(NoDeuteriumDrain)
+
+[DISABLE]
+
+NoDeuteriumDrain:
+  db 44 89 78 10 8B 43 08
+
+unregistersymbol(NoDeuteriumDrain)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "STVoyager-Win64-Shipping.exe"+4F9DC37
+
+"STVoyager-Win64-Shipping.exe"+4F9DC1A: 8B D0           - mov edx,eax
+"STVoyager-Win64-Shipping.exe"+4F9DC1C: 48 8B CE        - mov rcx,rsi
+"STVoyager-Win64-Shipping.exe"+4F9DC1F: E8 6C 1F 27 FC  - call "STVoyager-Win64-Shipping.exe"+120FB90
+"STVoyager-Win64-Shipping.exe"+4F9DC24: 83 F8 FF        - cmp eax,-01
+"STVoyager-Win64-Shipping.exe"+4F9DC27: 74 0B           - je "STVoyager-Win64-Shipping.exe"+4F9DC34
+"STVoyager-Win64-Shipping.exe"+4F9DC29: 48 98           - cdqe 
+"STVoyager-Win64-Shipping.exe"+4F9DC2B: 48 C1 E0 05     - shl rax,05
+"STVoyager-Win64-Shipping.exe"+4F9DC2F: 48 03 06        - add rax,[rsi]
+"STVoyager-Win64-Shipping.exe"+4F9DC32: EB 03           - jmp "STVoyager-Win64-Shipping.exe"+4F9DC37
+"STVoyager-Win64-Shipping.exe"+4F9DC34: 48 8B C7        - mov rax,rdi
+// ---------- INJECTING HERE ----------
+"STVoyager-Win64-Shipping.exe"+4F9DC37: 44 89 78 10     - mov [rax+10],r15d
+// ---------- DONE INJECTING  ----------
+"STVoyager-Win64-Shipping.exe"+4F9DC3B: 8B 43 08        - mov eax,[rbx+08]
+"STVoyager-Win64-Shipping.exe"+4F9DC3E: 85 C0           - test eax,eax
+"STVoyager-Win64-Shipping.exe"+4F9DC40: 74 05           - je "STVoyager-Win64-Shipping.exe"+4F9DC47
+"STVoyager-Win64-Shipping.exe"+4F9DC42: 48 8B 13        - mov rdx,[rbx]
+"STVoyager-Win64-Shipping.exe"+4F9DC45: EB 03           - jmp "STVoyager-Win64-Shipping.exe"+4F9DC4A
+"STVoyager-Win64-Shipping.exe"+4F9DC47: 49 8B D6        - mov rdx,r14
+"STVoyager-Win64-Shipping.exe"+4F9DC4A: 85 C0           - test eax,eax
+"STVoyager-Win64-Shipping.exe"+4F9DC4C: 8D 48 FF        - lea ecx,[rax-01]
+"STVoyager-Win64-Shipping.exe"+4F9DC4F: 0F 44 CF        - cmove ecx,edi
+"STVoyager-Win64-Shipping.exe"+4F9DC52: E8 99 53 27 FC  - call "STVoyager-Win64-Shipping.exe"+1212FF0
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>80</ID>
+      <Description>"Full Battery"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : STVoyager-Win64-Shipping.exe
+  Version: 
+  Date   : 2026-02-22
+  Author : freya
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+aobscanmodule(FullBattery,STVoyager-Win64-Shipping.exe,41 89 52 14 C3)
+alloc(newmem,$1000,FullBattery)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  mov edx,#3333       // Force the value to 9,999 (the # tells CE it's a decimal number)
+  mov [r10+14],edx    // Write our new 9,999 value to the battery address
+  ret                 // The original code had a 'ret' (C3), so we must keep it to exit the function
+  // jmp return       // We don't need this jmp because 'ret' finishes the job
+
+FullBattery:
+  jmp newmem
+return:
+registersymbol(FullBattery)
+
+[DISABLE]
+FullBattery:
+  db 41 89 52 14 C3
+unregistersymbol(FullBattery)
+dealloc(newmem)
+{
+// ORIGINAL CODE - INJECTION POINT: "STVoyager-Win64-Shipping.exe"+4E3132D
+
+"STVoyager-Win64-Shipping.exe"+4E31312: 75 05        - jne "STVoyager-Win64-Shipping.exe"+4E31319
+"STVoyager-Win64-Shipping.exe"+4E31314: 41 2B D1     - sub edx,r9d
+"STVoyager-Win64-Shipping.exe"+4E31317: EB 02        - jmp "STVoyager-Win64-Shipping.exe"+4E3131B
+"STVoyager-Win64-Shipping.exe"+4E31319: 33 D2        - xor edx,edx
+"STVoyager-Win64-Shipping.exe"+4E3131B: 8B 41 20     - mov eax,[rcx+20]
+"STVoyager-Win64-Shipping.exe"+4E3131E: 44 3B C0     - cmp r8d,eax
+"STVoyager-Win64-Shipping.exe"+4E31321: 41 0F 42 C0  - cmovb eax,r8d
+"STVoyager-Win64-Shipping.exe"+4E31325: 3B C2        - cmp eax,edx
+"STVoyager-Win64-Shipping.exe"+4E31327: 0F 42 D0     - cmovb edx,eax
+"STVoyager-Win64-Shipping.exe"+4E3132A: 41 03 D1     - add edx,r9d
+// ---------- INJECTING HERE ----------
+"STVoyager-Win64-Shipping.exe"+4E3132D: 41 89 52 14  - mov [r10+14],edx
+// ---------- DONE INJECTING  ----------
+"STVoyager-Win64-Shipping.exe"+4E31331: C3           - ret 
+"STVoyager-Win64-Shipping.exe"+4E31332: CC           - int 3 
+"STVoyager-Win64-Shipping.exe"+4E31333: CC           - int 3 
+"STVoyager-Win64-Shipping.exe"+4E31334: CC           - int 3 
+"STVoyager-Win64-Shipping.exe"+4E31335: CC           - int 3 
+"STVoyager-Win64-Shipping.exe"+4E31336: CC           - int 3 
+"STVoyager-Win64-Shipping.exe"+4E31337: CC           - int 3 
+"STVoyager-Win64-Shipping.exe"+4E31338: CC           - int 3 
+"STVoyager-Win64-Shipping.exe"+4E31339: CC           - int 3 
+"STVoyager-Win64-Shipping.exe"+4E3133A: CC           - int 3 
+}
+</AssemblerScript>
+    </CheatEntry>
+  </CheatEntries>
+  <CheatCodes>
+    <CodeEntry>
+      <Description>Code :mov [r14],eax</Description>
+      <AddressString>"STVoyager-Win64-Shipping.exe"+4D77A9D</AddressString>
+      <Before>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>5C</Byte>
+        <Byte>24</Byte>
+        <Byte>40</Byte>
+      </Before>
+      <Actual>
+        <Byte>41</Byte>
+        <Byte>89</Byte>
+        <Byte>06</Byte>
+      </Actual>
+      <After>
+        <Byte>48</Byte>
+        <Byte>83</Byte>
+        <Byte>C4</Byte>
+        <Byte>20</Byte>
+        <Byte>41</Byte>
+      </After>
+    </CodeEntry>
+  </CheatCodes>
+  <UserdefinedSymbols/>
+</CheatTable>

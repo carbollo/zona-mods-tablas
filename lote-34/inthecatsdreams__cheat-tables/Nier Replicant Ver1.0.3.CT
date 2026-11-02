@@ -1,0 +1,642 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="42">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>49844</ID>
+      <Description>"Script"</Description>
+      <Options moHideChildren="1"/>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>2</ID>
+          <Description>"CompactMode"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+{$lua}
+
+if not syntaxcheck then
+
+  function cycleFullCompact( sender, force )
+    local state = not( compactmenuitem.Caption == 'Compact View Mode' )
+    if force ~= nil then
+      state = not force
+    end
+    compactmenuitem.Caption = state and 'Compact View Mode' or 'Full View Mode'
+    getMainForm().Splitter1.Visible = state
+    getMainForm().Panel4.Visible = state
+    getMainForm().Panel5.Visible = state
+  end
+
+  function addCompactMenu()
+    if compactmenualreadyexists then return end
+      local parent = getMainForm().Menu.Items
+      compactmenuitem = createMenuItem( parent )
+      parent.add( compactmenuitem )
+      compactmenuitem.Caption = 'Compact View Mode'
+      compactmenuitem.OnClick = cycleFullCompact
+      compactmenualreadyexists = 'yes'
+  end
+
+  addCompactMenu()
+  cycleFullCompact( nil, true )
+
+end
+
+[DISABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  cycleFullCompact( nil, false )
+end
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>1</ID>
+          <Description>"Attach to Process"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+{$lua}
+if not syntaxcheck then
+  openProcess("NieR Replicant ver.1.22474487139.exe")
+end
+{$asm}
+
+[DISABLE]
+{$lua}
+if not syntaxcheck then
+  openProcess("NieR Replicant ver.1.22474487139.exe")
+end
+{$asm}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>49839</ID>
+          <Description>"Speed Hack"</Description>
+          <Options moHideChildren="1"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>49838</ID>
+              <Description>"Speed multiplied 0.25"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+luacall(speedhack_setSpeed(0.25))
+
+[DISABLE]
+luacall(speedhack_setSpeed(1))
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>49872</ID>
+              <Description>"Speed multiplied 0.5"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+luacall(speedhack_setSpeed(0.5))
+
+[DISABLE]
+luacall(speedhack_setSpeed(1))
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>49841</ID>
+              <Description>"Speed multiplied 0.75"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+luacall(speedhack_setSpeed(0.75))
+
+[DISABLE]
+luacall(speedhack_setSpeed(1))
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>9199</ID>
+              <Description>"Speed multiplied 1.25"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+luacall(speedhack_setSpeed(1.25))
+
+[DISABLE]
+luacall(speedhack_setSpeed(1))
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>49842</ID>
+              <Description>"Speed multiplied 1.5"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+luacall(speedhack_setSpeed(1.5))
+
+[DISABLE]
+luacall(speedhack_setSpeed(1))
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>49840</ID>
+              <Description>"Speed multiplied 2"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+luacall(speedhack_setSpeed(2))
+
+[DISABLE]
+luacall(speedhack_setSpeed(1))
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>49836</ID>
+              <Description>"Speed multiplied 3"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+luacall(speedhack_setSpeed(3))
+
+[DISABLE]
+luacall(speedhack_setSpeed(1))
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>49837</ID>
+              <Description>"Speed multiplied 5"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+luacall(speedhack_setSpeed(5))
+
+[DISABLE]
+luacall(speedhack_setSpeed(1))
+</AssemblerScript>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>49874</ID>
+          <Description>"EXP Multiplier"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(exp,NieR Replicant ver.1.22474487139.exe,44 01 44 81 70) // should be unique
+alloc(newmem,$1000,exp)
+
+label(code)
+label(return)
+alloc(ExpMultiplier,4,"NieR Replicant ver.1.22474487139.exe"+3BBB65)
+registersymbol(ExpMultiplier)
+
+ExpMultiplier:
+dd #5
+
+newmem:
+
+  imul r8d,[ExpMultiplier]
+
+code:
+  add [rcx+rax*4+70],r8d
+  jmp return
+
+exp:
+  jmp newmem
+return:
+registersymbol(exp)
+
+[DISABLE]
+
+exp:
+  db 44 01 44 81 70
+
+unregistersymbol(*)
+dealloc(*)
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>49875</ID>
+              <Description>"Multiply"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>ExpMultiplier</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>49855</ID>
+          <Description>"Ability Editor"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(Ability_Edit,NieR Replicant ver.1.22474487139.exe,8B 8C 81 A0 00 00 00) // should be unique
+alloc(newmem,$1000,"NieR Replicant ver.1.22474487139.exe"+3BBE48)
+globalalloc(AbilityEdit,4)
+label(code)
+label(return)
+
+newmem:
+push rax
+lea rax,[rcx+rax*4+000000A0]
+mov [AbilityEdit],rax
+pop rax
+code:
+  mov ecx,[rcx+rax*4+000000A0]
+  jmp return
+
+Ability_Edit:
+  jmp newmem
+  nop 2
+return:
+registersymbol(Ability_Edit)
+
+[DISABLE]
+
+Ability_Edit:
+  db 8B 8C 81 A0 00 00 00
+
+unregistersymbol(Ability_Edit)
+dealloc(newmem)
+dealloc(AbilityEdit)
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>49856</ID>
+              <Description>"LT"</Description>
+              <DropDownList DescriptionOnly="1" DisplayValueAsItem="1">0:None
+1:Defend
+2:Evade
+3:Dark Blast
+4:Dark Phantasm
+5:Dark Hand
+6:Dark Lance
+7:Dark Whirlwind
+8:Dark Gluttony
+9:Dark Wall
+10:Dark Execution
+</DropDownList>
+              <VariableType>4 Bytes</VariableType>
+              <Address>AbilityEdit</Address>
+              <Offsets>
+                <Offset>-4</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>49857</ID>
+              <Description>"LB"</Description>
+              <DropDownListLink>LT</DropDownListLink>
+              <VariableType>4 Bytes</VariableType>
+              <Address>AbilityEdit</Address>
+              <Offsets>
+                <Offset>-C</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>49858</ID>
+              <Description>"RT"</Description>
+              <DropDownListLink>LT</DropDownListLink>
+              <VariableType>4 Bytes</VariableType>
+              <Address>AbilityEdit</Address>
+              <Offsets>
+                <Offset>0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>49859</ID>
+              <Description>"RB"</Description>
+              <DropDownListLink>LT</DropDownListLink>
+              <VariableType>4 Bytes</VariableType>
+              <Address>AbilityEdit</Address>
+              <Offsets>
+                <Offset>-8</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>49873</ID>
+          <Description>"Infinite Money"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(Money,NieR Replicant ver.1.22474487139.exe,89 81 BC 00 00 00 3D 40 42 0F 00 7C 31 E8 0F) // should be unique
+alloc(newmem,$1000,Money)
+
+label(code)
+label(return)
+
+newmem:
+
+  mov eax,#9999999
+
+code:
+  mov [rcx+000000BC],eax
+  jmp return
+
+Money:
+  jmp newmem
+  nop
+return:
+registersymbol(Money)
+
+[DISABLE]
+
+Money:
+  db 89 81 BC 00 00 00
+
+unregistersymbol(Money)
+dealloc(newmem)
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>21</ID>
+          <Description>"Max Chain"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(Chain,NieR Replicant ver.1.22474487139.exe,89 BE 38 B9 06 00) // should be unique
+alloc(newmem,$1000,"NieR Replicant ver.1.22474487139.exe"+6B2231)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  mov [rsi+0006B938],#999
+  jmp return
+
+Chain:
+  jmp newmem
+  nop
+return:
+registersymbol(Chain)
+
+[DISABLE]
+
+Chain:
+  db 89 BE 38 B9 06 00
+
+unregistersymbol(*)
+dealloc(*)
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>49843</ID>
+          <Description>"Infinite HP"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(HP,NieR Replicant ver.1.22474487139.exe,44 89 44 81 4C) // should be unique
+alloc(newmem,$1000,HP)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  //mov [rcx+rax*4+4C],r8d
+  mov [rcx+rax*4+4C],(int)999999
+  jmp return
+
+HP:
+  jmp newmem
+return:
+registersymbol(HP)
+
+[DISABLE]
+
+HP:
+  db 44 89 44 81 4C
+
+unregistersymbol(*)
+dealloc(*)
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>49845</ID>
+          <Description>"Infinite MP"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(MP,NieR Replicant ver.1.22474487139.exe,F3 0F 11 54 81 58) // should be unique
+alloc(newmem,$1000,MP)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  mov [rcx+rax*4+58],(float)9999
+  //movss [rcx+rax*4+58],xmm2
+  jmp return
+
+MP:
+  jmp newmem
+  nop
+return:
+registersymbol(MP)
+
+[DISABLE]
+
+MP:
+  db F3 0F 11 54 81 58
+
+unregistersymbol(*)
+dealloc(*)
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>49853</ID>
+          <Description>"Infinite Jump"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(Jump,NieR Replicant ver.1.22474487139.exe,84 C0 74 53 48 8B 06) // should be unique
+alloc(newmem,$1000,"NieR Replicant ver.1.22474487139.exe"+6A007A)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  nop
+  je "NieR Replicant ver.1.22474487139.exe"+6A00D1
+  mov rax,[rsi]
+  jmp return
+
+Jump:
+  jmp newmem
+  nop 2
+return:
+registersymbol(Jump)
+
+[DISABLE]
+
+Jump:
+  db 84 C0 74 53 48 8B 06
+
+unregistersymbol(*)
+dealloc(*)
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>49863</ID>
+          <Description>"Infinite Buff (Stop Time Gage)"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(Buff,NieR Replicant ver.1.22474487139.exe,F3 0F 10 4D 00 48) // should be unique
+alloc(newmem,$1000,"NieR Replicant ver.1.22474487139.exe"+6C4941)
+
+label(code)
+label(return)
+
+newmem:
+mov [rbp+00],#0
+code:
+  movss xmm1,[rbp+00]
+  jmp return
+
+Buff:
+  jmp newmem
+return:
+registersymbol(Buff)
+
+[DISABLE]
+
+Buff:
+  db F3 0F 10 4D 00
+
+unregistersymbol(*)
+dealloc(*)
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>49850</ID>
+          <Description>"Infinite Item (Gain or Use,then will be 99)"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(Amount,NieR Replicant ver.1.22474487139.exe,44 00 84 08 C0 00 00 00) // should be unique
+alloc(newmem,$1000,Amount)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  mov byte ptr [rax+rcx+000000C0],#99
+  //add [rax+rcx+000000C0],r8l
+  jmp return
+
+Amount:
+  jmp newmem
+  nop 3
+return:
+registersymbol(Amount)
+
+[DISABLE]
+
+Amount:
+  db 44 00 84 08 C0 00 00 00
+
+unregistersymbol(*)
+dealloc(*)
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>49865</ID>
+          <Description>"Instant Magic"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(InstaMagic,NieR Replicant ver.1.22474487139.exe,F3 0F 11 43 38 48 8B 13) // should be unique
+alloc(newmem,$1000,"NieR Replicant ver.1.22474487139.exe"+567049)
+
+label(code)
+label(return)
+
+newmem:
+add [rbx+38],(float)10
+code:
+  nop
+  jmp return
+
+InstaMagic:
+  jmp newmem
+return:
+registersymbol(InstaMagic)
+
+[DISABLE]
+
+InstaMagic:
+  db F3 0F 11 43 38
+
+unregistersymbol(*)
+dealloc(*)
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>52</ID>
+          <Description>"Instant Fire"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(Bang,NieR Replicant ver.1.22474487139.exe,F3 0F 10 4B 44 0F 57 C0 0F) // should be unique
+alloc(newmem,$1000,"NieR Replicant ver.1.22474487139.exe"+5678A3)
+
+label(code)
+label(return)
+
+newmem:
+mov [rbx+44],0
+code:
+  movss xmm1,[rbx+44]
+  jmp return
+
+Bang:
+  jmp newmem
+return:
+registersymbol(Bang)
+
+[DISABLE]
+
+Bang:
+  db F3 0F 10 4B 44
+
+unregistersymbol(*)
+dealloc(*)
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>49871</ID>
+      <Description>"Misc"</Description>
+      <Options moHideChildren="1"/>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>49849</ID>
+          <Description>"BOSS HP for reference"</Description>
+          <VariableType>Float</VariableType>
+          <Address>"NieR Replicant ver.1.22474487139.exe"+277E4F8</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>49870</ID>
+          <Description>"Fishing BaseAddress"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Array of byte</VariableType>
+          <ByteLength>4</ByteLength>
+          <Address>"NieR Replicant ver.1.22474487139.exe"+3A8357</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols>
+    <SymbolEntry>
+      <Name>AbilityEdit</Name>
+      <Address>15795CA0000</Address>
+    </SymbolEntry>
+  </UserdefinedSymbols>
+</CheatTable>

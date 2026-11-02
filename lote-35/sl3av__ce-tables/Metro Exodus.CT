@@ -1,0 +1,3356 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="31">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>89082</ID>
+      <Description>"Metro Exodus"</Description>
+      <Options moHideChildren="1" moActivateChildrenAsWell="1" moDeactivateChildrenAsWell="1"/>
+      <LastState Value="" Activated="1" RealAddress="00000000"/>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>0</ID>
+          <Description>"[#1]"</Description>
+          <Options moHideChildren="1"/>
+          <LastState Value="" Activated="1" RealAddress="00000000"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>89492</ID>
+              <Description>"Infinite Health"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+aobscanmodule(PlayerPointer,MetroExodus.exe,F3 0F 10 87 88 03 00 00 45)
+alloc(newmem,$1000,"MetroExodus.exe")
+label(PP)
+label(code)
+label(return)
+registersymbol(PP)
+registersymbol(PlayerPointer)
+
+newmem:
+  mov [PP],rcx
+
+code:
+  movss xmm0,[rdi+00000388]
+  jmp return
+
+PP:
+  dd 00
+
+PlayerPointer:
+  jmp newmem
+  nop 3
+return:
+
+aobscanmodule(InfHealth,MetroExodus.exe,F3 0F 5C 52 14 F3)
+alloc(newmem1,$1000,"MetroExodus.exe")
+label(DMP)
+label(code1)
+label(return1)
+registersymbol(DMP)
+registersymbol(InfHealth)
+
+newmem1:
+  cmp rcx,[PP]
+  je @f
+  cmp [DMP],01
+  jne code1
+  fld [rdx+14]
+  fmul [DMPValue]
+  fstp [rdx+14]
+  jmp code1
+
+@@:
+  movss xmm2,[Health]
+  jmp code1+05
+
+code1:
+  subss xmm2,[rdx+14]
+  jmp return1
+
+DMP:
+  dd 00
+
+DMPValue:
+  dd (float)9.0 //Damage Multiplier
+
+Health:
+  dd (float)1.0
+
+InfHealth:
+  jmp newmem1
+return1:
+
+aobscanmodule(DeathBypass,MetroExodus.exe,3C 01 0F 86 BB 00 00 00)
+alloc(newmem2,$1000,"MetroExodus.exe")
+label(code2)
+label(return2)
+registersymbol(DeathBypass)
+
+newmem2:
+  cmp rbx,[PP]
+  je DeathBypass+C3
+
+code2:
+  cmp al,01
+  jbe DeathBypass+C3
+  jmp return2
+
+DeathBypass:
+  jmp newmem2
+  nop 3
+return2:
+
+[DISABLE]
+PlayerPointer:
+  db F3 0F 10 87 88 03 00 00
+unregistersymbol(PlayerPointer)
+unregistersymbol(PP)
+dealloc(newmem)
+
+InfHealth:
+  db F3 0F 5C 52 14
+unregistersymbol(InfHealth)
+unregistersymbol(DMP)
+dealloc(newmem1)
+
+DeathBypass:
+  db 3C 01 0F 86 BB 00 00 00
+unregistersymbol(DeathBypass)
+dealloc(newmem2)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "MetroExodus.exe"+373E5A
+
+"MetroExodus.exe"+373E30: 48 89 58 10              -  mov [rax+10],rbx
+"MetroExodus.exe"+373E34: 48 8B F9                 -  mov rdi,rcx
+"MetroExodus.exe"+373E37: 48 89 70 E8              -  mov [rax-18],rsi
+"MetroExodus.exe"+373E3B: 4C 89 78 D8              -  mov [rax-28],r15
+"MetroExodus.exe"+373E3F: 0F 29 70 C8              -  movaps [rax-38],xmm6
+"MetroExodus.exe"+373E43: 0F 29 78 B8              -  movaps [rax-48],xmm7
+"MetroExodus.exe"+373E47: 44 0F 29 40 A8           -  movaps [rax-58],xmm8
+"MetroExodus.exe"+373E4C: 44 0F 29 48 98           -  movaps [rax-68],xmm9
+"MetroExodus.exe"+373E51: 44 0F 28 C9              -  movaps xmm9,xmm1
+"MetroExodus.exe"+373E55: E8 B6 09 00 00           -  call MetroExodus.exe+374810
+// ---------- INJECTING HERE ----------
+"MetroExodus.exe"+373E5A: F3 0F 10 87 88 03 00 00  -  movss xmm0,[rdi+00000388]
+// ---------- DONE INJECTING  ----------
+"MetroExodus.exe"+373E62: 45 0F 57 C0              -  xorps xmm8,xmm8
+"MetroExodus.exe"+373E66: 41 0F 2F C0              -  comiss xmm0,xmm8
+"MetroExodus.exe"+373E6A: 48 8B 87 30 02 00 00     -  mov rax,[rdi+00000230]
+"MetroExodus.exe"+373E71: C7 45 67 00 00 80 3F     -  mov [rbp+67],3F800000
+"MetroExodus.exe"+373E78: F3 0F 10 3D 94 4A 17 01  -  movss xmm7,[MetroExodus.exe+14E8914]
+"MetroExodus.exe"+373E80: 77 47                    -  ja MetroExodus.exe+373EC9
+"MetroExodus.exe"+373E82: 8B 80 BC 0D 00 00        -  mov eax,[rax+00000DBC]
+"MetroExodus.exe"+373E88: 0F 28 CF                 -  movaps xmm1,xmm7
+"MetroExodus.exe"+373E8B: F3 0F 10 2D E5 5E 3F 01  -  movss xmm5,[MetroExodus.exe+1769D78]
+"MetroExodus.exe"+373E93: 0F 57 C0                 -  xorps xmm0,xmm0
+}
+
+{
+// ORIGINAL CODE - INJECTION POINT: "MetroExodus.exe"+3C53D8
+
+"MetroExodus.exe"+3C53C8: CC                       -  int 3
+"MetroExodus.exe"+3C53C9: CC                       -  int 3
+"MetroExodus.exe"+3C53CA: CC                       -  int 3
+"MetroExodus.exe"+3C53CB: CC                       -  int 3
+"MetroExodus.exe"+3C53CC: CC                       -  int 3
+"MetroExodus.exe"+3C53CD: CC                       -  int 3
+"MetroExodus.exe"+3C53CE: CC                       -  int 3
+"MetroExodus.exe"+3C53CF: CC                       -  int 3
+"MetroExodus.exe"+3C53D0: F3 41 0F 10 18           -  movss xmm3,[r8]
+"MetroExodus.exe"+3C53D5: 0F 28 D3                 -  movaps xmm2,xmm3
+// ---------- INJECTING HERE ----------
+"MetroExodus.exe"+3C53D8: F3 0F 5C 52 14           -  subss xmm2,[rdx+14]
+// ---------- DONE INJECTING  ----------
+"MetroExodus.exe"+3C53DD: F3 41 0F 11 10           -  movss [r8],xmm2
+"MetroExodus.exe"+3C53E2: 44 8B 49 68              -  mov r9d,[rcx+68]
+"MetroExodus.exe"+3C53E6: 41 F6 C1 01              -  test r9l,01
+"MetroExodus.exe"+3C53EA: 75 14                    -  jne MetroExodus.exe+3C5400
+"MetroExodus.exe"+3C53EC: 0F B7 42 36              -  movzx eax,word ptr [rdx+36]
+"MetroExodus.exe"+3C53F0: A8 04                    -  test al,04
+"MetroExodus.exe"+3C53F2: 75 37                    -  jne MetroExodus.exe+3C542B
+"MetroExodus.exe"+3C53F4: 41 BA 00 02 00 00        -  mov r10d,00000200
+"MetroExodus.exe"+3C53FA: 66 41 85 C2              -  test r10w,ax
+"MetroExodus.exe"+3C53FE: 75 2B                    -  jne MetroExodus.exe+3C542B
+}
+
+{
+// ORIGINAL code - INJECTION POINT: "MetroExodus.exe"+434609
+
+"MetroExodus.exe"+4345DC: 3B 05 BE 22 30 01        -  cmp eax,[MetroExodus.exe+17368A0]
+"MetroExodus.exe"+4345E2: 74 1C                    -  je MetroExodus.exe+434600
+"MetroExodus.exe"+4345E4: 3B 05 F6 21 30 01        -  cmp eax,[MetroExodus.exe+17367E0]
+"MetroExodus.exe"+4345EA: 74 14                    -  je MetroExodus.exe+434600
+"MetroExodus.exe"+4345EC: 3B 05 5A 22 30 01        -  cmp eax,[MetroExodus.exe+173684C]
+"MetroExodus.exe"+4345F2: 74 0C                    -  je MetroExodus.exe+434600
+"MetroExodus.exe"+4345F4: 3B 05 EA 20 30 01        -  cmp eax,[MetroExodus.exe+17366E4]
+"MetroExodus.exe"+4345FA: 0F 85 CC 00 00 00        -  jne MetroExodus.exe+4346CC
+"MetroExodus.exe"+434600: 0F B6 83 59 06 00 00     -  movzx eax,byte ptr [rbx+00000659]
+"MetroExodus.exe"+434607: FE C8                    -  dec al
+// ---------- INJECTING HERE ----------
+"MetroExodus.exe"+434609: 3C 01                    -  cmp al,01
+"MetroExodus.exe"+43460B: 0F 86 BB 00 00 00        -  jbe MetroExodus.exe+4346CC
+// ---------- DONE INJECTING  ----------
+"MetroExodus.exe"+434611: 48 8B 83 B0 FE FF FF     -  mov rax,[rbx-00000150]
+"MetroExodus.exe"+434618: F3 0F 10 80 E8 08 00 00  -  movss xmm0,[rax+000008E8]
+"MetroExodus.exe"+434620: 0F 2F 06                 -  comiss xmm0,[rsi]
+"MetroExodus.exe"+434623: 77 5F                    -  ja MetroExodus.exe+434684
+"MetroExodus.exe"+434625: 48 8B 8B 08 0A 00 00     -  mov rcx,[rbx+00000A08]
+"MetroExodus.exe"+43462C: 48 8B 01                 -  mov rax,[rcx]
+"MetroExodus.exe"+43462F: FF 90 48 01 00 00        -  call qword ptr [rax+00000148]
+"MetroExodus.exe"+434635: 85 C0                    -  test eax,eax
+"MetroExodus.exe"+434637: 75 4B                    -  jne MetroExodus.exe+434684
+"MetroExodus.exe"+434639: 48 8B 83 B0 FE FF FF     -  mov rax,[rbx-00000150]
+}
+</AssemblerScript>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Toggle Activation</Action>
+                  <Keys>
+                    <Key>110</Key>
+                  </Keys>
+                  <ID>0</ID>
+                  <ActivateSound>Activate</ActivateSound>
+                  <DeactivateSound>Deactivate</DeactivateSound>
+                </Hotkey>
+              </Hotkeys>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>89493</ID>
+                  <Description>"Damage Multiplier"</Description>
+                  <LastState/>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+DMP:
+  dd 01
+
+[DISABLE]
+DMP:
+  dd 00
+</AssemblerScript>
+                  <Hotkeys>
+                    <Hotkey>
+                      <Action>Toggle Activation</Action>
+                      <Keys>
+                        <Key>106</Key>
+                      </Keys>
+                      <ID>0</ID>
+                      <ActivateSound>Activate</ActivateSound>
+                      <DeactivateSound>Deactivate</DeactivateSound>
+                    </Hotkey>
+                  </Hotkeys>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89494</ID>
+              <Description>"Infinite Ammo"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+aobscanmodule(InfAmmo,MetroExodus.exe,66 89 51 70 41 8B E8)
+alloc(newmem,$1000,"MetroExodus.exe")
+label(code)
+label(return)
+registersymbol(InfAmmo)
+
+newmem:
+  push rsi
+  mov rsi,[rcx+58]
+  cmp [rsi+1C],0101007A //Bolts
+  je @f
+  cmp [rsi+1C],0101007B //Explosive Bolts
+  je @f
+  cmp [rsi+1C],01010082 //Buckshot
+  je @f
+  cmp [rsi+1C],01010080 //Handgun Ammo
+  je @f
+  cmp [rsi+1C],0101007E //Sniper Rifle Ammo
+  je @f
+  cmp [rsi+1C],0101007C //Assault Rifle Ammo
+  je @f
+  cmp [rsi+1C],0101007F //Assault Rifle Incendiary Ammo
+  je @f
+  cmp [rsi+1C],01010084 //Steel Balls
+  je @f
+  cmp [rsi+1C],01010085 //Incendiary Capsules
+  je @f
+  cmp [rsi+1C],01010086 //Flamethrower Fuel
+  je @f
+  jmp code
+
+@@:
+  mov dx,#999
+  jmp code
+
+code:
+  pop rsi
+  mov [rcx+70],dx
+  mov ebp,r8d
+  jmp return
+
+InfAmmo:
+  jmp newmem
+  nop 2
+return:
+
+aobscanmodule(InfThrowables,MetroExodus.exe,0F B7 81 00 05 00 00 C3)
+alloc(newmem1,$1000,"MetroExodus.exe")
+label(code1)
+label(return1)
+registersymbol(InfThrowables)
+
+newmem1:
+  cmp [rcx+500],#05
+  jge @f
+  mov [rcx+500],#01
+
+code1:
+  movzx eax,word ptr [rcx+00000500]
+  jmp return1
+
+InfThrowables:
+  jmp newmem1
+  nop 2
+return1:
+
+[DISABLE]
+InfAmmo:
+  db 66 89 51 70 41 8B E8
+unregistersymbol(InfAmmo)
+dealloc(newmem)
+
+InfThrowables:
+  db 0F B7 81 00 05 00 00
+unregistersymbol(InfThrowables)
+dealloc(newmem1)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "MetroExodus.exe"+3DBD2A
+
+"MetroExodus.exe"+3DBD19: C3                    -  ret
+"MetroExodus.exe"+3DBD1A: CC                    -  int 3
+"MetroExodus.exe"+3DBD1B: CC                    -  int 3
+"MetroExodus.exe"+3DBD1C: CC                    -  int 3
+"MetroExodus.exe"+3DBD1D: CC                    -  int 3
+"MetroExodus.exe"+3DBD1E: CC                    -  int 3
+"MetroExodus.exe"+3DBD1F: CC                    -  int 3
+"MetroExodus.exe"+3DBD20: 48 89 5C 24 20        -  mov [rsp+20],rbx
+"MetroExodus.exe"+3DBD25: 55                    -  push rbp
+"MetroExodus.exe"+3DBD26: 48 83 EC 20           -  sub rsp,20
+// ---------- INJECTING HERE ----------
+"MetroExodus.exe"+3DBD2A: 66 89 51 70           -  mov [rcx+70],dx
+"MetroExodus.exe"+3DBD2E: 41 8B E8              -  mov ebp,r8d
+// ---------- DONE INJECTING  ----------
+"MetroExodus.exe"+3DBD31: 48 8B 81 D8 FB FF FF  -  mov rax,[rcx-00000428]
+"MetroExodus.exe"+3DBD38: 48 8B D9              -  mov rbx,rcx
+"MetroExodus.exe"+3DBD3B: 48 85 C0              -  test rax,rax
+"MetroExodus.exe"+3DBD3E: 0F 84 13 01 00 00     -  je MetroExodus.exe+3DBE57
+"MetroExodus.exe"+3DBD44: 48 8B 00              -  mov rax,[rax]
+"MetroExodus.exe"+3DBD47: 48 85 C0              -  test rax,rax
+"MetroExodus.exe"+3DBD4A: 0F 84 07 01 00 00     -  je MetroExodus.exe+3DBE57
+"MetroExodus.exe"+3DBD50: 48 8D 88 20 FF FF FF  -  lea rcx,[rax-000000E0]
+"MetroExodus.exe"+3DBD57: 48 89 7C 24 38        -  mov [rsp+38],rdi
+"MetroExodus.exe"+3DBD5C: 4C 89 74 24 40        -  mov [rsp+40],r14
+}
+
+{
+// ORIGINAL CODE - INJECTION POINT: "MetroExodus.exe"+354D04
+
+"MetroExodus.exe"+354CD4: 48 81 E9 80 00 00 00     -  sub rcx,00000080
+"MetroExodus.exe"+354CDB: E9 EC FF FF FF           -  jmp MetroExodus.exe+354CCC
+"MetroExodus.exe"+354CE0: 66 89 91 20 05 00 00     -  mov [rcx+00000520],dx
+"MetroExodus.exe"+354CE7: C3                       -  ret
+"MetroExodus.exe"+354CE8: 0F B7 81 20 05 00 00     -  movzx eax,word ptr [rcx+00000520]
+"MetroExodus.exe"+354CEF: C3                       -  ret
+"MetroExodus.exe"+354CF0: 48 81 E9 90 03 00 00     -  sub rcx,00000390
+"MetroExodus.exe"+354CF7: E9 EC FF FF FF           -  jmp MetroExodus.exe+354CE8
+"MetroExodus.exe"+354CFC: 66 89 91 00 05 00 00     -  mov [rcx+00000500],dx
+"MetroExodus.exe"+354D03: C3                       -  ret
+// ---------- INJECTING HERE ----------
+"MetroExodus.exe"+354D04: 0F B7 81 00 05 00 00     -  movzx eax,word ptr [rcx+00000500]
+// ---------- DONE INJECTING  ----------
+"MetroExodus.exe"+354D0B: C3                       -  ret
+"MetroExodus.exe"+354D0C: 48 81 E9 70 03 00 00     -  sub rcx,00000370
+"MetroExodus.exe"+354D13: E9 EC FF FF FF           -  jmp MetroExodus.exe+354D04
+"MetroExodus.exe"+354D18: 0F B7 C2                 -  movzx eax,dx
+"MetroExodus.exe"+354D1B: 66 0F 6E C0              -  movd xmm0,eax
+"MetroExodus.exe"+354D1F: 0F 5B C0                 -  cvtdq2ps xmm0,xmm0
+"MetroExodus.exe"+354D22: F3 0F 11 81 90 03 00 00  -  movss [rcx+00000390],xmm0
+"MetroExodus.exe"+354D2A: C3                       -  ret
+"MetroExodus.exe"+354D2B: CC                       -  int 3
+"MetroExodus.exe"+354D2C: F3 0F 10 81 90 03 00 00  -  movss xmm0,[rcx+00000390]
+}
+</AssemblerScript>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Toggle Activation</Action>
+                  <Keys>
+                    <Key>110</Key>
+                  </Keys>
+                  <ID>0</ID>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89523</ID>
+              <Description>"Infinite Stamina"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+aobscanmodule(InfStamina,MetroExodus.exe,80 79 40 00 74 16)
+alloc(newmem,$1000,"MetroExodus.exe")
+label(code)
+label(return)
+registersymbol(InfStamina)
+
+newmem:
+  cmp byte ptr [rcx+40],01
+  jne @f
+  cmp byte ptr [rcx+48],02
+  jne @f
+  cmp byte ptr [rcx+4C],#10000
+  jne @f
+  mov [rcx+40],00
+
+code:
+  cmp byte ptr [rcx+40],00
+  je InfStamina+1C
+  jmp return
+
+InfStamina:
+  jmp newmem
+  nop
+return:
+
+[DISABLE]
+InfStamina:
+  db 80 79 40 00 74 16
+unregistersymbol(InfStamina)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "MetroExodus.exe"+71744
+
+"MetroExodus.exe"+7171E: 48 81 C2 C3 9E 26 00  -  add rdx,00269EC3
+"MetroExodus.exe"+71725: 48 89 15 BC 1A 5C 01  -  mov [MetroExodus.exe+16331E8],rdx
+"MetroExodus.exe"+7172C: 48 C1 FA 10           -  sar rdx,10
+"MetroExodus.exe"+71730: 81 E2 FF 7F 00 00     -  and edx,00007FFF
+"MetroExodus.exe"+71736: 8B C2                 -  mov eax,edx
+"MetroExodus.exe"+71738: 99                    -  cdq 
+"MetroExodus.exe"+71739: 41 F7 F9              -  idiv r9d
+"MetroExodus.exe"+7173C: 41 03 D0              -  add edx,r8d
+"MetroExodus.exe"+7173F: EB 03                 -  jmp MetroExodus.exe+71744
+"MetroExodus.exe"+71741: 41 8B D0              -  mov edx,r8d
+// ---------- INJECTING HERE ----------
+"MetroExodus.exe"+71744: 80 79 40 00           -  cmp byte ptr [rcx+40],00
+"MetroExodus.exe"+71748: 74 16                 -  je MetroExodus.exe+71760
+// ---------- DONE INJECTING  ----------
+"MetroExodus.exe"+7174A: 80 79 41 00           -  cmp byte ptr [rcx+41],00
+"MetroExodus.exe"+7174E: 74 06                 -  je MetroExodus.exe+71756
+"MetroExodus.exe"+71750: 83 79 18 00           -  cmp dword ptr [rcx+18],00
+"MetroExodus.exe"+71754: 75 0A                 -  jne MetroExodus.exe+71760
+"MetroExodus.exe"+71756: 48 8B 01              -  mov rax,[rcx]
+"MetroExodus.exe"+71759: 48 FF A0 40 02 00 00  -  jmp qword ptr [rax+00000240]
+"MetroExodus.exe"+71760: C3                    -  ret 
+"MetroExodus.exe"+71761: CC                    -  int 3 
+"MetroExodus.exe"+71762: CC                    -  int 3 
+"MetroExodus.exe"+71763: CC                    -  int 3 
+}
+</AssemblerScript>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Toggle Activation</Action>
+                  <Keys>
+                    <Key>110</Key>
+                  </Keys>
+                  <ID>0</ID>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89495</ID>
+              <Description>"Infinite Flashlight"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+aobscanmodule(InfFlashlight,MetroExodus.exe,F3 0F 10 9B 98 0A 00 00)
+alloc(newmem,$1000,"MetroExodus.exe")
+label(code)
+label(return)
+registersymbol(InfFlashlight)
+
+newmem:
+  cmp [rbx+A98],(float)0.8
+  jg @f
+  mov [rbx+A98],(float)0.8
+
+code:
+  movss xmm3,[rbx+00000A98]
+  jmp return
+
+InfFlashlight:
+  jmp newmem
+  nop 3
+return:
+
+[DISABLE]
+InfFlashlight:
+  db F3 0F 10 9B 98 0A 00 00
+unregistersymbol(InfFlashlight)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "MetroExodus.exe"+587EC0
+
+"MetroExodus.exe"+587E90: 40 53                    -  push rbx
+"MetroExodus.exe"+587E92: 48 83 EC 50              -  sub rsp,50
+"MetroExodus.exe"+587E96: 80 B9 8D 0A 00 00 00     -  cmp byte ptr [rcx+00000A8D],00
+"MetroExodus.exe"+587E9D: 0F 28 D1                 -  movaps xmm2,xmm1
+"MetroExodus.exe"+587EA0: 48 8B D9                 -  mov rbx,rcx
+"MetroExodus.exe"+587EA3: 0F 85 7C 01 00 00        -  jne MetroExodus.exe+588025
+"MetroExodus.exe"+587EA9: F3 0F 10 A9 9C 0A 00 00  -  movss xmm5,[rcx+00000A9C]
+"MetroExodus.exe"+587EB1: 0F 57 E4                 -  xorps xmm4,xmm4
+"MetroExodus.exe"+587EB4: 48 8B 81 30 02 00 00     -  mov rax,[rcx+00000230]
+"MetroExodus.exe"+587EBB: BA C0 01 00 00           -  mov edx,000001C0
+// ---------- INJECTING HERE ----------
+"MetroExodus.exe"+587EC0: F3 0F 10 9B 98 0A 00 00  -  movss xmm3,[rbx+00000A98]
+// ---------- DONE INJECTING  ----------
+"MetroExodus.exe"+587EC8: 48 85 C0                 -  test rax,rax
+"MetroExodus.exe"+587ECB: 0F 29 74 24 40           -  movaps [rsp+40],xmm6
+"MetroExodus.exe"+587ED0: F3 0F 5C DD              -  subss xmm3,xmm5
+"MetroExodus.exe"+587ED4: 0F 29 7C 24 30           -  movaps [rsp+30],xmm7
+"MetroExodus.exe"+587ED9: 0F 28 FD                 -  movaps xmm7,xmm5
+"MetroExodus.exe"+587EDC: F3 0F 58 B9 A4 0A 00 00  -  addss xmm7,[rcx+00000AA4]
+"MetroExodus.exe"+587EE4: C7 44 24 60 00 00 80 3F  -  mov [rsp+60],3F800000
+"MetroExodus.exe"+587EEC: C7 44 24 70 00 00 00 00  -  mov [rsp+70],00000000
+"MetroExodus.exe"+587EF4: F3 0F 59 B9 B4 0A 00 00  -  mulss xmm7,[rcx+00000AB4]
+"MetroExodus.exe"+587EFC: 48 8D 88 64 01 00 00     -  lea rcx,[rax+00000164]
+}
+</AssemblerScript>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Toggle Activation</Action>
+                  <Keys>
+                    <Key>110</Key>
+                  </Keys>
+                  <ID>0</ID>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89496</ID>
+              <Description>"Infinite Resources"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+aobscanmodule(InfResources,MetroExodus.exe,0F B7 41 70 C3)
+alloc(newmem,$1000,"MetroExodus.exe")
+label(code)
+label(return)
+registersymbol(InfResources)
+
+newmem:
+  push rsi
+  mov rsi,[rcx+58]
+  cmp [rsi+1C],01010090 //Scrap
+  je @f
+  cmp [rsi+1C],01010091 //Chemicals
+  je @f
+  jmp code
+
+@@:
+  mov [rcx+70],#299
+  jmp code
+
+code:
+  pop rsi
+  movzx eax,word ptr [rcx+70]
+  ret
+  jmp return
+
+InfResources:
+  jmp newmem
+return:
+
+aobscanmodule(InfFilters,MetroExodus.exe,F3 0F 10 81 90 03 00 00)
+alloc(newmem1,$1000,"MetroExodus.exe")
+label(code1)
+label(return1)
+registersymbol(InfFilters)
+
+newmem1:
+  mov [rcx+390],(float)5400
+
+code1:
+  movss xmm0,[rcx+00000390]
+  jmp return1
+
+InfFilters:
+  jmp newmem1
+  nop 3
+return1:
+
+aobscanmodule(InfMedkits,MetroExodus.exe,0F B7 81 90 03 00 00)
+alloc(newmem2,$1000,"MetroExodus.exe")
+label(code2)
+label(return2)
+registersymbol(InfMedkits)
+
+newmem2:
+  mov [rcx+390],#10
+
+code2:
+  movzx eax,word ptr [rcx+00000390]
+  jmp return2
+
+InfMedkits:
+  jmp newmem2
+  nop 2
+return2:
+
+[DISABLE]
+InfResources:
+  db 0F B7 41 70 C3
+unregistersymbol(InfResources)
+dealloc(newmem)
+
+InfFilters:
+  db F3 0F 10 81 90 03 00 00
+unregistersymbol(InfFilters)
+dealloc(newmem1)
+
+InfMedkits:
+  db 0F B7 81 90 03 00 00
+unregistersymbol(InfMedkits)
+dealloc(newmem2)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "MetroExodus.exe"+354CCC
+
+"MetroExodus.exe"+354CB2: CC                       -  int 3
+"MetroExodus.exe"+354CB3: CC                       -  int 3
+"MetroExodus.exe"+354CB4: 48 8B 81 E8 02 00 00     -  mov rax,[rcx+000002E8]
+"MetroExodus.exe"+354CBB: 0F B7 80 D2 00 00 00     -  movzx eax,word ptr [rax+000000D2]
+"MetroExodus.exe"+354CC2: C3                       -  ret
+"MetroExodus.exe"+354CC3: CC                       -  int 3
+"MetroExodus.exe"+354CC4: E9 57 70 08 00           -  jmp MetroExodus.exe+3DBD20
+"MetroExodus.exe"+354CC9: CC                       -  int 3
+"MetroExodus.exe"+354CCA: CC                       -  int 3
+"MetroExodus.exe"+354CCB: CC                       -  int 3
+// ---------- INJECTING HERE ----------
+"MetroExodus.exe"+354CCC: 0F B7 41 70              -  movzx eax,word ptr [rcx+70]
+"MetroExodus.exe"+354CD0: C3                       -  ret
+// ---------- DONE INJECTING  ----------
+"MetroExodus.exe"+354CD1: CC                       -  int 3
+"MetroExodus.exe"+354CD2: CC                       -  int 3
+"MetroExodus.exe"+354CD3: CC                       -  int 3
+"MetroExodus.exe"+354CD4: 48 81 E9 80 00 00 00     -  sub rcx,00000080
+"MetroExodus.exe"+354CDB: E9 EC FF FF FF           -  jmp MetroExodus.exe+354CCC
+"MetroExodus.exe"+354CE0: 66 89 91 20 05 00 00     -  mov [rcx+00000520],dx
+"MetroExodus.exe"+354CE7: C3                       -  ret
+"MetroExodus.exe"+354CE8: 0F B7 81 20 05 00 00     -  movzx eax,word ptr [rcx+00000520]
+"MetroExodus.exe"+354CEF: C3                       -  ret
+"MetroExodus.exe"+354CF0: 48 81 E9 90 03 00 00     -  sub rcx,00000390
+}
+
+{
+// ORIGINAL CODE - INJECTION POINT: "MetroExodus.exe"+354D2C
+
+"MetroExodus.exe"+354D04: 0F B7 81 00 05 00 00     -  movzx eax,word ptr [rcx+00000500]
+"MetroExodus.exe"+354D0B: C3                       -  ret
+"MetroExodus.exe"+354D0C: 48 81 E9 70 03 00 00     -  sub rcx,00000370
+"MetroExodus.exe"+354D13: E9 EC FF FF FF           -  jmp MetroExodus.exe+354D04
+"MetroExodus.exe"+354D18: 0F B7 C2                 -  movzx eax,dx
+"MetroExodus.exe"+354D1B: 66 0F 6E C0              -  movd xmm0,eax
+"MetroExodus.exe"+354D1F: 0F 5B C0                 -  cvtdq2ps xmm0,xmm0
+"MetroExodus.exe"+354D22: F3 0F 11 81 90 03 00 00  -  movss [rcx+00000390],xmm0
+"MetroExodus.exe"+354D2A: C3                       -  ret
+"MetroExodus.exe"+354D2B: CC                       -  int 3
+// ---------- INJECTING HERE ----------
+"MetroExodus.exe"+354D2C: F3 0F 10 81 90 03 00 00  -  movss xmm0,[rcx+00000390]
+// ---------- DONE INJECTING  ----------
+"MetroExodus.exe"+354D34: F3 0F 58 05 AC 3A 19 01  -  addss xmm0,[MetroExodus.exe+14E87E8]
+"MetroExodus.exe"+354D3C: F3 0F 2C C0              -  cvttss2si eax,xmm0
+"MetroExodus.exe"+354D40: C3                       -  ret
+"MetroExodus.exe"+354D41: CC                       -  int 3
+"MetroExodus.exe"+354D42: CC                       -  int 3
+"MetroExodus.exe"+354D43: CC                       -  int 3
+"MetroExodus.exe"+354D44: 48 81 E9 50 02 00 00     -  sub rcx,00000250
+"MetroExodus.exe"+354D4B: E9 20 94 CF FF           -  jmp MetroExodus.exe+4E170
+"MetroExodus.exe"+354D50: 0F B7 C2                 -  movzx eax,dx
+"MetroExodus.exe"+354D53: 89 81 90 03 00 00        -  mov [rcx+00000390],eax
+}
+
+{
+// ORIGINAL CODE - INJECTION POINT: "MetroExodus.exe"+354D5C
+
+"MetroExodus.exe"+354D41: CC                       -  int 3
+"MetroExodus.exe"+354D42: CC                       -  int 3
+"MetroExodus.exe"+354D43: CC                       -  int 3
+"MetroExodus.exe"+354D44: 48 81 E9 50 02 00 00     -  sub rcx,00000250
+"MetroExodus.exe"+354D4B: E9 20 94 CF FF           -  jmp MetroExodus.exe+4E170
+"MetroExodus.exe"+354D50: 0F B7 C2                 -  movzx eax,dx
+"MetroExodus.exe"+354D53: 89 81 90 03 00 00        -  mov [rcx+00000390],eax
+"MetroExodus.exe"+354D59: C3                       -  ret
+"MetroExodus.exe"+354D5A: CC                       -  int 3
+"MetroExodus.exe"+354D5B: CC                       -  int 3
+// ---------- INJECTING HERE ----------
+"MetroExodus.exe"+354D5C: 0F B7 81 90 03 00 00     -  movzx eax,word ptr [rcx+00000390]
+// ---------- DONE INJECTING  ----------
+"MetroExodus.exe"+354D63: C3                       -  ret
+"MetroExodus.exe"+354D64: 66 89 91 90 01 00 00     -  mov [rcx+00000190],dx
+"MetroExodus.exe"+354D6B: C3                       -  ret
+"MetroExodus.exe"+354D6C: 0F B7 81 90 01 00 00     -  movzx eax,word ptr [rcx+00000190]
+"MetroExodus.exe"+354D73: C3                       -  ret
+"MetroExodus.exe"+354D74: 0F B7 81 7E 03 00 00     -  movzx eax,word ptr [rcx+0000037E]
+"MetroExodus.exe"+354D7B: C3                       -  ret
+"MetroExodus.exe"+354D7C: 40 53                    -  push rbx
+"MetroExodus.exe"+354D7E: 48 83 EC 20              -  sub rsp,20
+"MetroExodus.exe"+354D82: 48 8B D9                 -  mov rbx,rcx
+}
+</AssemblerScript>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Toggle Activation</Action>
+                  <Keys>
+                    <Key>110</Key>
+                  </Keys>
+                  <ID>0</ID>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89497</ID>
+              <Description>"Infinite Mask Durability"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+aobscanmodule(InfMaskDurability,MetroExodus.exe,F3 0F 5C 83 88 03 00 00 F3)
+alloc(newmem,$1000,"MetroExodus.exe")
+label(code)
+label(return)
+registersymbol(InfMaskDurability)
+
+newmem:
+  mov [rbx+388],(float)1.0
+
+code:
+  subss xmm0,[rbx+00000388]
+  jmp return
+
+InfMaskDurability:
+  jmp newmem
+  nop 3
+return:
+
+[DISABLE]
+InfMaskDurability:
+  db F3 0F 5C 83 88 03 00 00
+unregistersymbol(InfMaskDurability)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "MetroExodus.exe"+57B015
+
+"MetroExodus.exe"+57AFEC: 48 8D 88 80 00 00 00     -  lea rcx,[rax+00000080]
+"MetroExodus.exe"+57AFF3: 48 0F 44 CA              -  cmove rcx,rdx
+"MetroExodus.exe"+57AFF7: F3 0F 10 01              -  movss xmm0,[rcx]
+"MetroExodus.exe"+57AFFB: EB 03                    -  jmp MetroExodus.exe+57B000
+"MetroExodus.exe"+57AFFD: 0F 28 C4                 -  movaps xmm0,xmm4
+"MetroExodus.exe"+57B000: 0F 28 CC                 -  movaps xmm1,xmm4
+"MetroExodus.exe"+57B003: C7 44 24 30 00 00 80 3F  -  mov [rsp+30],3F800000
+"MetroExodus.exe"+57B00B: F3 0F 5E C8              -  divss xmm1,xmm0
+"MetroExodus.exe"+57B00F: 0F 28 C4                 -  movaps xmm0,xmm4
+"MetroExodus.exe"+57B012: 0F 28 D4                 -  movaps xmm2,xmm4
+// ---------- INJECTING HERE ----------
+"MetroExodus.exe"+57B015: F3 0F 5C 83 88 03 00 00  -  subss xmm0,[rbx+00000388]
+// ---------- DONE INJECTING  ----------
+"MetroExodus.exe"+57B01D: F3 0F 5C E1              -  subss xmm4,xmm1
+"MetroExodus.exe"+57B021: F3 0F 59 C1              -  mulss xmm0,xmm1
+"MetroExodus.exe"+57B025: F3 0F 5C D0              -  subss xmm2,xmm0
+"MetroExodus.exe"+57B029: 0F 28 C2                 -  movaps xmm0,xmm2
+"MetroExodus.exe"+57B02C: F3 0F 5D 44 24 30        -  minss xmm0,[rsp+30]
+"MetroExodus.exe"+57B032: F3 0F 5F C4              -  maxss xmm0,xmm4
+"MetroExodus.exe"+57B036: 48 83 C4 20              -  add rsp,20
+"MetroExodus.exe"+57B03A: 5B                       -  pop rbx
+"MetroExodus.exe"+57B03B: C3                       -  ret
+"MetroExodus.exe"+57B03C: CC                       -  int 3
+}
+</AssemblerScript>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Toggle Activation</Action>
+                  <Keys>
+                    <Key>110</Key>
+                  </Keys>
+                  <ID>0</ID>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>13</ID>
+              <Description>"Infinite Mask Filter Time"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+aobscanmodule(InfMaskFilterTime,MetroExodus.exe,F3 0F 10 87 90 0A 00 00 48 85)
+alloc(newmem,$1000,"MetroExodus.exe")
+label(code)
+label(return)
+registersymbol(InfMaskFilterTime)
+
+newmem:
+  mov [rdi+A90],(float)600
+
+code:
+  movss xmm0,[rdi+00000A90]
+  jmp return
+
+InfMaskFilterTime:
+  jmp newmem
+  nop 3
+return:
+
+[DISABLE]
+InfMaskFilterTime:
+  db F3 0F 10 87 90 0A 00 00
+unregistersymbol(InfMaskFilterTime)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "MetroExodus.exe"+57C14E
+
+"MetroExodus.exe"+57C121: 80 7C 08 3B 00              -  cmp byte ptr [rax+rcx+3B],00
+"MetroExodus.exe"+57C126: 74 18                       -  je MetroExodus.exe+57C140
+"MetroExodus.exe"+57C128: 48 8B 8E 70 0F 00 00        -  mov rcx,[rsi+00000F70]
+"MetroExodus.exe"+57C12F: 45 33 C9                    -  xor r9d,r9d
+"MetroExodus.exe"+57C132: 45 33 C0                    -  xor r8d,r8d
+"MetroExodus.exe"+57C135: B2 08                       -  mov dl,08
+"MetroExodus.exe"+57C137: 48 8B 01                    -  mov rax,[rcx]
+"MetroExodus.exe"+57C13A: FF 90 A8 01 00 00           -  call qword ptr [rax+000001A8]
+"MetroExodus.exe"+57C140: 48 8B 8F 30 02 00 00        -  mov rcx,[rdi+00000230]
+"MetroExodus.exe"+57C147: 48 8D 1D F2 2F 1E 01        -  lea rbx,[MetroExodus.exe+175F140]
+// ---------- INJECTING HERE ----------
+"MetroExodus.exe"+57C14E: F3 0F 10 87 90 0A 00 00     -  movss xmm0,[rdi+00000A90]
+// ---------- DONE INJECTING  ----------
+"MetroExodus.exe"+57C156: 48 85 C9                    -  test rcx,rcx
+"MetroExodus.exe"+57C159: 41 BC 60 02 00 00           -  mov r12d,00000260
+"MetroExodus.exe"+57C15F: 0F 28 F0                    -  movaps xmm6,xmm0
+"MetroExodus.exe"+57C162: F3 0F 5E B7 94 0A 00 00     -  divss xmm6,[rdi+00000A94]
+"MetroExodus.exe"+57C16A: 48 8D 81 04 02 00 00        -  lea rax,[rcx+00000204]
+"MetroExodus.exe"+57C171: 48 8B D1                    -  mov rdx,rcx
+"MetroExodus.exe"+57C174: 49 0F 44 C4                 -  cmove rax,r12
+"MetroExodus.exe"+57C178: 0F 2F 00                    -  comiss xmm0,[rax]
+"MetroExodus.exe"+57C17B: 0F 83 A6 01 00 00           -  jae MetroExodus.exe+57C327
+"MetroExodus.exe"+57C181: 80 BF AF 0A 00 00 00        -  cmp byte ptr [rdi+00000AAF],00
+}
+</AssemblerScript>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Toggle Activation</Action>
+                  <Keys>
+                    <Key>110</Key>
+                  </Keys>
+                  <ID>0</ID>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>201</ID>
+              <Description>"Infinite Pressure &amp; Current"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+aobscanmodule(InfPressureCurrent,MetroExodus.exe,F3 0F 10 8B 70 1A 00 00 0F 28)
+alloc(newmem,$1000,"MetroExodus.exe")
+label(code)
+label(return)
+registersymbol(InfPressureCurrent)
+
+newmem:
+  cmp [rbx+1A70],(float)0.665
+  jge @f
+  mov [rbx+1A70],(float)0.665
+
+code:
+  movss xmm1,[rbx+00001A70]
+  jmp return
+
+InfPressureCurrent:
+  jmp newmem
+  nop 3
+return:
+
+[DISABLE]
+InfPressureCurrent:
+  db F3 0F 10 8B 70 1A 00 00
+unregistersymbol(InfPressureCurrent)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "MetroExodus.exe"+508928
+
+"MetroExodus.exe"+508906: 83 F8 01                 -  cmp eax,01
+"MetroExodus.exe"+508909: 75 13                    -  jne MetroExodus.exe+50891E
+"MetroExodus.exe"+50890B: BA FD FF FF BF           -  mov edx,BFFFFFFD
+"MetroExodus.exe"+508910: 33 C0                    -  xor eax,eax
+"MetroExodus.exe"+508912: F0 0F B1 51 08           -  lock  cmpxchg [rcx+08],edx
+"MetroExodus.exe"+508917: 75 05                    -  jne MetroExodus.exe+50891E
+"MetroExodus.exe"+508919: E8 12 A2 5A 00           -  call MetroExodus.exe+AB2B30
+"MetroExodus.exe"+50891E: 48 8B 7C 24 50           -  mov rdi,[rsp+50]
+"MetroExodus.exe"+508923: 48 85 F6                 -  test rsi,rsi
+"MetroExodus.exe"+508926: 74 13                    -  je MetroExodus.exe+50893B
+// ---------- INJECTING HERE ----------
+"MetroExodus.exe"+508928: F3 0F 10 8B 70 1A 00 00  -  movss xmm1,[rbx+00001A70]
+// ---------- DONE INJECTING  ----------
+"MetroExodus.exe"+508930: 0F 28 D6                 -  movaps xmm2,xmm6
+"MetroExodus.exe"+508933: 48 8B CE                 -  mov rcx,rsi
+"MetroExodus.exe"+508936: E8 25 9F F9 FF           -  call MetroExodus.exe+4A2860
+"MetroExodus.exe"+50893B: 48 8B 74 24 48           -  mov rsi,[rsp+48]
+"MetroExodus.exe"+508940: 0F 28 74 24 20           -  movaps xmm6,[rsp+20]
+"MetroExodus.exe"+508945: 48 83 C4 30              -  add rsp,30
+"MetroExodus.exe"+508949: 5B                       -  pop rbx
+"MetroExodus.exe"+50894A: C3                       -  ret
+"MetroExodus.exe"+50894B: CC                       -  int 3
+"MetroExodus.exe"+50894C: CC                       -  int 3
+}
+</AssemblerScript>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Toggle Activation</Action>
+                  <Keys>
+                    <Key>110</Key>
+                  </Keys>
+                  <ID>0</ID>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>1</ID>
+          <Description>"[#2]"</Description>
+          <Options moHideChildren="1"/>
+          <LastState Value="" Activated="1" RealAddress="00000000"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>89532</ID>
+              <Description>"MS"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+aobscanmodule(MouseSpeed,MetroExodus.exe,0F 29 B4 24 90 00 00 00 F3 0F 5E)
+alloc(newmem,$1000,"MetroExodus.exe")
+label(code)
+label(return)
+registersymbol(MouseSpeed)
+
+newmem:
+  movss xmm11,[MSpeed]
+
+code:
+  movaps [rsp+00000090],xmm6
+  jmp return
+
+MSpeed:
+  dd (float)0.65 //Mouse Speed
+
+MouseSpeed:
+  jmp newmem
+  nop 3
+return:
+
+[DISABLE]
+MouseSpeed:
+  db 0F 29 B4 24 90 00 00 00
+unregistersymbol(MouseSpeed)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "MetroExodus.exe"+4AA566
+
+"MetroExodus.exe"+4AA52D: FF 90 B0 01 00 00           -  call qword ptr [rax+000001B0]
+"MetroExodus.exe"+4AA533: 0F 57 FF                    -  xorps xmm7,xmm7
+"MetroExodus.exe"+4AA536: 45 0F 57 C0                 -  xorps xmm8,xmm8
+"MetroExodus.exe"+4AA53A: 8B F7                       -  mov esi,edi
+"MetroExodus.exe"+4AA53C: F3 44 0F 10 1D 53 3C 16 01  -  movss xmm11,[MetroExodus.exe+160E198]
+"MetroExodus.exe"+4AA545: F3 44 0F 10 15 C6 E3 03 01  -  movss xmm10,[MetroExodus.exe+14E8914]
+"MetroExodus.exe"+4AA54E: 41 0F 28 CB                 -  movaps xmm1,xmm11
+"MetroExodus.exe"+4AA552: F3 0F 5C 0D 6E 3C 16 01     -  subss xmm1,[MetroExodus.exe+160E1C8]
+"MetroExodus.exe"+4AA55A: C7 44 24 30 00 00 80 3F     -  mov [rsp+30],3F800000
+"MetroExodus.exe"+4AA562: 89 7C 24 34                 -  mov [rsp+34],edi
+// ---------- INJECTING HERE ----------
+"MetroExodus.exe"+4AA566: 0F 29 B4 24 90 00 00 00     -  movaps [rsp+00000090],xmm6
+// ---------- DONE INJECTING  ----------
+"MetroExodus.exe"+4AA56E: F3 0F 5E 0D 52 3C 16 01     -  divss xmm1,[MetroExodus.exe+160E1C8]
+"MetroExodus.exe"+4AA576: 0F 28 E9                    -  movaps xmm5,xmm1
+"MetroExodus.exe"+4AA579: F3 0F 5D 6C 24 30           -  minss xmm5,[rsp+30]
+"MetroExodus.exe"+4AA57F: F3 0F 5F 6C 24 34           -  maxss xmm5,[rsp+34]
+"MetroExodus.exe"+4AA585: 0F 2F 2D CC DF 03 01        -  comiss xmm5,[MetroExodus.exe+14E8558]
+"MetroExodus.exe"+4AA58C: 0F 82 5E 01 00 00           -  jb MetroExodus.exe+4AA6F0
+"MetroExodus.exe"+4AA592: 48 63 0D 5F 3C 16 01        -  movsxd  rcx,dword ptr [MetroExodus.exe+160E1F8]
+"MetroExodus.exe"+4AA599: 83 F9 04                    -  cmp ecx,04
+"MetroExodus.exe"+4AA59C: 7C 0C                       -  jl MetroExodus.exe+4AA5AA
+"MetroExodus.exe"+4AA59E: 0F 28 DF                    -  movaps xmm3,xmm7
+}
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89528</ID>
+              <Description>"FOV"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+aobscanmodule(FOV,MetroExodus.exe,F3 0F 10 65 50)
+alloc(newmem,$1000,"MetroExodus.exe")
+label(code)
+label(return)
+registersymbol(FOV)
+
+newmem:
+  movss xmm4,[rbp+50]
+  mulss xmm4,[FOValue]
+  jmp FOV+0D
+
+code:
+  movss xmm4,[rbp+50]
+  jmp return
+
+FOValue:
+  dd (float)68 //Field of View
+
+FOV:
+  jmp newmem
+return:
+
+[DISABLE]
+FOV:
+  db F3 0F 10 65 50
+unregistersymbol(FOV)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "MetroExodus.exe"+ACD3F8
+
+"MetroExodus.exe"+ACD3BD: F3 0F 59 D1              -  mulss xmm2,xmm1
+"MetroExodus.exe"+ACD3C1: F3 0F 11 15 2F 4B C8 00  -  movss [MetroExodus.exe+1751EF8],xmm2
+"MetroExodus.exe"+ACD3C9: F3 41 0F 59 4D 4C        -  mulss xmm1,[r13+4C]
+"MetroExodus.exe"+ACD3CF: F3 41 0F 11 4D 4C        -  movss [r13+4C],xmm1
+"MetroExodus.exe"+ACD3D5: 48 8B 05 C4 A1 C7 00     -  mov rax,[MetroExodus.exe+17475A0]
+"MetroExodus.exe"+ACD3DC: 0F B6 95 10 02 00 00     -  movzx edx,byte ptr [rbp+00000210]
+"MetroExodus.exe"+ACD3E3: 48 8B 48 08              -  mov rcx,[rax+08]
+"MetroExodus.exe"+ACD3E7: 48 8B 01                 -  mov rax,[rcx]
+"MetroExodus.exe"+ACD3EA: FF 90 E0 01 00 00        -  call qword ptr [rax+000001E0]
+"MetroExodus.exe"+ACD3F0: F3 0F 10 05 FC 0E A1 00  -  movss xmm0,[MetroExodus.exe+14DE2F4]
+// ---------- INJECTING HERE ----------
+"MetroExodus.exe"+ACD3F8: F3 0F 10 65 50           -  movss xmm4,[rbp+50]
+// ---------- DONE INJECTING  ----------
+"MetroExodus.exe"+ACD3FD: F3 0F 59 25 DF 57 B5 00  -  mulss xmm4,[MetroExodus.exe+1622BE4]
+"MetroExodus.exe"+ACD405: 8B 44 24 50              -  mov eax,[rsp+50]
+"MetroExodus.exe"+ACD409: F3 0F 10 1D FB 07 A1 00  -  movss xmm3,[MetroExodus.exe+14DDC0C]
+"MetroExodus.exe"+ACD411: F3 0F 11 85 10 02 00 00  -  movss [rbp+00000210],xmm0
+"MetroExodus.exe"+ACD419: F3 0F 11 A5 10 02 00 00  -  movss [rbp+00000210],xmm4
+"MetroExodus.exe"+ACD421: 0F 28 D4                 -  movaps xmm2,xmm4
+"MetroExodus.exe"+ACD424: F3 0F 11 9D 10 02 00 00  -  movss [rbp+00000210],xmm3
+"MetroExodus.exe"+ACD42C: F3 0F 5D D0              -  minss xmm2,xmm0
+"MetroExodus.exe"+ACD430: F3 0F 10 45 54           -  movss xmm0,[rbp+54]
+"MetroExodus.exe"+ACD435: F3 0F 5F D3              -  maxss xmm2,xmm3
+}
+</AssemblerScript>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Toggle Activation</Action>
+                  <Keys>
+                    <Key>110</Key>
+                  </Keys>
+                  <ID>0</ID>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89070</ID>
+              <Description>"No Sway"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+aobscanmodule(NoSway,MetroExodus.exe,F3 44 0F 10 87 40 3A 00 00)
+alloc(newmem,$1000,"MetroExodus.exe")
+label(code)
+label(return)
+registersymbol(NoSway)
+
+newmem:
+  mov [rdi+3A40],(float)0
+  mov [rdi+3A44],(float)0
+
+code:
+  movss xmm8,[rdi+00003A40]
+  jmp return
+
+NoSway:
+  jmp newmem
+  nop 4
+return:
+
+[DISABLE]
+NoSway:
+  db F3 44 0F 10 87 40 3A 00 00
+unregistersymbol(NoSway)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "MetroExodus.exe"+4B4AB6
+
+"MetroExodus.exe"+4B4A5C: F3 0F 5D 94 24 90 00 00 00        -  minss xmm2,[rsp+00000090]
+"MetroExodus.exe"+4B4A65: C7 84 24 90 00 00 00 00 00 80 3F  -  mov [rsp+00000090],3F800000
+"MetroExodus.exe"+4B4A70: F3 0F 5F 94 24 A0 00 00 00        -  maxss xmm2,[rsp+000000A0]
+"MetroExodus.exe"+4B4A79: C7 84 24 A0 00 00 00 00 00 80 BF  -  mov [rsp+000000A0],BF800000
+"MetroExodus.exe"+4B4A84: F3 0F 11 97 40 3A 00 00           -  movss [rdi+00003A40],xmm2
+"MetroExodus.exe"+4B4A8C: F3 0F 10 97 44 3A 00 00           -  movss xmm2,[rdi+00003A44]
+"MetroExodus.exe"+4B4A94: F3 0F 5D 94 24 90 00 00 00        -  minss xmm2,[rsp+00000090]
+"MetroExodus.exe"+4B4A9D: F3 0F 5F 94 24 A0 00 00 00        -  maxss xmm2,[rsp+000000A0]
+"MetroExodus.exe"+4B4AA6: F3 0F 11 97 44 3A 00 00           -  movss [rdi+00003A44],xmm2
+"MetroExodus.exe"+4B4AAE: F3 0F 10 B7 44 3A 00 00           -  movss xmm6,[rdi+00003A44]
+// ---------- INJECTING HERE ----------
+"MetroExodus.exe"+4B4AB6: F3 44 0F 10 87 40 3A 00 00        -  movss xmm8,[rdi+00003A40]
+// ---------- DONE INJECTING  ----------
+"MetroExodus.exe"+4B4ABF: 48 85 ED                          -  test rbp,rbp
+"MetroExodus.exe"+4B4AC2: 74 64                             -  je MetroExodus.exe+4B4B28
+"MetroExodus.exe"+4B4AC4: E8 C7 E6 ED FF                    -  call MetroExodus.exe+393190
+"MetroExodus.exe"+4B4AC9: 41 B9 01 00 00 00                 -  mov r9d,00000001
+"MetroExodus.exe"+4B4ACF: 48 8D 8D F0 05 00 00              -  lea rcx,[rbp+000005F0]
+"MetroExodus.exe"+4B4AD6: 0F 28 D6                          -  movaps xmm2,xmm6
+"MetroExodus.exe"+4B4AD9: 48 8D 90 B4 02 00 00              -  lea rdx,[rax+000002B4]
+"MetroExodus.exe"+4B4AE0: E8 DB ED F2 FF                    -  call MetroExodus.exe+3E38C0
+"MetroExodus.exe"+4B4AE5: E8 A6 E6 ED FF                    -  call MetroExodus.exe+393190
+"MetroExodus.exe"+4B4AEA: 41 B9 01 00 00 00                 -  mov r9d,00000001
+}
+</AssemblerScript>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Toggle Activation</Action>
+                  <Keys>
+                    <Key>110</Key>
+                  </Keys>
+                  <ID>0</ID>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>191</ID>
+              <Description>"No Recoil"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+aobscanmodule(NoRecoil,MetroExodus.exe,F3 0F 59 BC 39 78 17 00 00)
+alloc(newmem,$1000,"MetroExodus.exe")
+label(code)
+label(return)
+registersymbol(NoRecoil)
+
+newmem:
+  mov [rdi+18BC],(float)0
+  mov [rcx+rdi+1778],(float)0
+
+code:
+  mulss xmm7,[rcx+rdi+00001778]
+  jmp return
+
+NoRecoil:
+  jmp newmem
+  nop 4
+return:
+
+[DISABLE]
+NoRecoil:
+  db F3 0F 59 BC 39 78 17 00 00
+unregistersymbol(NoRecoil)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "MetroExodus.exe"+4F7F22
+
+"MetroExodus.exe"+4F7EF7: F3 0F 5E F0                 -  divss xmm6,xmm0
+"MetroExodus.exe"+4F7EFB: F3 0F 59 B7 BC 18 00 00     -  mulss xmm6,[rdi+000018BC]
+"MetroExodus.exe"+4F7F03: 0F B6 D3                    -  movzx edx,bl
+"MetroExodus.exe"+4F7F06: 48 8B CF                    -  mov rcx,rdi
+"MetroExodus.exe"+4F7F09: E8 62 00 00 00              -  call MetroExodus.exe+4F7F70
+"MetroExodus.exe"+4F7F0E: 0F B6 CB                    -  movzx ecx,bl
+"MetroExodus.exe"+4F7F11: 0F 57 D2                    -  xorps xmm2,xmm2
+"MetroExodus.exe"+4F7F14: C1 E1 04                    -  shl ecx,04
+"MetroExodus.exe"+4F7F17: 8B D9                       -  mov ebx,ecx
+"MetroExodus.exe"+4F7F19: F3 0F 5C BC 39 80 17 00 00  -  subss xmm7,[rcx+rdi+00001780]
+// ---------- INJECTING HERE ----------
+"MetroExodus.exe"+4F7F22: F3 0F 59 BC 39 78 17 00 00  -  mulss xmm7,[rcx+rdi+00001778]
+// ---------- DONE INJECTING  ----------
+"MetroExodus.exe"+4F7F2B: 48 8D 48 20                 -  lea rcx,[rax+20]
+"MetroExodus.exe"+4F7F2F: 0F 28 CF                    -  movaps xmm1,xmm7
+"MetroExodus.exe"+4F7F32: E8 59 1F 74 00              -  call MetroExodus.exe+C39E90
+"MetroExodus.exe"+4F7F37: F3 0F 59 84 3B 7C 17 00 00  -  mulss xmm0,[rbx+rdi+0000177C]
+"MetroExodus.exe"+4F7F40: 0F 28 7C 24 20              -  movaps xmm7,[rsp+20]
+"MetroExodus.exe"+4F7F45: F3 0F 58 84 3B 84 17 00 00  -  addss xmm0,[rbx+rdi+00001784]
+"MetroExodus.exe"+4F7F4E: 48 8B 5C 24 50              -  mov rbx,[rsp+50]
+"MetroExodus.exe"+4F7F53: F3 0F 58 C6                 -  addss xmm0,xmm6
+"MetroExodus.exe"+4F7F57: 0F 28 74 24 30              -  movaps xmm6,[rsp+30]
+"MetroExodus.exe"+4F7F5C: 48 83 C4 40                 -  add rsp,40
+}
+</AssemblerScript>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Toggle Activation</Action>
+                  <Keys>
+                    <Key>110</Key>
+                  </Keys>
+                  <ID>0</ID>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89147</ID>
+              <Description>"No Spread"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+aobscanmodule(NoSpread,MetroExodus.exe,F3 0F 59 B6 24 09 00 00)
+alloc(newmem,$1000,"MetroExodus.exe")
+label(code)
+label(return)
+registersymbol(NoSpread)
+
+newmem:
+  mov [rsi+924],(float)0
+
+code:
+  mulss xmm6,[rsi+00000924]
+  jmp return
+
+NoSpread:
+  jmp newmem
+  nop 3
+return:
+
+[DISABLE]
+NoSpread:
+  db F3 0F 59 B6 24 09 00 00
+unregistersymbol(NoSpread)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "MetroExodus.exe"+3FE17A
+
+"MetroExodus.exe"+3FE146: F3 0F 58 B6 20 09 00 00  -  addss xmm6,[rsi+00000920]
+"MetroExodus.exe"+3FE14E: 48 85 DB                 -  test rbx,rbx
+"MetroExodus.exe"+3FE151: 74 27                    -  je MetroExodus.exe+3FE17A
+"MetroExodus.exe"+3FE153: F3 0F 10 8B 08 09 00 00  -  movss xmm1,[rbx+00000908]
+"MetroExodus.exe"+3FE15B: 0F 28 C1                 -  movaps xmm0,xmm1
+"MetroExodus.exe"+3FE15E: 0F 54 05 3B C1 0E 01     -  andps xmm0,[MetroExodus.exe+14EA2A0]
+"MetroExodus.exe"+3FE165: 0F 2F 05 EC A3 0E 01     -  comiss xmm0,[MetroExodus.exe+14E8558]
+"MetroExodus.exe"+3FE16C: 73 08                    -  jae MetroExodus.exe+3FE176
+"MetroExodus.exe"+3FE16E: F3 0F 10 8B 04 09 00 00  -  movss xmm1,[rbx+00000904]
+"MetroExodus.exe"+3FE176: F3 0F 59 F1              -  mulss xmm6,xmm1
+// ---------- INJECTING HERE ----------
+"MetroExodus.exe"+3FE17A: F3 0F 59 B6 24 09 00 00  -  mulss xmm6,[rsi+00000924]
+// ---------- DONE INJECTING  ----------
+"MetroExodus.exe"+3FE182: 0F 57 C0                 -  xorps xmm0,xmm0
+"MetroExodus.exe"+3FE185: F3 0F 10 C6              -  movss xmm0,xmm6
+"MetroExodus.exe"+3FE189: 0F 28 B4 24 A0 00 00 00  -  movaps xmm6,[rsp+000000A0]
+"MetroExodus.exe"+3FE191: F3 0F 5D 44 24 58        -  minss xmm0,[rsp+58]
+"MetroExodus.exe"+3FE197: F3 0F 5F 44 24 54        -  maxss xmm0,[rsp+54]
+"MetroExodus.exe"+3FE19D: 48 81 C4 C8 00 00 00     -  add rsp,000000C8
+"MetroExodus.exe"+3FE1A4: 5E                       -  pop rsi
+"MetroExodus.exe"+3FE1A5: 5B                       -  pop rbx
+"MetroExodus.exe"+3FE1A6: C3                       -  ret
+"MetroExodus.exe"+3FE1A7: CC                       -  int 3
+}
+</AssemblerScript>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Toggle Activation</Action>
+                  <Keys>
+                    <Key>110</Key>
+                  </Keys>
+                  <ID>0</ID>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>148</ID>
+              <Description>"No Reload"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+aobscanmodule(NoReload,MetroExodus.exe,44 2B FB 44 0F B6 C7)
+alloc(newmem,$1000,"MetroExodus.exe")
+label(code)
+label(return)
+registersymbol(NoReload)
+
+newmem:
+  cmp word [rsi],54C8
+  je @@Ashot
+  cmp word [rsi],E508
+  je @@Valve
+  cmp r15d,01
+  jg code
+  cmp [rsp+318],01
+  jg code
+  movzx r8d,dil
+  jmp return
+
+@@Ashot:
+  movzx r8d,dil
+  jmp return
+
+@@Valve:
+  cmp r15d,01
+  jg code
+  cmp [rsp+318],01
+  jg code
+  movzx r8d,dil
+  jmp return
+
+code:
+  sub r15d,ebx
+  movzx r8d,dil
+  jmp return
+
+NoReload:
+  jmp newmem
+  nop 2
+return:
+
+[DISABLE]
+NoReload:
+  db 44 2B FB 44 0F B6 C7
+unregistersymbol(NoReload)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "MetroExodus.exe"+4D7E91
+
+"MetroExodus.exe"+4D7E6C: 80 BE D0 18 00 00 01        -  cmp byte ptr [rsi+000018D0],01
+"MetroExodus.exe"+4D7E73: 75 0C                       -  jne MetroExodus.exe+4D7E81
+"MetroExodus.exe"+4D7E75: 48 8B CE                    -  mov rcx,rsi
+"MetroExodus.exe"+4D7E78: E8 C3 42 01 00              -  call MetroExodus.exe+4EC140
+"MetroExodus.exe"+4D7E7D: 84 C0                       -  test al,al
+"MetroExodus.exe"+4D7E7F: 75 05                       -  jne MetroExodus.exe+4D7E86
+"MetroExodus.exe"+4D7E81: 40 B7 03                    -  mov dil,03
+"MetroExodus.exe"+4D7E84: EB 08                       -  jmp MetroExodus.exe+4D7E8E
+"MetroExodus.exe"+4D7E86: 44 0F B6 BE A9 11 00 00     -  movzx r15d,byte ptr [rsi+000011A9]
+"MetroExodus.exe"+4D7E8E: 48 8B 06                    -  mov rax,[rsi]
+// ---------- INJECTING HERE ----------
+"MetroExodus.exe"+4D7E91: 44 2B FB                    -  sub r15d,ebx
+"MetroExodus.exe"+4D7E94: 44 0F B6 C7                 -  movzx r8d,dil
+// ---------- DONE INJECTING  ----------
+"MetroExodus.exe"+4D7E98: 41 8B D7                    -  mov edx,r15d
+"MetroExodus.exe"+4D7E9B: 48 8B CE                    -  mov rcx,rsi
+"MetroExodus.exe"+4D7E9E: FF 90 E8 1A 00 00           -  call qword ptr [rax+00001AE8]
+"MetroExodus.exe"+4D7EA4: 4C 8D AE 80 05 00 00        -  lea r13,[rsi+00000580]
+"MetroExodus.exe"+4D7EAB: 49 8B CD                    -  mov rcx,r13
+"MetroExodus.exe"+4D7EAE: E8 CD 75 EF FF              -  call MetroExodus.exe+3CF480
+"MetroExodus.exe"+4D7EB3: 48 85 C0                    -  test rax,rax
+"MetroExodus.exe"+4D7EB6: 74 43                       -  je MetroExodus.exe+4D7EFB
+"MetroExodus.exe"+4D7EB8: 49 8B CD                    -  mov rcx,r13
+"MetroExodus.exe"+4D7EBB: E8 C0 75 EF FF              -  call MetroExodus.exe+3CF480
+}
+</AssemblerScript>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Toggle Activation</Action>
+                  <Keys>
+                    <Key>110</Key>
+                  </Keys>
+                  <ID>0</ID>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89028</ID>
+              <Description>"No Cleaning"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+aobscanmodule(NoCleaning,MetroExodus.exe,48 0F 44 C5 0F B7 08 ?? ?? ?? ?? ?? ?? ?? F3)
+alloc(newmem,$1000,"MetroExodus.exe")
+label(code)
+label(return)
+registersymbol(NoCleaning)
+
+newmem:
+  cmove rax,rbp
+
+@@:
+  mov [rax],0
+
+code:
+  movzx ecx,word ptr [rax]
+  jmp return
+
+NoCleaning:
+  jmp newmem
+  nop 2
+return:
+
+aobscanmodule(NoCleaning1,MetroExodus.exe,48 8B 41 38 48 89 85 20 02 00 00)
+alloc(newmem1,$1000,"MetroExodus.exe")
+label(code1)
+label(return1)
+registersymbol(NoCleaning1)
+
+newmem1:
+  cmp [rcx+310],3DCCCCCD
+  je @f
+  mov [rcx+38],0
+
+code1:
+  mov rax,[rcx+38]
+  mov [rbp+00000220],rax
+  jmp return1
+
+NoCleaning1:
+  jmp newmem1
+  nop 6
+return1:
+
+aobscanmodule(NoCleaning2,MetroExodus.exe,48 8B 41 38 48 89 45 68)
+alloc(newmem2,$1000,"MetroExodus.exe")
+label(code2)
+label(return2)
+registersymbol(NoCleaning2)
+
+newmem2:
+  cmp [rcx+310],3DCCCCCD
+  je @f
+  mov [rcx+38],0
+
+code2:
+  mov rax,[rcx+38]
+  mov [rbp+68],rax
+  jmp return2
+
+NoCleaning2:
+  jmp newmem2
+  nop 3
+return2:
+
+[DISABLE]
+NoCleaning:
+  db 48 0F 44 C5 0F B7 08
+unregistersymbol(NoCleaning)
+dealloc(newmem)
+
+NoCleaning1:
+  db 48 8B 41 38 48 89 85 20 02 00 00
+unregistersymbol(NoCleaning1)
+dealloc(newmem1)
+
+NoCleaning2:
+  db 48 8B 41 38 48 89 45 68
+unregistersymbol(NoCleaning2)
+dealloc(newmem2)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "MetroExodus.exe"+4EB255
+
+"MetroExodus.exe"+4EB230: 0F 57 F6                 -  xorps xmm6,xmm6
+"MetroExodus.exe"+4EB233: 85 F6                    -  test esi,esi
+"MetroExodus.exe"+4EB235: 74 34                    -  je MetroExodus.exe+4EB26B
+"MetroExodus.exe"+4EB237: 48 8B 9B 08 19 00 00     -  mov rbx,[rbx+00001908]
+"MetroExodus.exe"+4EB23E: 66 90                    -  nop 2
+"MetroExodus.exe"+4EB240: 8D 04 FD 00 00 00 00     -  lea eax,[rdi*8+00000000]
+"MetroExodus.exe"+4EB247: 48 8B 04 18              -  mov rax,[rax+rbx]
+"MetroExodus.exe"+4EB24B: 48 8B 10                 -  mov rdx,[rax]
+"MetroExodus.exe"+4EB24E: 48 85 D2                 -  test rdx,rdx
+"MetroExodus.exe"+4EB251: 48 8D 42 D0              -  lea rax,[rdx-30]
+// ---------- INJECTING HERE ----------
+"MetroExodus.exe"+4EB255: 48 0F 44 C5              -  cmove rax,rbp
+"MetroExodus.exe"+4EB259: 0F B7 08                 -  movzx ecx,word ptr [rax]
+// ---------- DONE INJECTING  ----------
+"MetroExodus.exe"+4EB25C: E8 6F 7B B9 FF           -  call MetroExodus.exe+82DD0
+"MetroExodus.exe"+4EB261: FF C7                    -  inc edi
+"MetroExodus.exe"+4EB263: F3 0F 58 F0              -  addss xmm6,xmm0
+"MetroExodus.exe"+4EB267: 3B FE                    -  cmp edi,esi
+"MetroExodus.exe"+4EB269: 72 D5                    -  jb MetroExodus.exe+4EB240
+"MetroExodus.exe"+4EB26B: 48 8B 6C 24 50           -  mov rbp,[rsp+50]
+"MetroExodus.exe"+4EB270: 0F 57 C9                 -  xorps xmm1,xmm1
+"MetroExodus.exe"+4EB273: F3 48 0F 2A CE           -  cvtsi2ss xmm1,rsi
+"MetroExodus.exe"+4EB278: 48 8B 74 24 58           -  mov rsi,[rsp+58]
+"MetroExodus.exe"+4EB27D: F3 0F 5E F1              -  divss xmm6,xmm1
+}
+
+{
+// ORIGINAL CODE - INJECTION POINT: "MetroExodus.exe"+1B3983
+
+"MetroExodus.exe"+1B3953: 0F 11 6F D8                 -  movups [rdi-28],xmm5
+"MetroExodus.exe"+1B3957: 0F 11 77 E8                 -  movups [rdi-18],xmm6
+"MetroExodus.exe"+1B395B: 0F 11 84 C5 90 07 00 00     -  movups [rbp+rax*8+00000790],xmm0
+"MetroExodus.exe"+1B3963: 0F 28 85 30 02 00 00        -  movaps xmm0,[rbp+00000230]
+"MetroExodus.exe"+1B396A: 41 8B C4                    -  mov eax,r12d
+"MetroExodus.exe"+1B396D: 41 FF C4                    -  inc r12d
+"MetroExodus.exe"+1B3970: 48 03 C0                    -  add rax,rax
+"MetroExodus.exe"+1B3973: 0F 11 84 C5 90 07 00 00     -  movups [rbp+rax*8+00000790],xmm0
+"MetroExodus.exe"+1B397B: 49 8B 4E 08                 -  mov rcx,[r14+08]
+"MetroExodus.exe"+1B397F: 48 8D 51 08                 -  lea rdx,[rcx+08]
+// ---------- INJECTING HERE ----------
+"MetroExodus.exe"+1B3983: 48 8B 41 38                 -  mov rax,[rcx+38]
+"MetroExodus.exe"+1B3987: 48 89 85 20 02 00 00        -  mov [rbp+00000220],rax
+// ---------- DONE INJECTING  ----------
+"MetroExodus.exe"+1B398E: 48 83 3A 00                 -  cmp qword ptr [rdx],00
+"MetroExodus.exe"+1B3992: 75 07                       -  jne MetroExodus.exe+1B399B
+"MetroExodus.exe"+1B3994: 48 83 7A 08 00              -  cmp qword ptr [rdx+08],00
+"MetroExodus.exe"+1B3999: 74 2D                       -  je MetroExodus.exe+1B39C8
+"MetroExodus.exe"+1B399B: 48 8D 8D E0 04 00 00        -  lea rcx,[rbp+000004E0]
+"MetroExodus.exe"+1B39A2: E8 09 4B 00 00              -  call MetroExodus.exe+1B84B0
+"MetroExodus.exe"+1B39A7: 48 8B 8D E0 04 00 00        -  mov rcx,[rbp+000004E0]
+"MetroExodus.exe"+1B39AE: 48 85 C9                    -  test rcx,rcx
+"MetroExodus.exe"+1B39B1: 74 15                       -  je MetroExodus.exe+1B39C8
+"MetroExodus.exe"+1B39B3: 48 8B 85 E8 04 00 00        -  mov rax,[rbp+000004E8]
+}
+
+{
+// ORIGINAL CODE - INJECTION POINT: "MetroExodus.exe"+1B5214
+
+"MetroExodus.exe"+1B51DF: 44 0F C6 9D 20 05 00 00 EE  -  shufps xmm11,[rbp+00000520],-12
+"MetroExodus.exe"+1B51E8: 0F C6 9D 40 05 00 00 EE     -  shufps xmm3,[rbp+00000540],-12
+"MetroExodus.exe"+1B51F0: 0F 11 73 C8                 -  movups [rbx-38],xmm6
+"MetroExodus.exe"+1B51F4: 0F 11 7B D8                 -  movups [rbx-28],xmm7
+"MetroExodus.exe"+1B51F8: 44 0F 11 43 E8              -  movups [rbx-18],xmm8
+"MetroExodus.exe"+1B51FD: 48 8B 4F 08                 -  mov rcx,[rdi+08]
+"MetroExodus.exe"+1B5201: 48 8D 51 08                 -  lea rdx,[rcx+08]
+"MetroExodus.exe"+1B5205: 44 0F C6 E0 88              -  shufps xmm12,xmm0,-78
+"MetroExodus.exe"+1B520A: 44 0F C6 D0 DD              -  shufps xmm10,xmm0,-23
+"MetroExodus.exe"+1B520F: 44 0F C6 DB 88              -  shufps xmm11,xmm3,-78
+// ---------- INJECTING HERE ----------
+"MetroExodus.exe"+1B5214: 48 8B 41 38                 -  mov rax,[rcx+38]
+"MetroExodus.exe"+1B5218: 48 89 45 68                 -  mov [rbp+68],rax
+// ---------- DONE INJECTING  ----------
+"MetroExodus.exe"+1B521C: 48 83 3A 00                 -  cmp qword ptr [rdx],00
+"MetroExodus.exe"+1B5220: 44 0F 29 A5 80 05 00 00     -  movaps [rbp+00000580],xmm12
+"MetroExodus.exe"+1B5228: 44 0F 29 95 90 05 00 00     -  movaps [rbp+00000590],xmm10
+"MetroExodus.exe"+1B5230: 44 0F 29 9D A0 05 00 00     -  movaps [rbp+000005A0],xmm11
+"MetroExodus.exe"+1B5238: 75 07                       -  jne MetroExodus.exe+1B5241
+"MetroExodus.exe"+1B523A: 48 83 7A 08 00              -  cmp qword ptr [rdx+08],00
+"MetroExodus.exe"+1B523F: 74 2A                       -  je MetroExodus.exe+1B526B
+"MetroExodus.exe"+1B5241: 48 8D 8D 40 03 00 00        -  lea rcx,[rbp+00000340]
+"MetroExodus.exe"+1B5248: E8 63 32 00 00              -  call MetroExodus.exe+1B84B0
+"MetroExodus.exe"+1B524D: 48 8B 8D 40 03 00 00        -  mov rcx,[rbp+00000340]
+}
+</AssemblerScript>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Toggle Activation</Action>
+                  <Keys>
+                    <Key>110</Key>
+                  </Keys>
+                  <ID>0</ID>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>25</ID>
+              <Description>"No Overheat"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+aobscanmodule(NoOverheat,MetroExodus.exe,F3 0F 10 87 C0 18 00 00 4C)
+alloc(newmem,$1000,"MetroExodus.exe")
+label(code)
+label(return)
+registersymbol(NoOverheat)
+
+newmem:
+  cmp [rdi+18C0],(float)0.1
+  jle @f
+  mov [rdi+18C0],(float)0.1
+
+code:
+  movss xmm0,[rdi+000018C0]
+  jmp return
+
+NoOverheat:
+  jmp newmem
+  nop 3
+return:
+
+[DISABLE]
+NoOverheat:
+  db F3 0F 10 87 C0 18 00 00
+unregistersymbol(NoOverheat)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "MetroExodus.exe"+4E9ABC
+
+"MetroExodus.exe"+4E9A8D: F3 0F 5F 95 90 01 00 00        -  maxss xmm2,[rbp+00000190]
+"MetroExodus.exe"+4E9A95: F3 0F 11 97 C0 18 00 00        -  movss [rdi+000018C0],xmm2
+"MetroExodus.exe"+4E9A9D: 0F 29 55 B0                    -  movaps [rbp-50],xmm2
+"MetroExodus.exe"+4E9AA1: 49 8B 06                       -  mov rax,[r14]
+"MetroExodus.exe"+4E9AA4: 48 8D 55 98                    -  lea rdx,[rbp-68]
+"MetroExodus.exe"+4E9AA8: 48 8B CF                       -  mov rcx,rdi
+"MetroExodus.exe"+4E9AAB: 48 89 45 98                    -  mov [rbp-68],rax
+"MetroExodus.exe"+4E9AAF: E8 9C E6 FF FF                 -  call MetroExodus.exe+4E8150
+"MetroExodus.exe"+4E9AB4: 48 8B CF                       -  mov rcx,rdi
+"MetroExodus.exe"+4E9AB7: E8 94 FE 00 00                 -  call MetroExodus.exe+4F9950
+// ---------- INJECTING HERE ----------
+"MetroExodus.exe"+4E9ABC: F3 0F 10 87 C0 18 00 00        -  movss xmm0,[rdi+000018C0]
+// ---------- DONE INJECTING  ----------
+"MetroExodus.exe"+4E9AC4: 4C 8B B4 24 40 02 00 00        -  mov r14,[rsp+00000240]
+"MetroExodus.exe"+4E9ACC: 41 0F 54 C2                    -  andps xmm0,xmm10
+"MetroExodus.exe"+4E9AD0: 0F 2F C7                       -  comiss xmm0,xmm7
+"MetroExodus.exe"+4E9AD3: 44 0F 28 94 24 E0 01 00 00     -  movaps xmm10,[rsp+000001E0]
+"MetroExodus.exe"+4E9ADC: 0F 82 15 01 00 00              -  jb MetroExodus.exe+4E9BF7
+"MetroExodus.exe"+4E9AE2: 48 8B CF                       -  mov rcx,rdi
+"MetroExodus.exe"+4E9AE5: E8 E6 B4 01 00                 -  call MetroExodus.exe+504FD0
+"MetroExodus.exe"+4E9AEA: 48 8B CF                       -  mov rcx,rdi
+"MetroExodus.exe"+4E9AED: 44 0F 28 C0                    -  movaps xmm8,xmm0
+"MetroExodus.exe"+4E9AF1: E8 4A B6 01 00                 -  call MetroExodus.exe+505140
+}
+</AssemblerScript>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Toggle Activation</Action>
+                  <Keys>
+                    <Key>110</Key>
+                  </Keys>
+                  <ID>0</ID>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>205</ID>
+              <Description>"Time of Day"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+aobscanmodule(TimeOfDay,MetroExodus.exe,48 8B 80 28 D3 00 00 48 F7 F1 49)
+alloc(newmem,$1000,"MetroExodus.exe")
+label(TOD)
+label(code)
+label(return)
+registersymbol(TOD)
+registersymbol(TimeOfDay)
+
+newmem:
+  mov [TOD],rax
+
+code:
+  mov rax,[rax+0000D328]
+  jmp return
+
+TOD:
+  dd 00
+
+TimeOfDay:
+  jmp newmem
+  nop 2
+return:
+
+[DISABLE]
+TimeOfDay:
+  db 48 8B 80 28 D3 00 00
+unregistersymbol(TimeOfDay)
+unregistersymbol(TOD)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "MetroExodus.exe"+B86308
+
+"MetroExodus.exe"+B862D0: 4C 89 68 E8                    -  mov [rax-18],r13
+"MetroExodus.exe"+B862D4: 49 BD 77 BE 9F 1A 2F DD 24 06  -  mov r13,0624DD2F1A9FBE77
+"MetroExodus.exe"+B862DE: 4C 89 70 E0                    -  mov [rax-20],r14
+"MetroExodus.exe"+B862E2: 4C 89 78 D8                    -  mov [rax-28],r15
+"MetroExodus.exe"+B862E6: 0F 29 70 C8                    -  movaps [rax-38],xmm6
+"MetroExodus.exe"+B862EA: 0F 29 78 B8                    -  movaps [rax-48],xmm7
+"MetroExodus.exe"+B862EE: 44 0F 29 40 A8                 -  movaps [rax-58],xmm8
+"MetroExodus.exe"+B862F3: 48 8B 05 BE 96 BD 00           -  mov rax,[MetroExodus.exe+175F9B8]
+"MetroExodus.exe"+B862FA: 48 8B 88 40 D3 00 00           -  mov rcx,[rax+0000D340]
+"MetroExodus.exe"+B86301: 48 2B 88 38 D3 00 00           -  sub rcx,[rax+0000D338]
+// ---------- INJECTING HERE ----------
+"MetroExodus.exe"+B86308: 48 8B 80 28 D3 00 00           -  mov rax,[rax+0000D328]
+// ---------- DONE INJECTING  ----------
+"MetroExodus.exe"+B8630F: 48 F7 F1                       -  div rcx
+"MetroExodus.exe"+B86312: 49 8B C5                       -  mov rax,r13
+"MetroExodus.exe"+B86315: 49 8B C8                       -  mov rcx,r8
+"MetroExodus.exe"+B86318: 48 8B EA                       -  mov rbp,rdx
+"MetroExodus.exe"+B8631B: 48 F7 E2                       -  mul rdx
+"MetroExodus.exe"+B8631E: 48 2B EA                       -  sub rbp,rdx
+"MetroExodus.exe"+B86321: 48 D1 ED                       -  shr rbp,1
+"MetroExodus.exe"+B86324: 48 03 EA                       -  add rbp,rdx
+"MetroExodus.exe"+B86327: 48 C1 ED 09                    -  shr rbp,09
+"MetroExodus.exe"+B8632B: 8B D5                          -  mov edx,ebp
+}
+</AssemblerScript>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Toggle Activation</Action>
+                  <Keys>
+                    <Key>110</Key>
+                  </Keys>
+                  <ID>0</ID>
+                </Hotkey>
+              </Hotkeys>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>89159</ID>
+                  <Description>"Increase [+] or decrease [-] time, Hold [Alt] to decelerate. Freeze [/] time."</Description>
+                  <Options moHideChildren="1"/>
+                  <LastState Value="" RealAddress="00000000"/>
+                  <GroupHeader>1</GroupHeader>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>89081</ID>
+                      <Description>"Current Time"</Description>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>TOD</Address>
+                      <Offsets>
+                        <Offset>D32B</Offset>
+                      </Offsets>
+                      <Hotkeys>
+                        <Hotkey>
+                          <Action>Increase Value</Action>
+                          <Keys>
+                            <Key>18</Key>
+                            <Key>107</Key>
+                          </Keys>
+                          <Value>4</Value>
+                          <ID>0</ID>
+                          <ActivateSound>Activate</ActivateSound>
+                          <DeactivateSound>Deactivate</DeactivateSound>
+                        </Hotkey>
+                        <Hotkey>
+                          <Action>Decrease Value</Action>
+                          <Keys>
+                            <Key>18</Key>
+                            <Key>109</Key>
+                          </Keys>
+                          <Value>4</Value>
+                          <ID>1</ID>
+                          <ActivateSound>Activate</ActivateSound>
+                        </Hotkey>
+                        <Hotkey>
+                          <Action>Increase Value</Action>
+                          <Keys>
+                            <Key>107</Key>
+                          </Keys>
+                          <Value>218</Value>
+                          <ID>2</ID>
+                          <ActivateSound>Activate</ActivateSound>
+                        </Hotkey>
+                        <Hotkey>
+                          <Action>Decrease Value</Action>
+                          <Keys>
+                            <Key>109</Key>
+                          </Keys>
+                          <Value>218</Value>
+                          <ID>3</ID>
+                          <ActivateSound>Activate</ActivateSound>
+                        </Hotkey>
+                        <Hotkey>
+                          <Action>Toggle Activation</Action>
+                          <Keys>
+                            <Key>111</Key>
+                          </Keys>
+                          <ID>4</ID>
+                          <ActivateSound TTS="EN">Time Freezed</ActivateSound>
+                          <DeactivateSound TTS="EN">Time Unfreezed</DeactivateSound>
+                        </Hotkey>
+                      </Hotkeys>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>89485</ID>
+          <Description>"[#3]"</Description>
+          <Options moHideChildren="1"/>
+          <LastState Value="" Activated="1" RealAddress="00000000"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>89157</ID>
+              <Description>"Walk Mode"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+aobscanmodule(WalkMode,MetroExodus.exe,F3 0F 10 83 28 21 00 00)
+alloc(newmem,$1000,"MetroExodus.exe")
+label(code)
+label(return)
+registersymbol(WalkMode)
+
+newmem:
+  mov [rbx+2128],(float)1.5
+
+code:
+  movss xmm0,[rbx+00002128]
+  jmp return
+
+WalkMode:
+  jmp newmem
+  nop 3
+return:
+
+[DISABLE]
+WalkMode:
+  db F3 0F 10 83 28 21 00 00
+unregistersymbol(WalkMode)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "MetroExodus.exe"+375A53
+
+"MetroExodus.exe"+375A2C: F3 0F 10 83 30 21 00 00  -  movss xmm0,[rbx+00002130]
+"MetroExodus.exe"+375A34: EB 25                    -  jmp MetroExodus.exe+375A5B
+"MetroExodus.exe"+375A36: 85 ED                    -  test ebp,ebp
+"MetroExodus.exe"+375A38: 74 0A                    -  je MetroExodus.exe+375A44
+"MetroExodus.exe"+375A3A: F3 0F 10 83 34 21 00 00  -  movss xmm0,[rbx+00002134]
+"MetroExodus.exe"+375A42: EB 17                    -  jmp MetroExodus.exe+375A5B
+"MetroExodus.exe"+375A44: 45 85 F6                 -  test r14d,r14d
+"MetroExodus.exe"+375A47: 74 0A                    -  je MetroExodus.exe+375A53
+"MetroExodus.exe"+375A49: F3 0F 10 83 2C 21 00 00  -  movss xmm0,[rbx+0000212C]
+"MetroExodus.exe"+375A51: EB 08                    -  jmp MetroExodus.exe+375A5B
+// ---------- INJECTING HERE ----------
+"MetroExodus.exe"+375A53: F3 0F 10 83 28 21 00 00  -  movss xmm0,[rbx+00002128]
+// ---------- DONE INJECTING  ----------
+"MetroExodus.exe"+375A5B: 0F 28 C8                 -  movaps xmm1,xmm0
+"MetroExodus.exe"+375A5E: F3 0F 5C 0D AE 2E 17 01  -  subss xmm1,[MetroExodus.exe+14E8914]
+"MetroExodus.exe"+375A66: 0F 54 0D 33 48 17 01     -  andps xmm1,[MetroExodus.exe+14EA2A0]
+"MetroExodus.exe"+375A6D: 0F 2F 0D 18 2B 17 01     -  comiss xmm1,[MetroExodus.exe+14E858C]
+"MetroExodus.exe"+375A74: 72 06                    -  jb MetroExodus.exe+375A7C
+"MetroExodus.exe"+375A76: F3 0F 59 C6              -  mulss xmm0,xmm6
+"MetroExodus.exe"+375A7A: EB 03                    -  jmp MetroExodus.exe+375A7F
+"MetroExodus.exe"+375A7C: 0F 28 C6                 -  movaps xmm0,xmm6
+"MetroExodus.exe"+375A7F: 48 8B 5C 24 50           -  mov rbx,[rsp+50]
+"MetroExodus.exe"+375A84: 48 8B 6C 24 58           -  mov rbp,[rsp+58]
+}
+</AssemblerScript>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Toggle Activation</Action>
+                  <Keys>
+                    <Key>110</Key>
+                  </Keys>
+                  <ID>0</ID>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89530</ID>
+              <Description>"Speed Mode"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+aobscanmodule(SpeedMode,MetroExodus.exe,F3 0F 59 F0 45 85 F6)
+alloc(newmem,$1000,"MetroExodus.exe")
+label(code)
+label(return)
+registersymbol(SpeedMode)
+
+newmem:
+  mulss xmm6,[Speed]
+  test r14d,r14d
+  jmp return
+
+code:
+  mulss xmm6,xmm0
+  test r14d,r14d
+  jmp return
+
+Speed:
+  dd (float)3.5
+
+SpeedMode:
+  jmp newmem
+  nop 2
+return:
+
+[DISABLE]
+SpeedMode:
+  db F3 0F 59 F0 45 85 F6
+unregistersymbol(SpeedMode)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "MetroExodus.exe"+3759BC
+
+"MetroExodus.exe"+37598E: 48 8B 10                 -  mov rdx,[rax]
+"MetroExodus.exe"+375991: 48 8B C8                 -  mov rcx,rax
+"MetroExodus.exe"+375994: FF 92 E0 04 00 00        -  call qword ptr [rdx+000004E0]
+"MetroExodus.exe"+37599A: F3 0F 59 C6              -  mulss xmm0,xmm6
+"MetroExodus.exe"+37599E: 0F 28 F0                 -  movaps xmm6,xmm0
+"MetroExodus.exe"+3759A1: 80 3D D0 00 3F 01 00     -  cmp byte ptr [MetroExodus.exe+1765A78],00
+"MetroExodus.exe"+3759A8: 74 0A                    -  je MetroExodus.exe+3759B4
+"MetroExodus.exe"+3759AA: F3 0F 10 05 CE 2F 17 01  -  movss xmm0,[MetroExodus.exe+14E8980]
+"MetroExodus.exe"+3759B2: EB 08                    -  jmp MetroExodus.exe+3759BC
+"MetroExodus.exe"+3759B4: F3 0F 10 05 7C 50 29 01  -  movss xmm0,[MetroExodus.exe+160AA38]
+// ---------- INJECTING HERE ----------
+"MetroExodus.exe"+3759BC: F3 0F 59 F0              -  mulss xmm6,xmm0
+"MetroExodus.exe"+3759C0: 45 85 F6                 -  test r14d,r14d
+// ---------- DONE INJECTING  ----------
+"MetroExodus.exe"+3759C3: 74 20                    -  je MetroExodus.exe+3759E5
+"MetroExodus.exe"+3759C5: 85 F6                    -  test esi,esi
+"MetroExodus.exe"+3759C7: 74 0E                    -  je MetroExodus.exe+3759D7
+"MetroExodus.exe"+3759C9: F3 0F 10 87 0C 0E 00 00  -  movss xmm0,[rdi+00000E0C]
+"MetroExodus.exe"+3759D1: F3 0F 59 F0              -  mulss xmm6,xmm0
+"MetroExodus.exe"+3759D5: EB 1A                    -  jmp MetroExodus.exe+3759F1
+"MetroExodus.exe"+3759D7: F3 0F 10 87 08 0E 00 00  -  movss xmm0,[rdi+00000E08]
+"MetroExodus.exe"+3759DF: F3 0F 59 F0              -  mulss xmm6,xmm0
+"MetroExodus.exe"+3759E3: EB 0C                    -  jmp MetroExodus.exe+3759F1
+"MetroExodus.exe"+3759E5: 85 F6                    -  test esi,esi
+}
+</AssemblerScript>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Toggle Activation</Action>
+                  <Keys>
+                    <Key>89</Key>
+                  </Keys>
+                  <ID>0</ID>
+                  <ActivateSound>Activate</ActivateSound>
+                  <DeactivateSound>Deactivate</DeactivateSound>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89524</ID>
+              <Description>"Stealth Mode"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+aobscanmodule(StealthMode,MetroExodus.exe,89 11 B8 01 00 00 00)
+registersymbol(StealthMode)
+
+StealthMode+02:
+  db B8 00
+
+aobscanmodule(StealthMode1,MetroExodus.exe,30 85 C0 75 15 B8 01 00 00 00)
+registersymbol(StealthMode1)
+
+StealthMode1+05:
+  db B8 00
+
+[DISABLE]
+StealthMode+02:
+  db B8 01
+unregistersymbol(StealthMode)
+
+StealthMode1+05:
+  db B8 01
+unregistersymbol(StealthMode1)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "MetroExodus.exe"+8884FC
+
+"MetroExodus.exe"+8884D2: 33 C0                    -  xor eax,eax
+"MetroExodus.exe"+8884D4: F0 0F B1 51 08           - lock  cmpxchg [rcx+08],edx
+"MetroExodus.exe"+8884D9: 75 05                    -  jne MetroExodus.exe+8884E0
+"MetroExodus.exe"+8884DB: E8 50 A6 22 00           -  call MetroExodus.exe+AB2B30
+"MetroExodus.exe"+8884E0: 40 84 ED                 -  test bpl,bpl
+"MetroExodus.exe"+8884E3: 48 8B 6C 24 78           -  mov rbp,[rsp+78]
+"MetroExodus.exe"+8884E8: 74 27                    -  je MetroExodus.exe+888511
+"MetroExodus.exe"+8884EA: 48 8B 8C 24 90 00 00 00  -  mov rcx,[rsp+00000090]
+"MetroExodus.exe"+8884F2: 48 8D 15 4F 91 AB 00     -  lea rdx,[MetroExodus.exe+1341648]
+"MetroExodus.exe"+8884F9: 48 89 11                 -  mov [rcx],rdx
+// ---------- INJECTING HERE ----------
+"MetroExodus.exe"+8884FC: B8 01 00 00 00           -  mov eax,00000001
+// ---------- DONE INJECTING  ----------
+"MetroExodus.exe"+888501: 48 83 C4 30              -  add rsp,30
+"MetroExodus.exe"+888505: 41 5F                    -  pop r15
+"MetroExodus.exe"+888507: 41 5E                    -  pop r14
+"MetroExodus.exe"+888509: 41 5D                    -  pop r13
+"MetroExodus.exe"+88850B: 41 5C                    -  pop r12
+"MetroExodus.exe"+88850D: 5F                       -  pop rdi
+"MetroExodus.exe"+88850E: 5E                       -  pop rsi
+"MetroExodus.exe"+88850F: 5B                       -  pop rbx
+"MetroExodus.exe"+888510: C3                       -  ret
+"MetroExodus.exe"+888511: 48 8B 43 50              -  mov rax,[rbx+50]
+}
+
+{
+// ORIGINAL CODE - INJECTION POINT: "MetroExodus.exe"+88A059
+
+"MetroExodus.exe"+88A03B: 2B C3                 -  sub eax,ebx
+"MetroExodus.exe"+88A03D: 48 8B D5              -  mov rdx,rbp
+"MetroExodus.exe"+88A040: 03 46 34              -  add eax,[rsi+34]
+"MetroExodus.exe"+88A043: 48 8B CF              -  mov rcx,rdi
+"MetroExodus.exe"+88A046: 89 44 24 48           -  mov [rsp+48],eax
+"MetroExodus.exe"+88A04A: 48 8B 07              -  mov rax,[rdi]
+"MetroExodus.exe"+88A04D: FF 50 38              -  call qword ptr [rax+38]
+"MetroExodus.exe"+88A050: 48 8B 5C 24 30        -  mov rbx,[rsp+30]
+"MetroExodus.exe"+88A055: 85 C0                 -  test eax,eax
+"MetroExodus.exe"+88A057: 75 15                 -  jne MetroExodus.exe+88A06E
+// ---------- INJECTING HERE ----------
+"MetroExodus.exe"+88A059: B8 01 00 00 00        -  mov eax,00000001
+// ---------- DONE INJECTING  ----------
+"MetroExodus.exe"+88A05E: 48 8B 6C 24 38        -  mov rbp,[rsp+38]
+"MetroExodus.exe"+88A063: 48 8B 74 24 40        -  mov rsi,[rsp+40]
+"MetroExodus.exe"+88A068: 48 83 C4 20           -  add rsp,20
+"MetroExodus.exe"+88A06C: 5F                    -  pop rdi
+"MetroExodus.exe"+88A06D: C3                    -  ret
+"MetroExodus.exe"+88A06E: 48 8B 6C 24 38        -  mov rbp,[rsp+38]
+"MetroExodus.exe"+88A073: 33 C0                 -  xor eax,eax
+"MetroExodus.exe"+88A075: 48 8B 74 24 40        -  mov rsi,[rsp+40]
+"MetroExodus.exe"+88A07A: 48 83 C4 20           -  add rsp,20
+"MetroExodus.exe"+88A07E: 5F                    -  pop rdi
+}
+</AssemblerScript>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Toggle Activation</Action>
+                  <Keys>
+                    <Key>35</Key>
+                  </Keys>
+                  <ID>0</ID>
+                  <ActivateSound TTS="EN">Stealth ON</ActivateSound>
+                  <DeactivateSound TTS="EN">Stealth OFF</DeactivateSound>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89160</ID>
+              <Description>"Teleport Mode"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+aobscanmodule(TMPointer,physx3_x64.dll,F3 0F 11 00 F3 0F 10 4D EB)
+alloc(newmem,$1000,"physx3_x64.dll")
+label(TMP)
+label(code)
+label(return)
+registersymbol(TMP)
+registersymbol(TMPointer)
+
+newmem:
+  mov [TMP],rax
+
+code:
+  movss [rax],xmm0
+  movss xmm1,[rbp-15]
+  jmp return
+
+TMP:
+  dd 00
+
+TMPointer:
+  jmp newmem
+  nop 4
+return:
+
+aobscanmodule(TeleportMode,physx3_x64.dll,F3 0F 10 40 10 F3 0F 11 45 D7)
+alloc(newmem1,$1000,"physx3_x64.dll")
+label(XPos)
+label(YPos)
+label(ZPos)
+label(XUPos)
+label(YUPos)
+label(ZUPos)
+label(code1)
+label(return1)
+label(SavePos)
+label(LoadPos)
+label(UndoPos)
+label(LockUndoPos)
+label(SavePosition)
+label(LoadPosition)
+label(UndoPosition)
+registersymbol(XPos)
+registersymbol(YPos)
+registersymbol(ZPos)
+registersymbol(XUPos)
+registersymbol(YUPos)
+registersymbol(ZUPos)
+registersymbol(SavePos)
+registersymbol(LoadPos)
+registersymbol(UndoPos)
+registersymbol(LockUndoPos)
+registersymbol(TeleportMode)
+
+newmem1:
+  cmp rax,[TMP]
+  jne code1
+  cmp [SavePos],1
+  je SavePosition
+  cmp [LoadPos],1
+  je LoadPosition
+  cmp [UndoPos],1
+  je UndoPosition
+  jmp code1
+
+SavePosition:
+  mov [SavePos],0
+  fld [rax+10]
+  fstp [XPos]
+  fld [rax+18]
+  fstp [YPos]
+  fld [rax+14]
+  fstp [ZPos]
+  jmp code1
+
+LoadPosition:
+  mov [LoadPos],0
+  cmp [LockUndoPos],0
+  jne @f
+  fld [rax+10]
+  fstp [XUPos]
+  fld [rax+18]
+  fstp [YUPos]
+  fld [rax+14]
+  fstp [ZUPos]
+
+@@:
+  fld [XPos]
+  fstp [rax+10]
+  fld [YPos]
+  fstp [rax+18]
+  fld [ZPos]
+  fstp [rax+14]
+  jmp code1
+
+UndoPosition:
+  mov [UndoPos],0
+  fld [XUPos]
+  fstp [rax+10]
+  fld [YUPos]
+  fstp [rax+18]
+  fld [ZUPos]
+  fstp [rax+14]
+  jmp code1
+
+code1:
+  movss xmm0,[rax+10]
+  jmp return1
+
+XPos:
+  dq 0
+YPos:
+  dq 0
+ZPos:
+  dq 0
+XUPos:
+  dq 0
+YUPos:
+  dq 0
+ZUPos:
+  dq 0
+SavePos:
+  dq 0
+LoadPos:
+  dq 0
+UndoPos:
+  dq 0
+LockUndoPos:
+  dq 0
+
+TeleportMode:
+  jmp newmem1
+return1:
+
+[DISABLE]
+TMPointer:
+  db F3 0F 11 00 F3 0F 10 4D EB
+unregistersymbol(TMPointer)
+unregistersymbol(TMP)
+dealloc(newmem)
+
+TeleportMode:
+  db F3 0F 10 40 10
+unregistersymbol(TeleportMode)
+unregistersymbol(LockUndoPos)
+unregistersymbol(SavePos)
+unregistersymbol(LoadPos)
+unregistersymbol(UndoPos)
+unregistersymbol(XUPos)
+unregistersymbol(YUPos)
+unregistersymbol(ZUPos)
+unregistersymbol(XPos)
+unregistersymbol(YPos)
+unregistersymbol(ZPos)
+dealloc(newmem1)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "PhysX3_x64.dll"+118523
+
+"PhysX3_x64.dll"+1184F9: F3 0F 10 4D DB           -  movss xmm1,[rbp-25]
+"PhysX3_x64.dll"+1184FE: F3 0F 11 48 14           -  movss [rax+14],xmm1
+"PhysX3_x64.dll"+118503: F3 0F 10 45 DF           -  movss xmm0,[rbp-21]
+"PhysX3_x64.dll"+118508: EB 54                    -  jmp PhysX3_x64.dll+11855E
+"PhysX3_x64.dll"+11850A: 48 8D 55 E7              -  lea rdx,[rbp-19]
+"PhysX3_x64.dll"+11850E: 48 8B CE                 -  mov rcx,rsi
+"PhysX3_x64.dll"+118511: E8 BA 05 00 00           -  call PhysX3_x64.dll+118AD0
+"PhysX3_x64.dll"+118516: F3 0F 10 45 E7           -  movss xmm0,[rbp-19]
+"PhysX3_x64.dll"+11851B: 48 8B 46 28              -  mov rax,[rsi+28]
+"PhysX3_x64.dll"+11851F: 48 8B 57 78              -  mov rdx,[rdi+78]
+// ---------- INJECTING HERE ----------
+"PhysX3_x64.dll"+118523: F3 0F 11 00              -  movss [rax],xmm0
+"PhysX3_x64.dll"+118527: F3 0F 10 4D EB           -  movss xmm1,[rbp-15]
+// ---------- DONE INJECTING  ----------
+"PhysX3_x64.dll"+11852C: F3 0F 11 48 04           -  movss [rax+04],xmm1
+"PhysX3_x64.dll"+118531: F3 0F 10 45 EF           -  movss xmm0,[rbp-11]
+"PhysX3_x64.dll"+118536: F3 0F 11 40 08           -  movss [rax+08],xmm0
+"PhysX3_x64.dll"+11853B: F3 0F 10 4D F3           -  movss xmm1,[rbp-0D]
+"PhysX3_x64.dll"+118540: F3 0F 11 48 0C           -  movss [rax+0C],xmm1
+"PhysX3_x64.dll"+118545: F3 0F 10 45 F7           -  movss xmm0,[rbp-09]
+"PhysX3_x64.dll"+11854A: F3 0F 11 40 10           -  movss [rax+10],xmm0
+"PhysX3_x64.dll"+11854F: F3 0F 10 4D FB           -  movss xmm1,[rbp-05]
+"PhysX3_x64.dll"+118554: F3 0F 11 48 14           -  movss [rax+14],xmm1
+"PhysX3_x64.dll"+118559: F3 0F 10 45 FF           -  movss xmm0,[rbp-01]
+}
+
+{
+// ORIGINAL CODE - INJECTION POINT: "PhysX3_x64.dll"+118364
+
+"PhysX3_x64.dll"+118337: 74 4F                    -  je PhysX3_x64.dll+118388
+"PhysX3_x64.dll"+118339: 48 8B 46 28              -  mov rax,[rsi+28]
+"PhysX3_x64.dll"+11833D: F3 0F 10 30              -  movss xmm6,[rax]
+"PhysX3_x64.dll"+118341: F3 0F 11 75 C7           -  movss [rbp-39],xmm6
+"PhysX3_x64.dll"+118346: F3 0F 10 58 04           -  movss xmm3,[rax+04]
+"PhysX3_x64.dll"+11834B: F3 0F 11 5D CB           -  movss [rbp-35],xmm3
+"PhysX3_x64.dll"+118350: F3 0F 10 60 08           -  movss xmm4,[rax+08]
+"PhysX3_x64.dll"+118355: F3 0F 11 65 CF           -  movss [rbp-31],xmm4
+"PhysX3_x64.dll"+11835A: F3 0F 10 50 0C           -  movss xmm2,[rax+0C]
+"PhysX3_x64.dll"+11835F: F3 0F 11 55 D3           -  movss [rbp-2D],xmm2
+// ---------- INJECTING HERE ----------
+"PhysX3_x64.dll"+118364: F3 0F 10 40 10           -  movss xmm0,[rax+10]
+// ---------- DONE INJECTING  ----------
+"PhysX3_x64.dll"+118369: F3 0F 11 45 D7           -  movss [rbp-29],xmm0
+"PhysX3_x64.dll"+11836E: F3 0F 10 48 14           -  movss xmm1,[rax+14]
+"PhysX3_x64.dll"+118373: F3 0F 11 4D DB           -  movss [rbp-25],xmm1
+"PhysX3_x64.dll"+118378: F3 0F 10 40 18           -  movss xmm0,[rax+18]
+"PhysX3_x64.dll"+11837D: 48 8D 45 D7              -  lea rax,[rbp-29]
+"PhysX3_x64.dll"+118381: F3 0F 11 45 DF           -  movss [rbp-21],xmm0
+"PhysX3_x64.dll"+118386: EB 33                    -  jmp PhysX3_x64.dll+1183BB
+"PhysX3_x64.dll"+118388: 0F 28 15 D1 F5 08 00     -  movaps xmm2,[PhysX3_x64.dll+1A7960]
+"PhysX3_x64.dll"+11838F: 48 8D 45 17              -  lea rax,[rbp+17]
+"PhysX3_x64.dll"+118393: 0F 28 DA                 -  movaps xmm3,xmm2
+}
+</AssemblerScript>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Toggle Activation</Action>
+                  <Keys>
+                    <Key>36</Key>
+                  </Keys>
+                  <ID>0</ID>
+                  <ActivateSound TTS="EN">Teleport ON</ActivateSound>
+                  <DeactivateSound TTS="EN">Teleport OFF</DeactivateSound>
+                </Hotkey>
+              </Hotkeys>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>89440</ID>
+                  <Description>"Teleport to Place"</Description>
+                  <Options moHideChildren="1"/>
+                  <LastState Value="" RealAddress="00000000"/>
+                  <GroupHeader>1</GroupHeader>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>89525</ID>
+                      <Description>"Activate No Collision [.] before use !"</Description>
+                      <Options moHideChildren="1"/>
+                      <LastState Value="" RealAddress="00000000"/>
+                      <Color>0000FF</Color>
+                      <GroupHeader>1</GroupHeader>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>89441</ID>
+                          <Description>"Vladivostok"</Description>
+                          <Options moHideChildren="1"/>
+                          <LastState Value="" RealAddress="00000000"/>
+                          <GroupHeader>1</GroupHeader>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>89479</ID>
+                              <Description>"Police Station"</Description>
+                              <Options moHideChildren="1"/>
+                              <LastState/>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript>{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+test al,al
+LuaCall(playSound(findTableFile('Activate')))
+
+[TMP]+10:
+dd (float)-504.1756897
+[TMP]+18:
+dd (float)-314.8039246
+[TMP]+14:
+dd (float)0.620737195
+ 
+[DISABLE]
+</AssemblerScript>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>89480</ID>
+                                  <Description>"Load Position "</Description>
+                                  <LastState/>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript>{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+test al,al
+
+LoadPos:
+  dd 01
+
+[DISABLE]
+
+</AssemblerScript>
+                                  <Hotkeys>
+                                    <Hotkey>
+                                      <Action>Toggle Activation</Action>
+                                      <Keys>
+                                        <Key>222</Key>
+                                      </Keys>
+                                      <ID>0</ID>
+                                    </Hotkey>
+                                  </Hotkeys>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>89475</ID>
+                              <Description>"Scout Resting Place"</Description>
+                              <Options moHideChildren="1"/>
+                              <LastState/>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript>{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+test al,al
+LuaCall(playSound(findTableFile('Activate')))
+
+[TMP]+10:
+dd (float)-282.2458191
+[TMP]+18:
+dd (float)-221.3190918
+[TMP]+14:
+dd (float)5.775517464
+ 
+[DISABLE]
+</AssemblerScript>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>89476</ID>
+                                  <Description>"Load Position "</Description>
+                                  <LastState/>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript>{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+test al,al
+
+LoadPos:
+  dd 01
+
+[DISABLE]
+
+</AssemblerScript>
+                                  <Hotkeys>
+                                    <Hotkey>
+                                      <Action>Toggle Activation</Action>
+                                      <Keys>
+                                        <Key>222</Key>
+                                      </Keys>
+                                      <ID>0</ID>
+                                    </Hotkey>
+                                  </Hotkeys>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>89483</ID>
+                              <Description>"Generator Resting Place"</Description>
+                              <Options moHideChildren="1"/>
+                              <LastState/>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript>{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+test al,al
+LuaCall(playSound(findTableFile('Activate')))
+
+[TMP]+10:
+dd (float)-700.4564819
+[TMP]+18:
+dd (float)-237.0493164
+[TMP]+14:
+dd (float)15.3684721
+ 
+[DISABLE]
+</AssemblerScript>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>89484</ID>
+                                  <Description>"Load Position "</Description>
+                                  <LastState/>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript>{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+test al,al
+
+LoadPos:
+  dd 01
+
+[DISABLE]
+
+</AssemblerScript>
+                                  <Hotkeys>
+                                    <Hotkey>
+                                      <Action>Toggle Activation</Action>
+                                      <Keys>
+                                        <Key>222</Key>
+                                      </Keys>
+                                      <ID>0</ID>
+                                    </Hotkey>
+                                  </Hotkeys>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>89471</ID>
+                              <Description>"Kuvshin Brother 1"</Description>
+                              <Options moHideChildren="1"/>
+                              <LastState/>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript>{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+test al,al
+LuaCall(playSound(findTableFile('Activate')))
+
+[TMP]+10:
+dd (float)-158.1731415
+[TMP]+18:
+dd (float)-104.7925568
+[TMP]+14:
+dd (float)0.9450125694
+ 
+[DISABLE]
+</AssemblerScript>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>89472</ID>
+                                  <Description>"Load Position "</Description>
+                                  <LastState/>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript>{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+test al,al
+
+LoadPos:
+  dd 01
+
+[DISABLE]
+
+</AssemblerScript>
+                                  <Hotkeys>
+                                    <Hotkey>
+                                      <Action>Toggle Activation</Action>
+                                      <Keys>
+                                        <Key>222</Key>
+                                      </Keys>
+                                      <ID>0</ID>
+                                    </Hotkey>
+                                  </Hotkeys>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>89477</ID>
+                              <Description>"Kuvshin Brother 2"</Description>
+                              <Options moHideChildren="1"/>
+                              <LastState/>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript>{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+test al,al
+LuaCall(playSound(findTableFile('Activate')))
+
+[TMP]+10:
+dd (float)-227.4093323
+[TMP]+18:
+dd (float)-333.6833496
+[TMP]+14:
+dd (float)0.7967248559
+ 
+[DISABLE]
+</AssemblerScript>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>89478</ID>
+                                  <Description>"Load Position "</Description>
+                                  <LastState/>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript>{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+test al,al
+
+LoadPos:
+  dd 01
+
+[DISABLE]
+
+</AssemblerScript>
+                                  <Hotkeys>
+                                    <Hotkey>
+                                      <Action>Toggle Activation</Action>
+                                      <Keys>
+                                        <Key>222</Key>
+                                      </Keys>
+                                      <ID>0</ID>
+                                    </Hotkey>
+                                  </Hotkeys>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>89473</ID>
+                              <Description>"Kuvshin Brothers Safe"</Description>
+                              <Options moHideChildren="1"/>
+                              <LastState/>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript>{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+test al,al
+LuaCall(playSound(findTableFile('Activate')))
+
+[TMP]+10:
+dd (float)-276.865448
+[TMP]+18:
+dd (float)-168.9527283
+[TMP]+14:
+dd (float)4.036367893
+ 
+[DISABLE]
+</AssemblerScript>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>89474</ID>
+                                  <Description>"Load Position "</Description>
+                                  <LastState/>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript>{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+test al,al
+
+LoadPos:
+  dd 01
+
+[DISABLE]
+
+</AssemblerScript>
+                                  <Hotkeys>
+                                    <Hotkey>
+                                      <Action>Toggle Activation</Action>
+                                      <Keys>
+                                        <Key>222</Key>
+                                      </Keys>
+                                      <ID>0</ID>
+                                    </Hotkey>
+                                  </Hotkeys>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>89481</ID>
+                              <Description>"Captain's Missing Crew"</Description>
+                              <Options moHideChildren="1"/>
+                              <LastState/>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript>{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+test al,al
+LuaCall(playSound(findTableFile('Activate')))
+
+[TMP]+10:
+dd (float)-543.592041
+[TMP]+18:
+dd (float)-149.4969177
+[TMP]+14:
+dd (float)8.839894295
+ 
+[DISABLE]
+</AssemblerScript>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>89482</ID>
+                                  <Description>"Load Position "</Description>
+                                  <LastState/>
+                                  <VariableType>Auto Assembler Script</VariableType>
+                                  <AssemblerScript>{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+test al,al
+
+LoadPos:
+  dd 01
+
+[DISABLE]
+
+</AssemblerScript>
+                                  <Hotkeys>
+                                    <Hotkey>
+                                      <Action>Toggle Activation</Action>
+                                      <Keys>
+                                        <Key>222</Key>
+                                      </Keys>
+                                      <ID>0</ID>
+                                    </Hotkey>
+                                  </Hotkeys>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>89161</ID>
+                  <Description>"Save [;], Load ['], Undo [\], Lock Undo [-]"</Description>
+                  <Options moHideChildren="1"/>
+                  <LastState Value="" RealAddress="00000000"/>
+                  <GroupHeader>1</GroupHeader>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>89165</ID>
+                      <Description>"No Collision"</Description>
+                      <LastState/>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript Async="1">{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+aobscanmodule(TMNC,physx3_x64.dll,89 42 10 8B 46 64)
+alloc(newmem,$1000,"physx3_x64.dll")
+label(code)
+label(return)
+registersymbol(TMNC)
+
+newmem:
+  cmp rdx,[TMP]
+  jne @f
+  jmp return+09
+
+code:
+  mov [rdx+10],eax
+  mov eax,[rsi+64]
+  jmp return
+
+TMNC:
+  jmp newmem
+  nop
+return:
+
+aobscanmodule(TMNC1,physx3_x64.dll,F3 0F 11 40 10 F3 0F 10 4D FB)
+registersymbol(TMNC1)
+
+TMNC1:
+  db 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90
+
+[DISABLE]
+TMNC:
+  db 89 42 10 8B 46 64
+unregistersymbol(TMNC)
+dealloc(newmem)
+
+TMNC1:
+  db F3 0F 11 40 10 F3 0F 10 4D FB F3 0F 11 48 14 F3 0F 10 45 FF F3 0F 11 40 18
+unregistersymbol(TMNC1)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "PhysX3_x64.dll"+17AABC
+
+"PhysX3_x64.dll"+17AA9F: 89 41 18                    -  mov [rcx+18],eax
+"PhysX3_x64.dll"+17AAA2: 8B 46 50                    -  mov eax,[rsi+50]
+"PhysX3_x64.dll"+17AAA5: 89 02                       -  mov [rdx],eax
+"PhysX3_x64.dll"+17AAA7: 8B 46 54                    -  mov eax,[rsi+54]
+"PhysX3_x64.dll"+17AAAA: 89 42 04                    -  mov [rdx+04],eax
+"PhysX3_x64.dll"+17AAAD: 8B 46 58                    -  mov eax,[rsi+58]
+"PhysX3_x64.dll"+17AAB0: 89 42 08                    -  mov [rdx+08],eax
+"PhysX3_x64.dll"+17AAB3: 8B 46 5C                    -  mov eax,[rsi+5C]
+"PhysX3_x64.dll"+17AAB6: 89 42 0C                    -  mov [rdx+0C],eax
+"PhysX3_x64.dll"+17AAB9: 8B 46 60                    -  mov eax,[rsi+60]
+// ---------- INJECTING HERE ----------
+"PhysX3_x64.dll"+17AABC: 89 42 10                    -  mov [rdx+10],eax
+"PhysX3_x64.dll"+17AABF: 8B 46 64                    -  mov eax,[rsi+64]
+// ---------- DONE INJECTING  ----------
+"PhysX3_x64.dll"+17AAC2: 89 42 14                    -  mov [rdx+14],eax
+"PhysX3_x64.dll"+17AAC5: 8B 46 68                    -  mov eax,[rsi+68]
+"PhysX3_x64.dll"+17AAC8: 89 42 18                    -  mov [rdx+18],eax
+"PhysX3_x64.dll"+17AACB: 8B 06                       -  mov eax,[rsi]
+"PhysX3_x64.dll"+17AACD: 89 42 40                    -  mov [rdx+40],eax
+"PhysX3_x64.dll"+17AAD0: 8B 46 04                    -  mov eax,[rsi+04]
+"PhysX3_x64.dll"+17AAD3: 89 42 44                    -  mov [rdx+44],eax
+"PhysX3_x64.dll"+17AAD6: 8B 46 08                    -  mov eax,[rsi+08]
+"PhysX3_x64.dll"+17AAD9: 89 42 48                    -  mov [rdx+48],eax
+"PhysX3_x64.dll"+17AADC: 8B 46 10                    -  mov eax,[rsi+10]
+}
+
+{
+// ORIGINAL CODE - INJECTION POINT: "PhysX3_x64.dll"+11854A
+
+"PhysX3_x64.dll"+11851B: 48 8B 46 28              -  mov rax,[rsi+28]
+"PhysX3_x64.dll"+11851F: 48 8B 57 78              -  mov rdx,[rdi+78]
+"PhysX3_x64.dll"+118523: E9 D8 7A 19 00           -  jmp 7FFC651F0000
+"PhysX3_x64.dll"+118528: 0F 1F 40 00              -  nop dword ptr [rax+00]
+"PhysX3_x64.dll"+11852C: F3 0F 11 48 04           -  movss [rax+04],xmm1
+"PhysX3_x64.dll"+118531: F3 0F 10 45 EF           -  movss xmm0,[rbp-11]
+"PhysX3_x64.dll"+118536: F3 0F 11 40 08           -  movss [rax+08],xmm0
+"PhysX3_x64.dll"+11853B: F3 0F 10 4D F3           -  movss xmm1,[rbp-0D]
+"PhysX3_x64.dll"+118540: F3 0F 11 48 0C           -  movss [rax+0C],xmm1
+"PhysX3_x64.dll"+118545: F3 0F 10 45 F7           -  movss xmm0,[rbp-09]
+// ---------- INJECTING HERE ----------
+"PhysX3_x64.dll"+11854A: F3 0F 11 40 10           -  movss [rax+10],xmm0
+// ---------- DONE INJECTING  ----------
+"PhysX3_x64.dll"+11854F: F3 0F 10 4D FB           -  movss xmm1,[rbp-05]
+"PhysX3_x64.dll"+118554: F3 0F 11 48 14           -  movss [rax+14],xmm1
+"PhysX3_x64.dll"+118559: F3 0F 10 45 FF           -  movss xmm0,[rbp-01]
+"PhysX3_x64.dll"+11855E: F3 0F 11 40 18           -  movss [rax+18],xmm0
+"PhysX3_x64.dll"+118563: 8B 43 0C                 -  mov eax,[rbx+0C]
+"PhysX3_x64.dll"+118566: 8B 4B 08                 -  mov ecx,[rbx+08]
+"PhysX3_x64.dll"+118569: 0F BA F0 1F              -  btr eax,1F
+"PhysX3_x64.dll"+11856D: 48 89 55 67              -  mov [rbp+67],rdx
+"PhysX3_x64.dll"+118571: 3B C1                    -  cmp eax,ecx
+"PhysX3_x64.dll"+118573: 77 0E                    -  ja PhysX3_x64.dll+118583
+}
+</AssemblerScript>
+                      <Hotkeys>
+                        <Hotkey>
+                          <Action>Toggle Activation</Action>
+                          <Keys>
+                            <Key>190</Key>
+                          </Keys>
+                          <ID>0</ID>
+                          <ActivateSound>Activate</ActivateSound>
+                          <DeactivateSound>Deactivate</DeactivateSound>
+                        </Hotkey>
+                      </Hotkeys>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>89170</ID>
+                      <Description>"Save Position"</Description>
+                      <LastState/>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+test al,al
+LuaCall(playSound(findTableFile('Activate')))
+
+SavePos:
+  dd 01
+ 
+[DISABLE]
+</AssemblerScript>
+                      <Hotkeys>
+                        <Hotkey>
+                          <Action>Toggle Activation</Action>
+                          <Keys>
+                            <Key>186</Key>
+                          </Keys>
+                          <ID>0</ID>
+                        </Hotkey>
+                      </Hotkeys>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>89171</ID>
+                      <Description>"Load Position"</Description>
+                      <Options moHideChildren="1"/>
+                      <LastState/>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+LuaCall(playSound(findTableFile('Activate')))
+LuaCall(getAddressList().getMemoryRecordByDescription("No Collision").Active=true)
+
+{$lua}
+local t = createTimer()
+t.Interval = 50
+t.OnTimer = function(t)
+  t.destroy()
+  memrec.Active = false
+  getAddressList().getMemoryRecordByDescription("Load Position ").Active=true
+end
+{$asm}
+ 
+[DISABLE]
+{$lua}
+local t = createTimer()
+t.Interval = 350
+t.OnTimer = function(t)
+  t.destroy()
+  getAddressList().getMemoryRecordByDescription("No Collision").Active=false
+end
+{$asm}
+</AssemblerScript>
+                      <Hotkeys>
+                        <Hotkey>
+                          <Action>Toggle Activation</Action>
+                          <Keys>
+                            <Key>222</Key>
+                          </Keys>
+                          <ID>0</ID>
+                        </Hotkey>
+                      </Hotkeys>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>89173</ID>
+                          <Description>"Load Position "</Description>
+                          <LastState/>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+test al,al
+
+LoadPos:
+  dd 01
+
+[DISABLE]
+
+</AssemblerScript>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>89172</ID>
+                      <Description>"Undo Position"</Description>
+                      <Options moHideChildren="1"/>
+                      <LastState/>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+LuaCall(playSound(findTableFile('Activate')))
+LuaCall(getAddressList().getMemoryRecordByDescription("No Collision").Active=true)
+
+{$lua}
+local t = createTimer()
+t.Interval = 50
+t.OnTimer = function(t)
+  t.destroy()
+  memrec.Active = false
+  getAddressList().getMemoryRecordByDescription("Undo Position ").Active=true
+end
+{$asm}
+
+[DISABLE]
+{$lua}
+local t = createTimer()
+t.Interval = 350
+t.OnTimer = function(t)
+  t.destroy()
+  getAddressList().getMemoryRecordByDescription("No Collision").Active=false
+end
+{$asm}
+</AssemblerScript>
+                      <Hotkeys>
+                        <Hotkey>
+                          <Action>Toggle Activation</Action>
+                          <Keys>
+                            <Key>220</Key>
+                          </Keys>
+                          <ID>0</ID>
+                        </Hotkey>
+                      </Hotkeys>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>89174</ID>
+                          <Description>"Undo Position "</Description>
+                          <LastState/>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+test al,al
+
+UndoPos:
+  dd 01
+
+[DISABLE]
+
+</AssemblerScript>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>89175</ID>
+                      <Description>"Lock Undo Position"</Description>
+                      <LastState/>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+LockUndoPos:
+  dd 1
+ 
+[DISABLE]
+LockUndoPos:
+  dd 0
+</AssemblerScript>
+                      <Hotkeys>
+                        <Hotkey>
+                          <Action>Toggle Activation</Action>
+                          <Keys>
+                            <Key>189</Key>
+                          </Keys>
+                          <ID>0</ID>
+                          <ActivateSound TTS="EN">Locked</ActivateSound>
+                          <DeactivateSound TTS="EN">Unlocked</DeactivateSound>
+                        </Hotkey>
+                      </Hotkeys>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>89176</ID>
+                  <Description>"X Pos [🡙], Y Pos [🡘], Z Pos [Alt + 🡙], Hold [Shift] to accelerate"</Description>
+                  <Options moHideChildren="1"/>
+                  <LastState Value="" RealAddress="00000000"/>
+                  <GroupHeader>1</GroupHeader>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>89177</ID>
+                      <Description>"X"</Description>
+                      <VariableType>Float</VariableType>
+                      <Address>TMP</Address>
+                      <Offsets>
+                        <Offset>10</Offset>
+                      </Offsets>
+                      <Hotkeys>
+                        <Hotkey>
+                          <Action>Increase Value</Action>
+                          <Keys>
+                            <Key>38</Key>
+                          </Keys>
+                          <Value>2.5</Value>
+                          <ID>0</ID>
+                        </Hotkey>
+                        <Hotkey>
+                          <Action>Decrease Value</Action>
+                          <Keys>
+                            <Key>40</Key>
+                          </Keys>
+                          <Value>2.5</Value>
+                          <ID>1</ID>
+                        </Hotkey>
+                        <Hotkey>
+                          <Action>Increase Value</Action>
+                          <Keys>
+                            <Key>16</Key>
+                            <Key>38</Key>
+                          </Keys>
+                          <Value>10</Value>
+                          <ID>2</ID>
+                        </Hotkey>
+                        <Hotkey>
+                          <Action>Decrease Value</Action>
+                          <Keys>
+                            <Key>16</Key>
+                            <Key>40</Key>
+                          </Keys>
+                          <Value>10</Value>
+                          <ID>3</ID>
+                        </Hotkey>
+                      </Hotkeys>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>89178</ID>
+                      <Description>"Y"</Description>
+                      <VariableType>Float</VariableType>
+                      <Address>TMP</Address>
+                      <Offsets>
+                        <Offset>18</Offset>
+                      </Offsets>
+                      <Hotkeys>
+                        <Hotkey>
+                          <Action>Increase Value</Action>
+                          <Keys>
+                            <Key>37</Key>
+                          </Keys>
+                          <Value>2.5</Value>
+                          <ID>0</ID>
+                        </Hotkey>
+                        <Hotkey>
+                          <Action>Decrease Value</Action>
+                          <Keys>
+                            <Key>39</Key>
+                          </Keys>
+                          <Value>2.5</Value>
+                          <ID>1</ID>
+                        </Hotkey>
+                        <Hotkey>
+                          <Action>Increase Value</Action>
+                          <Keys>
+                            <Key>16</Key>
+                            <Key>37</Key>
+                          </Keys>
+                          <Value>10</Value>
+                          <ID>2</ID>
+                        </Hotkey>
+                        <Hotkey>
+                          <Action>Decrease Value</Action>
+                          <Keys>
+                            <Key>16</Key>
+                            <Key>39</Key>
+                          </Keys>
+                          <Value>10</Value>
+                          <ID>3</ID>
+                        </Hotkey>
+                      </Hotkeys>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>89179</ID>
+                      <Description>"Z"</Description>
+                      <VariableType>Float</VariableType>
+                      <Address>TMP</Address>
+                      <Offsets>
+                        <Offset>14</Offset>
+                      </Offsets>
+                      <Hotkeys>
+                        <Hotkey>
+                          <Action>Increase Value</Action>
+                          <Keys>
+                            <Key>18</Key>
+                            <Key>38</Key>
+                          </Keys>
+                          <Value>0.5</Value>
+                          <ID>0</ID>
+                        </Hotkey>
+                        <Hotkey>
+                          <Action>Decrease Value</Action>
+                          <Keys>
+                            <Key>18</Key>
+                            <Key>40</Key>
+                          </Keys>
+                          <Value>0.5</Value>
+                          <ID>1</ID>
+                        </Hotkey>
+                        <Hotkey>
+                          <Action>Increase Value</Action>
+                          <Keys>
+                            <Key>16</Key>
+                            <Key>18</Key>
+                            <Key>38</Key>
+                          </Keys>
+                          <Value>10</Value>
+                          <ID>2</ID>
+                        </Hotkey>
+                        <Hotkey>
+                          <Action>Decrease Value</Action>
+                          <Keys>
+                            <Key>16</Key>
+                            <Key>18</Key>
+                            <Key>40</Key>
+                          </Keys>
+                          <Value>10</Value>
+                          <ID>3</ID>
+                        </Hotkey>
+                      </Hotkeys>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>89537</ID>
+              <Description>"Change Difficulty"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{
+===============
+Metro Exodus
+===============
+}
+[ENABLE]
+aobscanmodule(ChangeDifficulty,MetroExodus.exe,45 0F B6 B5 D6 01 00 00)
+alloc(newmem,$1000,"MetroExodus.exe")
+label(CHD)
+label(code)
+label(return)
+registersymbol(CHD)
+registersymbol(ChangeDifficulty)
+
+newmem:
+  mov [CHD],r13
+  cmp [CHD+08],0
+  jne @f
+  push rax
+  mov rax,[r13+1D7]
+  mov [CHD+08],rax
+  pop rax
+
+@@:
+  mov [r13+1D7],00 //00 - Easy, 01 - Normal, 03 - Hardcore Ranger
+
+code:
+  movzx r14d,byte ptr [r13+000001D6]
+  jmp return
+
+CHD:
+  dd 00
+
+ChangeDifficulty:
+  jmp newmem
+  nop 3
+return:
+
+[DISABLE]
+ChangeDifficulty:
+  db 45 0F B6 B5 D6 01 00 00
+unregistersymbol(ChangeDifficulty)
+unregistersymbol(CHD)
+dealloc(newmem)
+luaCall(writeInteger('[CHD]+1D7', readInteger('CHD+08')))
+
+{
+// ORIGINAL CODE - INJECTION POINT: "MetroExodus.exe"+B115A2
+
+"MetroExodus.exe"+B1156C: 41 BB FF FF 00 00        -  mov r11d,0000FFFF
+"MetroExodus.exe"+B11572: EB 03                    -  jmp MetroExodus.exe+B11577
+"MetroExodus.exe"+B11574: 45 8B FA                 -  mov r15d,r10d
+"MetroExodus.exe"+B11577: 0F B7 C3                 -  movzx eax,bx
+"MetroExodus.exe"+B1157A: 41 3B C7                 -  cmp eax,r15d
+"MetroExodus.exe"+B1157D: 0F 84 D4 04 00 00        -  je MetroExodus.exe+B11A57
+"MetroExodus.exe"+B11583: 48 89 BC 24 08 01 00 00  -  mov [rsp+00000108],rdi
+"MetroExodus.exe"+B1158B: 4C 89 A4 24 00 01 00 00  -  mov [rsp+00000100],r12
+"MetroExodus.exe"+B11593: 44 8B 25 22 88 C5 00     -  mov r12d,[MetroExodus.exe+1769DBC]
+"MetroExodus.exe"+B1159A: 4C 89 B4 24 F8 00 00 00  -  mov [rsp+000000F8],r14
+// ---------- INJECTING HERE ----------
+"MetroExodus.exe"+B115A2: 45 0F B6 B5 D6 01 00 00  -  movzx r14d,byte ptr [r13+000001D6]
+// ---------- DONE INJECTING  ----------
+"MetroExodus.exe"+B115AA: 0F 86 04 04 00 00        -  jbe MetroExodus.exe+B119B4
+"MetroExodus.exe"+B115B0: BB FD FF FF BF           -  mov ebx,BFFFFFFD
+"MetroExodus.exe"+B115B5: 49 8B 8D 10 01 00 00     -  mov rcx,[r13+00000110]
+"MetroExodus.exe"+B115BC: 43 8D 04 7F              -  lea eax,[r15+r15*2]
+"MetroExodus.exe"+B115C0: C1 E0 03                 -  shl eax,03
+"MetroExodus.exe"+B115C3: 48 8D 15 36 EA 4E FF     -  lea rdx,[MetroExodus.exe]
+"MetroExodus.exe"+B115CA: BF FE FF 00 00           -  mov edi,0000FFFE
+"MetroExodus.exe"+B115CF: 44 8B C8                 -  mov r9d,eax
+"MetroExodus.exe"+B115D2: 44 39 64 08 08           -  cmp [rax+rcx+08],r12d
+"MetroExodus.exe"+B115D7: 0F 87 D7 03 00 00        -  ja MetroExodus.exe+B119B4
+}
+</AssemblerScript>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Toggle Activation</Action>
+                  <Keys>
+                    <Key>117</Key>
+                  </Keys>
+                  <ID>0</ID>
+                  <ActivateSound TTS="EN">Difficulty Changed</ActivateSound>
+                  <DeactivateSound TTS="EN">Difficulty Restored</DeactivateSound>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+  <Comments>Table by Drazerak</Comments>
+  <LuaScript>-----------------------------------
+-- METRO EXODUS --
+-- TABLE BY DRAZERAK --
+-- GAME VERSION [STEAM/EPIC/GOG] --
+-----------------------------------
+--------------------------------------------------------------------------------
+getAutoAttachList().add("MetroExodus.exe")
+getAddressList().getMemoryRecordByDescription("Metro Exodus").Active=true
+</LuaScript>
+</CheatTable>

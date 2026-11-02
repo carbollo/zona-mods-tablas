@@ -1,12 +1,12 @@
 # Zona Mods · Tablas de Cheat Engine
 
-Recopilación de **6683 tablas de Cheat Engine (`.CT`) para juegos single-player en Windows**, preparada como fuente automática del servidor de trainers de Zona Mods.
+Recopilación de **6882 tablas de Cheat Engine (`.CT`) para juegos single-player en Windows**, preparada como fuente automática del servidor de trainers de Zona Mods.
 
 Solo están las tablas que el importador de Zona Mods convierte en al menos un cheat que la app puede ejecutar. Cada archivo es una **copia sin modificar** del original.
 
 ## Cómo usarlo en Zona Mods
 
-El servidor coge como mucho 200 archivos por fuente, así que las tablas van repartidas en 34 lotes. En el panel (**Fuentes automáticas**) añade una fuente por lote:
+El servidor coge como mucho 200 archivos por fuente, así que las tablas van repartidas en 35 lotes. En el panel (**Fuentes automáticas**) añade una fuente por lote:
 
 ```
 https://github.com/carbollo/zona-mods-tablas/tree/main/lote-01
@@ -43,6 +43,7 @@ https://github.com/carbollo/zona-mods-tablas/tree/main/lote-31
 https://github.com/carbollo/zona-mods-tablas/tree/main/lote-32
 https://github.com/carbollo/zona-mods-tablas/tree/main/lote-33
 https://github.com/carbollo/zona-mods-tablas/tree/main/lote-34
+https://github.com/carbollo/zona-mods-tablas/tree/main/lote-35
 ```
 
 Conviene añadirlas con **Publicar** desactivado y revisar lo importado antes de publicarlo. Las tablas nunca cambian de lote: las nuevas se añaden al último o abren otro.
@@ -82,6 +83,7 @@ Todo el mérito es de sus autores. Este repositorio solo reúne y filtra su trab
 | [grasmanek94/cheat-tables](https://github.com/grasmanek94/cheat-tables) | sin licencia | 114 |
 | [ken1882/CheatTables](https://github.com/ken1882/CheatTables) | sin licencia | 86 |
 | [ryu-highabusa/COMDATsamba](https://github.com/ryu-highabusa/COMDATsamba) | sin licencia | 70 |
+| [sl3av/ce-tables](https://github.com/sl3av/ce-tables) | sin licencia | 67 |
 | [atul1503/Cheat-Engine-Tables](https://github.com/atul1503/Cheat-Engine-Tables) | sin licencia | 63 |
 | [Eggertron/CheatEngine](https://github.com/Eggertron/CheatEngine) | sin licencia | 55 |
 | [berthrage/DMC3-Crimson](https://github.com/berthrage/DMC3-Crimson) | MIT | 55 |
@@ -104,6 +106,7 @@ Todo el mérito es de sus autores. Este repositorio solo reúne y filtra su trab
 | [AnticOwl/anticowl.github.io](https://github.com/AnticOwl/anticowl.github.io) | sin licencia | 19 |
 | [HakuyaNiji/CheatEngineTables](https://github.com/HakuyaNiji/CheatEngineTables) | sin licencia | 18 |
 | [metal-crow/Dark-Souls-1-Overhaul](https://github.com/metal-crow/Dark-Souls-1-Overhaul) | AGPL-3.0 | 17 |
+| [rajairfanahmed/pc-games-with-trainer-and-cheat-codes](https://github.com/rajairfanahmed/pc-games-with-trainer-and-cheat-codes) | sin licencia | 17 |
 | [ReclaimerShawn/Stuff-I-Made](https://github.com/ReclaimerShawn/Stuff-I-Made) | sin licencia | 16 |
 | [r3sus/cheads](https://github.com/r3sus/cheads) | sin licencia | 15 |
 | [RichardFranksComputer/fdny_info](https://github.com/RichardFranksComputer/fdny_info) | sin licencia | 14 |
@@ -114,6 +117,7 @@ Todo el mérito es de sus autores. Este repositorio solo reúne y filtra su trab
 | [Borshig/AllCheats](https://github.com/Borshig/AllCheats) | sin licencia | 12 |
 | [ParadoxEpoch/RatchetHax](https://github.com/ParadoxEpoch/RatchetHax) | GPL-3.0 | 12 |
 | [rjgabel/watches](https://github.com/rjgabel/watches) | sin licencia | 12 |
+| [inthecatsdreams/cheat-tables](https://github.com/inthecatsdreams/cheat-tables) | GPL-3.0 | 12 |
 | [SeulYoung/TrainerCollection](https://github.com/SeulYoung/TrainerCollection) | BSD-3-Clause | 11 |
 | [pilot2254/cheat-tables](https://github.com/pilot2254/cheat-tables) | MIT | 11 |
 | [DeveloperJose/Mega-Man-X8-Asset-Manager](https://github.com/DeveloperJose/Mega-Man-X8-Asset-Manager) | MIT | 11 |
@@ -121,11 +125,14 @@ Todo el mérito es de sus autores. Este repositorio solo reúne y filtra su trab
 | [HenryPDT/AC-Definitive-Parkour-Mod](https://github.com/HenryPDT/AC-Definitive-Parkour-Mod) | sin licencia | 10 |
 | [YukiXXL/PS2-modding](https://github.com/YukiXXL/PS2-modding) | sin licencia | 10 |
 | [r3sus/Resouls](https://github.com/r3sus/Resouls) | sin licencia | 10 |
+| [binaryriper/cheatenginetables](https://github.com/binaryriper/cheatenginetables) | sin licencia | 10 |
 | [crazydw4rf/ce-scripts](https://github.com/crazydw4rf/ce-scripts) | sin licencia | 9 |
 | [SomeGTAVCCodes/GTA-Vice-City-PS2](https://github.com/SomeGTAVCCodes/GTA-Vice-City-PS2) | sin licencia | 9 |
 | [W1thoutD0ubt/PVZGarageMod](https://github.com/W1thoutD0ubt/PVZGarageMod) | LGPL | 9 |
+| [chochang262/cheattables](https://github.com/chochang262/cheattables) | sin licencia | 9 |
 | [Wahgew/CheatEngine-CheatTables](https://github.com/Wahgew/CheatEngine-CheatTables) | sin licencia | 8 |
 | [junehappylove/june.everything](https://github.com/junehappylove/june.everything) | sin licencia | 8 |
+| [soniic7/cheat-tables](https://github.com/soniic7/cheat-tables) | GPL-3.0 | 8 |
 | [my-games-backup/my-cheat-engine-tables](https://gitlab.com/my-games-backup/my-cheat-engine-tables) | sin licencia | 7 |
 | [sub1to/cheat_tables](https://github.com/sub1to/cheat_tables) | sin licencia | 7 |
 | [FransBouma/InjectableGenericCameraSystem](https://github.com/FransBouma/InjectableGenericCameraSystem) | BSD-2-Clause | 7 |
@@ -142,6 +149,7 @@ Todo el mérito es de sus autores. Este repositorio solo reúne y filtra su trab
 | [YYLMZXC/nklua](https://github.com/YYLMZXC/nklua) | sin licencia | 6 |
 | [legnaleurc/junkcode](https://github.com/legnaleurc/junkcode) | sin licencia | 6 |
 | [themaoci/Game-Cheat-Tables-CE-](https://github.com/themaoci/Game-Cheat-Tables-CE-) | sin licencia | 6 |
+| [linkz64/cheat-engine-scripts](https://github.com/linkz64/cheat-engine-scripts) | sin licencia | 6 |
 | [Jesuszilla/cheatengine-scripts](https://github.com/Jesuszilla/cheatengine-scripts) | sin licencia | 5 |
 | [dsasmblr/cheat-engine](https://github.com/dsasmblr/cheat-engine) | sin licencia | 5 |
 | [Homer88/GTA2_RE](https://github.com/Homer88/GTA2_RE) | Apache-2.0 | 5 |
@@ -168,7 +176,10 @@ Todo el mérito es de sus autores. Este repositorio solo reúne y filtra su trab
 | [mouksx/Toy-Story-2-Modding](https://github.com/mouksx/Toy-Story-2-Modding) | sin licencia | 4 |
 | [my-repositories/GameTrainer](https://github.com/my-repositories/GameTrainer) | MIT | 4 |
 | [postrazh/PEL2](https://github.com/postrazh/PEL2) | sin licencia | 4 |
+| [fullsize/ce_scripts](https://github.com/fullsize/ce_scripts) | sin licencia | 4 |
+| [popruns/pop.cheattables](https://github.com/popruns/pop.cheattables) | sin licencia | 4 |
 | [Zhiqing-Xu/EXE](https://github.com/Zhiqing-Xu/EXE) | sin licencia | 4 |
+| [zupremacy/z-nation](https://github.com/zupremacy/z-nation) | sin licencia | 4 |
 | [AndreLouisIssa/Borderlands-Cheat-Tables](https://github.com/AndreLouisIssa/Borderlands-Cheat-Tables) | sin licencia | 3 |
 | [ethanwp28/cheat-engine-achievement-unlockers](https://github.com/ethanwp28/cheat-engine-achievement-unlockers) | sin licencia | 3 |
 | [Kemui52/EDF-Doc-Storage](https://github.com/Kemui52/EDF-Doc-Storage) | sin licencia | 3 |
@@ -188,6 +199,9 @@ Todo el mérito es de sus autores. Este repositorio solo reúne y filtra su trab
 | [yoratoni/bge-widescreen-fix](https://github.com/yoratoni/bge-widescreen-fix) | otra (ver LICENSE) | 3 |
 | [zzamizz/weed-sheet](https://github.com/zzamizz/weed-sheet) | sin licencia | 3 |
 | [JonathanDotCel/speedrun_tools_for_portal_1_and_2](https://github.com/JonathanDotCel/speedrun_tools_for_portal_1_and_2) | sin licencia | 3 |
+| [e4ac/ce-tables](https://github.com/e4ac/ce-tables) | sin licencia | 3 |
+| [earmada8/gust_ce](https://github.com/earmada8/gust_ce) | GPL-3.0 | 3 |
+| [glowmoss/remove-vhs-effect](https://github.com/glowmoss/remove-vhs-effect) | sin licencia | 3 |
 | [tehzz/ssb64-utils](https://github.com/tehzz/ssb64-utils) | sin licencia | 3 |
 | [AadityaKandel/IGI-2-Cheat-Engine-Script](https://github.com/AadityaKandel/IGI-2-Cheat-Engine-Script) | MIT | 2 |
 | [Adnini983/pvzdlc-ctlist](https://github.com/Adnini983/pvzdlc-ctlist) | MIT | 2 |
@@ -238,8 +252,16 @@ Todo el mérito es de sus autores. Este repositorio solo reúne y filtra su trab
 | [WolfGamerYT/Undertale-Hacking](https://github.com/WolfGamerYT/Undertale-Hacking) | sin licencia | 2 |
 | [abgache/rise-of-nations-cheats](https://github.com/abgache/rise-of-nations-cheats) | sin licencia | 2 |
 | [gitDanilo/LoP-Bars](https://github.com/gitDanilo/LoP-Bars) | sin licencia | 2 |
+| [h0p3fu1/cheattables](https://github.com/h0p3fu1/cheattables) | sin licencia | 2 |
+| [ifpcd/ct_tables](https://github.com/ifpcd/ct_tables) | sin licencia | 2 |
+| [karniverse/cheat-tables](https://github.com/karniverse/cheat-tables) | sin licencia | 2 |
+| [krymzone/ds-personal_tables](https://github.com/krymzone/ds-personal_tables) | sin licencia | 2 |
+| [kyadlfiles/kya_dl_cheat_tables](https://github.com/kyadlfiles/kya_dl_cheat_tables) | sin licencia | 2 |
 | [lucacicada/dark-chronicle-reverse-engineering](https://github.com/lucacicada/dark-chronicle-reverse-engineering) | MIT | 2 |
 | [sjkim1127/Everplanet_Reverse_Engineering](https://github.com/sjkim1127/Everplanet_Reverse_Engineering) | sin licencia | 2 |
+| [taitan666/cheatengineagent](https://github.com/taitan666/cheatengineagent) | MIT | 2 |
+| [thereisnotime/tint-cheats](https://github.com/thereisnotime/tint-cheats) | MIT | 2 |
+| [valgoldun/fly-corp-hack](https://github.com/valgoldun/fly-corp-hack) | sin licencia | 2 |
 | [abarichello/inside-noclip](https://github.com/abarichello/inside-noclip) | GPL-3.0 | 1 |
 | [abarichello/minininjas-noclip](https://github.com/abarichello/minininjas-noclip) | ISC | 1 |
 | [Adnini983/PvZHB-CheatTables](https://github.com/Adnini983/PvZHB-CheatTables) | MIT | 1 |
@@ -424,34 +446,62 @@ Todo el mérito es de sus autores. Este repositorio solo reúne y filtra su trab
 | [Twig6943/ReplantedMaxxer](https://github.com/Twig6943/ReplantedMaxxer) | GPL-3.0 | 1 |
 | [UtterVitriol/Game-Hacking](https://github.com/UtterVitriol/Game-Hacking) | sin licencia | 1 |
 | [aadmiqbal/pwnie-island-dll](https://github.com/aadmiqbal/pwnie-island-dll) | sin licencia | 1 |
+| [abhijeetadarsh/cttrainer](https://github.com/abhijeetadarsh/cttrainer) | MIT | 1 |
+| [aeons-d/crystar-cheat-engine](https://github.com/aeons-d/crystar-cheat-engine) | sin licencia | 1 |
 | [andrew101sanders/FF7RebirthFovChanger](https://github.com/andrew101sanders/FF7RebirthFovChanger) | MIT | 1 |
+| [antaresjay/freeplay](https://github.com/antaresjay/freeplay) | MIT | 1 |
+| [artemis-of-dust/ggst_ct](https://github.com/artemis-of-dust/ggst_ct) | sin licencia | 1 |
+| [bahndaten/ujl-cheattable](https://github.com/bahndaten/ujl-cheattable) | sin licencia | 1 |
 | [balenaucigasa/Gems-of-War-v9](https://github.com/balenaucigasa/Gems-of-War-v9) | Unlicense | 1 |
+| [ben2557/ce-table-sh3](https://github.com/ben2557/ce-table-sh3) | sin licencia | 1 |
+| [ben2557/ce-table-sh4](https://github.com/ben2557/ce-table-sh4) | sin licencia | 1 |
 | [bobba-v/fell-and-sell-ct](https://github.com/bobba-v/fell-and-sell-ct) | sin licencia | 1 |
 | [bramicoatual/re4-2005-internal-trainer](https://github.com/bramicoatual/re4-2005-internal-trainer) | sin licencia | 1 |
 | [carterjones/pwnie-island](https://github.com/carterjones/pwnie-island) | BSD-2-Clause | 1 |
+| [ceattable/cheat-table](https://github.com/ceattable/cheat-table) | sin licencia | 1 |
+| [colonywest/cheatengine](https://github.com/colonywest/cheatengine) | sin licencia | 1 |
 | [d3v0psdan/combat-master-internal](https://github.com/d3v0psdan/combat-master-internal) | sin licencia | 1 |
+| [danjaaron/fallout1-trainer](https://github.com/danjaaron/fallout1-trainer) | sin licencia | 1 |
+| [danjaaron/frostpunk-hack](https://github.com/danjaaron/frostpunk-hack) | sin licencia | 1 |
 | [eexpress/bin](https://github.com/eexpress/bin) | sin licencia | 1 |
 | [electricalArt/MemoryHackerLib](https://github.com/electricalArt/MemoryHackerLib) | sin licencia | 1 |
+| [feradile/sm64coopdx-cheats](https://github.com/feradile/sm64coopdx-cheats) | sin licencia | 1 |
 | [freshman2233/spell-brigade-ct](https://github.com/freshman2233/spell-brigade-ct) | sin licencia | 1 |
+| [freylaverse/vatucheats](https://github.com/freylaverse/vatucheats) | sin licencia | 1 |
+| [gcmaniac/cheat_engine_mod](https://github.com/gcmaniac/cheat_engine_mod) | MIT | 1 |
+| [gonthoriandx/the-ogre-table](https://github.com/gonthoriandx/the-ogre-table) | sin licencia | 1 |
 | [h0x91b/gta2-resurection](https://github.com/h0x91b/gta2-resurection) | MIT | 1 |
 | [he4rtbleed/CaptainHooker](https://github.com/he4rtbleed/CaptainHooker) | MIT | 1 |
 | [ibrow19/GGXrdReplayTakeover](https://github.com/ibrow19/GGXrdReplayTakeover) | sin licencia | 1 |
+| [iccugs/megamanunlimitedtrainer](https://github.com/iccugs/megamanunlimitedtrainer) | sin licencia | 1 |
 | [iccugs/zelda_tp_cemu_trainer](https://github.com/iccugs/zelda_tp_cemu_trainer) | sin licencia | 1 |
 | [iHackerJi/GameCheat](https://github.com/iHackerJi/GameCheat) | sin licencia | 1 |
 | [im23b-busere/Cheat-Tables](https://github.com/im23b-busere/Cheat-Tables) | sin licencia | 1 |
+| [jim00000/chasm-cheat-table](https://github.com/jim00000/chasm-cheat-table) | MIT | 1 |
 | [joboyskat/gw2-bot](https://github.com/joboyskat/gw2-bot) | sin licencia | 1 |
 | [jubin-park/ppdrow](https://github.com/jubin-park/ppdrow) | MIT | 1 |
+| [k-r-o-s/ce-tables](https://github.com/k-r-o-s/ce-tables) | sin licencia | 1 |
+| [kalbintion/ddaobcreator](https://github.com/kalbintion/ddaobcreator) | sin licencia | 1 |
+| [kohakubeast/holocure-pointer](https://github.com/kohakubeast/holocure-pointer) | sin licencia | 1 |
 | [kurtis2221/stuntsmp](https://github.com/kurtis2221/stuntsmp) | sin licencia | 1 |
 | [kwwsyk/Elden-Ring-Nightreign-Cheat-Table](https://github.com/kwwsyk/Elden-Ring-Nightreign-Cheat-Table) | sin licencia | 1 |
 | [mach-kernel/callisto-trainer](https://github.com/mach-kernel/callisto-trainer) | sin licencia | 1 |
+| [majorzero69/mgs3-trainer](https://github.com/majorzero69/mgs3-trainer) | sin licencia | 1 |
+| [maluramichael/re-silver](https://github.com/maluramichael/re-silver) | Apache-2.0 | 1 |
 | [mmahoney09110/EldenRingEncouragement](https://github.com/mmahoney09110/EldenRingEncouragement) | MIT | 1 |
 | [mmfelixfu-maker/l4d2_X_DGlab](https://github.com/mmfelixfu-maker/l4d2_X_DGlab) | sin licencia | 1 |
 | [mRally2/FramerateUnlocker](https://github.com/mRally2/FramerateUnlocker) | sin licencia | 1 |
 | [mvrozanti/HyperHexagon](https://github.com/mvrozanti/HyperHexagon) | sin licencia | 1 |
 | [nozwock/ce-cheat-tables](https://github.com/nozwock/ce-cheat-tables) | sin licencia | 1 |
+| [olegyadrov/thefriendlyghost](https://github.com/olegyadrov/thefriendlyghost) | BSD-3-Clause | 1 |
+| [olivia-mativi/shapez2-ct](https://github.com/olivia-mativi/shapez2-ct) | sin licencia | 1 |
+| [olivia-mativi/tinyrogues-ct](https://github.com/olivia-mativi/tinyrogues-ct) | sin licencia | 1 |
 | [pkmnya/mymspinyin](https://github.com/pkmnya/mymspinyin) | MIT | 1 |
+| [polskiftw/cheatengine](https://github.com/polskiftw/cheatengine) | Apache-2.0 | 1 |
+| [posio-dev/cheat-engine-scripts](https://github.com/posio-dev/cheat-engine-scripts) | Unlicense | 1 |
 | [rqmaot/rqmaot.github.io](https://github.com/rqmaot/rqmaot.github.io) | sin licencia | 1 |
 | [ruarq/Calturin](https://github.com/ruarq/Calturin) | MIT | 1 |
+| [ryanbabij/mtwcameraunlock](https://github.com/ryanbabij/mtwcameraunlock) | sin licencia | 1 |
 | [ryder7223/Minesweeper-Tools](https://github.com/ryder7223/Minesweeper-Tools) | sin licencia | 1 |
 | [seyounff/Scripts_corekeeper](https://github.com/seyounff/Scripts_corekeeper) | sin licencia | 1 |
 | [sheysyn/NFSU2.Clutch](https://github.com/sheysyn/NFSU2.Clutch) | MIT | 1 |
@@ -474,3 +524,8 @@ Todo el mérito es de sus autores. Este repositorio solo reúne y filtra su trab
 | [zoomdbz/Cyberpunk-2077-Cheat-Engine-Cheat-tables](https://github.com/zoomdbz/Cyberpunk-2077-Cheat-Engine-Cheat-tables) | GPL-3.0 | 1 |
 | [zzctrl/rxwg](https://github.com/zzctrl/rxwg) | sin licencia | 1 |
 | [zzzzsky/CS1.6_Hook](https://github.com/zzzzsky/CS1.6_Hook) | sin licencia | 1 |
+| [The-Grand-Archives/Dark-Souls-III-CT-TGA](https://github.com/The-Grand-Archives/Dark-Souls-III-CT-TGA) | sin licencia | 1 |
+| [tox1cp4nd4/ce_cheat_tables](https://github.com/tox1cp4nd4/ce_cheat_tables) | sin licencia | 1 |
+| [welstrec/ac-valhalla](https://github.com/welstrec/ac-valhalla) | sin licencia | 1 |
+| [xtvaser/ramwatches](https://github.com/xtvaser/ramwatches) | MIT | 1 |
+| [yuiastin/tcs-release-tools](https://github.com/yuiastin/tcs-release-tools) | sin licencia | 1 |

@@ -1,0 +1,1061 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>87952</ID>
+      <Description>"[Enable] v.0.1.2.0"</Description>
+      <Options moHideChildren="1"/>
+      <Color>0000FF</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript Async="1">{ Game   : Palworld-Win64-Shipping.exe
+  Version: 
+  Date   : 2024-01-19
+  Author : cfe
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+aobscanmodule(aobFNameFName,$process,48895C2408574883EC30488BD9488954242033C9418BF84C8BD2448BC94885D2)
+registersymbol(aobFNameFName)
+aobscanmodule(aobFNameString,$process,48 89 5C 24 10 48 89 74 24 18 57 48 83 EC 30 83 79 04 00 48 8B FA 8B 19 48 8B F1 0F 85 8C 00 00 00)
+registersymbol(aobFNameString)
+
+aobscanmodule(aobStaticFindObject,$process,488BC448895808488968184889702057415641574883EC604883FAFF488BFA)
+registersymbol(aobStaticFindObject)
+
+aobscanmodule(aobObjectProcessEvent,$process,4055565741544155415641574881EC10010000488D6C243048899D38010000)
+registersymbol(aobObjectProcessEvent)
+
+aobscanmodule(aobULocalPlayer_GetProjectionData,$process,40 55 56 41 54 41 55 41 56 41 57 48 8D AC 24 28 F4 FF FF 48 81 EC D8 0C 00 00 44 0F 29 8C 24 B0 0C 00 00) // should be unique
+alloc(newmem,$1000,aobULocalPlayer_GetProjectionData)
+
+label(code)
+label(return)
+label(pLocalPlayer)
+registersymbol(pLocalPlayer)
+newmem:
+
+code:
+mov [pLocalPlayer],rcx
+  push rbp
+  push rsi
+  push r12
+  jmp return
+pLocalPlayer:
+dq 0
+
+aobULocalPlayer_GetProjectionData:
+  jmp newmem
+return:
+registersymbol(aobULocalPlayer_GetProjectionData)
+
+[DISABLE]
+
+aobULocalPlayer_GetProjectionData:
+  db 40 55 56 41 54
+
+unregistersymbol(*)
+dealloc(newmem)
+
+
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>87969</ID>
+          <Description>"[Scripts]"</Description>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>87959</ID>
+              <Description>"100% Capture Rate"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{ Game   : Palworld-Win64-Shipping.exe
+  Version: 
+  Date   : 2024-01-19
+  Author : cfe
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+aobscanmodule(aobPalDatabaseCharacterParameter_GetCaptureRateCorrect,$process,F3 0F 10 40 6C 48) // should be unique
+alloc(newmem,$1000,aobPalDatabaseCharacterParameter_GetCaptureRateCorrect)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  movss xmm0,[rax+6C]
+  mulss xmm0,[fCaptureMul]
+  jmp return
+fCaptureMul:
+dd (float)10000000
+
+aobPalDatabaseCharacterParameter_GetCaptureRateCorrect:
+  jmp newmem
+return:
+registersymbol(aobPalDatabaseCharacterParameter_GetCaptureRateCorrect)
+
+[DISABLE]
+
+aobPalDatabaseCharacterParameter_GetCaptureRateCorrect:
+  db F3 0F 10 40 6C
+
+unregistersymbol(aobPalDatabaseCharacterParameter_GetCaptureRateCorrect)
+dealloc(newmem)
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87960</ID>
+              <Description>"God"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{ Game   : Palworld-Win64-Shipping.exe
+  Version: 
+  Date   : 2024-01-19
+  Author : cfe
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(aobPalIndividualCharacterParameter_SetHP,$process,48 89 54 24 10 53 57 48 83 EC 48 48 8B D9) // should be unique
+alloc(newmem,$1000,aobPalIndividualCharacterParameter_SetHP)
+
+label(code)
+label(return)
+label(IsPlayer)
+newmem:
+
+code:
+  cmp byte ptr[rcx+328],1 // player, alt: 0x1D8(IndividualActor) == (Player)Pawn
+  je short IsPlayer
+  cmp qword ptr[rcx+330],0 // player monster
+  jne short IsPlayer
+  @@:
+  mov [rsp+10],rdx
+  jmp return
+IsPlayer:
+  ret
+
+aobPalIndividualCharacterParameter_SetHP:
+  jmp newmem
+return:
+registersymbol(aobPalIndividualCharacterParameter_SetHP)
+
+[DISABLE]
+
+aobPalIndividualCharacterParameter_SetHP:
+  db 48 89 54 24 10
+
+unregistersymbol(aobPalIndividualCharacterParameter_SetHP)
+dealloc(newmem)
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>88033</ID>
+              <Description>"Player+Pals No Hunger (Won't work if they already starving )"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{ Game   : Palworld-Win64-Shipping.exe
+  Version: 
+  Date   : 2024-01-19
+  Author : cfe
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(aobReadStomach,$process,F3 0F 10 8B 00 03 00 00 44) // should be unique
+alloc(newmem,$1000,aobReadStomach)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+    movss xmm1,[rbx+3DC] // maxStomach
+    movss [rbx+300],xmm1
+    movss xmm1,[rbx+300]
+  jmp return
+
+aobReadStomach:
+  jmp newmem
+  nop 3
+return:
+registersymbol(aobReadStomach)
+
+[DISABLE]
+
+aobReadStomach:
+  db F3 0F 10 8B 00 03 00 00
+
+unregistersymbol(aobReadStomach)
+dealloc(newmem)
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>88049</ID>
+              <Description>"Get Monster (Party Mouse-Over) "</Description>
+              <Options moHideChildren="1"/>
+              <Color>FF8000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{ Game   : Palworld-Win64-Shipping.exe
+  Version:
+  Date   : 2024-01-23
+  Author : cfe
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(aobPalIndividualCharacterParameter_GetEquipWaza,$process,48 8B B1 C8 02 00 00) // should be unique
+alloc(newmem,$1000,aobPalIndividualCharacterParameter_GetEquipWaza)
+
+label(code)
+label(return)
+label(pMonsterData)
+registersymbol(pMonsterData)
+newmem:
+
+code:
+  mov [pMonsterData],rcx
+  mov rsi,[rcx+2C8]
+  jmp return
+pMonsterData:
+dq 0
+
+aobPalIndividualCharacterParameter_GetEquipWaza:
+  jmp newmem
+  nop 2
+return:
+registersymbol(aobPalIndividualCharacterParameter_GetEquipWaza)
+
+[DISABLE]
+
+aobPalIndividualCharacterParameter_GetEquipWaza:
+  db 48 8B B1 C8 02 00 00
+
+unregistersymbol(aobPalIndividualCharacterParameter_GetEquipWaza)
+dealloc(newmem)
+
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>88050</ID>
+                  <Description>"Health"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>pMonsterData</Address>
+                  <Offsets>
+                    <Offset>2E8</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>88051</ID>
+                  <Description>"EXP"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>pMonsterData</Address>
+                  <Offsets>
+                    <Offset>2A8</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>88052</ID>
+                  <Description>"Level"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>pMonsterData</Address>
+                  <Offsets>
+                    <Offset>290</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>88053</ID>
+                  <Description>"Rank"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>pMonsterData</Address>
+                  <Offsets>
+                    <Offset>294</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>88054</ID>
+                  <Description>"Sanity"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>pMonsterData</Address>
+                  <Offsets>
+                    <Offset>39C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>88055</ID>
+                  <Description>"Melee_Damage"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>pMonsterData</Address>
+                  <Offsets>
+                    <Offset>2F4</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>88056</ID>
+                  <Description>"Shot_Damage"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>pMonsterData</Address>
+                  <Offsets>
+                    <Offset>2F8</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>88057</ID>
+                  <Description>"Defence"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>pMonsterData</Address>
+                  <Offsets>
+                    <Offset>2FC</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>88058</ID>
+                  <Description>"StomachDecreaseRate"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>pMonsterData</Address>
+                  <Offsets>
+                    <Offset>3E0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>88060</ID>
+                  <Description>"Add Active Skill"</Description>
+                  <Color>808000</Color>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>{$lua}
+if syntaxcheck then return end
+[ENABLE]
+
+local ProcessEvent = getAddress("aobObjectProcessEvent")
+local Find = getAddress("aobStaticFindObject")
+local pAddEquip = executeCodeEx(0,nil,Find,0,-1,{type = 4,value = "AddEquipWaza"},1)
+
+local Monster = getAddress("[pMonsterData]")
+if Monster == 0 then print("Error: No Monster Pointer") error("nullptr") return end
+
+local SkillList = createStringList()
+SkillList.add("Human_Punch")
+SkillList.add("WorkAttack")
+SkillList.add("Throw")
+SkillList.add("Scratch")
+SkillList.add("EnergyShot")
+SkillList.add("Unique_Anubis_LowRoundKick")
+SkillList.add("Unique_Anubis_GroundPunch")
+SkillList.add("Unique_Anubis_Tackle")
+SkillList.add("Unique_Deer_PushupHorn")
+SkillList.add("HyperBeam")
+SkillList.add("PowerShot")
+SkillList.add("PowerBall")
+SkillList.add("Unique_Garm_Bite")
+SkillList.add("Intimidate")
+SkillList.add("Unique_Boar_Tackle")
+SkillList.add("Unique_PinkCat_CatPunch")
+SkillList.add("Unique_FlowerDinosaur_Whip")
+SkillList.add("Unique_SheepBall_Roll")
+SkillList.add("Unique_ChickenPal_ChickenPeck")
+SkillList.add("Unique_Gorilla_GroundPunch")
+SkillList.add("Unique_Grassmammoth_Earthquake")
+SkillList.add("AirCanon")
+SkillList.add("Unique_GrassPanda_MusclePunch")
+SkillList.add("Unique_RobinHood_BowSnipe")
+SkillList.add("Unique_Alpaca_Tackle")
+SkillList.add("Unique_KingAlpaca_BodyPress")
+SkillList.add("Unique_Werewolf_Scratch")
+SkillList.add("Unique_FengyunDeeper_CloudTempest")
+SkillList.add("Unique_Baphomet_SwallowKite")
+SkillList.add("Unique_HerculesBeetle_BeetleTackle")
+SkillList.add("Unique_HawkBird_Storm")
+SkillList.add("Unique_Eagle_GlidingNail")
+SkillList.add("SelfDestruct")
+SkillList.add("SelfDestruct_Bee")
+SkillList.add("SelfExplosion")
+SkillList.add("FireBlast")
+SkillList.add("Flamethrower")
+SkillList.add("FireBall")
+SkillList.add("FlareArrow")
+SkillList.add("FireSeed")
+SkillList.add("Unique_Horus_FlareBird")
+SkillList.add("FlareTornado")
+SkillList.add("Inferno")
+SkillList.add("Unique_FireKirin_Tackle")
+SkillList.add("Unique_AmaterasuWolf_FireCharge")
+SkillList.add("Unique_VolcanicMonster_MagmaAttack")
+SkillList.add("Unique_FlameBuffalo_FlameHorn")
+SkillList.add("WaterGun")
+SkillList.add("WaterWave")
+SkillList.add("HydroPump")
+SkillList.add("WaterBall")
+SkillList.add("TidalWave")
+SkillList.add("AquaJet")
+SkillList.add("BubbleShot")
+SkillList.add("AcidRain")
+SkillList.add("Unique_BluePlatypus_Toboggan")
+SkillList.add("WindCutter")
+SkillList.add("GrassTornado")
+SkillList.add("SolarBeam")
+SkillList.add("SeedMachinegun")
+SkillList.add("SeedMine")
+SkillList.add("RootAttack")
+SkillList.add("SpecialCutter")
+SkillList.add("Unique_QueenBee_SpinLance")
+SkillList.add("ThunderRain")
+SkillList.add("ThunderBall")
+SkillList.add("LineThunder")
+SkillList.add("CrossThunder")
+SkillList.add("ThreeThunder")
+SkillList.add("ElecWave")
+SkillList.add("Thunderbolt")
+SkillList.add("ThunderFunnel")
+SkillList.add("SpreadPulse")
+SkillList.add("LockonLaser")
+SkillList.add("LightningStrike")
+SkillList.add("Unique_ElecPanda_ElecScratch")
+SkillList.add("Unique_Kirin_LightningTackle")
+SkillList.add("IceMissile")
+SkillList.add("BlizzardLance")
+SkillList.add("SnowStorm")
+SkillList.add("IcicleThrow")
+SkillList.add("Unique_IceHorse_IceBladeAttack")
+SkillList.add("IceBlade")
+SkillList.add("SandTornado")
+SkillList.add("ThrowRock")
+SkillList.add("RockLance")
+SkillList.add("MudShot")
+SkillList.add("StoneShotgun")
+SkillList.add("Unique_DrillGame_ShellAttack")
+SkillList.add("DarkLaser")
+SkillList.add("DarkWave")
+SkillList.add("ShadowBall")
+SkillList.add("Psychokinesis")
+SkillList.add("PoisonShot")
+SkillList.add("GhostFlame")
+SkillList.add("Unique_DarkCrow_TelePoke")
+SkillList.add("DragonMeteor")
+SkillList.add("DragonBreath")
+SkillList.add("DragonWave")
+SkillList.add("DragonCanon")
+SkillList.add("Unique_FairyDragon_FairyTornado")
+SkillList.add("Funnel_DreamDemon")
+SkillList.add("Funnel_RaijinDaughter")
+SkillList.add("StardustArrow")
+SkillList.add("Tremor")
+SkillList.add("FrostBreath")
+SkillList.add("DiamondFall")
+SkillList.add("BeamSlicer")
+SkillList.add("Commet")
+SkillList.add("DarkBall")
+SkillList.add("DarkFog")
+SkillList.add("PoisonFog")
+SkillList.add("DarkLegion")
+SkillList.add("Unique_BirdDragon_FireBreath")
+SkillList.add("Unique_BlackMetalDragon_FirePunch")
+SkillList.add("Unique_DarkScorpion_Pierce")
+SkillList.add("Unique_GhostBeast_Tossin")
+SkillList.add("Unique_JetDragon_JumpBeam")
+SkillList.add("Unique_ThunderBird_ThunderStorm")
+SkillList.add("Unique_Yeti_SnowBall")
+SkillList.add("Unique_NaughtyCat_CatPress")
+SkillList.add("Unique_IceDeer_IceHorn")
+SkillList.add("Unique_KingBahamut_AirCrash")
+SkillList.add("Unique_Manticore_InfernoStrike")
+SkillList.add("Unique_SoldierBee_NeedleLance")
+SkillList.add("Unique_ThunderDog_InazumaShorai")
+SkillList.add("Unique_BlackCentaur_TwoSpearRushes")
+SkillList.add("Unique_BlackGriffon_TackleLaser")
+SkillList.add("Unique_SakuraSaurus_SideTackle")
+SkillList.add("Unique_ThunderDragonMan_ThunderSwordAttack")
+SkillList.add("Unique_RedArmorBird_TriplePeck")
+SkillList.add("Unique_CaptainPenguin_BodySlide")
+SkillList.add("Unique_Ronin_Iai")
+SkillList.add("Unique_GrassRabbitMan_GrassRoundKick")
+SkillList.add("Unique_SaintCentaur_OneSpearRushes")
+SkillList.add("Unique_Umihebi_WindingTackle")
+SkillList.add("Unique_WeaselDragon_FlyingTackle")
+SkillList.add("Unique_WhiteTiger_IceScratch")
+SkillList.add("Unique_Baphomet_Dark_DarkKite")
+SkillList.add("Unique_BirdDragon_Ice_IceBreath")
+SkillList.add("Unique_FireKirin_Dark_DarkTossin")
+SkillList.add("Unique_VolcanicMonster_Ice_IceAttack")
+SkillList.add("Unique_IceHorse_Dark_DarkBladeAttack")
+SkillList.add("Unique_Yeti_Grass_GrassBall")
+SkillList.add("Unique_GrassPanda_Electric_ElectricPunch")
+
+local nameIndex = showSelectionList("Select A Skill Name", "Select:", SkillList, false)
+if nameIndex == -1 then error("no selection") return end
+
+local p = allocateMemory(32)
+
+local SkillID = nameIndex+1
+
+writeInteger(p,SkillID)
+executeCodeEx(0,nil,ProcessEvent,Monster,pAddEquip,p)
+deAlloc(p)
+
+showMessage("Done!")
+
+[DISABLE]
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>88059</ID>
+                  <Description>"Swap Pal ID"</Description>
+                  <Color>808000</Color>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>{$lua}
+if syntaxcheck then return end
+[ENABLE]
+local FName_String = getAddress("aobFNameString")
+local FName_FName = getAddress( "aobFNameFName" )
+local ProcessEvent = getAddress("aobObjectProcessEvent")
+local Find = getAddress("aobStaticFindObject")
+local pClear = executeCodeEx(0,nil,Find,0,-1,{type = 4,value = "ClearEquipWaza"},1)
+
+local Monster = getAddress("[pMonsterData]")
+if Monster == 0 then print("error: no monster pointer data - did you hover over any?") error("nullptr") return end
+
+local MonsterList = createStringList()
+MonsterList.add("Gorilla")
+MonsterList.add("BOSS_Eagle")
+MonsterList.add("BOSS_FlyingManta")
+MonsterList.add("BOSS_NegativeOctopus")
+MonsterList.add("BOSS_WindChimes")
+MonsterList.add("BOSS_WindChimes_Ice")
+MonsterList.add("Eagle")
+MonsterList.add("FlyingManta")
+MonsterList.add("NegativeOctopus")
+MonsterList.add("WindChimes")
+MonsterList.add("WindChimes_Ice")
+MonsterList.add("BlackFurDragon")
+MonsterList.add("BlackMetalDragon")
+MonsterList.add("ElecPanda")
+MonsterList.add("FlowerDinosaur")
+MonsterList.add("GrassPanda")
+MonsterList.add("JetDragon")
+MonsterList.add("KingBahamut")
+MonsterList.add("LazyDragon")
+MonsterList.add("LilyQueen")
+MonsterList.add("Yeti")
+MonsterList.add("Alpaca")
+MonsterList.add("AmaterasuWolf")
+MonsterList.add("Anubis")
+MonsterList.add("BadCatgirl")
+MonsterList.add("Baphomet")
+MonsterList.add("Baphomet_Dark")
+MonsterList.add("Basetet")
+MonsterList.add("Basetet_Ice")
+MonsterList.add("BeardedDragon")
+MonsterList.add("BerryGoat")
+MonsterList.add("BirdDragon")
+MonsterList.add("BirdDragon_Ice")
+MonsterList.add("BlackCentaur")
+MonsterList.add("BlackGriffon")
+MonsterList.add("BlueberryFairy")
+MonsterList.add("BlueDragon")
+MonsterList.add("BluePlatypus")
+MonsterList.add("Boar")
+MonsterList.add("BrownRabbit")
+MonsterList.add("CaptainPenguin")
+MonsterList.add("Carbunclo")
+MonsterList.add("CatBat")
+MonsterList.add("CatMage")
+MonsterList.add("CatVampire")
+MonsterList.add("ChickenPal")
+MonsterList.add("ColorfulBird")
+MonsterList.add("CowPal")
+MonsterList.add("CuteButterfly")
+MonsterList.add("CuteFox")
+MonsterList.add("CuteMole")
+MonsterList.add("DarkCrow")
+MonsterList.add("DarkScorpion")
+MonsterList.add("Deer")
+MonsterList.add("Deer_Ground")
+
+local nameIndex = showSelectionList("Select A Monster Name", "Select:", MonsterList, false)
+if nameIndex == -1 then error("no selection") return end
+
+local szName = MonsterList[nameIndex]
+
+local p = allocateMemory(32)
+executeCodeEx( 0, nil, FName_FName, p, {type=4,value=szName}, 1 )
+local FMonsterID = readQword(p)
+
+writeQword(Monster+0x270,FMonsterID)
+
+writeQword(p,0)
+executeCodeEx(0,nil,ProcessEvent,Monster,pClear,p)
+showMessage("Done! re-load the savegame to see the effect")
+deAlloc(p)
+
+
+[DISABLE]
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>88061</ID>
+                  <Description>"Reset All Active Skills"</Description>
+                  <Color>808000</Color>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>{$lua}
+if syntaxcheck then return end
+[ENABLE]
+local FName_String = getAddress("aobFNameString")
+local FName_FName = getAddress( "aobFNameFName" )
+local ProcessEvent = getAddress("aobObjectProcessEvent")
+local Find = getAddress("aobStaticFindObject")
+local pClear = executeCodeEx(0,nil,Find,0,-1,{type = 4,value = "ClearEquipWaza"},1)
+
+local Monster = getAddress("[pMonsterData]")
+if Monster == 0 then print("error: no monster pointer data - did you hover over any?") error("nullptr") return end
+
+local p = allocateMemory(32)
+executeCodeEx(0,nil,ProcessEvent,Monster,pClear,p)
+showMessage("Done!")
+deAlloc(p)
+
+
+[DISABLE]
+
+</AssemblerScript>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>88001</ID>
+              <Description>"NoClip"</Description>
+              <Options moHideChildren="1"/>
+              <Color>FF8000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+globalalloc(NoClipThread,$1000,$process)
+
+createthread(NoClipThread)
+
+label(bStop)
+registersymbol(bStop)
+label(Start)
+label(Ending)
+label(KeyLoop)
+label(LDisable)
+label(fSpeed)
+registersymbol(fSpeed)
+NoClipThread:
+//jmp NoClipThread
+sub rsp,78
+Start:
+cmp [bStop],1
+je Ending
+mov rax,pLocalPlayer
+mov rax,[rax]
+mov rax,[rax+30]
+test rax,rax
+je Start
+mov rsi,[rax+2D0] // Pawn
+mov rdi,[rsi+320] // Movement
+mov rbx,[rsi+198] // Root
+
+//mov byte ptr[rdi+1A4],5
+
+xor ecx,ecx
+mov rdx,-1
+mov r8,szGetActorForwardVector
+mov r9d,1
+call aobStaticFindObject
+test rax,rax
+je Start
+mov [pForward],rax
+
+xor ecx,ecx
+mov rdx,-1
+mov r8,szSetActorEnableCollision
+mov r9d,1
+call aobStaticFindObject
+test rax,rax
+je Start
+mov [pActorCollision],rax
+
+mov rcx,rsi
+mov rdx,rax
+lea r8,[rsp+20]
+mov [rsp+20],0
+call aobObjectProcessEvent
+
+KeyLoop:
+mov byte ptr[rdi+1A4],5
+cmp [bStop],1
+je LDisable
+mov ecx,20
+call GetAsyncKeyState
+test eax,eax
+je short @f
+ // SPACE UP
+ movsd xmm0,[rbx+270]
+ movsd xmm1,[fSpeed]
+ divsd xmm1,[fThousand]
+ addsd xmm0,xmm1
+ movsd [rbx+270],xmm0
+@@:
+
+mov ecx,10
+call GetAsyncKeyState
+test eax,eax
+je short @f
+ // SHIFT DOWN
+ movsd xmm0,[rbx+270]
+ movsd xmm1,[fSpeed]
+ divsd xmm1,[fThousand]
+ subsd xmm0,xmm1
+ movsd [rbx+270],xmm0
+@@:
+
+mov ecx,57
+call GetAsyncKeyState
+test eax,eax
+je short @f
+ // W Forward
+ mov rcx,rsi
+ mov rdx,[pForward]
+ lea r8,[rsp+20]
+ call aobObjectProcessEvent
+ movups xmm0,[rsp+20]
+ movsd xmm2,[fSpeed]
+ divsd xmm2,[fThousand]
+ shufpd xmm2,xmm2,0
+ mulpd xmm0,xmm2
+ movups xmm1,[rbx+260]
+ addpd xmm1,xmm0
+ movups [rbx+260],xmm1
+@@:
+jmp KeyLoop
+
+
+LDisable:
+mov byte ptr[rdi+1A4],1
+
+mov rcx,rsi
+mov rdx,[pActorCollision]
+lea r8,[rsp+20]
+mov [rsp+20],1
+call aobObjectProcessEvent
+
+Ending:
+add rsp,78
+ret
+bStop:
+dd 0
+pActorCollision:
+dq 0
+pForward:
+dq 0
+szGetActorForwardVector:
+dw 'GetActorForwardVector'
+dw 0
+szSetActorEnableCollision:
+dw 'SetActorEnableCollision'
+dw 0
+fSpeed:
+dq (double)2 //0.002
+fThousand:
+dq (double)1000
+
+
+ 
+[DISABLE]
+bStop:
+dd 1
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>88002</ID>
+                  <Description>"Movement Speed:"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Double</VariableType>
+                  <Address>fSpeed</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>88003</ID>
+                  <Description>"[INFO] Space = Uo"</Description>
+                  <GroupHeader>1</GroupHeader>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>88004</ID>
+                  <Description>"[INFO] Shift = Down"</Description>
+                  <GroupHeader>1</GroupHeader>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>88062</ID>
+              <Description>"Save Player Position"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$lua}
+if syntaxcheck then return end
+[ENABLE]
+local LP = getAddress("[pLocalPlayer]")
+local t = readPointer(LP+0x30)
+t = readPointer(t+0x2D0)
+local Root = readPointer(t+0x198)
+
+PosX = readDouble(Root+0x260)
+PosY = readDouble(Root+0x268)
+PosZ = readDouble(Root+0x270)
+
+ 
+ 
+[DISABLE]
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>88063</ID>
+              <Description>"Load Player Position"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$lua}
+if syntaxcheck then return end
+[ENABLE]
+local LP = getAddress("[pLocalPlayer]")
+local t = readPointer(LP+0x30)
+t = readPointer(t+0x2D0)
+local Root = readPointer(t+0x198)
+
+if PosX == nil then print("Error: no position is saved") error("no saved pos") return end
+
+writeDouble(Root+0x260,PosX)
+writeDouble(Root+0x268,PosY)
+writeDouble(Root+0x270,PosZ)
+
+[DISABLE]
+
+</AssemblerScript>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>87970</ID>
+          <Description>"[Pointers]"</Description>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>88047</ID>
+              <Description>"MaxWalkSpeed"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>[pLocalPlayer]+30</Address>
+              <Offsets>
+                <Offset>1E8</Offset>
+                <Offset>320</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>88048</ID>
+              <Description>"SprintMaxSpeed"</Description>
+              <VariableType>Float</VariableType>
+              <Address>[pLocalPlayer]+30</Address>
+              <Offsets>
+                <Offset>FB0</Offset>
+                <Offset>320</Offset>
+                <Offset>2D0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87983</ID>
+              <Description>"Tech Points"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pLocalPlayer</Address>
+              <Offsets>
+                <Offset>140</Offset>
+                <Offset>550</Offset>
+                <Offset>298</Offset>
+                <Offset>30</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87986</ID>
+              <Description>"Anicent Tech Points"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pLocalPlayer</Address>
+              <Offsets>
+                <Offset>144</Offset>
+                <Offset>550</Offset>
+                <Offset>298</Offset>
+                <Offset>30</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87968</ID>
+              <Description>"Status Points:"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pLocalPlayer</Address>
+              <Offsets>
+                <Offset>3E4</Offset>
+                <Offset>108</Offset>
+                <Offset>628</Offset>
+                <Offset>2D0</Offset>
+                <Offset>30</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87973</ID>
+              <Description>"Health:"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>8 Bytes</VariableType>
+              <Address>pLocalPlayer</Address>
+              <Offsets>
+                <Offset>2E8</Offset>
+                <Offset>108</Offset>
+                <Offset>628</Offset>
+                <Offset>2D0</Offset>
+                <Offset>30</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87981</ID>
+              <Description>"MP:"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>8 Bytes</VariableType>
+              <Address>pLocalPlayer</Address>
+              <Offsets>
+                <Offset>320</Offset>
+                <Offset>108</Offset>
+                <Offset>628</Offset>
+                <Offset>2D0</Offset>
+                <Offset>30</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87982</ID>
+              <Description>"Max MP:"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>8 Bytes</VariableType>
+              <Address>pLocalPlayer</Address>
+              <Offsets>
+                <Offset>358</Offset>
+                <Offset>108</Offset>
+                <Offset>628</Offset>
+                <Offset>2D0</Offset>
+                <Offset>30</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87974</ID>
+              <Description>"Hunger(Stomach)"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>pLocalPlayer</Address>
+              <Offsets>
+                <Offset>300</Offset>
+                <Offset>108</Offset>
+                <Offset>628</Offset>
+                <Offset>2D0</Offset>
+                <Offset>30</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87976</ID>
+              <Description>"Stomach Decrease Rate"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>pLocalPlayer</Address>
+              <Offsets>
+                <Offset>3E0</Offset>
+                <Offset>108</Offset>
+                <Offset>628</Offset>
+                <Offset>2D0</Offset>
+                <Offset>30</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87975</ID>
+              <Description>"CraftSpeed"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pLocalPlayer</Address>
+              <Offsets>
+                <Offset>364</Offset>
+                <Offset>108</Offset>
+                <Offset>628</Offset>
+                <Offset>2D0</Offset>
+                <Offset>30</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87978</ID>
+              <Description>"Level"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pLocalPlayer</Address>
+              <Offsets>
+                <Offset>290</Offset>
+                <Offset>108</Offset>
+                <Offset>628</Offset>
+                <Offset>2D0</Offset>
+                <Offset>30</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87979</ID>
+              <Description>"Rank"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pLocalPlayer</Address>
+              <Offsets>
+                <Offset>294</Offset>
+                <Offset>108</Offset>
+                <Offset>628</Offset>
+                <Offset>2D0</Offset>
+                <Offset>30</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>87980</ID>
+              <Description>"EXP"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>pLocalPlayer</Address>
+              <Offsets>
+                <Offset>2A8</Offset>
+                <Offset>108</Offset>
+                <Offset>628</Offset>
+                <Offset>2D0</Offset>
+                <Offset>30</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols>
+    <SymbolEntry>
+      <Name>NoClipThread</Name>
+      <Address>7FF6604E0000</Address>
+    </SymbolEntry>
+  </UserdefinedSymbols>
+</CheatTable>

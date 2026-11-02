@@ -1,0 +1,4750 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="29">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>23930</ID>
+      <Description>"Compact Mode"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript Async="1">[ENABLE]
+
+{$lua}
+
+if not syntaxcheck then
+
+  function cycleFullCompact( sender, force )
+    local state = not( compactmenuitem.Caption == 'Compact View Mode' )
+    if force ~= nil then
+      state = not force
+    end
+    compactmenuitem.Caption = state and 'Compact View Mode' or 'Full View Mode'
+    getMainForm().Splitter1.Visible = state
+    getMainForm().Panel4.Visible = state
+    getMainForm().Panel5.Visible = state
+  end
+
+  function addCompactMenu()
+    if compactmenualreadyexists then return end
+      local parent = getMainForm().Menu.Items
+      compactmenuitem = createMenuItem( parent )
+      parent.add( compactmenuitem )
+      compactmenuitem.Caption = 'Compact View Mode'
+      compactmenuitem.OnClick = cycleFullCompact
+      compactmenualreadyexists = 'yes'
+  end
+
+  addCompactMenu()
+  cycleFullCompact( nil, true )
+
+end
+
+[DISABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  cycleFullCompact( nil, false )
+end
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>23931</ID>
+      <Description>"[ Initialize ]"</Description>
+      <Options moHideChildren="1"/>
+      <LastState Activated="1"/>
+      <Color>0000FF</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript Async="1">[ENABLE]
+
+{$lua}
+
+if not syntaxcheck then
+
+  function _readInteger( Input )
+    -- thanks, Pox!
+    local Value = readInteger( Input )
+    if Value &lt; 0x80000000 then return Value
+    else return Value - 0x100000000 end
+  end
+
+  function AOBScanEx( aob, p, a, n, s, e, pb )
+    -- thanks, panraven!
+    -- see: https://forum.cheatengine.org/viewtopic.php?t=577536
+    local p, a, n, s, e = p or '*X*W', a or fsmNotAligned, n or '0', s or 0x0, e or 0xffffffffffffffff
+    local ms = pb and createMemScan( pb ) or createMemScan()
+    local fl = createFoundList( ms )
+    ms.firstScan( soExactValue, vtByteArray, nil, aob, nil, s, e, p, a, n, true, false, false, false )
+    ms.waitTillDone()
+    fl.initialize()
+    local result = nil
+    if fl ~= nil and fl.getCount() &gt; 0 then
+      result = createStringlist()
+      for i = 1, fl.getCount() do result.add( fl.getAddress( i-1 ) ) end
+    end
+    fl.destroy()
+    ms.destroy()
+    return result
+  end
+
+  function GetAssemblySpot( p )
+    local gameProcess = "GRW.exe"
+    local gameModule = getAddress( gameProcess )
+    local pStart = gameModule + 0x500
+    local pEnd = pStart + 0xB00
+    local pScan = AOBScanEx( "DEADC0DE00", nil, nil, nil, pStart, pEnd )
+    if pScan == nil then
+      p = pStart
+    else
+      p = tonumber( pScan[0], 16 ) + 0x4
+    end
+    return p
+  end
+
+  function GetCaves()
+    local pCave0 = gameModule + 0x500
+    fullAccess( gameModule, 0xB00 )
+    unregisterSymbol( "Cave0" )
+    registerSymbol( "Cave0", pCave0, true )
+    -- find &lt;/application&gt;&lt;/assembly&gt;
+    local hkCave = AOBScanEx( "3C2F6170706C69636174696F6E3E3C2F617373656D626C793E", nil, nil, nil, gameModule, gameModule + moduleSize )
+    if hkCave ~= nil then
+      local t = tonumber( hkCave[0], 16 ) + 0x2A
+      fullAccess( t, 0xC00 )
+      unregisterSymbol( "Cave1" )
+      registerSymbol( "Cave1", t, true )
+      --print( string.format( "GetCaves -&gt; AOB1: 0x%X", t ) )
+    else
+      print( "GetCaves -&gt; AOB1 not found!" )
+    end
+  end
+
+  function GetPBYTE_GetBhvGhostRefs()
+    --local pScan = AOBScanEx( "40534883EC300F29742420488BD90F28F1E8????????488BCBE8????????80BB????00000074", nil, nil, nil, gameModule, gameModule + moduleSize )
+    local pScan = AOBScanEx( "40534883EC??0F297424204889CB0F28F1E8????????80BB????????0074??48", nil, nil, nil, gameModule, gameModule + moduleSize )
+    if pScan ~= nil then
+      local t = tonumber( pScan[0], 16 )
+      unregisterSymbol( "PBYTE_GetBhvGhostRefs" )
+      registerSymbol( "PBYTE_GetBhvGhostRefs", t, true )
+    else
+      print( "GetPBYTE_GetBhvGhostRefs -&gt; AOB not found!" )
+    end
+  end
+
+  function GetPBYTE_GodMode()
+    --local pScan = AOBScanEx( "48895C241048896C241848897C242041564883EC40458BF1418BE88BFA488BD94585C074??80B90102000000", nil, nil, nil, gameModule, gameModule + moduleSize )
+    local pScan = AOBScanEx( "48895C241048896C241848897C242041564883EC4045??????????????48????4585C074??80B90102000000", nil, nil, nil, gameModule, gameModule + moduleSize )
+    if pScan ~= nil then
+      local t = tonumber( pScan[0], 16 )
+      unregisterSymbol( "PBYTE_GodMode" )
+      registerSymbol( "PBYTE_GodMode", t, true )
+    else
+      print( "GetPBYTE_GodMode -&gt; AOB not found!" )
+    end
+  end
+
+  function GetPBYTE_SkipVehicleDamage()
+    --local pScan = AOBScanEx( "48895C240848896C24104889742418574883EC20498B4038488BF9498BD84C63480C", nil, nil, nil, gameModule, gameModule + moduleSize )
+    local pScan = AOBScanEx( "48895C240848896C24104889742418574883EC20498B403848??????????4C63480C", nil, nil, nil, gameModule, gameModule + moduleSize )
+    if pScan ~= nil then
+      local t = tonumber( pScan[0], 16 )
+      unregisterSymbol( "PBYTE_SkipVehicleDamage" )
+      registerSymbol( "PBYTE_SkipVehicleDamage", t, true )
+    else
+      print( "GetPBYTE_SkipVehicleDamage -&gt; AOB not found!" )
+    end
+  end
+
+  function GetPBYTE_SkipMissileDamage()
+    local pScan = AOBScanEx( "4053555741564883EC58488B41??488BD9458BF14C6350??488B08498BE849C1E220488BFA49C1FA3F4923CA74??E8", nil, nil, nil, gameModule, gameModule + moduleSize )
+    if pScan ~= nil then
+      local t = tonumber( pScan[0], 16 )
+      unregisterSymbol( "PBYTE_SkipMissileDamage" )
+      registerSymbol( "PBYTE_SkipMissileDamage", t, true )
+    else
+      print( "GetPBYTE_SkipMissileDamage -&gt; AOB not found!" )
+    end
+  end
+
+  function GetPBYTE_SkipMobilePartsDamage()
+    local pScan = AOBScanEx( "B93F0000000FB6D038C80F46CABA01000000D3E289D021D839D0", nil, nil, nil, gameModule, gameModule + moduleSize )
+    if pScan ~= nil then
+      local t = tonumber( pScan[0], 16 ) - 0x119
+      unregisterSymbol( "PBYTE_SkipMobilePartsDamage" )
+      registerSymbol( "PBYTE_SkipMobilePartsDamage", t, true )
+    else
+      print( "GetPBYTE_SkipMobilePartsDamage -&gt; AOB not found!" )
+    end
+  end
+
+  function GetPBYTE_Immunity()
+    local pScan = AOBScanEx( "0FB64178C3", nil, nil, nil, gameModule, gameModule + moduleSize )
+    if pScan ~= nil then
+      local t = tonumber( pScan[0], 16 )
+      unregisterSymbol( "PBYTE_Immunity" )
+      registerSymbol( "PBYTE_Immunity", t, true )
+    else
+      print( "GetPBYTE_Immunity -&gt; AOB not found!" )
+    end
+  end
+
+  function GetPBYTE_NoReload()
+    local pScan = AOBScanEx( "48895C24??574883EC20488B41??89D34889CF4C6340", nil, nil, nil, gameModule, gameModule + moduleSize )
+    if pScan ~= nil then
+      local t = tonumber( pScan[0], 16 )
+      unregisterSymbol( "PBYTE_NoReload" )
+      registerSymbol( "PBYTE_NoReload", t, true )
+    else
+      print( "GetPBYTE_NoReload -&gt; AOB not found!" )
+    end
+  end
+
+  function GetPBYTE_NoRecoil()
+    local pScan = AOBScanEx( "48????F30F1148105541??41??488D6888", nil, nil, nil, gameModule, gameModule + moduleSize )
+    if pScan ~= nil then
+      local t = tonumber( pScan[0], 16 )
+      unregisterSymbol( "PBYTE_NoRecoil" )
+      registerSymbol( "PBYTE_NoRecoil", t, true )
+    else
+      print( "GetPBYTE_NoRecoil -&gt; AOB not found!" )
+    end
+  end
+
+  function GetPBYTE_SuperAccuracy()
+    local pScan = AOBScanEx( "80BBF400000000C683E400000001", nil, nil, nil, gameModule, gameModule + moduleSize )
+    if pScan ~= nil then
+      local t = tonumber( pScan[0], 16 )
+      unregisterSymbol( "PBYTE_SuperAccuracy" )
+      registerSymbol( "PBYTE_SuperAccuracy", t, true )
+    else
+      print( "GetPBYTE_SuperAccuracy -&gt; AOB not found!" )
+    end
+  end
+
+  function GetPBYTE_UnlimitedDroneBattery()
+    local pScan = AOBScanEx( "0F28F074??48C787????????FFFFFFFFEB", nil, nil, nil, gameModule, gameModule + moduleSize )
+    if pScan ~= nil then
+      local t = tonumber( pScan[0], 16 )
+      unregisterSymbol( "PBYTE_UnlimitedDroneBattery" )
+      registerSymbol( "PBYTE_UnlimitedDroneBattery", t, true )
+    else
+      print( "GetPBYTE_UnlimitedDroneBattery -&gt; AOB not found!" )
+    end
+  end
+
+  function GetPBYTE_UnlimitedDroneRange()
+    local pScan = AOBScanEx( "488B8E????????4885C974??E8????????488B8E????????0F28CE", nil, nil, nil, gameModule, gameModule + moduleSize )
+    if pScan ~= nil then
+      local t = tonumber( pScan[0], 16 )
+      unregisterSymbol( "PBYTE_UnlimitedDroneRange" )
+      registerSymbol( "PBYTE_UnlimitedDroneRange", t, true )
+    else
+      print( "GetPBYTE_UnlimitedDroneRange -&gt; AOB not found!" )
+    end
+  end
+
+  function GetPBYTE_RemoveSyncShotCooldown()
+    local pScan = AOBScanEx( "48895C24084889742410574883EC204889D74889CBE8????????488B83", nil, nil, nil, gameModule, gameModule + moduleSize )
+    if pScan ~= nil then
+      local t = tonumber( pScan[0], 16 )
+      unregisterSymbol( "PBYTE_RemoveSyncShotCooldown" )
+      registerSymbol( "PBYTE_RemoveSyncShotCooldown", t, true )
+    else
+      print( "GetPBYTE_RemoveSyncShotCooldown -&gt; AOB not found!" )
+    end
+  end
+
+  function GetPBYTE_RemoveRebelSupportCooldown()
+    local pScan = AOBScanEx( "40534883EC30488BD98B49200F297424200F28F1FFC9", nil, nil, nil, gameModule, gameModule + moduleSize )
+    if pScan ~= nil then
+      local t = tonumber( pScan[0], 16 )
+      unregisterSymbol( "PBYTE_RemoveRebelSupportCooldown" )
+      registerSymbol( "PBYTE_RemoveRebelSupportCooldown", t, true )
+    else
+      print( "GetPBYTE_RemoveRebelSupportCooldown -&gt; AOB not found!" )
+    end
+  end
+
+  function GetPBYTE_SetResource()
+    --local pScan = AOBScanEx( "488B85????????8B50??488B48??E8????????389D", nil, nil, nil, gameModule, gameModule + moduleSize )
+    local pScan = AOBScanEx( "498B????498B140C4989??4C8B????4C39????74??48", nil, nil, nil, gameModule, gameModule + moduleSize )
+    if pScan ~= nil then
+      local t = tonumber( pScan[0], 16 ) - 0x5
+      unregisterSymbol( "PBYTE_SetResource" )
+      registerSymbol( "PBYTE_SetResource", t, true )
+    else
+      print( "GetPBYTE_SetResource -&gt; AOB not found!" )
+    end
+  end
+
+  function GetPBYTE_InstantMaxLevel()
+    local pScan = AOBScanEx( "488B14193B42100F", nil, nil, nil, gameModule, gameModule + moduleSize )
+    if pScan ~= nil then
+      local t = tonumber( pScan[0], 16 )
+      unregisterSymbol( "PBYTE_InstantMaxLevel" )
+      registerSymbol( "PBYTE_InstantMaxLevel", t, true )
+    else
+      print( "GetPBYTE_InstantMaxLevel -&gt; AOB not found!" )
+    end
+  end
+
+  function GetPBYTE_FastTierOne()
+    local pScan = AOBScanEx( "4401F84189C74529F74585FF", nil, nil, nil, gameModule, gameModule + moduleSize )
+    if pScan ~= nil then
+      local t = tonumber( pScan[0], 16 )
+      unregisterSymbol( "PBYTE_FastTierOne" )
+      registerSymbol( "PBYTE_FastTierOne", t, true )
+    else
+      print( "GetPBYTE_FastTierOne -&gt; AOB not found!" )
+    end
+  end
+
+  function GetPBYTE_ClipDecrease()
+    local pScan = AOBScanEx( "8B05????????4885C074068078300075??83", nil, nil, nil, gameModule, gameModule + moduleSize )
+    if pScan ~= nil then
+      local t = tonumber( pScan[0], 16 )
+      unregisterSymbol( "PBYTE_ClipDecrease" )
+      registerSymbol( "PBYTE_ClipDecrease", t, true )
+    else
+      print( "GetPBYTE_ClipDecrease -&gt; AOB not found!" )
+    end
+  end
+
+  function GetPBYTE_MapMarkerBool()
+    local pScan = AOBScanEx( "C683??00000005E8????????4883C4405BC3", nil, nil, nil, gameModule, gameModule + moduleSize )
+    if pScan ~= nil then
+      local t = tonumber( pScan[0], 16 )
+      unregisterSymbol( "PBYTE_MapMarkerBool" )
+      registerSymbol( "PBYTE_MapMarkerBool", t, true )
+    else
+      print( "GetPBYTE_MapMarkerBool -&gt; AOB not found!" )
+    end
+  end
+
+  function GetResPointers()
+    local pScan = AOBScanEx( "833D????????FF74??E8????????4885C0", nil, nil, nil, gameModule, gameModule + moduleSize )
+    if pScan ~= nil then
+      local t = tonumber( pScan[0], 16 ) + 0x9
+      t = t + _readInteger( t + 0x1 ) + 0x5
+      unregisterSymbol( "GetResTabPointer" )
+      registerSymbol( "GetResTabPointer", t, true )
+    else
+      print( "GetResPointers -&gt; GetResTabPointer_AOB not found!" )
+    end
+    --local pScan = AOBScanEx( "E8????????488BC8E8????????0FB65C24??84C0", nil, nil, nil, gameModule, gameModule + moduleSize )
+    local pScan = AOBScanEx( "E8????????48????E8????????0FB65C24??84C0", nil, nil, nil, gameModule, gameModule + moduleSize )
+    if pScan ~= nil then
+      local t = tonumber( pScan[0], 16 )
+      t = t + _readInteger( t + 0x1 ) + 0x5
+      unregisterSymbol( "GetResTable" )
+      registerSymbol( "GetResTable", t, true )
+    else
+      print( "GetResPointers -&gt; GetResTable_AOB not found!" )
+    end
+    --local pScan = AOBScanEx( "488B1D????????418BF88BF24885DB0F84", nil, nil, nil, gameModule, gameModule + moduleSize )
+    local pScan = AOBScanEx( "488B1D??????????????????4885DB0F84????????488968", nil, nil, nil, gameModule, gameModule + moduleSize )
+    if pScan ~= nil then
+      local t = tonumber( pScan[0], 16 )
+      t = t + _readInteger( t + 0x3 ) + 0x7
+      unregisterSymbol( "pResConst" )
+      registerSymbol( "pResConst", t, true )
+    else
+      print( "GetResPointers -&gt; pResConst_AOB not found!" )
+    end
+    --local pScan = AOBScanEx( "E8????????4885FF74??4D8D87????????488D4C24??8BD0E8", nil, nil, nil, gameModule, gameModule + moduleSize )
+    local pScan = AOBScanEx( "E8????????4885FF74??4D8D87????????488D4C24??????E8", nil, nil, nil, gameModule, gameModule + moduleSize )
+    if pScan ~= nil then
+      local t = tonumber( pScan[0], 16 )
+      t = t + _readInteger( t + 0x1 ) + 0x5
+      unregisterSymbol( "ResourceRead" )
+      registerSymbol( "ResourceRead", t, true )
+    else
+      print( "GetResPointers -&gt; ResourceRead_AOB not found!" )
+    end
+    local pScan = AOBScanEx( "E8????????8B53??488B4B??E8????????4531C94983C8FF", nil, nil, nil, gameModule, gameModule + moduleSize )
+    if pScan ~= nil then
+      local t = tonumber( pScan[0], 16 )
+      t = t + _readInteger( t + 0x1 ) + 0x5
+      unregisterSymbol( "ResourceWrite" )
+      registerSymbol( "ResourceWrite", t, true )
+    else
+      print( "GetResPointers -&gt; ResourceWrite_AOB not found!" )
+    end
+  end
+
+  function GetPBYTE_NoSplashDamage()
+    local pScan = AOBScanEx( "4889E05357415541574881EC????????488970??4C8960??4889CB4989D4", nil, nil, nil, gameModule, gameModule + moduleSize )
+    if pScan ~= nil then
+      local t = tonumber( pScan[0], 16 )
+      unregisterSymbol( "PBYTE_NoSplashDamage" )
+      registerSymbol( "PBYTE_NoSplashDamage", t, true )
+    else
+      print( "GetPBYTE_NoSplashDamage -&gt; AOB not found!" )
+    end
+  end
+
+  function GetPBYTE_MissionTimer()
+    local pScan = AOBScanEx( "40534883EC??8079??000F297424??4889CB0F57F674??0F2F71??7362E8????????83F80176??E8????????F3", nil, nil, nil, gameModule, gameModule + moduleSize )
+    if pScan ~= nil then
+      local t = tonumber( pScan[0], 16 )
+      unregisterSymbol( "PBYTE_MissionTimer" )
+      registerSymbol( "PBYTE_MissionTimer", t, true )
+    else
+      print( "GetPBYTE_MissionTimer -&gt; AOB not found!" )
+    end
+  end
+
+  function Init()
+    gameProcess = "GRW.exe"
+    gameModule = getAddress( gameProcess )
+    moduleSize = getModuleSize( gameProcess )
+    -- time to fetch the helpers
+    GetCaves()
+    GetPBYTE_GetBhvGhostRefs()
+    GetPBYTE_GodMode()
+    GetPBYTE_SkipVehicleDamage()
+    GetPBYTE_SkipMissileDamage()
+    GetPBYTE_SkipMobilePartsDamage()
+    GetPBYTE_Immunity()
+    GetPBYTE_NoReload()
+    GetPBYTE_NoRecoil()
+    GetPBYTE_SuperAccuracy()
+    GetPBYTE_UnlimitedDroneBattery()
+    GetPBYTE_UnlimitedDroneRange()
+    GetPBYTE_RemoveSyncShotCooldown()
+    GetPBYTE_RemoveRebelSupportCooldown()
+    GetPBYTE_SetResource()
+    GetPBYTE_InstantMaxLevel()
+    GetPBYTE_FastTierOne()
+    GetPBYTE_ClipDecrease()
+    GetPBYTE_MapMarkerBool()
+    GetResPointers()
+    GetPBYTE_NoSplashDamage()
+    GetPBYTE_MissionTimer()
+  end
+
+  Init()
+
+end
+
+{$asm}
+
+[DISABLE]
+
+
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>23933</ID>
+          <Description>"[ Gather Intel ]"</Description>
+          <Options moHideChildren="1"/>
+          <LastState Activated="1"/>
+          <Color>0000FF</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  if getAddressSafe( "GetBhvGhostRefsHook" ) == nil then
+    local Sym = GetAssemblySpot()
+    registerSymbol( "GetBhvGhostRefsHook", Sym, true )
+  end
+end
+
+{$asm}
+
+label( PBYTE_GetBhvGhostRefs_o )
+registersymbol( PBYTE_GetBhvGhostRefs_o )
+
+label( o )
+registersymbol( o )
+label( p )
+registersymbol( p )
+label( q )
+registersymbol( q )
+
+GetBhvGhostRefsHook:
+mov [o],rbx
+mov [p],rcx
+mov rax,[rcx+30]
+mov [q],rax
+PBYTE_GetBhvGhostRefs_o:
+readmem( PBYTE_GetBhvGhostRefs, 6 )
+jmp PBYTE_GetBhvGhostRefs+6
+
+db CC CC CC CC
+
+o:
+dq 0
+p:
+dq 0
+q:
+dq 0
+
+db DE AD C0 DE
+
+PBYTE_GetBhvGhostRefs:
+jmp GetBhvGhostRefsHook
+db 90
+
+[DISABLE]
+
+PBYTE_GetBhvGhostRefs:
+readmem( PBYTE_GetBhvGhostRefs_o, 6 )
+
+unregistersymbol( q )
+unregistersymbol( p )
+unregistersymbol( o )
+unregistersymbol( PBYTE_GetBhvGhostRefs_o )
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>23934</ID>
+              <Description>"God Mode"</Description>
+              <LastState Activated="1"/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  if getAddressSafe( "GodModeHook" ) == nil then
+    local Sym = GetAssemblySpot()
+    registerSymbol( "GodModeHook", Sym, true )
+  end
+end
+
+{$asm}
+
+label( PBYTE_GodMode_o )
+registersymbol( PBYTE_GodMode_o )
+
+GodModeHook:
+push rax
+mov rax,[p]
+test rax,rax
+je short @f
+  cmp rax,rcx // just in case
+  jne short @f
+    mov byte ptr [rcx+201],1
+    //mov byte ptr [p+1F3],1 -- this is for instant actions; becomes 1, then 0 when action finishes
+    //mov byte ptr [p+78],1  -- you get God and invisibility (sound is still detected)
+@@:
+pop rax
+PBYTE_GodMode_o:
+readmem( PBYTE_GodMode, 5 )
+jmp PBYTE_GodMode+5
+
+db DE AD C0 DE
+
+PBYTE_GodMode:
+jmp GodModeHook
+
+[DISABLE]
+
+[p]+201:
+db 0
+
+PBYTE_GodMode:
+readmem( PBYTE_GodMode_o, 5 )
+
+unregistersymbol( PBYTE_GodMode_o )
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>23978</ID>
+              <Description>"Disable Splash Damage (annoying when Unidad are swarming)"</Description>
+              <LastState Activated="1"/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  if getAddressSafe( "NoSplashDamageHook" ) == nil then
+    local Sym = GetAssemblySpot()
+    registerSymbol( "NoSplashDamageHook", Sym, true )
+  end
+end
+
+{$asm}
+
+label( PBYTE_NoSplashDamage_o )
+registersymbol( PBYTE_NoSplashDamage_o )
+
+NoSplashDamageHook:
+push rax
+mov rax,[o]
+mov rax,[rax+10]
+cmp [rbx+28],rax
+pop rax
+jne short @f
+  ret
+PBYTE_NoSplashDamage_o:
+readmem( PBYTE_NoSplashDamage, 5 )
+jmp PBYTE_NoSplashDamage+5
+
+db DE AD C0 DE
+
+PBYTE_NoSplashDamage:
+jmp NoSplashDamageHook
+
+[DISABLE]
+
+PBYTE_NoSplashDamage:
+readmem( PBYTE_NoSplashDamage_o, 5 )
+
+unregistersymbol( PBYTE_NoSplashDamage_o )
+
+{
+// ORIGINAL CODE - INJECTION POINT: "GRW.exe"+7B71440
+
+"GRW.exe"+7B71418: C3                             -  ret 
+"GRW.exe"+7B71419: CC                             -  int 3 
+"GRW.exe"+7B7141A: 48 8B 34 24                    -  mov rsi,[rsp]
+"GRW.exe"+7B7141E: 48 83 EC F8                    -  sub rsp,-08
+"GRW.exe"+7B71422: 48 8B 04 24                    -  mov rax,[rsp]
+"GRW.exe"+7B71426: 4C 89 3C 24                    -  mov [rsp],r15
+"GRW.exe"+7B7142A: 4C 8D 3D AD 9C 6C 06           -  lea r15,[GRW.exe+E23B0DE]
+"GRW.exe"+7B71431: 4C 87 3C 24                    -  xchg [rsp],r15
+"GRW.exe"+7B71435: C3                             -  ret 
+"GRW.exe"+7B71436: 66 2E 0F 1F 84 00 00 00 00 00  -  nop cs:[rax+rax+00000000]
+// ---------- INJECTING HERE ----------
+"GRW.exe"+7B71440: 48 89 E0                       -  mov rax,rsp
+"GRW.exe"+7B71443: 53                             -  push rbx
+"GRW.exe"+7B71444: 57                             -  push rdi
+// ---------- DONE INJECTING  ----------
+"GRW.exe"+7B71445: 41 55                          -  push r13
+"GRW.exe"+7B71447: 41 57                          -  push r15
+"GRW.exe"+7B71449: 48 81 EC 78 03 00 00           -  sub rsp,00000378
+"GRW.exe"+7B71450: 48 89 70 10                    -  mov [rax+10],rsi
+"GRW.exe"+7B71454: 4C 89 60 18                    -  mov [rax+18],r12
+"GRW.exe"+7B71458: 48 89 CB                       -  mov rbx,rcx
+"GRW.exe"+7B7145B: 49 89 D4                       -  mov r12,rdx
+"GRW.exe"+7B7145E: 41 BF 00 00 F0 FF              -  mov r15d,FFF00000
+"GRW.exe"+7B71464: 8B 41 38                       -  mov eax,[rcx+38]
+"GRW.exe"+7B71467: A9 00 00 F0 7F                 -  test eax,7FF00000
+}
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>23935</ID>
+              <Description>"Vehicle God"</Description>
+              <LastState Activated="1"/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+{$lua}
+
+if not syntaxcheck then
+
+  if getAddressSafe( "SkipVehicleDamageHook" ) == nil then
+    local Sym = GetAssemblySpot()
+    registerSymbol( "SkipVehicleDamageHook", Sym, true )
+  end
+
+  autoAssemble([[
+    label( PBYTE_SkipVehicleDamage_o )
+    registersymbol( PBYTE_SkipVehicleDamage_o )
+
+    SkipVehicleDamageHook:
+    push rax
+    mov rax,[o]
+    test rax,rax
+    je short @f
+      mov rax,[rax+3C8] // see notes down below to fix this
+      test rax,rax
+      je short @f
+        mov rax,[rax+38]
+        test rax,rax
+        je short @f
+          mov rax,[rax]
+          test rax,rax
+          je short @f
+            cmp rax,rcx
+            jne short @f
+              pop rax
+              ret
+    @@:
+    pop rax
+    PBYTE_SkipVehicleDamage_o:
+    readmem( PBYTE_SkipVehicleDamage, 5 )
+    jmp PBYTE_SkipVehicleDamage+5
+
+    db DE AD C0 DE
+
+    PBYTE_SkipVehicleDamage:
+    jmp SkipVehicleDamageHook
+  ]])
+
+  if getAddressSafe( "SkipMissileDamageHook" ) == nil then
+    local Sym = GetAssemblySpot()
+    registerSymbol( "SkipMissileDamageHook", Sym, true )
+  end
+
+  autoAssemble([[
+    label( PBYTE_SkipMissileDamage_o )
+    registersymbol( PBYTE_SkipMissileDamage_o )
+
+    SkipMissileDamageHook:
+    push rax
+    mov rax,[o]
+    test rax,rax
+    je short @f
+      mov rax,[rax+3C8] // see notes down below to fix this
+      test rax,rax
+      je short @f
+        mov rax,[rax+38]
+        test rax,rax
+        je short @f
+          mov rax,[rax]
+          test rax,rax
+          je short @f
+            cmp [rax+88],rcx
+            jne short @f
+              pop rax
+              ret
+    @@:
+    pop rax
+    PBYTE_SkipMissileDamage_o:
+    readmem( PBYTE_SkipMissileDamage, 6 )
+    jmp PBYTE_SkipMissileDamage+6
+
+    db DE AD C0 DE
+
+    PBYTE_SkipMissileDamage:
+    jmp SkipMissileDamageHook
+    db 90
+  ]])
+
+  if getAddressSafe( "SkipMobilePartsDamageHook" ) == nil then
+    local Sym = GetAssemblySpot()
+    registerSymbol( "SkipMobilePartsDamageHook", Sym, true )
+  end
+
+  autoAssemble([[
+    label( PBYTE_SkipMobilePartsDamage_o )
+    registersymbol( PBYTE_SkipMobilePartsDamage_o )
+
+    SkipMobilePartsDamageHook:
+    push rax
+    mov rax,[o]
+    test rax,rax
+    je short @f
+      mov rax,[rax+3C8] // see notes down below to fix this
+      test rax,rax
+      je short @f
+        mov rax,[rax+38]
+        test rax,rax
+        je short @f
+          mov rax,[rax]
+          test rax,rax
+          je short @f
+            cmp [rax+88],rcx
+            jne short @f
+              pop rax
+              ret
+    @@:
+    pop rax
+    PBYTE_SkipMobilePartsDamage_o:
+    readmem( PBYTE_SkipMobilePartsDamage, 6 )
+    jmp PBYTE_SkipMobilePartsDamage+6
+
+    db DE AD C0 DE
+
+    PBYTE_SkipMobilePartsDamage:
+    jmp SkipMobilePartsDamageHook
+    db 90
+  ]])
+
+end
+
+{$asm}
+
+[DISABLE]
+
+PBYTE_SkipVehicleDamage:
+readmem( PBYTE_SkipVehicleDamage_o, 5 )
+
+PBYTE_SkipMissileDamage:
+readmem( PBYTE_SkipMissileDamage_o, 6 )
+
+PBYTE_SkipMobilePartsDamage:
+readmem( PBYTE_SkipMobilePartsDamage_o, 6 )
+
+unregistersymbol( PBYTE_SkipMobilePartsDamage_o )
+unregistersymbol( PBYTE_SkipMissileDamage_o )
+unregistersymbol( PBYTE_SkipVehicleDamage_o )
+
+/*
+
+BA 61C4888FFF50284885C074??48????E8 - first occurence out of the two found
+
+GRW.exe+2397A55 - BA 61C4888F           - mov edx,8F88C461
+GRW.exe+2397A5A - FF 50 28              - call qword ptr [rax+28]
+GRW.exe+2397A5D - 48 85 C0              - test rax,rax
+GRW.exe+2397A60 - 74 24                 - je GRW.exe+2397A86
+GRW.exe+2397A62 - 48 8B C8              - mov rcx,rax
+GRW.exe+2397A65 - E8 E6090BFE           - call GRW.exe+448450 &lt;-- use it to find the offset to car structure
+GRW.exe+2397A6A - 84 C0                 - test al,al
+GRW.exe+2397A6C - 74 18                 - je GRW.exe+2397A86
+GRW.exe+2397A6E - 0F57 C0               - xorps xmm0,xmm0
+GRW.exe+2397A71 - 48 8B 74 24 40        - mov rsi,[rsp+40]
+GRW.exe+2397A76 - 48 8B 6C 24 48        - mov rbp,[rsp+48]
+GRW.exe+2397A7B - 48 8B 5C 24 60        - mov rbx,[rsp+60]
+GRW.exe+2397A80 - 48 83 C4 50           - add rsp,50
+GRW.exe+2397A84 - 5F                    - pop rdi
+GRW.exe+2397A85 - C3                    - ret
+GRW.exe+2397A86 - 48 8B 47 50           - mov rax,[rdi+50]
+GRW.exe+2397A8A - 89 5C 24 68           - mov [rsp+68],ebx
+GRW.exe+2397A8E - 89 5C 24 70           - mov [rsp+70],ebx
+GRW.exe+2397A92 - 48 85 C0              - test rax,rax
+GRW.exe+2397A95 - 74 14                 - je GRW.exe+2397AAB
+GRW.exe+2397A97 - 48 8B 48 20           - mov rcx,[rax+20]
+GRW.exe+2397A9B - 48 85 C9              - test rcx,rcx
+GRW.exe+2397A9E - 74 0B                 - je GRW.exe+2397AAB
+GRW.exe+2397AA0 - 38 59 0C              - cmp [rcx+0C],bl
+GRW.exe+2397AA3 - B8 01000000           - mov eax,00000001
+GRW.exe+2397AA8 - 0F45 D8               - cmovne ebx,eax
+GRW.exe+2397AAB - 48 8D 4C 24 20        - lea rcx,[rsp+20]
+
+GRW.exe+448450:
+
+GRW.exe+448450 - 48 8B 01              - mov rax,[rcx]
+GRW.exe+448453 - 48 8B 90 90000000     - mov rdx,[rax+00000090]
+GRW.exe+44845A - 48 FF E2              - jmp rdx
+
+GRW.exe+20E3450 - E9 AB2AB508           - jmp GRW.exe+AC35F00
+
+GRW.exe+AC35F00 - 48 85 C9              - test rcx,rcx
+GRW.exe+AC35F03 - 74 09                 - je GRW.exe+AC35F0E
+GRW.exe+AC35F05 - 48 8D 81 F8FEFFFF     - lea rax,[rcx-00000108] &lt;-- this makes RAX == "o"
+GRW.exe+AC35F0C - EB 02                 - jmp GRW.exe+AC35F10
+GRW.exe+AC35F0E - 31 C0                 - xor eax,eax
+GRW.exe+AC35F10 - 48 8B 88 A8030000     - mov rcx,[rax+000003A8] &lt;-- offset to car structure
+GRW.exe+AC35F17 - 48 85 C9              - test rcx,rcx
+GRW.exe+AC35F1A - 0F85 F04C81F5         - jne GRW.exe+44AC10
+GRW.exe+AC35F20 - 30 C0                 - xor al,al
+GRW.exe+AC35F22 - C3                    - ret
+*/
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>23936</ID>
+              <Description>"Immunity"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  if getAddressSafe( "ImmunityHook" ) == nil then
+    local Sym = GetAssemblySpot()
+    registerSymbol( "ImmunityHook", Sym, true )
+  end
+end
+
+{$asm}
+
+label( PBYTE_Immunity_o )
+registersymbol( PBYTE_Immunity_o )
+
+ImmunityHook:
+push rax
+mov rax,[p]
+test rax,rax
+je short @f
+  cmp rax,rcx // just in case
+  jne short @f
+    mov byte ptr [rcx+78],1
+@@:
+pop rax
+PBYTE_Immunity_o:
+readmem( PBYTE_Immunity, 5 )
+
+db DE AD C0 DE
+
+PBYTE_Immunity:
+jmp ImmunityHook
+
+[DISABLE]
+
+[p]+78:
+db 0
+
+PBYTE_Immunity:
+readmem( PBYTE_Immunity_o, 5 )
+
+unregistersymbol( PBYTE_Immunity_o )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>23937</ID>
+              <Description>"Unlimited Ammo|Items"</Description>
+              <Options moHideChildren="1"/>
+              <LastState Activated="1"/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+{$lua}
+
+if not syntaxcheck then
+
+  function _readInteger( Input )
+    -- thanks, Pox!
+    local Value = readInteger( Input )
+    if Value &lt; 0x80000000 then return Value
+    else return Value - 0x100000000 end
+  end
+
+  unregisterSymbol( "dwItemSkipCheck" )
+
+  autoAssemble([[
+    aobscanmodule( dwItemSkipCheck, GRW.exe, 488B05????????4885C0740680783000751A0F )
+    registersymbol( dwItemSkipCheck )
+  ]])
+
+  local addr = getAddress( "dwItemSkipCheck" )
+  addr = addr + _readInteger( addr + 0x3 ) + 0x7
+  unregisterSymbol( "dwItemSkipCheck" )
+  unregisterSymbol( "ItemSkipCheck" )
+  registerSymbol( "ItemSkipCheck", addr, true )
+
+  addr = readQword( addr ) + 0x30
+  writeBytes( addr, 0x1 )
+
+end
+
+[DISABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  local addr = getAddress( "ItemSkipCheck" )
+  addr = readQword( addr ) + 0x30
+  writeBytes( addr, 0x0 )
+  unregisterSymbol( "ItemSkipCheck" )
+end
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>23938</ID>
+                  <Description>"Force Clip Decrease"</Description>
+                  <LastState/>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+
+PBYTE_ClipDecrease+F:
+db 90 90
+
+[DISABLE]
+
+PBYTE_ClipDecrease+F:
+db 75 E1
+</AssemblerScript>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>23939</ID>
+              <Description>"No Reload"</Description>
+              <LastState Activated="1"/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  if getAddressSafe( "NoReloadHook" ) == nil then
+    local Sym = GetAssemblySpot()
+    registerSymbol( "NoReloadHook", Sym, true )
+  end
+end
+
+{$asm}
+
+label( PBYTE_NoReload_o )
+registersymbol( PBYTE_NoReload_o )
+
+NoReloadHook:
+push rax
+push rcx
+mov rcx,[rcx+30]
+mov rcx,[rcx]
+mov rcx,[rcx+10]
+mov rax,[o]
+test rax,rax
+je short @f
+  cmp rcx,[rax+10]
+  jne short @f
+    pop rcx
+    pop rax
+    ret
+@@:
+pop rcx
+pop rax
+PBYTE_NoReload_o:
+readmem( PBYTE_NoReload, 5 )
+jmp PBYTE_NoReload+5
+
+db DE AD C0 DE
+
+PBYTE_NoReload:
+jmp NoReloadHook
+
+[DISABLE]
+
+PBYTE_NoReload:
+readmem( PBYTE_NoReload_o, 5 )
+
+unregistersymbol( PBYTE_NoReload_o )
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>23940</ID>
+              <Description>"No Recoil"</Description>
+              <LastState Activated="1"/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  if getAddressSafe( "NoRecoilHook" ) == nil then
+    local Sym = GetAssemblySpot()
+    registerSymbol( "NoRecoilHook", Sym, true )
+  end
+end
+
+{$asm}
+
+label( PBYTE_NoRecoil_o )
+registersymbol( PBYTE_NoRecoil_o )
+
+NoRecoilHook:
+push rax
+push rcx
+mov rcx,[rcx+28]
+mov rax,[o]
+test rax,rax
+je short @f
+  cmp rcx,[rax+10]
+  jne short @f
+    pop rcx
+    pop rax
+    ret
+@@:
+pop rcx
+pop rax
+PBYTE_NoRecoil_o:
+readmem( PBYTE_NoRecoil, 8 )
+jmp PBYTE_NoRecoil+8
+
+db DE AD C0 DE
+
+PBYTE_NoRecoil:
+jmp NoRecoilHook
+db 90 90 90
+
+[DISABLE]
+
+PBYTE_NoRecoil:
+readmem( PBYTE_NoRecoil_o, 8 )
+
+unregistersymbol( PBYTE_NoRecoil_o )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>23941</ID>
+              <Description>"Super Accuracy"</Description>
+              <LastState Activated="1"/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  if getAddressSafe( "SuperAccuracyHook" ) == nil then
+    local Sym = GetAssemblySpot()
+    registerSymbol( "SuperAccuracyHook", Sym, true )
+  end
+end
+
+{$asm}
+
+label( PBYTE_SuperAccuracy_o )
+registersymbol( PBYTE_SuperAccuracy_o )
+
+SuperAccuracyHook:
+push rax
+push rcx
+mov rcx,[rdi+A8]
+mov rcx,[rcx]
+mov rcx,[rcx+30]
+mov rcx,[rcx]
+mov rcx,[rcx+10]
+mov rax,[o]
+test rax,rax
+je short @f
+  cmp rcx,[rax+10]
+  jne short @f
+    mov byte ptr [rbx+F4],1
+    mov rcx,[rdi+A8]
+    mov rcx,[rcx]
+    mov rcx,[rcx+118] //changed from 0x100 (Title Update 7) to 0x108 (Title Update 8) and to 0x110 (Title Update 12) and to 0x118 (TU15)
+    mov rcx,[rcx]
+    test rcx,rcx
+    je short @f
+      mov rcx,[rcx+220]
+      test rcx,rcx
+      je short @f
+        mov rcx,[rcx]
+        test rcx,rcx
+        je short @f
+          mov [rcx+20],FFFFFFFF
+          mov [rcx+24],FFFFFFFF
+          mov [rcx+28],FFFFFFFF
+          mov [rcx+2C],FFFFFFFF
+@@:
+pop rcx
+pop rax
+PBYTE_SuperAccuracy_o:
+readmem( PBYTE_SuperAccuracy, 7 )
+jmp PBYTE_SuperAccuracy+7
+
+db DE AD C0 DE
+
+PBYTE_SuperAccuracy:
+jmp SuperAccuracyHook
+db 90 90
+
+[DISABLE]
+
+PBYTE_SuperAccuracy:
+readmem( PBYTE_SuperAccuracy_o, 7 )
+
+unregistersymbol( PBYTE_SuperAccuracy_o )
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>23942</ID>
+              <Description>"Unlimited Drone Battery"</Description>
+              <LastState Activated="1"/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+PBYTE_UnlimitedDroneBattery+4:
+db 00
+
+[DISABLE]
+
+PBYTE_UnlimitedDroneBattery+4:
+db 0D
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>23943</ID>
+              <Description>"Unlimited Drone Range"</Description>
+              <LastState Activated="1"/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  if getAddressSafe( "UnlimitedDroneRangeHook" ) == nil then
+    local Sym = GetAssemblySpot()
+    registerSymbol( "UnlimitedDroneRangeHook", Sym, true )
+  end
+end
+
+{$asm}
+
+label( PBYTE_UnlimitedDroneRange_o )
+registersymbol( PBYTE_UnlimitedDroneRange_o )
+
+UnlimitedDroneRangeHook:
+PBYTE_UnlimitedDroneRange_o:
+readmem( PBYTE_UnlimitedDroneRange, 7 )
+mov [rsi+5BC],(float)0.1      // timer
+mov [rsi+648],(float)80000.0  // XoY
+mov [rsi+64C],(float)80000.0  // XoZ
+jmp PBYTE_UnlimitedDroneRange+7
+
+db DE AD C0 DE
+
+PBYTE_UnlimitedDroneRange:
+jmp UnlimitedDroneRangeHook
+db 90 90
+back:
+
+[DISABLE]
+
+PBYTE_UnlimitedDroneRange:
+readmem( PBYTE_UnlimitedDroneRange_o, 7 )
+
+unregistersymbol( PBYTE_UnlimitedDroneRange_o )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>23944</ID>
+              <Description>"Remove Sync Shot Cooldown"</Description>
+              <LastState Activated="1"/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  if getAddressSafe( "RemoveSyncShotCooldownHook" ) == nil then
+    local Sym = GetAssemblySpot()
+    registerSymbol( "RemoveSyncShotCooldownHook", Sym, true )
+  end
+end
+
+{$asm}
+
+label( PBYTE_RemoveSyncShotCooldown_o )
+registersymbol( PBYTE_RemoveSyncShotCooldown_o )
+
+label( pSyncShotTimer )
+registersymbol( pSyncShotTimer )
+label( SyncShotTimer )
+registersymbol( SyncShotTimer )
+
+RemoveSyncShotCooldownHook:
+push rbx
+cmp [pSyncShotTimer],0
+jne short @f
+  mov [pSyncShotTimer],rcx
+  mov ebx,[rcx+190]
+  mov [SyncShotTimer],ebx
+@@:
+pop rbx
+mov [rcx+190],0
+PBYTE_RemoveSyncShotCooldown_o:
+readmem( PBYTE_RemoveSyncShotCooldown, 5 )
+jmp PBYTE_RemoveSyncShotCooldown+5
+
+db CC CC CC CC
+
+pSyncShotTimer:
+dq 0
+SyncShotTimer:
+dd 0
+
+db DE AD C0 DE
+
+PBYTE_RemoveSyncShotCooldown:
+jmp RemoveSyncShotCooldownHook
+
+[DISABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  if readQword( getAddress( "pSyncShotTimer" ) ) ~= 0 then
+    writeInteger( readQword( getAddress( "pSyncShotTimer" ) ) + 0x190, readInteger( getAddress( "SyncShotTimer" ) ) )
+  end
+end
+
+{$asm}
+
+PBYTE_RemoveSyncShotCooldown:
+readmem( PBYTE_RemoveSyncShotCooldown_o, 5 )
+
+unregistersymbol( SyncShotTimer )
+unregistersymbol( pSyncShotTimer )
+unregistersymbol( PBYTE_RemoveSyncShotCooldown_o )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>23945</ID>
+              <Description>"Remove Rebel Support Cooldown"</Description>
+              <LastState Activated="1"/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+PBYTE_RemoveRebelSupportCooldown+85:
+db EB 04
+
+[DISABLE]
+
+PBYTE_RemoveRebelSupportCooldown+85:
+db 0F 84
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>23966</ID>
+              <Description>"Process Resources"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+alloc( ResourcesThread, 0x1000, GRW.exe )
+registersymbol( ResourcesThread )
+CreateThread( ResourcesThread )
+label( ResourcesThreadOff )
+registersymbol( ResourcesThreadOff )
+label( ResourcesThread_loop )
+
+label( ResRead_do )
+registersymbol( ResRead_do )
+label( ResRead_do_exit )
+label( ResWrite_do )
+registersymbol( ResWrite_do )
+label( ResWrite_do_exit )
+
+label( dwIdx )
+registersymbol( dwIdx )
+label( dwResource )
+registersymbol( dwResource )
+label( dwAmount )
+registersymbol( dwAmount )
+
+label( ResTable )
+registersymbol( ResTable )
+
+ResourcesThread:
+sub rsp,28
+
+ResourcesThread_loop:
+mov rcx,A
+call Sleep
+
+cmp [ResourcesThreadOff],1
+jne short @f
+  add rsp,28
+  mov [ResourcesThreadOff],2
+  ret
+@@:
+
+  // VK_NUMPAD7
+  mov rcx,67
+  call GetAsyncKeyState
+  test ax,ax
+  je short @f
+
+    call short ResRead_do
+    mov rcx,C8
+    call Sleep
+
+  @@:
+  // VK_NUMPAD9
+  mov rcx,69
+  call GetAsyncKeyState
+  test ax,ax
+  je short @f
+
+    call short ResWrite_do
+    mov rcx,C8
+    call Sleep
+
+  @@:
+  jmp ResourcesThread_loop
+
+align 4 CC
+
+ResRead_do:
+sub rsp,28
+call GetResTabPointer
+test rax,rax
+je ResRead_do_exit
+  mov rcx,rax
+  call GetResTable
+  test rax,rax
+  je short ResRead_do_exit
+    xor rbx,rbx
+    xor rsi,rsi
+    xor rdi,rdi
+    mov bl,[rax+1356]     // get table size
+    shl bl,3              // multiply by 2^3 = 8
+    mov rsi,[rax+134C]    // get first pointer
+    lea rdi,[rsi+rbx]     // get last pointer
+    @@:
+    mov rax,[rsi]
+    mov rax,[rax]
+    movzx eax,[rax+28]
+    mov [dwIdx],rax
+    mov rax,[rsi]
+    mov rax,[rax]
+    mov rax,[rax+38]
+    mov [dwResource],rax
+    mov rdx,rsi
+    mov rcx,[pResConst]   // get base constant
+    call ResourceRead
+    mov [dwAmount],eax
+    lea rbx,[ResTable]    // store values in a table for display
+    mov rcx,[dwIdx]
+    mov [rbx+rcx*8],eax
+    add rsi,8
+    cmp rsi,rdi
+    jne short @b
+ResRead_do_exit:
+add rsp,28
+ret
+
+align 4 CC
+
+ResWrite_do:
+sub rsp,28
+call GetResTabPointer
+test rax,rax
+je short ResWrite_do_exit
+  mov rcx,rax
+  call GetResTable
+  test rax,rax
+  je short ResWrite_do_exit
+    xor rbx,rbx
+    xor rsi,rsi
+    xor rdi,rdi
+    mov rsi,[rax+134C]    // get first pointer
+    mov bl,[rax+1356]     // get table size
+    shl bl,3              // multiply by 2^3 = 8
+    lea rdi,[rsi+rbx]     // get last pointer
+    @@:
+    mov rax,[rsi]
+    mov rcx,[rax]
+    movzx ecx,[rcx+28]
+    shl cl,3
+    lea rbx,[ResTable]    // store values in a table for display
+    mov r9,[rbx+rcx]      // get value to write
+    mov r8,[rsi]
+    mov r8,[r8]
+    mov rcx,[pResConst]
+    mov edx,[rcx+10]
+    mov rcx,[rcx+18]
+    call ResourceWrite
+    add rsi,8
+    cmp rsi,rdi           // loop till all 4 resources were processed
+    jne short @b
+ResWrite_do_exit:
+add rsp,28
+ret
+
+align 4 CC
+
+ResourcesThreadOff:
+dd 0
+dwIdx:
+dq 0
+dwResource:
+dq 0
+dwAmount:
+dq 0
+
+align 4 CC
+
+ResTable:
+dq 0
+dq 0
+dq 0
+dq 0
+
+[DISABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  local starttime = getTickCount()
+
+  if readInteger( "ResourcesThreadOff" ) == 0 then --could be 2 already
+    writeInteger( "ResourcesThreadOff", 1 ) --tell the thread to kill itself
+  end
+
+  while( getTickCount() &lt; starttime + 1000 ) and ( readInteger( "ResourcesThreadOff" ) ~= 2 ) do --wait till it has finished
+    sleep( 20 )
+  end
+
+  if( getTickCount() &gt; starttime + 1000 ) then --could happen when the window is shown
+    showMessage( 'Disabling the thread failed!' )
+    error( 'Thread disabling failed!' )
+  end
+    sleep( 1 )
+  end
+
+{$asm}
+
+unregistersymbol( ResTable )
+
+unregistersymbol( dwAmount )
+unregistersymbol( dwResource )
+unregistersymbol( dwIdx )
+
+unregistersymbol( ResWrite_do )
+unregistersymbol( ResRead_do )
+
+unregistersymbol( ResourcesThreadOff )
+unregistersymbol( ResourcesThread )
+dealloc( ResourcesThread )
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>23970</ID>
+                  <Description>"(1) RESOURCE_GAZOLINE"</Description>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>ResTable+8</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>23972</ID>
+                  <Description>"(3) RESOURCE_MEDICATION"</Description>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>ResTable+18</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>23973</ID>
+                  <Description>"(2) RESOURCE_COM"</Description>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>ResTable+10</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>23971</ID>
+                  <Description>"(0) RESOURCE_FOOD"</Description>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>ResTable+0</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>23946</ID>
+              <Description>"Acquire Skill Points Pointer"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+{$lua}
+
+if not syntaxcheck then
+
+  function _readInteger( Input )
+    -- thanks, Pox!
+    local Value = readInteger( Input )
+    if Value &lt; 0x80000000 then return Value
+    else return Value - 0x100000000 end
+  end
+
+  unregisterSymbol( "dwSkillPoints" )
+
+  autoAssemble([[
+    aobscanmodule( dwSkillPoints, GRW.exe, 534883EC208B51184889CB488B0D????????E8????????85C0 )
+    registersymbol( dwSkillPoints )
+  ]])
+
+  local addr = getAddress( "dwSkillPoints" ) + 0xB
+  addr = addr + _readInteger( addr + 0x3 ) + 0x7
+  unregisterSymbol( "dwSkillPoints" )
+  unregisterSymbol( "pSkillPoints" )
+  registerSymbol( "pSkillPoints", addr, true )
+
+end
+
+[DISABLE]
+
+{$lua}
+
+unregisterSymbol( "pSkillPoints" )
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>23947</ID>
+                  <Description>"Skill Points"</Description>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>pSkillPoints</Address>
+                  <Offsets>
+                    <Offset>1C</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>23949</ID>
+              <Description>"Instant Max Level (30 or 35)"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+alloc( pStore, 0x1000, GRW.exe )
+registersymbol( pStore )
+
+pStore:
+readmem( PBYTE_InstantMaxLevel+7, 6 )
+
+PBYTE_InstantMaxLevel+7:
+db 90 90 90 90 90 90
+
+[DISABLE]
+
+PBYTE_InstantMaxLevel+7:
+readmem( pStore, 6 )
+
+unregistersymbol( pStore )
+dealloc( pStore )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>23950</ID>
+              <Description>"Teleport To Marker"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  if getAddressSafe( "MapMarkerHook" ) == nil then
+    local Sym = GetAssemblySpot()
+    registerSymbol( "MapMarkerHook", Sym, true )
+  end
+end
+
+{$asm}
+
+label( TeleportHandlerThread )
+registersymbol( TeleportHandlerThread )
+CreateThread( TeleportHandlerThread )
+label( TeleportHandlerOff )
+registersymbol( TeleportHandlerOff )
+label( ExitTeleportHandler )
+label( TeleportHandlerThread_loop )
+
+label( Teleport_do )
+label( Teleport_do_exit )
+
+label( MapMarkerHook )
+label( pMarker )
+
+Cave1:
+TeleportHandlerThread:
+sub rsp,28
+
+TeleportHandlerThread_loop:
+mov rcx,A
+call Sleep
+
+cmp [TeleportHandlerOff],1
+je ExitTeleportHandler
+
+  mov rcx,60 // VK_NUMPAD0
+  call GetAsyncKeyState
+  test ax,ax
+  jne Teleport_do
+
+jmp TeleportHandlerThread_loop
+
+Teleport_do:
+mov rax,[pMarker]
+test rax,rax                            // if pointer to object was initialized
+je short Teleport_do_exit
+  //cmp byte ptr [rax+90],1               // and marker was set
+  //jne short Teleport_do_exit
+    movups xmm0,[rax+80]                // get object's coordinates
+    movups xmm2,xmm0
+    mov rbx,[o]
+    test rbx,rbx
+    je short Teleport_do_exit           // check if player object is valid
+      mov rbx,[rbx+10]
+      test rbx,rbx
+      je short Teleport_do_exit
+        movups [rbx+50],xmm0            // update them to marker's coordinates
+Teleport_do_exit:
+mov rcx,C8
+call Sleep
+jmp TeleportHandlerThread_loop
+
+ExitTeleportHandler:
+add rsp,28
+mov [TeleportHandlerOff],2
+ret
+
+TeleportHandlerOff:
+dd 0
+
+label( PBYTE_MapMarkerBool_o )
+registersymbol( PBYTE_MapMarkerBool_o )
+
+MapMarkerHook:
+mov [pMarker],rbx
+PBYTE_MapMarkerBool_o:
+readmem( PBYTE_MapMarkerBool, 7 )
+jmp PBYTE_MapMarkerBool+7
+
+db CC CC CC CC
+
+pMarker:
+dq 0
+
+db DE AD C0 DE
+
+PBYTE_MapMarkerBool:
+jmp MapMarkerHook
+db 90 90
+
+[DISABLE]
+
+PBYTE_MapMarkerBool:
+readmem( PBYTE_MapMarkerBool_o, 7 )
+
+unregistersymbol( PBYTE_MapMarkerBool_o )
+
+{$lua}
+
+if( syntaxcheck == false ) then --actual execution
+  local starttime = getTickCount()
+
+if readInteger( "TeleportHandlerOff" ) == 0 then --could be 2 already
+  writeInteger( "TeleportHandlerOff", 1 ) --tell the thread to kill itself
+end
+
+while( getTickCount() &lt; starttime + 1000 ) and ( readInteger( "TeleportHandlerOff" ) ~= 2 ) do --wait till it has finished
+  sleep( 20 )
+end
+
+if( getTickCount() &gt; starttime + 1000 ) then --could happen when the window is shown
+  showMessage( 'Disabling the thread failed!' )
+  error( 'Thread disabling failed!' )
+end
+  sleep( 1 )
+end
+
+{$asm}
+
+unregistersymbol( TeleportHandlerOff )
+unregistersymbol( TeleportHandlerThread )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>23951</ID>
+              <Description>"Fast Tier One"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+PBYTE_FastTierOne:
+db 41 8B C6
+
+[DISABLE]
+
+PBYTE_FastTierOne:
+db 44 01 F8
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>23995</ID>
+              <Description>"Hook Mission Timer"</Description>
+              <LastState Activated="1"/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  if getAddressSafe( "MissionTimerHook" ) == nil then
+    local Sym = GetAssemblySpot()
+    registerSymbol( "MissionTimerHook", Sym, true )
+  end
+end
+
+{$asm}
+
+label( PBYTE_MissionTimer_o )
+registersymbol( PBYTE_MissionTimer_o )
+label( pTimer )
+registersymbol( pTimer )
+
+MissionTimerHook:
+mov [pTimer],rcx
+PBYTE_MissionTimer_o:
+readmem( PBYTE_MissionTimer, 6 )
+jmp PBYTE_MissionTimer+6
+
+align 10 CC
+
+pTimer:
+dq 0
+
+db DE AD C0 DE
+
+PBYTE_MissionTimer:
+jmp MissionTimerHook
+
+[DISABLE]
+
+PBYTE_MissionTimer:
+readmem( PBYTE_MissionTimer_o, 6 )
+
+unregistersymbol( pTimer )
+unregistersymbol( PBYTE_MissionTimer_o )
+
+{
+// ORIGINAL CODE - INJECTION POINT: "GRW.exe"+83FB4C0
+
+"GRW.exe"+83FB491: 49 89 B3 B7 5C 9E 6C           -  mov [r11+6C9E5CB7],rsi
+"GRW.exe"+83FB498: 48 83 C4 F8                    -  add rsp,-08
+"GRW.exe"+83FB49C: 48 8B 04 24                    -  mov rax,[rsp]
+"GRW.exe"+83FB4A0: 4C 89 E0                       -  mov rax,r12
+"GRW.exe"+83FB4A3: 48 89 04 24                    -  mov [rsp],rax
+"GRW.exe"+83FB4A7: 4C 8D 25 CC EA 1F 08           -  lea r12,[GRW.exe+105F9F7A]
+"GRW.exe"+83FB4AE: 4C 87 24 24                    -  xchg [rsp],r12
+"GRW.exe"+83FB4B2: C3                             -  ret
+"GRW.exe"+83FB4B3: 01 66 66                       -  add [rsi+66],esp
+"GRW.exe"+83FB4B6: 66 2E 0F 1F 84 00 00 00 00 00  -  nop cs:[rax+rax+00000000]
+// ---------- INJECTING HERE ----------
+"GRW.exe"+83FB4C0: 40 53                          -  push rbx
+"GRW.exe"+83FB4C2: 48 83 EC 40                    -  sub rsp,40
+// ---------- DONE INJECTING  ----------
+"GRW.exe"+83FB4C6: 80 79 40 00                    -  cmp byte ptr [rcx+40],00
+"GRW.exe"+83FB4CA: 0F 29 74 24 30                 -  movaps [rsp+30],xmm6
+"GRW.exe"+83FB4CF: 48 89 CB                       -  mov rbx,rcx
+"GRW.exe"+83FB4D2: 0F 57 F6                       -  xorps xmm6,xmm6
+"GRW.exe"+83FB4D5: 74 68                          -  je GRW.exe+83FB53F
+"GRW.exe"+83FB4D7: 0F 2F 71 4C                    -  comiss xmm6,[rcx+4C]
+"GRW.exe"+83FB4DB: 73 62                          -  jae GRW.exe+83FB53F
+"GRW.exe"+83FB4DD: E8 AE 07 7B F8                 -  call GRW.exe+BABC90
+"GRW.exe"+83FB4E2: 83 F8 01                       -  cmp eax,01
+"GRW.exe"+83FB4E5: 76 24                          -  jna GRW.exe+83FB50B
+}
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>23996</ID>
+                  <Description>"Current Timer (actual counter)"</Description>
+                  <LastState Value="005DAC03" RealAddress="999F4AD0"/>
+                  <ShowAsHex>1</ShowAsHex>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>pTimer</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                    <Offset>38</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>23997</ID>
+                  <Description>"Timer Start Value (can use this to refresh timer)"</Description>
+                  <LastState Value="003C6965" RealAddress="7FF4F5B4A5E0"/>
+                  <ShowAsHex>1</ShowAsHex>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>pTimer</Address>
+                  <Offsets>
+                    <Offset>20</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>23998</ID>
+                  <Description>"Timer Max Value (if timer hits this, mission ends)"</Description>
+                  <LastState Value="014F11E5" RealAddress="7FF4F5B4A5E8"/>
+                  <ShowAsHex>1</ShowAsHex>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>pTimer</Address>
+                  <Offsets>
+                    <Offset>28</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>23999</ID>
+                  <Description>"Conditional Flag (if set to 0x0, it disables timer)"</Description>
+                  <LastState Value="1" RealAddress="7FF4F5B4A600"/>
+                  <VariableType>Byte</VariableType>
+                  <Address>pTimer</Address>
+                  <Offsets>
+                    <Offset>40</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>23952</ID>
+              <Description>"Debug"</Description>
+              <Options moHideChildren="1"/>
+              <LastState Value="" RealAddress="00000000"/>
+              <Color>4080FF</Color>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>23953</ID>
+                  <Description>"o == GR_cPlayerComponent (0x6CD605D3)"</Description>
+                  <LastState Value="00000000BF1BB670" RealAddress="14000052B"/>
+                  <ShowAsHex>1</ShowAsHex>
+                  <Color>C0C0C0</Color>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>o</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>23954</ID>
+                  <Description>"p == ?? (0x3F61AFE6)"</Description>
+                  <LastState Value="0000000110E78940" RealAddress="140000533"/>
+                  <ShowAsHex>1</ShowAsHex>
+                  <Color>C0C0C0</Color>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>p</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>23955</ID>
+                  <Description>"q == p-&gt;SilexNetComponent_Player (0x507DC2EC)"</Description>
+                  <LastState Value="000000010F56AED0" RealAddress="14000053B"/>
+                  <ShowAsHex>1</ShowAsHex>
+                  <Color>C0C0C0</Color>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>q</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>23956</ID>
+                  <Description>"[o+10] == Entity (0x984415E)"</Description>
+                  <LastState Value="00000000BDAE28B0" RealAddress="BF1BB680"/>
+                  <ShowAsHex>1</ShowAsHex>
+                  <Color>C0C0C0</Color>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>o</Address>
+                  <Offsets>
+                    <Offset>10</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>23957</ID>
+                  <Description>"pItemSkipCheck"</Description>
+                  <LastState Value="00007FF4FD6A7EC0" RealAddress="14490A1D0"/>
+                  <ShowAsHex>1</ShowAsHex>
+                  <Color>C0C0C0</Color>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>ItemSkipCheck</Address>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>23958</ID>
+                      <Description>"bSkip"</Description>
+                      <LastState Value="1" RealAddress="7FF4FD6A7EF0"/>
+                      <Color>C0C0C0</Color>
+                      <VariableType>Byte</VariableType>
+                      <Address>ItemSkipCheck</Address>
+                      <Offsets>
+                        <Offset>30</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>23959</ID>
+                  <Description>"Acquire Level Pointer"</Description>
+                  <Options moHideChildren="1"/>
+                  <LastState/>
+                  <Color>C0C0C0</Color>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+
+{$lua}
+
+if not syntaxcheck then
+
+  function _readInteger( Input )
+    -- thanks, Pox!
+    local Value = readInteger( Input )
+    if Value &lt; 0x80000000 then return Value
+    else return Value - 0x100000000 end
+  end
+
+  unregisterSymbol( "dwLevel" )
+
+  autoAssemble([[
+    aobscanmodule( dwLevel, GRW.exe, 8987????????488B1D????????4889D9E8 )
+    registersymbol( dwLevel )
+  ]])
+
+  local addr = getAddress( "dwLevel" ) + 0x6
+  addr = addr + _readInteger( addr + 0x3 ) + 0x7
+  unregisterSymbol( "dwLevel" )
+  unregisterSymbol( "pLevel" )
+  registerSymbol( "pLevel", addr, true )
+
+end
+
+[DISABLE]
+
+{$lua}
+
+unregisterSymbol( "pLevel" )
+</AssemblerScript>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>23960</ID>
+                      <Description>"Enc/Dec Key (offset 0x40+0x20)"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>pLevel</Address>
+                      <Offsets>
+                        <Offset>60</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>23961</ID>
+                      <Description>"Base Pointer"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>pLevel</Address>
+                      <Offsets>
+                        <Offset>40</Offset>
+                      </Offsets>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>23962</ID>
+                          <Description>"Level_Enc_Byte_A"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>Byte</VariableType>
+                          <Address>pLevel</Address>
+                          <Offsets>
+                            <Offset>0</Offset>
+                            <Offset>40</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>23963</ID>
+                          <Description>"Level_Enc_Byte_B"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>Byte</VariableType>
+                          <Address>pLevel</Address>
+                          <Offsets>
+                            <Offset>0</Offset>
+                            <Offset>48</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>23964</ID>
+                          <Description>"Level_Enc_Byte_C"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>Byte</VariableType>
+                          <Address>pLevel</Address>
+                          <Offsets>
+                            <Offset>0</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>23965</ID>
+                          <Description>"Level_Enc_Byte_D"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>Byte</VariableType>
+                          <Address>pLevel</Address>
+                          <Offsets>
+                            <Offset>0</Offset>
+                            <Offset>58</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>23967</ID>
+                  <Description>"dwIdx"</Description>
+                  <Color>C0C0C0</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>dwIdx</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>23969</ID>
+                  <Description>"dwResource"</Description>
+                  <Color>C0C0C0</Color>
+                  <VariableType>String</VariableType>
+                  <Length>100</Length>
+                  <Unicode>0</Unicode>
+                  <CodePage>0</CodePage>
+                  <ZeroTerminate>1</ZeroTerminate>
+                  <Address>dwResource</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>23968</ID>
+                  <Description>"dwAmount"</Description>
+                  <Color>C0C0C0</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>dwAmount</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>23932</ID>
+      <Description>"[ Debug ]"</Description>
+      <Options moHideChildren="1"/>
+      <LastState Value="" RealAddress="00000000"/>
+      <Color>C0C0C0</Color>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>146</ID>
+          <Description>"[ Gather Intel ]"</Description>
+          <LastState/>
+          <Color>0000FF</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+{$lua}
+
+if not syntaxcheck then
+
+  function _readInteger( Input )
+    -- thanks, Pox!
+    local Value = readInteger( Input )
+    if Value &lt; 0x80000000 then return Value
+    else return Value - 0x100000000 end
+  end
+
+  unregisterSymbol( "QREF_GetBhvGhostRefs" )
+
+  autoAssemble([[
+    aobscanmodule( QREF_GetBhvGhostRefs, GRW.exe, 488D05????????488943??89BB????????6689BB????????48????C783????????0000803F89BB????????40 )
+    registersymbol( QREF_GetBhvGhostRefs )
+  ]])
+
+  local addr = getAddress( "QREF_GetBhvGhostRefs" )
+  unregisterSymbol( "QREF_GetBhvGhostRefs" )
+  addr = addr + _readInteger( addr + 0x3 ) + 0x7
+
+  addrA = readQword( addr + 0x270 ) -- VT'd my way out :)
+  if readBytes( addrA, 1 ) == 0xE9 then
+    addrA = addrA + _readInteger( addrA + 0x1 ) + 0x5
+  end
+  unregisterSymbol( "PBYTE_GetBhvGhostRefs" )
+  registerSymbol( "PBYTE_GetBhvGhostRefs", addrA, true )
+
+  addrB = readQword( addr + 0x2F0 ) -- VT'd my way out :)
+  if readBytes( addrB, 1 ) == 0xE9 then
+    addrA = addrA + _readInteger( addrB + 0x1 ) + 0x5
+  end
+  unregisterSymbol( "PBYTE_GodMode" )
+  registerSymbol( "PBYTE_GodMode", addrB, true )
+
+end
+
+{$asm}
+
+alloc( pHook, 0x1000, GRW.exe )
+label( o )
+registersymbol( o )
+label( p )
+registersymbol( p )
+label( q )
+registersymbol( q )
+
+pHook:
+mov [o],rbx
+mov [p],rcx
+mov rax,[rcx+30]
+mov [q],rax
+@@:
+push rbx
+sub rsp,30
+jmp PBYTE_GetBhvGhostRefs+5
+
+o:
+dq 0
+p:
+dq 0
+q:
+dq 0
+
+PBYTE_GetBhvGhostRefs:
+jmp pHook
+db 90
+
+[DISABLE]
+
+PBYTE_GetBhvGhostRefs:
+db 40 53 48 83 EC 30
+
+unregistersymbol( q )
+unregistersymbol( p )
+unregistersymbol( o )
+dealloc( pHook )
+unregistersymbol( PBYTE_GetBhvGhostRefs )
+unregisterSymbol( PBYTE_GodMode )
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>148</ID>
+              <Description>"God Mode"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+alloc( pHook, 0x1000, GRW.exe )
+
+pHook:
+push rax
+mov rax,[p]
+test rax,rax
+je short @f
+  cmp rax,rcx // just in case
+  jne short @f
+    mov byte ptr [rcx+201],1
+    //mov byte ptr [p+1F3],1 -- this is for instant actions; becomes 1, then 0 when action finishes
+    //mov byte ptr [p+78],1  -- you get God and invisibility (sound is still detected)
+@@:
+pop rax
+mov [rsp+10],rbx
+jmp PBYTE_GodMode+5
+
+PBYTE_GodMode:
+jmp pHook
+
+[DISABLE]
+
+[p]+201:
+db 0
+
+PBYTE_GodMode:
+db 48 89 5C 24 10
+
+dealloc( pHook )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>109</ID>
+              <Description>"Vehicle God"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+{$lua}
+
+if not syntaxcheck then
+
+  function _readInteger( Input )
+    -- thanks, Pox!
+    local Value = readInteger( Input )
+    if Value &lt; 0x80000000 then return Value
+    else return Value - 0x100000000 end
+  end
+
+  autoAssemble([[
+    aobscanmodule( PBYTE_SkipVehicleDamage, GRW.exe, 48895C240848896C24104889742418574883EC20498B4038488BF9498BD84C63480C )
+    registersymbol( PBYTE_SkipVehicleDamage )
+    aobscanmodule( QREF_SkipMissileDamage, GRW.exe, 83E1034989F083C9014831D183E1034831CA8D4803 )
+    registersymbol( QREF_SkipMissileDamage )
+    aobscanmodule( QREF_SkipMobilePartsDamage, GRW.exe, 83E10383C9014831D10F2944244083E1034831CA488B4B40 )
+    registersymbol( QREF_SkipMobilePartsDamage )
+  ]])
+
+  local addr = getAddress( "QREF_SkipMissileDamage" )
+  unregisterSymbol( "QREF_SkipMissileDamage" )
+  addr = addr - 0x36
+  addr = addr + _readInteger( addr + 0x3 ) + 0x7
+  if readBytes( addr, 1 ) == 0xE9 then
+    addr = addr + _readInteger( addr + 0x1 ) + 0x5
+  end
+  unregisterSymbol( "PBYTE_SkipMissileDamage" )
+  registerSymbol( "PBYTE_SkipMissileDamage", addr, true )
+
+  local addr = getAddress( "QREF_SkipMobilePartsDamage" )
+  unregisterSymbol( "QREF_SkipMobilePartsDamage" )
+  addr = addr - 0x2A
+  addr = addr + _readInteger( addr + 0x3 ) + 0x7
+  if readBytes( addr, 1 ) == 0xE9 then
+    addr = addr + _readInteger( addr + 0x1 ) + 0x5
+  end
+  unregisterSymbol( "PBYTE_SkipMobilePartsDamage" )
+  registerSymbol( "PBYTE_SkipMobilePartsDamage", addr, true )
+
+end
+
+{$asm}
+
+alloc( pHook, 0x1000, GRW.exe )
+
+label( SkipVehicleDamage )
+label( SkipMissileDamage )
+label( SkipMobilePartsDamage )
+
+pHook:
+
+SkipVehicleDamage:
+push rax
+mov rax,[o]
+test rax,rax
+je short @f
+  mov rax,[rax+3A8] // see notes down below to fix this
+  test rax,rax
+  je short @f
+    mov rax,[rax+38]
+    test rax,rax
+    je short @f
+      mov rax,[rax]
+      test rax,rax
+      je short @f
+        cmp rax,rcx
+        jne short @f
+          pop rax
+          ret
+@@:
+pop rax
+mov [rsp+08],rbx
+jmp PBYTE_SkipVehicleDamage+5
+
+SkipMissileDamage:
+push rax
+mov rax,[o]
+test rax,rax
+je short @f
+  mov rax,[rax+3A8] // see notes down below to fix this
+  test rax,rax
+  je short @f
+    mov rax,[rax+38]
+    test rax,rax
+    je short @f
+      mov rax,[rax]
+      test rax,rax
+      je short @f
+        cmp [rax+88],rcx
+        jne short @f
+          pop rax
+          ret
+@@:
+pop rax
+push rbx
+push rbp
+push rdi
+push r14
+jmp PBYTE_SkipMissileDamage+6
+
+SkipMobilePartsDamage:
+push rax
+mov rax,[o]
+test rax,rax
+je short @f
+  mov rax,[rax+3A8] // see notes down below to fix this
+  test rax,rax
+  je short @f
+    mov rax,[rax+38]
+    test rax,rax
+    je short @f
+      mov rax,[rax]
+      test rax,rax
+      je short @f
+        cmp [rax+88],rcx
+        jne short @f
+          pop rax
+          ret
+@@:
+pop rax
+push rbp
+push rdi
+push r12
+push r13
+jmp PBYTE_SkipMobilePartsDamage+6
+
+PBYTE_SkipVehicleDamage:
+jmp SkipVehicleDamage
+
+PBYTE_SkipMissileDamage:
+jmp SkipMissileDamage
+db 90
+
+PBYTE_SkipMobilePartsDamage:
+jmp SkipMobilePartsDamage
+db 90
+
+[DISABLE]
+
+PBYTE_SkipVehicleDamage:
+db 48 89 5C 24 08
+
+PBYTE_SkipMissileDamage:
+db 40 53 55 57 41 56
+
+PBYTE_SkipMobilePartsDamage:
+db 55 57 41 54 41 55
+
+unregistersymbol( PBYTE_SkipMobilePartsDamage )
+unregistersymbol( PBYTE_SkipMissileDamage )
+unregistersymbol( PBYTE_SkipVehicleDamage )
+
+dealloc( pHook )
+
+/*
+
+BA 61C4888FFF50284885C074??48????E8 - first occurence out of the two found
+
+GRW.exe+2397A55 - BA 61C4888F           - mov edx,8F88C461
+GRW.exe+2397A5A - FF 50 28              - call qword ptr [rax+28]
+GRW.exe+2397A5D - 48 85 C0              - test rax,rax
+GRW.exe+2397A60 - 74 24                 - je GRW.exe+2397A86
+GRW.exe+2397A62 - 48 8B C8              - mov rcx,rax
+GRW.exe+2397A65 - E8 E6090BFE           - call GRW.exe+448450 &lt;-- use it to find the offset to car structure
+GRW.exe+2397A6A - 84 C0                 - test al,al
+GRW.exe+2397A6C - 74 18                 - je GRW.exe+2397A86
+GRW.exe+2397A6E - 0F57 C0               - xorps xmm0,xmm0
+GRW.exe+2397A71 - 48 8B 74 24 40        - mov rsi,[rsp+40]
+GRW.exe+2397A76 - 48 8B 6C 24 48        - mov rbp,[rsp+48]
+GRW.exe+2397A7B - 48 8B 5C 24 60        - mov rbx,[rsp+60]
+GRW.exe+2397A80 - 48 83 C4 50           - add rsp,50
+GRW.exe+2397A84 - 5F                    - pop rdi
+GRW.exe+2397A85 - C3                    - ret
+GRW.exe+2397A86 - 48 8B 47 50           - mov rax,[rdi+50]
+GRW.exe+2397A8A - 89 5C 24 68           - mov [rsp+68],ebx
+GRW.exe+2397A8E - 89 5C 24 70           - mov [rsp+70],ebx
+GRW.exe+2397A92 - 48 85 C0              - test rax,rax
+GRW.exe+2397A95 - 74 14                 - je GRW.exe+2397AAB
+GRW.exe+2397A97 - 48 8B 48 20           - mov rcx,[rax+20]
+GRW.exe+2397A9B - 48 85 C9              - test rcx,rcx
+GRW.exe+2397A9E - 74 0B                 - je GRW.exe+2397AAB
+GRW.exe+2397AA0 - 38 59 0C              - cmp [rcx+0C],bl
+GRW.exe+2397AA3 - B8 01000000           - mov eax,00000001
+GRW.exe+2397AA8 - 0F45 D8               - cmovne ebx,eax
+GRW.exe+2397AAB - 48 8D 4C 24 20        - lea rcx,[rsp+20]
+
+GRW.exe+448450:
+
+GRW.exe+448450 - 48 8B 01              - mov rax,[rcx]
+GRW.exe+448453 - 48 8B 90 90000000     - mov rdx,[rax+00000090]
+GRW.exe+44845A - 48 FF E2              - jmp rdx
+
+GRW.exe+20E3450 - E9 AB2AB508           - jmp GRW.exe+AC35F00
+
+GRW.exe+AC35F00 - 48 85 C9              - test rcx,rcx
+GRW.exe+AC35F03 - 74 09                 - je GRW.exe+AC35F0E
+GRW.exe+AC35F05 - 48 8D 81 F8FEFFFF     - lea rax,[rcx-00000108] &lt;-- this makes RAX == "o"
+GRW.exe+AC35F0C - EB 02                 - jmp GRW.exe+AC35F10
+GRW.exe+AC35F0E - 31 C0                 - xor eax,eax
+GRW.exe+AC35F10 - 48 8B 88 A8030000     - mov rcx,[rax+000003A8] &lt;-- offset to car structure
+GRW.exe+AC35F17 - 48 85 C9              - test rcx,rcx
+GRW.exe+AC35F1A - 0F85 F04C81F5         - jne GRW.exe+44AC10
+GRW.exe+AC35F20 - 30 C0                 - xor al,al
+GRW.exe+AC35F22 - C3                    - ret
+*/
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>56</ID>
+              <Description>"Immunity"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+aobscanmodule( PBYTE_Immunity, GRW.exe, 0FB64178C3 )
+registersymbol( PBYTE_Immunity )
+alloc( pHook, 0x1000, GRW.exe )
+
+pHook:
+push rax
+mov rax,[p]
+test rax,rax
+je short @f
+  cmp rax,rcx // just in case
+  jne short @f
+    mov byte ptr [rcx+78],1
+@@:
+pop rax
+movzx eax,byte ptr [rcx+78]
+ret
+
+PBYTE_Immunity:
+jmp pHook
+
+[DISABLE]
+
+[p]+78:
+db 0
+
+PBYTE_Immunity:
+db 0F B6 41 78 C3
+
+dealloc( pHook )
+unregistersymbol( PBYTE_Immunity )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>53</ID>
+              <Description>"Unlimited Ammo|Items"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+{$lua}
+
+if not syntaxcheck then
+
+  function _readInteger( Input )
+    -- thanks, Pox!
+    local Value = readInteger( Input )
+    if Value &lt; 0x80000000 then return Value
+    else return Value - 0x100000000 end
+  end
+
+  unregisterSymbol( "dwItemSkipCheck" )
+
+  autoAssemble([[
+    aobscanmodule( dwItemSkipCheck, GRW.exe, 488B05????????4885C0740680783000751A0F )
+    registersymbol( dwItemSkipCheck )
+  ]])
+
+  local addr = getAddress( "dwItemSkipCheck" )
+  addr = addr + _readInteger( addr + 0x3 ) + 0x7
+  unregisterSymbol( "dwItemSkipCheck" )
+  unregisterSymbol( "ItemSkipCheck" )
+  registerSymbol( "ItemSkipCheck", addr, true )
+
+  addr = readQword( addr ) + 0x30
+  writeBytes( addr, 0x1 )
+
+end
+
+[DISABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  local addr = getAddress( "ItemSkipCheck" )
+  addr = readQword( addr ) + 0x30
+  writeBytes( addr, 0x0 )
+  unregisterSymbol( "ItemSkipCheck" )
+end
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>90</ID>
+                  <Description>"Force Clip Decrease"</Description>
+                  <LastState/>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+
+aobscanmodule( PBYTE_ClipDecrease, GRW.exe, 8B05????????4885C074068078300075??83 )
+registersymbol( PBYTE_ClipDecrease )
+
+PBYTE_ClipDecrease+F:
+db 90 90
+
+[DISABLE]
+
+PBYTE_ClipDecrease+F:
+db 75 E1
+
+unregistersymbol( PBYTE_ClipDecrease )
+</AssemblerScript>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>28</ID>
+              <Description>"No Reload"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+aobscanmodule( PBYTE_NoReload, GRW.exe, 48895C24??574883EC20488B41??89D34889CF4C6340 )
+registersymbol( PBYTE_NoReload )
+alloc( pHook, 0x1000, GRW.exe )
+
+pHook:
+push rax
+push rcx
+mov rcx,[rcx+30]
+mov rcx,[rcx]
+mov rcx,[rcx+10]
+mov rax,[o]
+test rax,rax
+je short @f
+  cmp rcx,[rax+10]
+  jne short @f
+    pop rcx
+    pop rax
+    ret
+@@:
+pop rcx
+pop rax
+mov [rsp+10],rbx
+jmp PBYTE_NoReload+5
+
+PBYTE_NoReload:
+jmp pHook
+
+[DISABLE]
+
+PBYTE_NoReload:
+db 48 89 5C 24 10
+
+dealloc( pHook )
+unregistersymbol( PBYTE_NoReload )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>33</ID>
+              <Description>"No Recoil"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+aobscanmodule( PBYTE_NoRecoil, GRW.exe, 48????F30F1148105541??41??488D6888 )
+registersymbol( PBYTE_NoRecoil )
+alloc( pHook, 0x1000, GRW.exe )
+
+pHook:
+push rax
+push rcx
+mov rcx,[rcx+28]
+mov rax,[o]
+test rax,rax
+je short @f
+  cmp rcx,[rax+10]
+  jne short @f
+    pop rcx
+    pop rax
+    ret
+@@:
+pop rcx
+pop rax
+mov rax,rsp
+movss [rax+10],xmm1
+jmp PBYTE_NoRecoil+8
+
+PBYTE_NoRecoil:
+jmp pHook
+db 90 90 90
+
+[DISABLE]
+
+PBYTE_NoRecoil:
+db 48 8B C4 F3 0F 11 48 10
+
+dealloc( pHook )
+unregistersymbol( PBYTE_NoRecoil )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>36</ID>
+              <Description>"Super Accuracy"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+aobscanmodule( PBYTE_SuperAccuracy, GRW.exe, 80BBF400000000C683E400000001 )
+registersymbol( PBYTE_SuperAccuracy )
+alloc( pHook, 0x1000, GRW.exe )
+
+pHook:
+push rax
+push rcx
+mov rcx,[rdi+A8]
+mov rcx,[rcx]
+mov rcx,[rcx+30]
+mov rcx,[rcx]
+mov rcx,[rcx+10]
+mov rax,[o]
+test rax,rax
+je @f
+  cmp rcx,[rax+10]
+  jne short @f
+    mov byte ptr [rbx+F4],1
+    mov rcx,[rdi+A8]
+    mov rcx,[rcx]
+    mov rcx,[rcx+118] //changed from 0x100 (Title Update 7) to 0x108 (Title Update 8) and to 0x110 (Title Update 12) and to 0x118 (TU15)
+    mov rcx,[rcx]
+    test rcx,rcx
+    je short @f
+      mov rcx,[rcx+220]
+      test rcx,rcx
+      je short @f
+        mov rcx,[rcx]
+        test rcx,rcx
+        je short @f
+          mov [rcx+20],FFFFFFFF
+          mov [rcx+24],FFFFFFFF
+          mov [rcx+28],FFFFFFFF
+          mov [rcx+2C],FFFFFFFF
+@@:
+pop rcx
+pop rax
+cmp byte ptr [rbx+F4],0
+jmp PBYTE_SuperAccuracy+7
+
+PBYTE_SuperAccuracy:
+jmp pHook
+db 90 90
+
+[DISABLE]
+
+PBYTE_SuperAccuracy:
+db 80 BB F4 00 00 00 00
+
+dealloc( pHook )
+unregistersymbol( PBYTE_SuperAccuracy )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>158</ID>
+              <Description>"Unlimited Drone Battery"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+aobscanmodule( PBYTE_UnlimitedDroneBattery, GRW.exe, 0F28F074??48C787????????FFFFFFFFEB )
+registersymbol( PBYTE_UnlimitedDroneBattery )
+
+PBYTE_UnlimitedDroneBattery+4:
+db 00
+
+[DISABLE]
+
+PBYTE_UnlimitedDroneBattery+4:
+db 0D
+
+unregistersymbol( PBYTE_UnlimitedDroneBattery )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>69</ID>
+              <Description>"Unlimited Drone Range"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+aobscanmodule( PBYTE_UnlimitedDroneRange, GRW.exe, 488B8E????????4885C974??E8????????488B8E????????0F28CE )
+registersymbol( PBYTE_UnlimitedDroneRange )
+alloc( pHook, 0x1000, GRW.exe )
+
+pHook:
+mov [rsi+5BC],(float)0.1      // timer
+mov [rsi+648],(float)80000.0  // XoY
+mov [rsi+64C],(float)80000.0  // XoZ
+@@:
+mov rcx,[rsi+000001B8]
+jmp PBYTE_UnlimitedDroneRange+7
+
+PBYTE_UnlimitedDroneRange:
+jmp pHook
+db 90 90
+
+[DISABLE]
+
+PBYTE_UnlimitedDroneRange:
+db 48 8B 8E B8 01 00 00
+
+dealloc( pHook )
+unregistersymbol( PBYTE_UnlimitedDroneRange )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>76</ID>
+              <Description>"Remove Sync Shot Cooldown"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+aobscanmodule( PBYTE_RemoveSyncShotCooldown, GRW.exe, 48895C24084889742410574883EC204889D74889CBE8????????488B83 )
+registersymbol( PBYTE_RemoveSyncShotCooldown )
+alloc( pHook, 0x1000, GRW.exe )
+label( pSyncShotTimer )
+registersymbol( pSyncShotTimer )
+label( SyncShotTimer )
+registersymbol( SyncShotTimer )
+
+pHook:
+push rbx
+mov [pSyncShotTimer],rcx
+mov ebx,[rcx+190]
+mov [SyncShotTimer],ebx
+pop rbx
+mov [rcx+190],0
+@@:
+mov [rsp+08],rbx
+jmp PBYTE_RemoveSyncShotCooldown+5
+
+pSyncShotTimer:
+dq 0
+SyncShotTimer:
+dd 0
+
+PBYTE_RemoveSyncShotCooldown:
+jmp pHook
+
+[DISABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  if readQword( getAddress( "pSyncShotTimer" ) ) ~= 0 then
+    writeInteger( readQword( getAddress( "pSyncShotTimer" ) ) + 0x190, readInteger( getAddress( "SyncShotTimer" ) ) )
+  end
+end
+
+{$asm}
+
+PBYTE_RemoveSyncShotCooldown:
+db 48 89 5C 24 08
+
+unregistersymbol( SyncShotTimer )
+unregistersymbol( pSyncShotTimer )
+dealloc( pHook )
+unregistersymbol( PBYTE_RemoveSyncShotCooldown )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>77</ID>
+              <Description>"Remove Rebel Support Cooldown"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+aobscanmodule( PBYTE_RemoveRebelSupportCooldown, GRW.exe, 40534883EC30488BD98B49200F297424200F28F1FFC9 )
+registersymbol( PBYTE_RemoveRebelSupportCooldown )
+
+PBYTE_RemoveRebelSupportCooldown+85:
+db EB 04
+
+[DISABLE]
+
+PBYTE_RemoveRebelSupportCooldown+85:
+db 0F 84
+
+unregistersymbol( PBYTE_RemoveRebelSupportCooldown )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>79</ID>
+              <Description>"Acquire Skill Points Pointer"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+{$lua}
+
+if not syntaxcheck then
+
+  function _readInteger( Input )
+    -- thanks, Pox!
+    local Value = readInteger( Input )
+    if Value &lt; 0x80000000 then return Value
+    else return Value - 0x100000000 end
+  end
+
+  unregisterSymbol( "dwSkillPoints" )
+
+  autoAssemble([[
+    aobscanmodule( dwSkillPoints, GRW.exe, 534883EC208B51184889CB488B0D????????E8????????85C0 )
+    registersymbol( dwSkillPoints )
+  ]])
+
+  local addr = getAddress( "dwSkillPoints" ) + 0xB
+  addr = addr + _readInteger( addr + 0x3 ) + 0x7
+  unregisterSymbol( "dwSkillPoints" )
+  unregisterSymbol( "pSkillPoints" )
+  registerSymbol( "pSkillPoints", addr, true )
+
+end
+
+[DISABLE]
+
+{$lua}
+
+unregisterSymbol( "pSkillPoints" )
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>80</ID>
+                  <Description>"Skill Points"</Description>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>pSkillPoints</Address>
+                  <Offsets>
+                    <Offset>1C</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>93</ID>
+              <Description>"Set Tagged Resource To 100 Million"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+aobscanmodule( PBYTE_AddResource, GRW.exe, 448D0C06488B85800000008B5010488B4818 )
+registersymbol( PBYTE_AddResource )
+alloc( pHook, 0x1000, GRW.exe )
+
+pHook:
+mov r9d,#100000000
+@@:
+//lea r9d,[rsi+rax]
+mov rax,[rbp+80]
+jmp PBYTE_AddResource+B
+
+PBYTE_AddResource:
+jmp pHook
+db 90 90 90 90 90 90
+
+[DISABLE]
+
+PBYTE_AddResource:
+db 44 8D 0C 06 48 8B 85 80 00 00 00
+
+dealloc( pHook )
+unregistersymbol( PBYTE_AddResource )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>94</ID>
+              <Description>"Instant Max Level (30 or 35)"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+aobscanmodule( PBYTE_InstantLevel, GRW.exe, 488B14193B42100F )
+registersymbol( PBYTE_InstantLevel )
+alloc( pStore, 0x1000, GRW.exe )
+registersymbol( pStore )
+
+pStore:
+readmem( PBYTE_InstantLevel+7, 6 )
+
+PBYTE_InstantLevel+7:
+db 90 90 90 90 90 90
+
+[DISABLE]
+
+PBYTE_InstantLevel+7:
+readmem( pStore, 6 )
+
+unregistersymbol( pStore )
+dealloc( pStore )
+unregistersymbol( PBYTE_InstantLevel )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>144</ID>
+              <Description>"Teleport To Marker"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+alloc( TeleportHandlerThread, 0x1000, GRW.exe )
+registersymbol( TeleportHandlerThread )
+CreateThread( TeleportHandlerThread )
+label( TeleportHandlerOff )
+registersymbol( TeleportHandlerOff )
+label( ExitTeleportHandler )
+label( TeleportHandlerThread_loop )
+
+label( Teleport_do )
+label( Teleport_do_exit )
+
+alloc( pHook, 0x1000, GRW.exe )
+label( pMarker )
+
+TeleportHandlerThread:
+sub rsp,28
+
+TeleportHandlerThread_loop:
+mov rcx,A
+call Sleep
+
+cmp [TeleportHandlerOff],1
+je ExitTeleportHandler
+
+  mov rcx,60 // VK_NUMPAD0
+  call GetAsyncKeyState
+  test ax,ax
+  jne Teleport_do
+
+jmp TeleportHandlerThread_loop
+
+Teleport_do:
+mov rax,[pMarker]
+test rax,rax                            // if pointer to object was initialized
+je short Teleport_do_exit
+  //cmp byte ptr [rax+90],1               // and marker was set
+  //jne short Teleport_do_exit
+    movups xmm0,[rax+80]                // get object's coordinates
+    movups xmm2,xmm0
+    mov rbx,[o]
+    test rbx,rbx
+    je short Teleport_do_exit           // check if player object is valid
+      mov rbx,[rbx+10]
+      test rbx,rbx
+      je short Teleport_do_exit
+        movups [rbx+50],xmm0            // update them to marker's coordinates
+Teleport_do_exit:
+mov rcx,C8
+call Sleep
+jmp TeleportHandlerThread_loop
+
+ExitTeleportHandler:
+add rsp,28
+mov [TeleportHandlerOff],2
+ret
+
+TeleportHandlerOff:
+dd 0
+
+//aobscanmodule( PBYTE_MapMarkerBool, GRW.exe, C683??00000001488B7C24404883C4305BC3 )
+aobscanmodule( PBYTE_MapMarkerBool, GRW.exe, C683??00000005E8????????4883C4405BC3 )
+registersymbol( PBYTE_MapMarkerBool )
+
+pHook:
+mov [pMarker],rbx
+mov byte ptr [rbx+90],5                 // original code
+jmp PBYTE_MapMarkerBool+7
+
+pMarker:
+dq 0
+
+PBYTE_MapMarkerBool:
+jmp pHook
+db 90 90
+
+[DISABLE]
+
+PBYTE_MapMarkerBool:
+//db C6 83 90 00 00 00 01
+db C6 83 90 00 00 00 05
+
+unregistersymbol( PBYTE_MapMarkerBool )
+
+{$lua}
+
+if( syntaxcheck == false ) then --actual execution
+  local starttime = getTickCount()
+
+if readInteger( "TeleportHandlerOff" ) == 0 then --could be 2 already
+  writeInteger( "TeleportHandlerOff", 1 ) --tell the thread to kill itself
+end
+
+while( getTickCount() &lt; starttime + 1000 ) and ( readInteger( "TeleportHandlerOff" ) ~= 2 ) do --wait till it has finished
+  sleep( 20 )
+end
+
+if( getTickCount() &gt; starttime + 1000 ) then --could happen when the window is shown
+  showMessage( 'Disabling the thread failed!' )
+  error( 'Thread disabling failed!' )
+end
+  sleep( 1 )
+end
+
+{$asm}
+
+dealloc( pHook )
+unregistersymbol( TeleportHandlerOff )
+unregistersymbol( TeleportHandlerThread )
+dealloc( TeleportHandlerThread )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>145</ID>
+              <Description>"Fast Tier One"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+aobscanmodule( PBYTE_FastTierOne, GRW.exe, 4401F84189C74529F74585FF )
+registersymbol( PBYTE_FastTierOne )
+
+PBYTE_FastTierOne:
+db 41 8B C6
+
+[DISABLE]
+
+PBYTE_FastTierOne:
+db 44 01 F8
+
+unregistersymbol( PBYTE_FastTierOne )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>32</ID>
+              <Description>"Debug"</Description>
+              <Options moHideChildren="1"/>
+              <LastState Value="" RealAddress="00000000"/>
+              <Color>4080FF</Color>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>34</ID>
+                  <Description>"o"</Description>
+                  <LastState Value="00000000BF1BB670" RealAddress="14000052B"/>
+                  <ShowAsHex>1</ShowAsHex>
+                  <Color>C0C0C0</Color>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>o</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>30</ID>
+                  <Description>"p"</Description>
+                  <LastState Value="0000000110E78940" RealAddress="140000533"/>
+                  <ShowAsHex>1</ShowAsHex>
+                  <Color>C0C0C0</Color>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>p</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>31</ID>
+                  <Description>"q"</Description>
+                  <LastState Value="000000010F56AED0" RealAddress="14000053B"/>
+                  <ShowAsHex>1</ShowAsHex>
+                  <Color>C0C0C0</Color>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>q</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>39</ID>
+                  <Description>"[o+10]"</Description>
+                  <LastState Value="00000000BDAE28B0" RealAddress="BF1BB680"/>
+                  <ShowAsHex>1</ShowAsHex>
+                  <Color>C0C0C0</Color>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>o</Address>
+                  <Offsets>
+                    <Offset>10</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>54</ID>
+                  <Description>"pItemSkipCheck"</Description>
+                  <LastState Value="00007FF4FD6A7EC0" RealAddress="14490A1D0"/>
+                  <ShowAsHex>1</ShowAsHex>
+                  <Color>C0C0C0</Color>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>ItemSkipCheck</Address>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>55</ID>
+                      <Description>"bSkip"</Description>
+                      <LastState Value="1" RealAddress="7FF4FD6A7EF0"/>
+                      <Color>C0C0C0</Color>
+                      <VariableType>Byte</VariableType>
+                      <Address>ItemSkipCheck</Address>
+                      <Offsets>
+                        <Offset>30</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>81</ID>
+                  <Description>"Acquire Level Pointer"</Description>
+                  <Options moHideChildren="1"/>
+                  <LastState/>
+                  <Color>C0C0C0</Color>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+
+{$lua}
+
+if not syntaxcheck then
+
+  function _readInteger( Input )
+    -- thanks, Pox!
+    local Value = readInteger( Input )
+    if Value &lt; 0x80000000 then return Value
+    else return Value - 0x100000000 end
+  end
+
+  unregisterSymbol( "dwLevel" )
+
+  autoAssemble([[
+    aobscanmodule( dwLevel, GRW.exe, 8987????????488B1D????????4889D9E8 )
+    registersymbol( dwLevel )
+  ]])
+
+  local addr = getAddress( "dwLevel" ) + 0x6
+  addr = addr + _readInteger( addr + 0x3 ) + 0x7
+  unregisterSymbol( "dwLevel" )
+  unregisterSymbol( "pLevel" )
+  registerSymbol( "pLevel", addr, true )
+
+end
+
+[DISABLE]
+
+{$lua}
+
+unregisterSymbol( "pLevel" )
+</AssemblerScript>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>87</ID>
+                      <Description>"Enc/Dec Key (offset 0x40+0x20)"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>pLevel</Address>
+                      <Offsets>
+                        <Offset>60</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>82</ID>
+                      <Description>"Base Pointer"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>pLevel</Address>
+                      <Offsets>
+                        <Offset>40</Offset>
+                      </Offsets>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>86</ID>
+                          <Description>"Level_Enc_Byte_A"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>Byte</VariableType>
+                          <Address>pLevel</Address>
+                          <Offsets>
+                            <Offset>0</Offset>
+                            <Offset>40</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>85</ID>
+                          <Description>"Level_Enc_Byte_B"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>Byte</VariableType>
+                          <Address>pLevel</Address>
+                          <Offsets>
+                            <Offset>0</Offset>
+                            <Offset>48</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>84</ID>
+                          <Description>"Level_Enc_Byte_C"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>Byte</VariableType>
+                          <Address>pLevel</Address>
+                          <Offsets>
+                            <Offset>0</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>83</ID>
+                          <Description>"Level_Enc_Byte_D"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>Byte</VariableType>
+                          <Address>pLevel</Address>
+                          <Offsets>
+                            <Offset>0</Offset>
+                            <Offset>58</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>147</ID>
+          <Description>"[ Gather Intel ] -- OK"</Description>
+          <LastState/>
+          <Color>0000FF</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule( PBYTE_GetBhvGhostRefs, GRW.exe, 40534883EC300F29742420488BD90F28F1E8????????488BCBE8????????80BB????00000074 )
+registersymbol( PBYTE_GetBhvGhostRefs )
+label( PBYTE_GetBhvGhostRefs_o )
+registersymbol( PBYTE_GetBhvGhostRefs_o )
+
+alloc( GetBhvGhostRefsHook, 0x1000, GRW.exe )
+label( back )
+
+label( o )
+registersymbol( o )
+label( p )
+registersymbol( p )
+label( q )
+registersymbol( q )
+
+GetBhvGhostRefsHook:
+mov [o],rbx
+mov [p],rcx
+mov rax,[rcx+30]
+mov [q],rax
+PBYTE_GetBhvGhostRefs_o:
+readmem( PBYTE_GetBhvGhostRefs, 14 )
+jmp back
+
+o:
+dq 0
+p:
+dq 0
+q:
+dq 0
+
+PBYTE_GetBhvGhostRefs:
+db FF 25 00 00 00 00
+dq GetBhvGhostRefsHook
+back:
+
+[DISABLE]
+
+PBYTE_GetBhvGhostRefs:
+readmem( PBYTE_GetBhvGhostRefs_o, 14 )
+
+unregistersymbol( q )
+unregistersymbol( p )
+unregistersymbol( o )
+dealloc( GetBhvGhostRefsHook )
+unregistersymbol( PBYTE_GetBhvGhostRefs_o )
+unregistersymbol( PBYTE_GetBhvGhostRefs )
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>52</ID>
+              <Description>"God Mode -- OK"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+aobscanmodule( PBYTE_GodMode, GRW.exe, 48895C241048896C241848897C242041564883EC40458BF1418BE88BFA488BD94585C074??80B90102000000 )
+registersymbol( PBYTE_GodMode )
+label( PBYTE_GodMode_o )
+registersymbol( PBYTE_GodMode_o )
+alloc( GodModeHook, 0x1000, GRW.exe )
+label( back )
+
+GodModeHook:
+push rax
+mov rax,[p]
+test rax,rax
+je short @f
+  cmp rax,rcx // just in case
+  jne short @f
+    mov byte ptr [rcx+201],1
+    //mov byte ptr [p+1F3],1 -- this is for instant actions; becomes 1, then 0 when action finishes
+    //mov byte ptr [p+78],1  -- you get God and invisibility (sound is still detected)
+@@:
+pop rax
+PBYTE_GodMode_o:
+readmem( PBYTE_GodMode, 15 )
+jmp back
+
+PBYTE_GodMode:
+db FF 25 00 00 00 00
+dq GodModeHook
+db 90
+back:
+
+[DISABLE]
+
+[p]+201:
+db 0
+
+PBYTE_GodMode:
+readmem( PBYTE_GodMode_o, 15 )
+
+dealloc( GodModeHook )
+unregistersymbol( PBYTE_GodMode_o )
+unregistersymbol( PBYTE_GodMode )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>150</ID>
+              <Description>"Vehicle God -- OK"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+aobscanmodule( PBYTE_SkipVehicleDamage, GRW.exe, 48895C240848896C24104889742418574883EC20498B4038488BF9498BD84C63480C )
+registersymbol( PBYTE_SkipVehicleDamage )
+label( PBYTE_SkipVehicleDamage_o )
+registersymbol( PBYTE_SkipVehicleDamage_o )
+aobscanmodule( PBYTE_SkipMissileDamage, GRW.exe, 4053555741564883EC58488B41??488BD9458BF14C6350??488B08498BE849C1E220488BFA49C1FA3F4923CA74??E8 )
+registersymbol( PBYTE_SkipMissileDamage )
+label( PBYTE_SkipMissileDamage_o )
+registersymbol( PBYTE_SkipMissileDamage_o )
+aobscanmodule( PBYTE_SkipMobilePartsDamage, GRW.exe, 55574154415541564883EC??488B41??4D89C64589CD4C6350??4C8B20488B41??4C8B80????????49 )
+registersymbol( PBYTE_SkipMobilePartsDamage )
+label( PBYTE_SkipMobilePartsDamage_o )
+registersymbol( PBYTE_SkipMobilePartsDamage_o )
+
+alloc( VehicleGodHook, 0x1000, GRW.exe )
+
+label( SkipVehicleDamage )
+label( SkipVehicleDamage_back )
+label( SkipMissileDamage )
+label( SkipMissileDamage_back )
+label( SkipMobilePartsDamage )
+label( SkipMobilePartsDamage_back )
+
+VehicleGodHook:
+
+SkipVehicleDamage:
+push rax
+mov rax,[o]
+test rax,rax
+je short @f
+  mov rax,[rax+3B8] // see notes down below to fix this
+  test rax,rax
+  je short @f
+    mov rax,[rax+38]
+    test rax,rax
+    je short @f
+      mov rax,[rax]
+      test rax,rax
+      je short @f
+        cmp rax,rcx
+        jne short @f
+          pop rax
+          ret
+@@:
+pop rax
+PBYTE_SkipVehicleDamage_o:
+readmem( PBYTE_SkipVehicleDamage, 15 )
+jmp SkipVehicleDamage_back
+
+SkipMissileDamage:
+push rax
+mov rax,[o]
+test rax,rax
+je short @f
+  mov rax,[rax+3B8] // see notes down below to fix this
+  test rax,rax
+  je short @f
+    mov rax,[rax+38]
+    test rax,rax
+    je short @f
+      mov rax,[rax]
+      test rax,rax
+      je short @f
+        cmp [rax+88],rcx
+        jne short @f
+          pop rax
+          ret
+@@:
+pop rax
+PBYTE_SkipMissileDamage_o:
+readmem( PBYTE_SkipMissileDamage, 14 )
+jmp SkipMissileDamage_back
+
+SkipMobilePartsDamage:
+push rax
+mov rax,[o]
+test rax,rax
+je short @f
+  mov rax,[rax+3B8] // see notes down below to fix this
+  test rax,rax
+  je short @f
+    mov rax,[rax+38]
+    test rax,rax
+    je short @f
+      mov rax,[rax]
+      test rax,rax
+      je short @f
+        cmp [rax+88],rcx
+        jne short @f
+          pop rax
+          ret
+@@:
+pop rax
+PBYTE_SkipMobilePartsDamage_o:
+readmem( PBYTE_SkipMobilePartsDamage, 16 )
+jmp SkipMobilePartsDamage_back
+
+PBYTE_SkipVehicleDamage:
+db FF 25 00 00 00 00
+dq SkipVehicleDamage
+db 90
+SkipVehicleDamage_back:
+
+PBYTE_SkipMissileDamage:
+db FF 25 00 00 00 00
+dq SkipMissileDamage
+SkipMissileDamage_back:
+
+PBYTE_SkipMobilePartsDamage:
+db FF 25 00 00 00 00
+dq SkipMobilePartsDamage
+db 90 90
+SkipMobilePartsDamage_back:
+
+[DISABLE]
+
+PBYTE_SkipVehicleDamage:
+readmem( PBYTE_SkipVehicleDamage_o, 15 )
+
+PBYTE_SkipMissileDamage:
+readmem( PBYTE_SkipMissileDamage_o, 14 )
+
+PBYTE_SkipMobilePartsDamage:
+readmem( PBYTE_SkipMobilePartsDamage_o, 16 )
+
+dealloc( VehicleGodHook )
+
+unregistersymbol( PBYTE_SkipMobilePartsDamage_o )
+unregistersymbol( PBYTE_SkipMobilePartsDamage )
+unregistersymbol( PBYTE_SkipMissileDamage_o )
+unregistersymbol( PBYTE_SkipMissileDamage )
+unregistersymbol( PBYTE_SkipVehicleDamage_o )
+unregistersymbol( PBYTE_SkipVehicleDamage )
+
+/*
+
+BA 61C4888FFF50284885C074??48????E8 - first occurence out of the two found
+
+GRW.exe+2397A55 - BA 61C4888F           - mov edx,8F88C461
+GRW.exe+2397A5A - FF 50 28              - call qword ptr [rax+28]
+GRW.exe+2397A5D - 48 85 C0              - test rax,rax
+GRW.exe+2397A60 - 74 24                 - je GRW.exe+2397A86
+GRW.exe+2397A62 - 48 8B C8              - mov rcx,rax
+GRW.exe+2397A65 - E8 E6090BFE           - call GRW.exe+448450 &lt;-- use it to find the offset to car structure
+GRW.exe+2397A6A - 84 C0                 - test al,al
+GRW.exe+2397A6C - 74 18                 - je GRW.exe+2397A86
+GRW.exe+2397A6E - 0F57 C0               - xorps xmm0,xmm0
+GRW.exe+2397A71 - 48 8B 74 24 40        - mov rsi,[rsp+40]
+GRW.exe+2397A76 - 48 8B 6C 24 48        - mov rbp,[rsp+48]
+GRW.exe+2397A7B - 48 8B 5C 24 60        - mov rbx,[rsp+60]
+GRW.exe+2397A80 - 48 83 C4 50           - add rsp,50
+GRW.exe+2397A84 - 5F                    - pop rdi
+GRW.exe+2397A85 - C3                    - ret
+GRW.exe+2397A86 - 48 8B 47 50           - mov rax,[rdi+50]
+GRW.exe+2397A8A - 89 5C 24 68           - mov [rsp+68],ebx
+GRW.exe+2397A8E - 89 5C 24 70           - mov [rsp+70],ebx
+GRW.exe+2397A92 - 48 85 C0              - test rax,rax
+GRW.exe+2397A95 - 74 14                 - je GRW.exe+2397AAB
+GRW.exe+2397A97 - 48 8B 48 20           - mov rcx,[rax+20]
+GRW.exe+2397A9B - 48 85 C9              - test rcx,rcx
+GRW.exe+2397A9E - 74 0B                 - je GRW.exe+2397AAB
+GRW.exe+2397AA0 - 38 59 0C              - cmp [rcx+0C],bl
+GRW.exe+2397AA3 - B8 01000000           - mov eax,00000001
+GRW.exe+2397AA8 - 0F45 D8               - cmovne ebx,eax
+GRW.exe+2397AAB - 48 8D 4C 24 20        - lea rcx,[rsp+20]
+
+GRW.exe+448450:
+
+GRW.exe+448450 - 48 8B 01              - mov rax,[rcx]
+GRW.exe+448453 - 48 8B 90 90000000     - mov rdx,[rax+00000090]
+GRW.exe+44845A - 48 FF E2              - jmp rdx
+
+GRW.exe+20E3450 - E9 AB2AB508           - jmp GRW.exe+AC35F00
+
+GRW.exe+AC35F00 - 48 85 C9              - test rcx,rcx
+GRW.exe+AC35F03 - 74 09                 - je GRW.exe+AC35F0E
+GRW.exe+AC35F05 - 48 8D 81 F8FEFFFF     - lea rax,[rcx-00000108] &lt;-- this makes RAX == "o"
+GRW.exe+AC35F0C - EB 02                 - jmp GRW.exe+AC35F10
+GRW.exe+AC35F0E - 31 C0                 - xor eax,eax
+GRW.exe+AC35F10 - 48 8B 88 A8030000     - mov rcx,[rax+000003A8] &lt;-- offset to car structure
+GRW.exe+AC35F17 - 48 85 C9              - test rcx,rcx
+GRW.exe+AC35F1A - 0F85 F04C81F5         - jne GRW.exe+44AC10
+GRW.exe+AC35F20 - 30 C0                 - xor al,al
+GRW.exe+AC35F22 - C3                    - ret
+*/
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>149</ID>
+              <Description>"Immunity -- OK"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+aobscanmodule( PBYTE_Immunity, GRW.exe, 0FB64178C3 )
+registersymbol( PBYTE_Immunity )
+label( PBYTE_Immunity_o )
+registersymbol( PBYTE_Immunity_o )
+alloc( ImmunityHook, 0x1000, GRW.exe )
+
+ImmunityHook:
+push rax
+mov rax,[p]
+test rax,rax
+je short @f
+  cmp rax,rcx // just in case
+  jne short @f
+    mov byte ptr [rcx+78],1
+@@:
+pop rax
+PBYTE_Immunity_o:
+readmem( PBYTE_Immunity, 14 )
+
+PBYTE_Immunity:
+db FF 25 00 00 00 00
+dq ImmunityHook
+
+[DISABLE]
+
+[p]+78:
+db 0
+
+PBYTE_Immunity:
+readmem( PBYTE_Immunity_o, 14 )
+
+dealloc( ImmunityHook )
+unregistersymbol( PBYTE_Immunity_o )
+unregistersymbol( PBYTE_Immunity )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>156</ID>
+              <Description>"Unlimited Ammo|Items -- OK"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+{$lua}
+
+if not syntaxcheck then
+
+  function _readInteger( Input )
+    -- thanks, Pox!
+    local Value = readInteger( Input )
+    if Value &lt; 0x80000000 then return Value
+    else return Value - 0x100000000 end
+  end
+
+  unregisterSymbol( "dwItemSkipCheck" )
+
+  autoAssemble([[
+    aobscanmodule( dwItemSkipCheck, GRW.exe, 488B05????????4885C0740680783000751A0F )
+    registersymbol( dwItemSkipCheck )
+  ]])
+
+  local addr = getAddress( "dwItemSkipCheck" )
+  addr = addr + _readInteger( addr + 0x3 ) + 0x7
+  unregisterSymbol( "dwItemSkipCheck" )
+  unregisterSymbol( "ItemSkipCheck" )
+  registerSymbol( "ItemSkipCheck", addr, true )
+
+  addr = readQword( addr ) + 0x30
+  writeBytes( addr, 0x1 )
+
+end
+
+[DISABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  local addr = getAddress( "ItemSkipCheck" )
+  addr = readQword( addr ) + 0x30
+  writeBytes( addr, 0x0 )
+  unregisterSymbol( "ItemSkipCheck" )
+end
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>157</ID>
+                  <Description>"Force Clip Decrease"</Description>
+                  <LastState/>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+
+aobscanmodule( PBYTE_ClipDecrease, GRW.exe, 8B05????????4885C074068078300075??83 )
+registersymbol( PBYTE_ClipDecrease )
+
+PBYTE_ClipDecrease+F:
+db 90 90
+
+[DISABLE]
+
+PBYTE_ClipDecrease+F:
+db 75 E1
+
+unregistersymbol( PBYTE_ClipDecrease )
+</AssemblerScript>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>151</ID>
+              <Description>"No Reload -- OK"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+aobscanmodule( PBYTE_NoReload, GRW.exe, 48895C24??574883EC20488B41??89D34889CF4C6340 )
+registersymbol( PBYTE_NoReload )
+label( PBYTE_NoReload_o )
+registersymbol( PBYTE_NoReload_o )
+
+alloc( NoReloadHook, 0x1000, GRW.exe )
+label( back )
+
+NoReloadHook:
+push rax
+push rcx
+mov rcx,[rcx+30]
+mov rcx,[rcx]
+mov rcx,[rcx+10]
+mov rax,[o]
+test rax,rax
+je short @f
+  cmp rcx,[rax+10]
+  jne short @f
+    pop rcx
+    pop rax
+    ret
+@@:
+pop rcx
+pop rax
+PBYTE_NoReload_o:
+readmem( PBYTE_NoReload, 14 )
+jmp back
+
+PBYTE_NoReload:
+db FF 25 00 00 00 00
+dq NoReloadHook
+back:
+
+[DISABLE]
+
+PBYTE_NoReload:
+readmem( PBYTE_NoReload_o, 14 )
+
+dealloc( NoReloadHook )
+unregistersymbol( PBYTE_NoReload_o )
+unregistersymbol( PBYTE_NoReload )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>152</ID>
+              <Description>"No Recoil -- OK"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+aobscanmodule( PBYTE_NoRecoil, GRW.exe, 48????F30F1148105541??41??488D6888 )
+registersymbol( PBYTE_NoRecoil )
+label( PBYTE_NoRecoil_o )
+registersymbol( PBYTE_NoRecoil_o )
+
+alloc( NoRecoilHook, 0x1000, GRW.exe )
+label( back )
+
+NoRecoilHook:
+push rax
+push rcx
+mov rcx,[rcx+28]
+mov rax,[o]
+test rax,rax
+je short @f
+  cmp rcx,[rax+10]
+  jne short @f
+    pop rcx
+    pop rax
+    ret
+@@:
+pop rcx
+pop rax
+PBYTE_NoRecoil_o:
+readmem( PBYTE_NoRecoil, 17 )
+jmp back
+
+PBYTE_NoRecoil:
+db FF 25 00 00 00 00
+dq NoRecoilHook
+db 90 90 90
+back:
+
+[DISABLE]
+
+PBYTE_NoRecoil:
+readmem( PBYTE_NoRecoil_o, 17 )
+
+dealloc( NoRecoilHook )
+unregistersymbol( PBYTE_NoRecoil_o )
+unregistersymbol( PBYTE_NoRecoil )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>153</ID>
+              <Description>"Super Accuracy -- OK"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+aobscanmodule( PBYTE_SuperAccuracy, GRW.exe, 80BBF400000000C683E400000001 )
+registersymbol( PBYTE_SuperAccuracy )
+label( PBYTE_SuperAccuracy_o )
+registersymbol( PBYTE_SuperAccuracy_o )
+
+alloc( SuperAccuracyHook, 0x1000, GRW.exe )
+label( back )
+
+SuperAccuracyHook:
+push rax
+push rcx
+mov rcx,[rdi+A8]
+mov rcx,[rcx]
+mov rcx,[rcx+30]
+mov rcx,[rcx]
+mov rcx,[rcx+10]
+mov rax,[o]
+test rax,rax
+je short @f
+  cmp rcx,[rax+10]
+  jne short @f
+    mov byte ptr [rbx+F4],1
+    mov rcx,[rdi+A8]
+    mov rcx,[rcx]
+    mov rcx,[rcx+118] //changed from 0x100 (Title Update 7) to 0x108 (Title Update 8) and to 0x110 (Title Update 12) and to 0x118 (TU15)
+    mov rcx,[rcx]
+    test rcx,rcx
+    je short @f
+      mov rcx,[rcx+220]
+      test rcx,rcx
+      je short @f
+        mov rcx,[rcx]
+        test rcx,rcx
+        je short @f
+          mov [rcx+20],FFFFFFFF
+          mov [rcx+24],FFFFFFFF
+          mov [rcx+28],FFFFFFFF
+          mov [rcx+2C],FFFFFFFF
+@@:
+pop rcx
+pop rax
+PBYTE_SuperAccuracy_o:
+readmem( PBYTE_SuperAccuracy, 14 )
+jmp back
+
+PBYTE_SuperAccuracy:
+db FF 25 00 00 00 00
+dq SuperAccuracyHook
+back:
+
+[DISABLE]
+
+PBYTE_SuperAccuracy:
+readmem( PBYTE_SuperAccuracy_o, 14 )
+
+dealloc( SuperAccuracyHook )
+unregistersymbol( PBYTE_SuperAccuracy_o )
+unregistersymbol( PBYTE_SuperAccuracy )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>68</ID>
+              <Description>"Unlimited Drone Battery"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+aobscanmodule( PBYTE_UnlimitedDroneBattery, GRW.exe, 0F28F074??48C787????????FFFFFFFFEB )
+registersymbol( PBYTE_UnlimitedDroneBattery )
+
+PBYTE_UnlimitedDroneBattery+4:
+db 00
+
+[DISABLE]
+
+PBYTE_UnlimitedDroneBattery+4:
+db 0D
+
+unregistersymbol( PBYTE_UnlimitedDroneBattery )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>154</ID>
+              <Description>"Unlimited Drone Range -- OK"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+aobscanmodule( PBYTE_UnlimitedDroneRange, GRW.exe, F30F5986????????F30F1186????????488B8E????????4885C9 )
+registersymbol( PBYTE_UnlimitedDroneRange )
+label( PBYTE_UnlimitedDroneRange_o )
+registersymbol( PBYTE_UnlimitedDroneRange_o )
+
+alloc( UnlimitedDroneRangeHook, 0x1000, GRW.exe )
+label( back )
+
+UnlimitedDroneRangeHook:
+PBYTE_UnlimitedDroneRange_o:
+readmem( PBYTE_UnlimitedDroneRange, 16 )
+mov [rsi+5BC],(float)0.1      // timer
+mov [rsi+648],(float)80000.0  // XoY
+mov [rsi+64C],(float)80000.0  // XoZ
+jmp back
+
+PBYTE_UnlimitedDroneRange:
+db FF 25 00 00 00 00
+dq UnlimitedDroneRangeHook
+db 90 90
+back:
+
+[DISABLE]
+
+PBYTE_UnlimitedDroneRange:
+readmem( PBYTE_UnlimitedDroneRange_o, 16 )
+
+dealloc( UnlimitedDroneRangeHook )
+unregistersymbol( PBYTE_UnlimitedDroneRange_o )
+unregistersymbol( PBYTE_UnlimitedDroneRange )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>155</ID>
+              <Description>"Remove Sync Shot Cooldown -- OK"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+aobscanmodule( PBYTE_RemoveSyncShotCooldown, GRW.exe, 48895C24084889742410574883EC204889D74889CBE8????????488B83 )
+registersymbol( PBYTE_RemoveSyncShotCooldown )
+label( PBYTE_RemoveSyncShotCooldown_o )
+registersymbol( PBYTE_RemoveSyncShotCooldown_o )
+
+alloc( RemoveSyncShotCooldownHook, 0x1000, GRW.exe )
+label( back )
+
+label( pSyncShotTimer )
+registersymbol( pSyncShotTimer )
+label( SyncShotTimer )
+registersymbol( SyncShotTimer )
+
+RemoveSyncShotCooldownHook:
+push rbx
+cmp [pSyncShotTimer],0
+jne short @f
+    mov [pSyncShotTimer],rcx
+    mov ebx,[rcx+190]
+    mov [SyncShotTimer],ebx
+@@:
+pop rbx
+mov [rcx+190],0
+PBYTE_RemoveSyncShotCooldown_o:
+readmem( PBYTE_RemoveSyncShotCooldown, 15 )
+jmp back
+
+pSyncShotTimer:
+dq 0
+SyncShotTimer:
+dd 0
+
+PBYTE_RemoveSyncShotCooldown:
+db FF 25 00 00 00 00
+dq RemoveSyncShotCooldownHook
+db 90
+back:
+
+[DISABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  if readQword( getAddress( "pSyncShotTimer" ) ) ~= 0 then
+    writeInteger( readQword( getAddress( "pSyncShotTimer" ) ) + 0x190, readInteger( getAddress( "SyncShotTimer" ) ) )
+  end
+end
+
+{$asm}
+
+PBYTE_RemoveSyncShotCooldown:
+readmem( PBYTE_RemoveSyncShotCooldown_o, 15 )
+
+unregistersymbol( SyncShotTimer )
+unregistersymbol( pSyncShotTimer )
+dealloc( RemoveSyncShotCooldownHook )
+unregistersymbol( PBYTE_RemoveSyncShotCooldown_o )
+unregistersymbol( PBYTE_RemoveSyncShotCooldown )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>159</ID>
+              <Description>"Remove Rebel Support Cooldown -- OK"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+aobscanmodule( PBYTE_RemoveRebelSupportCooldown, GRW.exe, 40534883EC30488BD98B49200F297424200F28F1FFC9 )
+registersymbol( PBYTE_RemoveRebelSupportCooldown )
+
+PBYTE_RemoveRebelSupportCooldown+85:
+db EB 04
+
+[DISABLE]
+
+PBYTE_RemoveRebelSupportCooldown+85:
+db 0F 84
+
+unregistersymbol( PBYTE_RemoveRebelSupportCooldown )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>160</ID>
+              <Description>"Acquire Skill Points Pointer -- OK"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+{$lua}
+
+if not syntaxcheck then
+
+  function _readInteger( Input )
+    -- thanks, Pox!
+    local Value = readInteger( Input )
+    if Value &lt; 0x80000000 then return Value
+    else return Value - 0x100000000 end
+  end
+
+  unregisterSymbol( "dwSkillPoints" )
+
+  autoAssemble([[
+    aobscanmodule( dwSkillPoints, GRW.exe, 534883EC208B51184889CB488B0D????????E8????????85C0 )
+    registersymbol( dwSkillPoints )
+  ]])
+
+  local addr = getAddress( "dwSkillPoints" ) + 0xB
+  addr = addr + _readInteger( addr + 0x3 ) + 0x7
+  unregisterSymbol( "dwSkillPoints" )
+  unregisterSymbol( "pSkillPoints" )
+  registerSymbol( "pSkillPoints", addr, true )
+
+end
+
+[DISABLE]
+
+{$lua}
+
+unregisterSymbol( "pSkillPoints" )
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>161</ID>
+                  <Description>"Skill Points"</Description>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>pSkillPoints</Address>
+                  <Offsets>
+                    <Offset>1C</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>162</ID>
+              <Description>"Set Tagged Resource To 100 Million -- OK"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+aobscanmodule( PBYTE_AddResource, GRW.exe, 488B85????????8B50??488B48??E8????????389D )
+registersymbol( PBYTE_AddResource )
+label( PBYTE_AddResource_o )
+registersymbol( PBYTE_AddResource_o )
+
+alloc( AddResourceHook, 0x1000, GRW.exe )
+label( back )
+
+AddResourceHook:
+mov r9d,#100000000
+PBYTE_AddResource_o:
+readmem( PBYTE_AddResource, 14 )
+jmp back
+
+PBYTE_AddResource:
+db FF 25 00 00 00 00
+dq AddResourceHook
+back:
+
+[DISABLE]
+
+PBYTE_AddResource:
+readmem( PBYTE_AddResource_o, 14 )
+
+dealloc( AddResourceHook )
+unregistersymbol( PBYTE_AddResource_o )
+unregistersymbol( PBYTE_AddResource )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>163</ID>
+              <Description>"Instant Max Level (30 or 35) -- OK"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+aobscanmodule( PBYTE_InstantLevel, GRW.exe, 488B14193B42100F )
+registersymbol( PBYTE_InstantLevel )
+alloc( pStore, 0x1000, GRW.exe )
+registersymbol( pStore )
+
+pStore:
+readmem( PBYTE_InstantLevel+7, 6 )
+
+PBYTE_InstantLevel+7:
+db 90 90 90 90 90 90
+
+[DISABLE]
+
+PBYTE_InstantLevel+7:
+readmem( pStore, 6 )
+
+unregistersymbol( pStore )
+dealloc( pStore )
+unregistersymbol( PBYTE_InstantLevel )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>165</ID>
+              <Description>"Teleport To Marker -- OK"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+alloc( TeleportHandlerThread, 0x1000, GRW.exe )
+registersymbol( TeleportHandlerThread )
+CreateThread( TeleportHandlerThread )
+label( TeleportHandlerOff )
+registersymbol( TeleportHandlerOff )
+label( ExitTeleportHandler )
+label( TeleportHandlerThread_loop )
+
+label( Teleport_do )
+label( Teleport_do_exit )
+
+label( MapMarkerHook )
+label( back )
+label( pMarker )
+
+TeleportHandlerThread:
+sub rsp,28
+
+TeleportHandlerThread_loop:
+mov rcx,A
+call Sleep
+
+cmp [TeleportHandlerOff],1
+je ExitTeleportHandler
+
+  mov rcx,60 // VK_NUMPAD0
+  call GetAsyncKeyState
+  test ax,ax
+  jne Teleport_do
+
+jmp TeleportHandlerThread_loop
+
+Teleport_do:
+mov rax,[pMarker]
+test rax,rax                            // if pointer to object was initialized
+je short Teleport_do_exit
+  //cmp byte ptr [rax+90],1               // and marker was set
+  //jne short Teleport_do_exit
+    movups xmm0,[rax+80]                // get object's coordinates
+    movups xmm2,xmm0
+    mov rbx,[o]
+    test rbx,rbx
+    je short Teleport_do_exit           // check if player object is valid
+      mov rbx,[rbx+10]
+      test rbx,rbx
+      je short Teleport_do_exit
+        movups [rbx+50],xmm0            // update them to marker's coordinates
+Teleport_do_exit:
+mov rcx,C8
+call Sleep
+jmp TeleportHandlerThread_loop
+
+ExitTeleportHandler:
+add rsp,28
+mov [TeleportHandlerOff],2
+ret
+
+TeleportHandlerOff:
+dd 0
+
+//aobscanmodule( PBYTE_MapMarkerBool, GRW.exe, C683??00000001488B7C24404883C4305BC3 )
+aobscanmodule( PBYTE_MapMarkerBool, GRW.exe, 4C8D83????????488D53??4889D9E8????????488D4C24??C6 )
+registersymbol( PBYTE_MapMarkerBool )
+label( PBYTE_MapMarkerBool_o )
+registersymbol( PBYTE_MapMarkerBool_o )
+
+MapMarkerHook:
+mov [pMarker],rbx
+PBYTE_MapMarkerBool_o:
+readmem( PBYTE_MapMarkerBool, 14 )
+jmp back
+
+pMarker:
+dq 0
+
+PBYTE_MapMarkerBool:
+db FF 25 00 00 00 00
+dq MapMarkerHook
+back:
+
+[DISABLE]
+
+PBYTE_MapMarkerBool:
+readmem( PBYTE_MapMarkerBool_o, 14 )
+
+unregistersymbol( PBYTE_MapMarkerBool_o )
+unregistersymbol( PBYTE_MapMarkerBool )
+
+{$lua}
+
+if( syntaxcheck == false ) then --actual execution
+  local starttime = getTickCount()
+
+if readInteger( "TeleportHandlerOff" ) == 0 then --could be 2 already
+  writeInteger( "TeleportHandlerOff", 1 ) --tell the thread to kill itself
+end
+
+while( getTickCount() &lt; starttime + 1000 ) and ( readInteger( "TeleportHandlerOff" ) ~= 2 ) do --wait till it has finished
+  sleep( 20 )
+end
+
+if( getTickCount() &gt; starttime + 1000 ) then --could happen when the window is shown
+  showMessage( 'Disabling the thread failed!' )
+  error( 'Thread disabling failed!' )
+end
+  sleep( 1 )
+end
+
+{$asm}
+
+dealloc( pHook )
+unregistersymbol( TeleportHandlerOff )
+unregistersymbol( TeleportHandlerThread )
+dealloc( TeleportHandlerThread )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>164</ID>
+              <Description>"Fast Tier One -- OK"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+aobscanmodule( PBYTE_FastTierOne, GRW.exe, 4401F84189C74529F74585FF )
+registersymbol( PBYTE_FastTierOne )
+
+PBYTE_FastTierOne:
+db 41 8B C6
+
+[DISABLE]
+
+PBYTE_FastTierOne:
+db 44 01 F8
+
+unregistersymbol( PBYTE_FastTierOne )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>176</ID>
+              <Description>"Debug"</Description>
+              <Options moHideChildren="1"/>
+              <LastState Value="" RealAddress="00000000"/>
+              <Color>4080FF</Color>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>177</ID>
+                  <Description>"o"</Description>
+                  <LastState Value="00000000BF1BB670" RealAddress="14000052B"/>
+                  <ShowAsHex>1</ShowAsHex>
+                  <Color>C0C0C0</Color>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>o</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>178</ID>
+                  <Description>"p"</Description>
+                  <LastState Value="0000000110E78940" RealAddress="140000533"/>
+                  <ShowAsHex>1</ShowAsHex>
+                  <Color>C0C0C0</Color>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>p</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>179</ID>
+                  <Description>"q == ptr to something"</Description>
+                  <LastState Value="000000010F56AED0" RealAddress="14000053B"/>
+                  <ShowAsHex>1</ShowAsHex>
+                  <Color>C0C0C0</Color>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>q</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>180</ID>
+                  <Description>"[o+10] == Entity"</Description>
+                  <LastState Value="00000000BDAE28B0" RealAddress="BF1BB680"/>
+                  <ShowAsHex>1</ShowAsHex>
+                  <Color>C0C0C0</Color>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>o</Address>
+                  <Offsets>
+                    <Offset>10</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>181</ID>
+                  <Description>"pItemSkipCheck"</Description>
+                  <LastState Value="00007FF4FD6A7EC0" RealAddress="14490A1D0"/>
+                  <ShowAsHex>1</ShowAsHex>
+                  <Color>C0C0C0</Color>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>ItemSkipCheck</Address>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>182</ID>
+                      <Description>"bSkip"</Description>
+                      <LastState Value="1" RealAddress="7FF4FD6A7EF0"/>
+                      <Color>C0C0C0</Color>
+                      <VariableType>Byte</VariableType>
+                      <Address>ItemSkipCheck</Address>
+                      <Offsets>
+                        <Offset>30</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>183</ID>
+                  <Description>"Acquire Level Pointer"</Description>
+                  <Options moHideChildren="1"/>
+                  <LastState/>
+                  <Color>C0C0C0</Color>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+
+{$lua}
+
+if not syntaxcheck then
+
+  function _readInteger( Input )
+    -- thanks, Pox!
+    local Value = readInteger( Input )
+    if Value &lt; 0x80000000 then return Value
+    else return Value - 0x100000000 end
+  end
+
+  unregisterSymbol( "dwLevel" )
+
+  autoAssemble([[
+    aobscanmodule( dwLevel, GRW.exe, 8987????????488B1D????????4889D9E8 )
+    registersymbol( dwLevel )
+  ]])
+
+  local addr = getAddress( "dwLevel" ) + 0x6
+  addr = addr + _readInteger( addr + 0x3 ) + 0x7
+  unregisterSymbol( "dwLevel" )
+  unregisterSymbol( "pLevel" )
+  registerSymbol( "pLevel", addr, true )
+
+end
+
+[DISABLE]
+
+{$lua}
+
+unregisterSymbol( "pLevel" )
+</AssemblerScript>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>184</ID>
+                      <Description>"Enc/Dec Key (offset 0x40+0x20)"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>pLevel</Address>
+                      <Offsets>
+                        <Offset>60</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>185</ID>
+                      <Description>"Base Pointer"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>pLevel</Address>
+                      <Offsets>
+                        <Offset>40</Offset>
+                      </Offsets>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>186</ID>
+                          <Description>"Level_Enc_Byte_A"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>Byte</VariableType>
+                          <Address>pLevel</Address>
+                          <Offsets>
+                            <Offset>0</Offset>
+                            <Offset>40</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>187</ID>
+                          <Description>"Level_Enc_Byte_B"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>Byte</VariableType>
+                          <Address>pLevel</Address>
+                          <Offsets>
+                            <Offset>0</Offset>
+                            <Offset>48</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>188</ID>
+                          <Description>"Level_Enc_Byte_C"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>Byte</VariableType>
+                          <Address>pLevel</Address>
+                          <Offsets>
+                            <Offset>0</Offset>
+                            <Offset>50</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>189</ID>
+                          <Description>"Level_Enc_Byte_D"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>Byte</VariableType>
+                          <Address>pLevel</Address>
+                          <Offsets>
+                            <Offset>0</Offset>
+                            <Offset>58</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>166</ID>
+          <Description>"Resources Processing"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+alloc( KeyHandlerThread, 1024, GRW.exe )
+registersymbol( KeyHandlerThread )
+CreateThread( KeyHandlerThread )
+label( KeyHandlerOff )
+registersymbol( KeyHandlerOff )
+label( KeyHandlerThread_loop )
+label( KeyHandlerThread_return )
+
+// pointers
+label( idx )
+registersymbol( idx )
+label( amount_all )
+registersymbol( amount_all )
+label( amount )
+registersymbol( amount )
+label( dwIdx )
+registersymbol( dwIdx )
+label( dqResource )
+registersymbol( dqResource )
+label( dwAmount )
+registersymbol( dwAmount )
+
+// functions
+label( ReadResources_do )
+registersymbol( ReadResources_do )
+label( ReadResources_do_exit )
+label( WriteResources_do )
+registersymbol( WriteResources_do )
+label( ReadResource_do )
+registersymbol( ReadResource_do )
+label( WriteResource_do )
+registersymbol( WriteResource_do )
+
+KeyHandlerThread:
+sub rsp,28
+
+KeyHandlerThread_loop:
+mov rcx,A
+call Sleep
+
+cmp [KeyHandlerOff],1
+jne short @f
+  add rsp,28
+  mov [KeyHandlerOff],2
+  ret
+@@:
+
+  // VK_NUMPAD0
+  mov rcx,60
+  call GetAsyncKeyState
+  test ax,ax
+  je short @f
+
+    call short ReadResources_do
+    mov rcx,C8
+    call Sleep
+    jmp short KeyHandlerThread_return
+
+  @@:
+  // VK_NUMPAD1
+  mov rcx,61
+  call GetAsyncKeyState
+  test ax,ax
+  je short @f
+
+    mov rcx,[amount_all]
+    call short WriteResources_do
+    mov rcx,C8
+    call Sleep
+    jmp short KeyHandlerThread_return
+
+  @@:
+  // VK_NUMPAD2
+  mov rcx,62
+  call GetAsyncKeyState
+  test ax,ax
+  je short @f
+
+    mov rcx,[idx]
+    call short ReadResource_do
+    mov rcx,C8
+    call Sleep
+    jmp short KeyHandlerThread_return
+
+  @@:
+  // VK_NUMPAD3
+  mov rcx,63
+  call GetAsyncKeyState
+  test ax,ax
+  je short @f
+
+    mov rcx,[idx]
+    mov rdx,[amount]
+    call short WriteResource_do
+    mov rcx,C8
+    call Sleep
+
+  KeyHandlerThread_return:
+  jmp KeyHandlerThread_loop
+
+//*******************************
+//*          Functions          *
+//*******************************
+
+align 4 CC
+
+ReadResources_do:
+sub rsp,28
+call GRW.exe+61A0AA0
+test rax,rax
+je short ReadResources_do_exit
+  mov rcx,rax
+  call GRW.exe+883DB0
+  test rax,rax
+  je short ReadResources_do_exit
+    movzx rcx,[rax+1356]        // size
+    shl ecx,3                   // size*8
+    mov rsi,[rax+134C]          // start
+    lea rdi,[rsi+rcx]           // end
+    mov rbx,[GRW.exe+4731EE8]   // base pointer to crypto
+    @@:
+      cmp rsi,rdi               // if whole table has been processed
+      je short @f               // je-&gt;exit
+        mov rax,[rsi]
+        mov rcx,[rax]
+        movzx eax,[rcx+28]      // resource id
+        mov [dwIdx],al
+        mov rdx,[rcx+38]
+        mov [dqResource],rdx
+        mov rcx,rbx
+        mov rdx,rsi
+        call GRW.exe+338290     // read
+        mov [dwAmount],eax
+        /*xor rdx,rdx
+        xor rcx,rcx
+        mov r14,rbx
+        mov edx,[r14+10]
+        mov rcx,[r14+18]
+        mov eax,[amount_all]
+        mov r8,[rsi]
+        mov r8,[r8]
+        mov r9d,eax
+        call GRW.exe+637C10     // write*/
+        add rsi,8               // next resource pointer
+        jmp short @b
+ReadResources_do_exit:
+add rsp,28
+ret
+
+WriteResources_do:
+sub rsp,28
+add rsp,28
+ret
+
+ReadResource_do:
+sub rsp,28
+add rsp,28
+ret
+
+WriteResource_do:
+sub rsp,28
+add rsp,28
+ret
+
+align 4 CC
+
+KeyHandlerOff:
+dd 0
+idx:
+dd 0
+amount_all:
+dd #100
+amount:
+dd 0
+dwIdx:
+dd 0
+dqResource:
+dq 0
+dwAmount:
+dd 0
+
+align 8 CC
+
+[DISABLE]
+
+{$lua}
+
+if( syntaxcheck == false ) then --actual execution
+  local starttime = getTickCount()
+
+if readInteger( "KeyHandlerOff" ) == 0 then --could be 2 already
+  writeInteger( "KeyHandlerOff", 1 ) --tell the thread to kill itself
+end
+
+while( getTickCount() &lt; starttime + 1000 ) and ( readInteger( "KeyHandlerOff" ) ~= 2 ) do --wait till it has finished
+  sleep( 20 )
+end
+
+if( getTickCount() &gt; starttime + 1000 ) then --could happen when the window is shown
+  showMessage( 'Disabling the thread failed!' )
+  error( 'Thread disabling failed!' )
+end
+  sleep( 1 )
+end
+
+{$asm}
+
+unregistersymbol( WriteResource_do )
+unregistersymbol( ReadResource_do )
+unregistersymbol( WriteResources_do )
+unregistersymbol( ReadResources_do )
+
+unregistersymbol( dwAmount )
+unregistersymbol( dqResource )
+unregistersymbol( dwIdx )
+
+unregistersymbol( amount )
+unregistersymbol( amount_all )
+unregistersymbol( idx )
+
+unregistersymbol( KeyHandlerOff )
+dealloc( KeyHandlerOff )
+unregistersymbol( KeyHandlerThread )
+dealloc( KeyHandlerThread )
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>167</ID>
+              <Description>"KeyHandlerOff"</Description>
+              <VariableType>Byte</VariableType>
+              <Address>KeyHandlerOff</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>168</ID>
+              <Description>"Resource Id"</Description>
+              <VariableType>Byte</VariableType>
+              <Address>dwIdx</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>170</ID>
+              <Description>"Resource Name"</Description>
+              <VariableType>String</VariableType>
+              <Length>100</Length>
+              <Unicode>0</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>dqResource</Address>
+              <Offsets>
+                <Offset>0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>169</ID>
+              <Description>"Resource Amount"</Description>
+              <VariableType>4 Bytes</VariableType>
+              <Address>dwAmount</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>171</ID>
+              <Description>"amount_all"</Description>
+              <VariableType>4 Bytes</VariableType>
+              <Address>amount_all</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>23948</ID>
+          <Description>"Set Tagged Resource To 100 Million -- OK"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule( PBYTE_AddResource, GRW.exe, 488B85????????8B50??488B48??E8????????389D )
+registersymbol( PBYTE_AddResource )
+label( PBYTE_AddResource_o )
+registersymbol( PBYTE_AddResource_o )
+
+alloc( AddResourceHook, 0x1000, GRW.exe )
+label( back )
+
+AddResourceHook:
+mov r9d,#100000000
+PBYTE_AddResource_o:
+readmem( PBYTE_AddResource, 14 )
+jmp back
+
+PBYTE_AddResource:
+db FF 25 00 00 00 00
+dq AddResourceHook
+back:
+
+[DISABLE]
+
+PBYTE_AddResource:
+readmem( PBYTE_AddResource_o, 14 )
+
+dealloc( AddResourceHook )
+unregistersymbol( PBYTE_AddResource_o )
+unregistersymbol( PBYTE_AddResource )
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+  <Comments>ChangeList:4792145
+Version:2.51.0.4792145
+User:mibdah
+Branch://silex/tu21/
+Project Name:TU21_Silex
+Time:Mon Jan 13 17:18:53 2020
+SDK:N/A
+Exec:scimitar_engine_win64_f.exe
+MD5:N/A
+Updated for 1.21.
+</Comments>
+  <DisassemblerComments>
+    <DisassemblerComment>
+      <Address>"GRW.exe"+83FB514</Address>
+      <Comment>here
+</Comment>
+    </DisassemblerComment>
+  </DisassemblerComments>
+  <Signature>
+    <SignedHash HashSize="132">0JFx-8WNzaCyL00c=vT_8e5V.8hwv#5OYlNtVB5sT@SmYlkW#[(.l0.,%s%X(cL!W7.HgBGa!{2@,QRoif^lLjX9Pd(;0}{4+0HH,AP.ug5_^3I*+3!]%;eJk_qXN2E69oPrwq)g-OZq^Gnl9({{X6JSFymciCP}iI)Gh</SignedHash>
+    <PublicKey Size="3019">5dZ*HQ*y;zWn;@=c[34DZbD@YZHxc]07XMnH9]OY004,YdAcuzstQ.NhpCaQg6AIpKI?^QXluZR?y1@F5,b8P_8TaZPM}UYAu^tzILzkaeRya)Q_$+F-OiKgDNRcNHE^..L2(s2e#y#x)It_%SOsCw-_,ww=o.JqtVdFTsjG#Rp;qE#U{+d2.i5@Lc/Fbs[q5_W1MTu/vLRr=.^{-t004/lPDc$28VUda01Zh/L^b0%03ZMW03Zkk0001UdV2H#000JJOGiWi^^a60_De66lK:n!32.bRa^vGf6951U69E94oEQKA00)qQO,@Rc1R4/[FZfxb0000ACP[p:R9M5UmwR.8*s?FT:l9ON$t93WAYiZrfnY+NpcsS(7Ing-5+RJ(xFod-K1NnsA213!OtGTXL07HdgX!;S3)i:qhL:Ev89^KSMKlsh7C^9Z0)sw=]}3ax?0_JL?)[j9S,hKA^nl@oz0ZEEy{xVkv+E8CZ[DkMm8s9]ZT}.,4PC@GeR*B5$Gv/j$KP;BAArPfYVbc/d7huzG[NH3^NVBDXm_UAL_,.s0NnZ=6!UGJ[-kWIBQI25e}wPCpC_x2o}fAKx?5!xfb^B0aZcX-^HVI+s;%WX7u)u5Qoi+L/nj0LKl/f*UhuvHN8HZX#=-${=E^dBrECDzqyCPx]VoLNZmI#0+zo/Z,Z_t#Gw/V5@Uvz^RDienHsP*+$J.UYB7fo:;E80ULjV3BRPwh_F!CJCnePD5?mS@djEdLT^R$?NW,u/:N!GY0^D)0VW=!+Nw}Z#Ne_Tg3P_H!xG8?Co4pjnp?758mUndGyqS9}QZrZcn?V?HL[$rZHT]iOy(P{Ylu^]I[=fU[uFO4!oKmNp1PO8xTvkg_.2QsaJp}!TY3QY)=-aIen/Ho-HXSX2-dt71_Kx,MsdFIr0J%Ea;sJh;t@}S62TQh{q@E;LY835;hwse^o:b]XjQ{3YU#h$jsLqC+*%H.btRzQ)IM(Y+?#2S21kXvD)5Af+xFAb?IH8za}o(A/I7sOUyJ34W,eXCPkTpoI0SNqp{eItO[s*@+z,e6!.tN$Ro/SYtYq-$X22+fUv^ikEBYU$:@I*!6tC=M%dN@OUE^qwoDC;J?:$MZ92rb3.v)2M:meSg,.cYNIpf[0lN4j{X1-)%dc5@v3L%*6S-3+0RehP1!c-t0E)/P24]9{wJf[!y-DhbM^)8D]mhmUIz7Nx/UMWQwOwx6(L;vuSJz]NJX6pb[_/huz/p*[cL;cLCD%b:bA+vOYFWxpWDXnqYS/=b[wJ;G7Gp4h[c;%sF_I1LZ@cv?@x;o){kKg3?6,08LFk*/.1Wgu*E!Wl.6$QQjPMC6#3Xv^7kv-H7ykYGYp@%Dk,7rF)DQ5VCIF*g:Jb-Uq_6gL}]TE,y$5[+[P!H,hltTua*V^Ltsd^l^qe=g)ldPBL[Uif13w2$%v.:PMca6bqh}biEd2ZTSES^(bkV*mJfaqJ{3t=6CHNo);*JGSON*-;DBh*UXmjcw6USPX7%6=LQy6RJLTE%ybGej#PQ4OmX#(BQ%a4#+Bs(^NpyCnz0b,1_hzlHRzQOn=IDSn(t3H:;RGY9[5Q$OX/]z%1jwT8:S@0aB2z]H_(f(*koyb,phGde%Fu%-/s*K^+OP^wQzR7h@hRkkw0qUg@xR@3Ojt;nW1E9jJj!pXcQbf]=,q]c[:R%Kq3JZg9XhYkLXSd#{w?QI7OAp5uu45/myj]pJ-g8l*]V]jy-A7g-(R=hh,TKv39ticjJ,,G)W5UjPY-Fk]7DO1l#$Cxf./Pur2t^^TeU-3s[b+kbim)8k.ms10p?J[/oJo(32sOlJReLv1H[D968_/aLl0Ea*TXPA[)5IJL?;{?v9f7?_B8TOdp:7R619wNI.D)%TbU1#8D}_P;}Y;rMd(@v4/QreTt=0j){2.fErnDsujxvD$^:UP9(h[KVYkyCI@*4%uy/ut8N_/QtDTuR)(1thEaJxN,}V2qPi-1re}ga)z]F@D}VDXKzqXH]iUm#R2Fd2C[FOXptDO6iz_eHH-2qV*DPl];;W1,+H6%S=tl.IfFhj]DswzDw^:ljsc@LQP9O8nfl:2TG34(M?=+a(zai1=U#q#s6xj*Qh.sm!67qZL[]XLdU!y0Yur0{e^#lt*aOD+WDYL-L%?ZW!iu[(zDZheLsZgFk7{5dhYfdn)6/[BW,T:Cez^a!RqiWUYrN(.KL;HhGx(h6fWf)U]qjG{J-fcRb2fD5/3?^%u84#MFYEp*SdkmVt0NqgM];h@Cm=h$@zCSs9%Y}?,TmWHubp/NE*j}SX-xLLTeZ9-cF3DiWq/+VUcNAvNGI*F]@ezO.Qs+-e;IIIYG3P#b.BJ#h7i][.F}Bf6+)F*;vd5eeAqWOHq(L)ABUP7{hUrW^-40H7Tc5eQ/GxY7]Te5-mS,,=-9N.]J5HlJlEn^8^]-K(w3(+VXIKm#BuTr1J@K]gj!0H67Yyw06G.o=]$2wM*Q1/x[An]w$Bnn?v[,Fz.oJ{7)G{x$9@B]jZA5osPXBFo:0831Isc4Y.B]y%JgKZUQ=woOIFs;NSbUuQJ8im-]{8i/XgUmS=FvJOD,dXR20^BNNqC6P[^nKjoc/0$O]}9lNvgnCT1E)=K%*26pD%c#aUp;Fc5QYRsC@F:#2fbCoNS48h[Lq.k#eqb,Y/Gf*QRp87$}.1#?ICB4DYVC?LfeuEDJ(aP0KbTVF.$)/x%(iBC7KpL]WkvUf[u_W-n*?mTPa6QHpZH!pbQf^jPrfs,LO,qdj$lTDR?rgr],;y*D2^IHur0B+h{Hg$Ezk[}GpuK]RTgSQ:Juko?Z{1kYPV3:dhPQi[}n9ebRMhVf/Ll#+-2q@(Jq@@/:63N-(/[U-5IdouefS}FgViR)?XOMT%UHp#7q^OfdlQ:;f3W;4V_w50^i8EA7.xz3DogS*TDA-JqByZe/eIM;7%8lh?_j0.q_j#c11E,%blNv/4)Z2buN#rACXt?-uk#[?_r;%+@k!comiNK1MQ)hNalvxZa)*7LO]g^BEm.7diuhm0YydKu)SmPl73%nYi^M)ZOF6,YWEGP1lv@m=R0UGi1zH=AeI:6f1I:g)i=V3p*uQ{_5N)7=d[dv#meg[f.xaF_ZsOo:hfASo0nLt$4L/lO^Lk%0iD?*5c@7Agsk;$hZ79{ID^bJ;Xby(h;$N}udf$@6E):w(}_edh.dX6?_12yvTiUp7jF7k#1tPA_MlWsW$=tV^{-6bM]3H5m#C:5S9aPoUWn=?$11Si(oO=wIA*+P2#sy$29qJ$Z}73bt6cY)90[y($vm9%0S:eWMV!Nr3R8PgKWG(t25otTL{HZ)wo%.E;]PU1PUVB!$si2[rY;wVXnGZeGdA?0exj6C$H20IRm%%WS)7?BJkNf3+96X=3)+e+J1)n[W!*c;g8kt(2+!lu^flK}KK7*COo/JbYu?g0kZP^?b/o%Ci_gvuNny%:(Q!:f{YR=8)}RSo8l_%}ETti,g?mb:@6-^ZzJ(Jug;Zb7t{IR^-1%lLf%DfcjvD6MOaAS;M]j:*YIz03=4]gZy(mMY8Biqwl$tj?(Xe?U1xaHqX8!KXWj/CCmK[i?u?r=}{6sx2F76]}M3VK!Mw9)+!^P0000/MNUMnLSTY}00001XZi^(F#=O7]eM)7uRBu%n]bT=vOZV1$D.[G6uNS!4t$sN=:117^ai4HQvZM(kYLB]Ys8SuD.VIgPmfTD1pvGokqOhgjAgO*Y#0E1?:$y5^EJx7Gxdyyt[}hApw9;jcA{^5=3e{GlwM!%@D:iDnVkgGP7rDABB?5$ww(b</PublicKey>
+  </Signature>
+</CheatTable>

@@ -1,0 +1,841 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="31">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>178</ID>
+      <Description>"====== Scripts 1.02 ======"</Description>
+      <LastState Value="" RealAddress="00000000"/>
+      <Color>008000</Color>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>45</ID>
+          <Description>"No Wanted Level"</Description>
+          <LastState/>
+          <Color>008000</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : Scarface.exe
+  Version: 
+  Date   : 2018-12-30
+  Author : GOSUNGARI
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+
+ 
+ 
+aobscanmodule(cop,Scarface.exe,D9 1D 34 F4 82 00) // should be unique
+alloc(newmem,$1000)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  fstp dword ptr [Scarface.exe+42F434]
+  mov dword ptr [Scarface.exe+42F434],0
+  jmp return
+
+cop:
+  jmp newmem
+  nop
+return:
+registersymbol(cop)
+
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+cop:
+  db D9 1D 34 F4 82 00
+
+unregistersymbol(cop)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "Scarface.exe"+2402A6
+
+"Scarface.exe"+240284: EB 49                          -  jmp Scarface.exe+2402CF
+"Scarface.exe"+240286: D8 05 34 F4 82 00              -  fadd dword ptr [Scarface.exe+42F434]
+"Scarface.exe"+24028C: D8 15 94 F9 72 00              -  fcom dword ptr [Scarface.exe+32F994]
+"Scarface.exe"+240292: DF E0                          -  fnstsw ax
+"Scarface.exe"+240294: F6 C4 01                       -  test ah,01
+"Scarface.exe"+240297: 75 15                          -  jne Scarface.exe+2402AE
+"Scarface.exe"+240299: D8 15 24 51 76 00              -  fcom dword ptr [Scarface.exe+365124]
+"Scarface.exe"+24029F: DF E0                          -  fnstsw ax
+"Scarface.exe"+2402A1: F6 C4 41                       -  test ah,41
+"Scarface.exe"+2402A4: 7A 08                          -  jp Scarface.exe+2402AE
+// ---------- INJECTING HERE ----------
+"Scarface.exe"+2402A6: D9 1D 34 F4 82 00              -  fstp dword ptr [Scarface.exe+42F434]
+// ---------- DONE INJECTING  ----------
+"Scarface.exe"+2402AC: EB 21                          -  jmp Scarface.exe+2402CF
+"Scarface.exe"+2402AE: D8 1D 24 51 76 00              -  fcomp dword ptr [Scarface.exe+365124]
+"Scarface.exe"+2402B4: C7 05 34 F4 82 00 00 00 7A 44  -  mov [Scarface.exe+42F434],447A0000
+"Scarface.exe"+2402BE: DF E0                          -  fnstsw ax
+"Scarface.exe"+2402C0: F6 C4 41                       -  test ah,41
+"Scarface.exe"+2402C3: 74 0A                          -  je Scarface.exe+2402CF
+"Scarface.exe"+2402C5: C7 05 34 F4 82 00 00 00 00 00  -  mov [Scarface.exe+42F434],00000000
+"Scarface.exe"+2402CF: D9 05 34 F4 82 00              -  fld dword ptr [Scarface.exe+42F434]
+"Scarface.exe"+2402D5: D9 44 24 0C                    -  fld dword ptr [esp+0C]
+"Scarface.exe"+2402D9: DA E9                          -  fucompp 
+}
+</AssemblerScript>
+          <Hotkeys>
+            <Hotkey>
+              <Action>Toggle Activation</Action>
+              <Keys>
+                <Key>110</Key>
+              </Keys>
+              <ID>0</ID>
+              <ActivateSound TTS="EN">No Wanted Activated</ActivateSound>
+              <DeactivateSound TTS="EN">No Wanted Deactivated</DeactivateSound>
+            </Hotkey>
+          </Hotkeys>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>59</ID>
+          <Description>"Inf Ammo / No Reload"</Description>
+          <LastState/>
+          <Color>008000</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : Scarface.exe
+  Version: 
+  Date   : 2019-08-25
+  Author : Taha
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(InfClip,Scarface.exe,83 86 38 01 00 00 FF) // should be unique
+alloc(newmem,$1000)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  //add dword ptr [esi+00000138],-01
+  jmp return
+
+InfClip:
+  jmp newmem
+  nop 2
+return:
+registersymbol(InfClip)
+
+[DISABLE]
+
+InfClip:
+  db 83 86 38 01 00 00 FF
+
+unregistersymbol(InfClip)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "Scarface.exe"+20DB7C
+
+"Scarface.exe"+20DB6B: CC                    -  int 3 
+"Scarface.exe"+20DB6C: CC                    -  int 3 
+"Scarface.exe"+20DB6D: CC                    -  int 3 
+"Scarface.exe"+20DB6E: CC                    -  int 3 
+"Scarface.exe"+20DB6F: CC                    -  int 3 
+"Scarface.exe"+20DB70: 56                    -  push esi
+"Scarface.exe"+20DB71: 8B F1                 -  mov esi,ecx
+"Scarface.exe"+20DB73: E8 78 FF FF FF        -  call Scarface.exe+20DAF0
+"Scarface.exe"+20DB78: 84 C0                 -  test al,al
+"Scarface.exe"+20DB7A: 75 4A                 -  jne Scarface.exe+20DBC6
+// ---------- INJECTING HERE ----------
+"Scarface.exe"+20DB7C: 83 86 38 01 00 00 FF  -  add dword ptr [esi+00000138],-01
+// ---------- DONE INJECTING  ----------
+"Scarface.exe"+20DB83: 75 41                 -  jne Scarface.exe+20DBC6
+"Scarface.exe"+20DB85: 83 BE 3C 01 00 00 00  -  cmp dword ptr [esi+0000013C],00
+"Scarface.exe"+20DB8C: 75 38                 -  jne Scarface.exe+20DBC6
+"Scarface.exe"+20DB8E: 8B 86 54 01 00 00     -  mov eax,[esi+00000154]
+"Scarface.exe"+20DB94: 50                    -  push eax
+"Scarface.exe"+20DB95: E8 66 5E E3 FF        -  call Scarface.exe+43A00
+"Scarface.exe"+20DB9A: 8B 0D 78 5A 82 00     -  mov ecx,[Scarface.exe+425A78]
+"Scarface.exe"+20DBA0: 83 C4 04              -  add esp,04
+"Scarface.exe"+20DBA3: 85 C9                 -  test ecx,ecx
+"Scarface.exe"+20DBA5: 74 1F                 -  je Scarface.exe+20DBC6
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>68</ID>
+          <Description>"Inf Attachment"</Description>
+          <LastState/>
+          <Color>008000</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : Scarface.exe
+  Version: 
+  Date   : 2019-08-26
+  Author : Taha
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(InfGrenades,Scarface.exe,83 86 44 01 00 00 FF) // should be unique
+alloc(newmem,$1000)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  //add dword ptr [esi+00000144],-01
+  jmp return
+
+InfGrenades:
+  jmp newmem
+  nop 2
+return:
+registersymbol(InfGrenades)
+
+[DISABLE]
+
+InfGrenades:
+  db 83 86 44 01 00 00 FF
+
+unregistersymbol(InfGrenades)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "Scarface.exe"+207954
+
+"Scarface.exe"+20793A: 84 C0                 -  test al,al
+"Scarface.exe"+20793C: 74 57                 -  je Scarface.exe+207995
+"Scarface.exe"+20793E: 6A 00                 -  push 00
+"Scarface.exe"+207940: 6A 03                 -  push 03
+"Scarface.exe"+207942: 8B CE                 -  mov ecx,esi
+"Scarface.exe"+207944: E8 87 6F 00 00        -  call Scarface.exe+20E8D0
+"Scarface.exe"+207949: 8B CE                 -  mov ecx,esi
+"Scarface.exe"+20794B: E8 A0 61 00 00        -  call Scarface.exe+20DAF0
+"Scarface.exe"+207950: 84 C0                 -  test al,al
+"Scarface.exe"+207952: 75 07                 -  jne Scarface.exe+20795B
+// ---------- INJECTING HERE ----------
+"Scarface.exe"+207954: 83 86 44 01 00 00 FF  -  add dword ptr [esi+00000144],-01
+// ---------- DONE INJECTING  ----------
+"Scarface.exe"+20795B: 8B 0D 04 AC 80 00     -  mov ecx,[Scarface.exe+40AC04]
+"Scarface.exe"+207961: 8B 51 2C              -  mov edx,[ecx+2C]
+"Scarface.exe"+207964: 6A 00                 -  push 00
+"Scarface.exe"+207966: 8B CE                 -  mov ecx,esi
+"Scarface.exe"+207968: 89 96 30 01 00 00     -  mov [esi+00000130],edx
+"Scarface.exe"+20796E: E8 1D 67 00 00        -  call Scarface.exe+20E090
+"Scarface.exe"+207973: 8B 86 60 01 00 00     -  mov eax,[esi+00000160]
+"Scarface.exe"+207979: 50                    -  push eax
+"Scarface.exe"+20797A: 56                    -  push esi
+"Scarface.exe"+20797B: 8B CE                 -  mov ecx,esi
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>9</ID>
+          <Description>"No Gang Heat"</Description>
+          <LastState/>
+          <Color>008000</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : Scarface.exe
+  Version: 
+  Date   : 2019-08-25
+  Author : Taha
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,Scarface.exe,D9 1C 88 C2 08 00) // should be unique
+alloc(newmem,$1000)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  //fstp dword ptr [eax+ecx*4]
+  ret 0008
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db D9 1C 88 C2 08 00
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "Scarface.exe"+3137A
+
+"Scarface.exe"+3135E: CC                       -  int 3 
+"Scarface.exe"+3135F: CC                       -  int 3 
+"Scarface.exe"+31360: 8B 01                    -  mov eax,[ecx]
+"Scarface.exe"+31362: 8B 4C 24 08              -  mov ecx,[esp+08]
+"Scarface.exe"+31366: 8B 54 24 04              -  mov edx,[esp+04]
+"Scarface.exe"+3136A: 89 14 88                 -  mov [eax+ecx*4],edx
+"Scarface.exe"+3136D: C2 08 00                 -  ret 0008
+"Scarface.exe"+31370: 8B 01                    -  mov eax,[ecx]
+"Scarface.exe"+31372: D9 44 24 04              -  fld dword ptr [esp+04]
+"Scarface.exe"+31376: 8B 4C 24 08              -  mov ecx,[esp+08]
+// ---------- INJECTING HERE ----------
+"Scarface.exe"+3137A: D9 1C 88                 -  fstp dword ptr [eax+ecx*4]
+"Scarface.exe"+3137D: C2 08 00                 -  ret 0008
+// ---------- DONE INJECTING  ----------
+"Scarface.exe"+31380: 8B 01                    -  mov eax,[ecx]
+"Scarface.exe"+31382: 8B 4C 24 04              -  mov ecx,[esp+04]
+"Scarface.exe"+31386: 8B 04 88                 -  mov eax,[eax+ecx*4]
+"Scarface.exe"+31389: C2 04 00                 -  ret 0004
+"Scarface.exe"+3138C: CC                       -  int 3 
+"Scarface.exe"+3138D: CC                       -  int 3 
+"Scarface.exe"+3138E: CC                       -  int 3 
+"Scarface.exe"+3138F: CC                       -  int 3 
+"Scarface.exe"+31390: 8B 01                    -  mov eax,[ecx]
+"Scarface.exe"+31392: 8B 4C 24 04              -  mov ecx,[esp+04]
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>160</ID>
+          <Description>"Freeze Timer"</Description>
+          <LastState/>
+          <Color>008000</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : Scarface.exe
+  Version: 
+  Date   : 2020-11-28
+  Author : Taha
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(InfTimer,Scarface.exe,89 14 88 C2 08 00 8B) // should be unique
+alloc(newmem,$1000)
+
+label(code)
+label(return)
+
+newmem:
+  //mov [eax+ecx*4],edx
+  ret 0008
+  jmp return
+
+code:
+  mov [eax+ecx*4],edx
+  ret 0008
+  jmp return
+
+InfTimer:
+  jmp newmem
+  nop
+return:
+registersymbol(InfTimer)
+
+[DISABLE]
+
+InfTimer:
+  db 89 14 88 C2 08 00
+
+unregistersymbol(InfTimer)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "Scarface.exe"+3136A
+
+"Scarface.exe"+31359: CC                       -  int 3 
+"Scarface.exe"+3135A: CC                       -  int 3 
+"Scarface.exe"+3135B: CC                       -  int 3 
+"Scarface.exe"+3135C: CC                       -  int 3 
+"Scarface.exe"+3135D: CC                       -  int 3 
+"Scarface.exe"+3135E: CC                       -  int 3 
+"Scarface.exe"+3135F: CC                       -  int 3 
+"Scarface.exe"+31360: 8B 01                    -  mov eax,[ecx]
+"Scarface.exe"+31362: 8B 4C 24 08              -  mov ecx,[esp+08]
+"Scarface.exe"+31366: 8B 54 24 04              -  mov edx,[esp+04]
+// ---------- INJECTING HERE ----------
+"Scarface.exe"+3136A: 89 14 88                 -  mov [eax+ecx*4],edx
+"Scarface.exe"+3136D: C2 08 00                 -  ret 0008
+// ---------- DONE INJECTING  ----------
+"Scarface.exe"+31370: 8B 01                    -  mov eax,[ecx]
+"Scarface.exe"+31372: D9 44 24 04              -  fld dword ptr [esp+04]
+"Scarface.exe"+31376: 8B 4C 24 08              -  mov ecx,[esp+08]
+"Scarface.exe"+3137A: D9 1C 88                 -  fstp dword ptr [eax+ecx*4]
+"Scarface.exe"+3137D: C2 08 00                 -  ret 0008
+"Scarface.exe"+31380: 8B 01                    -  mov eax,[ecx]
+"Scarface.exe"+31382: 8B 4C 24 04              -  mov ecx,[esp+04]
+"Scarface.exe"+31386: 8B 04 88                 -  mov eax,[eax+ecx*4]
+"Scarface.exe"+31389: C2 04 00                 -  ret 0004
+"Scarface.exe"+3138C: CC                       -  int 3 
+}
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>55</ID>
+      <Description>"====== Pointers 1.02 ======="</Description>
+      <LastState Value="" RealAddress="00000000"/>
+      <Color>800000</Color>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>177</ID>
+          <Description>"Player"</Description>
+          <Options moHideChildren="1"/>
+          <LastState Value="" RealAddress="00000000"/>
+          <Color>800000</Color>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>96</ID>
+              <Description>"Health"</Description>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"Scarface.exe"+00425A78</Address>
+              <Offsets>
+                <Offset>15C</Offset>
+              </Offsets>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Set Value</Action>
+                  <Keys>
+                    <Key>96</Key>
+                  </Keys>
+                  <Value>1600</Value>
+                  <ID>0</ID>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>155</ID>
+              <Description>"Rage"</Description>
+              <VariableType>Float</VariableType>
+              <Address>"Scarface.exe"+0040B648</Address>
+              <Offsets>
+                <Offset>0</Offset>
+                <Offset>24C</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>154</ID>
+              <Description>"Rage"</Description>
+              <VariableType>Float</VariableType>
+              <Address>"Scarface.exe"+0040A714</Address>
+              <Offsets>
+                <Offset>0</Offset>
+                <Offset>24C</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>107</ID>
+              <Description>"Car Health"</Description>
+              <VariableType>Float</VariableType>
+              <Address>"Scarface.exe"+00400A2C</Address>
+              <Offsets>
+                <Offset>74</Offset>
+                <Offset>4</Offset>
+                <Offset>14</Offset>
+                <Offset>C</Offset>
+                <Offset>0</Offset>
+              </Offsets>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Toggle Activation</Action>
+                  <Keys>
+                    <Key>109</Key>
+                  </Keys>
+                  <ID>0</ID>
+                  <ActivateSound TTS="EN">God Car</ActivateSound>
+                  <DeactivateSound TTS="EN">Normal</DeactivateSound>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>108</ID>
+              <Description>"Boat Health"</Description>
+              <VariableType>Float</VariableType>
+              <Address>"Scarface.exe"+00422AF8</Address>
+              <Offsets>
+                <Offset>BC</Offset>
+                <Offset>C4</Offset>
+                <Offset>0</Offset>
+                <Offset>30</Offset>
+                <Offset>B4</Offset>
+              </Offsets>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Toggle Activation</Action>
+                  <Keys>
+                    <Key>106</Key>
+                  </Keys>
+                  <ID>0</ID>
+                  <ActivateSound TTS="EN">God Boat</ActivateSound>
+                  <DeactivateSound TTS="EN">Normal Boat</DeactivateSound>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>76</ID>
+          <Description>"Ammo Pointers"</Description>
+          <Options moHideChildren="1"/>
+          <LastState Value="" RealAddress="00000000"/>
+          <Color>800000</Color>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>86</ID>
+              <Description>"AK-47/RPG Clip"</Description>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"Scarface.exe"+00425A78</Address>
+              <Offsets>
+                <Offset>138</Offset>
+                <Offset>8</Offset>
+                <Offset>30</Offset>
+                <Offset>1C</Offset>
+                <Offset>18</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>135</ID>
+              <Description>"AK-47/RPG"</Description>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"Scarface.exe"+00425A78</Address>
+              <Offsets>
+                <Offset>13C</Offset>
+                <Offset>8</Offset>
+                <Offset>30</Offset>
+                <Offset>1C</Offset>
+                <Offset>18</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>132</ID>
+              <Description>"Carbine Rifle/SMG/GRNL Clip"</Description>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"Scarface.exe"+00425A78</Address>
+              <Offsets>
+                <Offset>138</Offset>
+                <Offset>4</Offset>
+                <Offset>30</Offset>
+                <Offset>1C</Offset>
+                <Offset>18</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>106</ID>
+              <Description>"Carbine Rifle/SMG/GRNL"</Description>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"Scarface.exe"+00425A78</Address>
+              <Offsets>
+                <Offset>13C</Offset>
+                <Offset>4</Offset>
+                <Offset>30</Offset>
+                <Offset>1C</Offset>
+                <Offset>18</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>134</ID>
+              <Description>"MAC Clip"</Description>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"Scarface.exe"+00425A78</Address>
+              <Offsets>
+                <Offset>138</Offset>
+                <Offset>0</Offset>
+                <Offset>30</Offset>
+                <Offset>1C</Offset>
+                <Offset>18</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>133</ID>
+              <Description>"MAC"</Description>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"Scarface.exe"+00425A78</Address>
+              <Offsets>
+                <Offset>13C</Offset>
+                <Offset>0</Offset>
+                <Offset>30</Offset>
+                <Offset>1C</Offset>
+                <Offset>18</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>176</ID>
+          <Description>"Cash &amp; Coke"</Description>
+          <Options moHideChildren="1"/>
+          <LastState Value="" RealAddress="00000000"/>
+          <Color>800000</Color>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>136</ID>
+              <Description>"Dirty Cash (Not More Than 2 Billion)"</Description>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"Scarface.exe"+0040A714</Address>
+              <Offsets>
+                <Offset>0</Offset>
+                <Offset>74</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>137</ID>
+              <Description>"Dirty Cash (Not More Than 2 Billion)"</Description>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"Scarface.exe"+0040B648</Address>
+              <Offsets>
+                <Offset>0</Offset>
+                <Offset>74</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>142</ID>
+              <Description>"Clean Cash (Not More Than 2 Billion)"</Description>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"Scarface.exe"+0040B648</Address>
+              <Offsets>
+                <Offset>0</Offset>
+                <Offset>6C</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>143</ID>
+              <Description>"Clean Cash (Not More Than 2 Billion)"</Description>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"Scarface.exe"+0040A714</Address>
+              <Offsets>
+                <Offset>0</Offset>
+                <Offset>6C</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>119</ID>
+              <Description>"Coke (Not More Than 2 Billion)"</Description>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"Scarface.exe"+0040B648</Address>
+              <Offsets>
+                <Offset>0</Offset>
+                <Offset>94</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>172</ID>
+          <Description>"Heat"</Description>
+          <Options moHideChildren="1" moRecursiveSetValue="1"/>
+          <LastState Value="" RealAddress="00000000"/>
+          <Color>800000</Color>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>150</ID>
+              <Description>"Cop Heat (Freeze At Zero)"</Description>
+              <VariableType>Float</VariableType>
+              <Address>"Scarface.exe"+0040A714</Address>
+              <Offsets>
+                <Offset>0</Offset>
+                <Offset>104</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>151</ID>
+              <Description>"Cop Heat (Freeze At Zero)"</Description>
+              <VariableType>Float</VariableType>
+              <Address>"Scarface.exe"+0040B648</Address>
+              <Offsets>
+                <Offset>0</Offset>
+                <Offset>104</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>50</ID>
+              <Description>"Gang Heat (Freeze At Zero)"</Description>
+              <VariableType>Float</VariableType>
+              <Address>"Scarface.exe"+0040A714</Address>
+              <Offsets>
+                <Offset>0</Offset>
+                <Offset>114</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>109</ID>
+              <Description>"Gang Heat (Freeze At Zero)"</Description>
+              <VariableType>Float</VariableType>
+              <Address>"Scarface.exe"+0040A714</Address>
+              <Offsets>
+                <Offset>0</Offset>
+                <Offset>114</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Set Value</Action>
+                  <Keys>
+                    <Key>96</Key>
+                  </Keys>
+                  <Value>0</Value>
+                  <ID>0</ID>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>175</ID>
+          <Description>"Storage"</Description>
+          <Options moHideChildren="1" moRecursiveSetValue="1"/>
+          <LastState Value="" RealAddress="00000000"/>
+          <Color>800000</Color>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>165</ID>
+              <Description>"Havana Storage (Kg)"</Description>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"Scarface.exe"+0040EE98</Address>
+              <Offsets>
+                <Offset>E1AC</Offset>
+                <Offset>18</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>169</ID>
+              <Description>"Marina Storage (Kg)"</Description>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"Scarface.exe"+0040EE98</Address>
+              <Offsets>
+                <Offset>E0CC</Offset>
+                <Offset>18</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>170</ID>
+              <Description>"Shoreline Storage (Kg)"</Description>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"Scarface.exe"+0040EE98</Address>
+              <Offsets>
+                <Offset>DFEC</Offset>
+                <Offset>18</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>171</ID>
+              <Description>"Leopard Storage (Kg)"</Description>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"Scarface.exe"+0040EE98</Address>
+              <Offsets>
+                <Offset>DF0C</Offset>
+                <Offset>18</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>174</ID>
+          <Description>"Misc."</Description>
+          <Options moHideChildren="1"/>
+          <LastState Value="" RealAddress="00000000"/>
+          <Color>800000</Color>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>146</ID>
+              <Description>"Balls"</Description>
+              <VariableType>Float</VariableType>
+              <Address>"Scarface.exe"+0040A714</Address>
+              <Offsets>
+                <Offset>0</Offset>
+                <Offset>264</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>147</ID>
+              <Description>"Balls"</Description>
+              <VariableType>Float</VariableType>
+              <Address>"Scarface.exe"+0040B648</Address>
+              <Offsets>
+                <Offset>0</Offset>
+                <Offset>264</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>159</ID>
+              <Description>"Timer"</Description>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"Scarface.exe"+0040B648</Address>
+              <Offsets>
+                <Offset>0</Offset>
+                <Offset>4FC</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>158</ID>
+              <Description>"Timer"</Description>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"Scarface.exe"+0040A714</Address>
+              <Offsets>
+                <Offset>0</Offset>
+                <Offset>4FC</Offset>
+                <Offset>14</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>138</ID>
+      <Description>"Dirty Cash"</Description>
+      <VariableType>4 Bytes</VariableType>
+      <Address>"Scarface.exe"+0040BBB8</Address>
+      <Offsets>
+        <Offset>0</Offset>
+        <Offset>11C</Offset>
+      </Offsets>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>139</ID>
+      <Description>"Dirty Cash"</Description>
+      <VariableType>4 Bytes</VariableType>
+      <Address>"Scarface.exe"+004234F4</Address>
+      <Offsets>
+        <Offset>0</Offset>
+        <Offset>11C</Offset>
+      </Offsets>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

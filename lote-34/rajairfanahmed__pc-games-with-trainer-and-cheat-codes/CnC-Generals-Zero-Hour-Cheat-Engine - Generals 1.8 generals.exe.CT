@@ -1,0 +1,963 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="27">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>1</ID>
+      <Description>"Player Base"</Description>
+      <ShowAsHex>1</ShowAsHex>
+      <VariableType>4 Bytes</VariableType>
+      <Address>generals.exe+561A54</Address>
+      <Offsets>
+        <Offset>C</Offset>
+      </Offsets>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>8</ID>
+      <Description>"Money"</Description>
+      <VariableType>4 Bytes</VariableType>
+      <Address>generals.exe+561A54</Address>
+      <Offsets>
+        <Offset>34</Offset>
+        <Offset>C</Offset>
+      </Offsets>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>69</ID>
+      <Description>"Current Power"</Description>
+      <VariableType>4 Bytes</VariableType>
+      <Address>generals.exe+561A54</Address>
+      <Offsets>
+        <Offset>74</Offset>
+        <Offset>C</Offset>
+      </Offsets>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>70</ID>
+      <Description>"Required Power"</Description>
+      <VariableType>4 Bytes</VariableType>
+      <Address>generals.exe+561A54</Address>
+      <Offsets>
+        <Offset>78</Offset>
+        <Offset>C</Offset>
+      </Offsets>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>46</ID>
+      <Description>"XP"</Description>
+      <VariableType>4 Bytes</VariableType>
+      <Address>generals.exe+561A54</Address>
+      <Offsets>
+        <Offset>178</Offset>
+        <Offset>C</Offset>
+      </Offsets>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>61</ID>
+      <Description>"Max XP"</Description>
+      <VariableType>4 Bytes</VariableType>
+      <Address>generals.exe+561A54</Address>
+      <Offsets>
+        <Offset>180</Offset>
+        <Offset>C</Offset>
+      </Offsets>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>45</ID>
+      <Description>"General Points"</Description>
+      <VariableType>4 Bytes</VariableType>
+      <Address>generals.exe+561A54</Address>
+      <Offsets>
+        <Offset>17C</Offset>
+        <Offset>C</Offset>
+      </Offsets>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>96</ID>
+      <Description>"Money Spent Modifier"</Description>
+      <Options moHideChildren="1"/>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+alloc(money_spent_mod,2048)
+registersymbol(money_spent_mod)
+
+money_spent_mod:
+dd 0
+
+money_spent_mod+4:
+dd (Float)1
+
+aobscanmodule(Money_Spent,generals.exe,8B 74 24 78 57)
+registersymbol(Money_Spent)
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode)
+label(exit)
+
+newmem: //this is allocated memory, you have read,write,execute access
+push eax
+push ebx
+mov eax,[generals.exe+561A54]
+test eax,eax
+je originalcode
+lea ebx,[ecx-30]
+cmp ebx,[eax+C]
+je exit
+jmp originalcode
+
+originalcode:
+pop ebx
+pop eax
+mov esi,[esp+78]
+push edi
+jmp returnhere
+
+exit:
+pop ebx
+pop eax
+fild dword ptr [esp+78]
+fadd dword ptr [money_spent_mod]
+fmul dword ptr [money_spent_mod+4]
+fistp dword ptr [esp+78]
+mov esi,[esp+78]
+push edi
+jmp returnhere
+
+Money_Spent: //"generals.exe"+167A19:
+jmp newmem
+returnhere:
+
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+dealloc(money_spent_mod)
+unregistersymbol(money_spent_mod)
+
+unregistersymbol(Money_Spent)
+dealloc(newmem)
+Money_Spent: //"generals.exe"+167A19:
+mov esi,[esp+78]
+push edi
+//Alt: db 8B 74 24 78 57
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>97</ID>
+          <Description>"Additional Money Spent"</Description>
+          <VariableType>Float</VariableType>
+          <Address>money_spent_mod</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>98</ID>
+          <Description>"Money Spent Multiplier"</Description>
+          <VariableType>Float</VariableType>
+          <Address>money_spent_mod+4</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>27</ID>
+      <Description>"Money Gained Modifier"</Description>
+      <Options moHideChildren="1"/>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+alloc(money_gain_mod,2048)
+registersymbol(money_gain_mod)
+
+money_gain_mod:
+dd 0
+
+money_gain_mod+4:
+dd (Float)5
+
+aobscanmodule(Money_Gain,generals.exe,8B 7C 24 7C 85)
+registersymbol(Money_Gain)
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode)
+label(exit)
+
+newmem: //this is allocated memory, you have read,write,execute access
+push eax
+push ebx
+mov eax,[generals.exe+561A54]
+test eax,eax
+je originalcode
+lea ebx,[ecx-30]
+cmp ebx,[eax+C]
+je exit
+jmp originalcode
+
+originalcode:
+pop ebx
+pop eax
+mov edi,[esp+7C]
+test edi,edi
+jmp returnhere
+
+exit:
+pop ebx
+pop eax
+fild dword ptr [esp+7C]
+fadd dword ptr [money_gain_mod]
+fmul dword ptr [money_gain_mod+4]
+fistp dword ptr [esp+7C]
+mov edi,[esp+7C]
+test edi,edi
+jmp returnhere
+
+Money_Gain: //"generals.exe"+167ADA:
+jmp newmem
+nop
+returnhere:
+
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+dealloc(money_gain_mod)
+unregistersymbol(money_gain_mod)
+
+unregistersymbol(Money_Gain)
+dealloc(newmem)
+Money_Gain: //"generals.exe"+167ADA:
+mov edi,[esp+7C]
+test edi,edi
+//Alt: db 8B 7C 24 7C 85 FF
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>28</ID>
+          <Description>"Additional Money Gained"</Description>
+          <VariableType>Float</VariableType>
+          <Address>money_gain_mod</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>29</ID>
+          <Description>"Money Gained Multiplier"</Description>
+          <VariableType>Float</VariableType>
+          <Address>money_gain_mod+4</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>51</ID>
+      <Description>"Invulnerable"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+aobscanmodule(Damage_Taken,generals.exe,6A FF 68 68 63 87)
+registersymbol(Damage_Taken)
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode)
+label(exit)
+
+newmem: //this is allocated memory, you have read,write,execute access
+push eax
+push ebx
+mov ebx,[ecx-8]
+test ebx,ebx
+je originalcode
+mov eax,[ebx+4]
+test eax,eax
+je originalcode
+mov eax,[eax+68]
+test ax,380     //ah = 1 OR 2 is a unit, al = 80 is a building
+je originalcode
+mov ebx,[ebx+140]
+test ebx,ebx
+je originalcode
+mov ebx,[ebx+8]
+test ebx,ebx
+je originalcode
+mov ebx,[ebx+C]
+mov eax,[generals.exe+561A54]
+test eax,eax
+je originalcode
+cmp ebx,[eax+C]
+je exit
+jmp originalcode
+
+originalcode:
+pop ebx
+pop eax
+push -01
+push generals.exe+476368
+jmp returnhere
+
+exit:
+pop ebx
+pop eax
+ret 4
+
+Damage_Taken: //"generals.exe"+238480:
+jmp newmem
+nop
+nop
+returnhere:
+
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+unregistersymbol(Damage_Taken)
+dealloc(newmem)
+Damage_Taken: //"generals.exe"+238480:
+push -01
+push generals.exe+476368
+//Alt: db 6A FF 68 68 63 87 00
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>21</ID>
+      <Description>"Damage Modifier"</Description>
+      <Options moHideChildren="1"/>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+alloc(damage_mod,2048)
+registersymbol(damage_mod)
+
+damage_mod:
+dd 0
+
+damage_mod+4:
+dd (Float)5
+
+aobscanmodule(Damage,generals.exe,56 8B F1 8B 8E 10)
+registersymbol(Damage)
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode)
+label(exit)
+
+newmem: //this is allocated memory, you have read,write,execute access
+push eax
+push ebx
+push ecx
+mov ebx,[generals.exe+561F64]
+test ebx,ebx
+je originalcode
+lea ebx,[ebx+6C]
+mov ebx,[ebx+4]
+test ebx,ebx
+je originalcode
+mov ecx,[esp+10]
+test ecx,ecx
+je originalcode
+mov ecx,[ecx+8]
+test ecx,ecx
+je originalcode
+mov ebx,[ebx+ecx*4]
+test ebx,ebx
+je originalcode
+mov ebx,[ebx+8]
+test ebx,ebx
+je originalcode
+mov ebx,[ebx+140]
+test ebx,ebx
+je originalcode
+mov ebx,[ebx+8]
+test ebx,ebx
+je originalcode
+mov ebx,[ebx+C]
+mov eax,[generals.exe+561A54]
+test eax,eax
+je originalcode
+cmp ebx,[eax+C]
+je exit
+
+originalcode:
+pop ecx
+pop ebx
+pop eax
+push esi
+mov esi,ecx
+mov ecx,[esi+00000110]
+jmp returnhere
+
+exit:
+pop ecx
+pop ebx
+mov eax,[esp+8]
+fld dword ptr [eax+18]
+fadd dword ptr [damage_mod]
+fmul dword ptr [damage_mod+4]
+fstp dword ptr [eax+18]
+pop eax
+push esi
+mov esi,ecx
+mov ecx,[esi+00000110]
+jmp returnhere
+
+Damage: //"generals.exe"+13F9B0:
+jmp newmem
+nop
+nop
+nop
+nop
+returnhere:
+
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+dealloc(damage_mod)
+unregistersymbol(damage_mod)
+
+unregistersymbol(Damage)
+dealloc(newmem)
+Damage: //"generals.exe"+13F9B0:
+push esi
+mov esi,ecx
+mov ecx,[esi+00000110]
+//Alt: db 56 8B F1 8B 8E 10 01 00 00
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>56</ID>
+          <Description>"Additional Damage"</Description>
+          <VariableType>Float</VariableType>
+          <Address>damage_mod</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>57</ID>
+          <Description>"Damage Multiplier"</Description>
+          <VariableType>Float</VariableType>
+          <Address>damage_mod+4</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>9</ID>
+      <Description>"Instant Building &amp; Training"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+aobscanmodule(Build,generals.exe,8B 86 ?? ?? 00 00 56)
+registersymbol(Build)
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode)
+label(exit)
+
+newmem: //this is allocated memory, you have read,write,execute access
+push eax
+mov eax,[generals.exe+561A54]
+test eax,eax
+je originalcode
+cmp edi,[eax+C]
+je exit
+jmp originalcode
+
+originalcode:
+pop eax
+mov eax,[esi+00000204]
+jmp returnhere
+
+exit:
+pop eax
+mov eax,0
+jmp returnhere
+
+Build: //"generals.exe"+177A2C:
+jmp newmem
+nop
+returnhere:
+
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+unregistersymbol(Build)
+dealloc(newmem)
+Build: //"generals.exe"+177A2C:
+mov eax,[esi+00000204]
+//Alt: db 8B 86 04 02 00 00
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>11</ID>
+      <Description>"Instant Upgrade"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+aobscanmodule(Upgrade,generals.exe,D9 41 14 D8 0D ?? ?? ?? 00 E8)
+registersymbol(Upgrade)
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode)
+label(exit)
+
+newmem: //this is allocated memory, you have read,write,execute access
+push eax
+mov eax,[generals.exe+561A54]
+test eax,eax
+je originalcode
+cmp edi,[eax+C]
+je exit
+jmp originalcode
+
+originalcode:
+pop eax
+fld dword ptr [ecx+14]
+fmul dword ptr [generals.exe+494E74]
+jmp returnhere
+
+exit:
+pop eax
+fldz
+fmul dword ptr [generals.exe+494E74]
+jmp returnhere
+
+Upgrade: //"generals.exe"+9C540:
+jmp newmem
+nop
+nop
+nop
+nop
+returnhere:
+
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+unregistersymbol(Upgrade)
+dealloc(newmem)
+Upgrade: //"generals.exe"+9C540:
+fld dword ptr [ecx+14]
+fmul dword ptr [generals.exe+494E74]
+//Alt: db D9 41 14 D8 0D 74 4E 89 00
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>50</ID>
+      <Description>"Instant Cooldown (General Abilities)"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+aobscanmodule(Ability_General,generals.exe,8B 40 0C 5F)
+registersymbol(Ability_General)
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode)
+label(exit)
+
+newmem: //this is allocated memory, you have read,write,execute access
+push ebx
+push ecx
+lea ecx,[esi-394]
+mov ebx,[generals.exe+561A54]
+test ebx,ebx
+je originalcode
+cmp ecx,[ebx+C]
+je exit
+jmp originalcode
+
+originalcode:
+pop ecx
+pop ebx
+mov eax,[eax+0C]
+pop edi
+pop esi
+jmp returnhere
+
+exit:
+mov ebx,[generals.exe+561F64]
+test ebx,ebx
+je originalcode
+mov ebx,[ebx+3C]
+cmp ebx,[eax+C]
+jge originalcode
+mov [eax+C],ebx
+jmp originalcode
+
+Ability_General: //"generals.exe"+4FFC2:
+jmp newmem
+returnhere:
+
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+unregistersymbol(Ability_General)
+dealloc(newmem)
+Ability_General: //"generals.exe"+4FFC2:
+mov eax,[eax+0C]
+pop edi
+pop esi
+//Alt: db 8B 40 0C 5F 5E
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>33</ID>
+      <Description>"Instant Cooldown (Buildings)"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+aobscanmodule(Ability_Buildings,generals.exe,3B 46 04 72)
+registersymbol(Ability_Buildings)
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode)
+label(exit)
+
+newmem: //this is allocated memory, you have read,write,execute access
+push ebx
+push ecx
+mov ecx,[esi-8]
+test ecx,ecx
+je originalcode
+mov ecx,[ecx+140]
+test ecx,ecx
+je originalcode
+mov ecx,[ecx+8]
+test ecx,ecx
+je originalcode
+mov ecx,[ecx+C]
+mov ebx,[generals.exe+561A54]
+test ebx,ebx
+je originalcode
+cmp ecx,[ebx+C]
+je exit
+jmp originalcode
+
+originalcode:
+pop ecx
+pop ebx
+cmp eax,[esi+04]
+jb Ability_Buildings+E //generals.exe+23B8CA
+jmp returnhere
+
+exit:
+cmp eax,[esi+04]
+jge originalcode
+mov [esi+4],eax
+jmp originalcode
+
+Ability_Buildings: //"generals.exe"+23B8BC:
+jmp newmem
+returnhere:
+
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+unregistersymbol(Ability_Buildings)
+dealloc(newmem)
+Ability_Buildings: //"generals.exe"+23B8BC:
+cmp eax,[esi+04]
+jb Ability_Buildings+E //generals.exe+23B8CA
+//Alt: db 3B 46 04 72 09
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>105</ID>
+      <Description>"Instant Cooldown (Units)"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+aobscanmodule(Ability_Units,generals.exe,24 3B 41 18)
+registersymbol(Ability_Units)
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode)
+label(exit)
+
+newmem: //this is allocated memory, you have read,write,execute access
+push ebx
+push edx
+mov edx,[edi+140]
+test edx,edx
+je originalcode
+mov edx,[edx+8]
+test edx,edx
+je originalcode
+mov edx,[edx+C]
+mov ebx,[generals.exe+561A54]
+test ebx,ebx
+je originalcode
+cmp edx,[ebx+C]
+je exit
+jmp originalcode
+
+originalcode:
+pop edx
+pop ebx
+cmp eax,[ecx+18]
+jb Ability_Units+1D //generals.exe+B30C7
+jmp returnhere
+
+exit:
+cmp eax,[ecx+18]
+jge originalcode
+mov [ecx+18],eax
+jmp originalcode
+
+Ability_Units+1: //"generals.exe"+B30AB:
+jmp newmem
+returnhere:
+
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+unregistersymbol(Ability_Units)
+dealloc(newmem)
+Ability_Units+1: //"generals.exe"+B30AB:
+cmp eax,[ecx+18]
+jb Ability_Units+1D //generals.exe+B30C7
+//Alt: db 3B 41 18 72 17
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>74</ID>
+      <Description>"Unlock All Abilities"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+aobscanmodule(Ability_Check,generals.exe,8B 81 ?? 01 00 00 8B 54)
+registersymbol(Ability_Check)
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode)
+label(exit)
+
+newmem: //this is allocated memory, you have read,write,execute access
+push eax
+mov eax,[generals.exe+561A54]
+test eax,eax
+je originalcode
+cmp ecx,[eax+C]
+je exit
+jmp originalcode
+
+originalcode:
+pop eax
+mov eax,[ecx+00000150]
+jmp returnhere
+
+exit:
+pop eax
+mov al,1
+ret 4
+
+Ability_Check: //"generals.exe"+4F1B0:
+jmp newmem
+nop
+returnhere:
+
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+unregistersymbol(Ability_Check)
+dealloc(newmem)
+Ability_Check: //"generals.exe"+4F1B0:
+mov eax,[ecx+00000150]
+//Alt: db 8B 81 50 01 00 00
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>90</ID>
+      <Description>"Sight Range Modifier"</Description>
+      <Options moHideChildren="1"/>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+alloc(sight_mod,2048)
+registersymbol(sight_mod)
+
+sight_mod:
+dd (Float)10000
+
+sight_mod+4:
+dd (Float)1
+
+sight_mod+8:
+dd 0
+
+aobscanmodule(Sight,generals.exe,8B 96 BC 00 00 00 8D)
+registersymbol(Sight)
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode)
+label(exit)
+
+newmem: //this is allocated memory, you have read,write,execute access
+push eax
+push ebx
+mov ebx,[esi+140]
+test ebx,ebx
+je originalcode
+mov ebx,[ebx+8]
+test ebx,ebx
+je originalcode
+mov ebx,[ebx+C]
+mov eax,[generals.exe+561A54]
+test eax,eax
+je originalcode
+cmp ebx,[eax+C]
+je exit
+jmp originalcode
+
+originalcode:
+pop ebx
+pop eax
+mov edx,[esi+000000BC]
+jmp returnhere
+
+exit:
+pop ebx
+pop eax
+fld dword ptr [esi+000000BC]
+fadd dword ptr [sight_mod]
+fmul dword ptr [sight_mod+4]
+fstp dword ptr [sight_mod+8]
+mov edx,[sight_mod+8]
+jmp returnhere
+
+Sight: //"generals.exe"+144064:
+jmp newmem
+nop
+returnhere:
+
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+dealloc(sight_mod)
+unregistersymbol(sight_mod)
+
+unregistersymbol(Sight)
+dealloc(newmem)
+Sight: //"generals.exe"+144064:
+mov edx,[esi+000000BC]
+//Alt: db 8B 96 BC 00 00 00
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>91</ID>
+          <Description>"Additional Sight Range"</Description>
+          <VariableType>Float</VariableType>
+          <Address>sight_mod</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>92</ID>
+          <Description>"Sight Range Multiplier"</Description>
+          <VariableType>Float</VariableType>
+          <Address>sight_mod+4</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>124</ID>
+      <Description>"Stealth Detection Range Modifier"</Description>
+      <Options moHideChildren="1"/>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+alloc(detection_mod,2048)
+registersymbol(detection_mod)
+
+detection_mod:
+dd (Float)10000
+
+detection_mod+4:
+dd (Float)1
+
+detection_mod+8:
+dd 80
+
+aobscanmodule(Detection,generals.exe,D9 44 24 60 D8 4C 24 60 8B)
+registersymbol(Detection)
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode)
+label(exit)
+
+newmem: //this is allocated memory, you have read,write,execute access
+push eax
+push ebx
+mov ebx,[esp+60]
+test ebx,ebx
+je originalcode
+mov eax,[ebx+4]
+test eax,eax
+je originalcode
+mov eax,[eax+68]
+test [detection_mod+8],ax   //ah = 1 OR 2 is a unit, al = 80 is a building
+je originalcode
+mov ebx,[ebx+140]
+test ebx,ebx
+je originalcode
+mov ebx,[ebx+8]
+test ebx,ebx
+je originalcode
+mov ebx,[ebx+C]
+mov eax,[generals.exe+561A54]
+test eax,eax
+je originalcode
+cmp ebx,[eax+C]
+je exit
+jmp originalcode
+
+originalcode:
+pop ebx
+pop eax
+fld dword ptr [esp+60]
+fmul dword ptr [esp+60]
+jmp returnhere
+
+exit:
+fld dword ptr [esp+68]
+fadd dword ptr [detection_mod]
+fmul dword ptr [detection_mod+4]
+fstp dword ptr [esp+68]
+pop ebx
+pop eax
+fld dword ptr [esp+60]
+fmul dword ptr [esp+60]
+jmp returnhere
+
+Detection: //"generals.exe"+135D3F:
+jmp newmem
+nop
+nop
+nop
+returnhere:
+
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+dealloc(detection_mod)
+unregistersymbol(detection_mod)
+
+unregistersymbol(Detection)
+dealloc(newmem)
+Detection: //"generals.exe"+135D3F:
+fld dword ptr [esp+60]
+fmul dword ptr [esp+60]
+//Alt: db D9 44 24 60 D8 4C 24 60
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>120</ID>
+          <Description>"Additional Stealth Detection Range"</Description>
+          <VariableType>Float</VariableType>
+          <Address>detection_mod</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>121</ID>
+          <Description>"Stealth Detection Range Multiplier"</Description>
+          <VariableType>Float</VariableType>
+          <Address>detection_mod+4</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>125</ID>
+          <Description>"Which Category Has This Cheat"</Description>
+          <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">128:Buildings Only
+768:Units Only
+896:Buildings &amp; Units
+</DropDownList>
+          <VariableType>2 Bytes</VariableType>
+          <Address>detection_mod+8</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>
+

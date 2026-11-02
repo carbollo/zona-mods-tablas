@@ -1,0 +1,1313 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>24238</ID>
+      <Description>"INIT"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <Color>0080FF</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{$lua}
+if syntaxcheck then return end
+
+[ENABLE]
+local PROCESS_NAME = 'METAL GEAR SOLID3.exe'
+
+strings_add(getAutoAttachList(), PROCESS_NAME)
+
+function cls()
+    GetLuaEngine().mOutput.Clear()
+end
+
+function hex(h)
+  if h then
+    return string.format('%X',h)
+  end
+  return '0'
+end
+
+function printhex(h,l)
+  local s = hex(h)
+  if string.len(s) &gt; 8 then l = l or 16 else l = l or 8 end
+  for i=1,l do s = '0'..s end
+  print( string.sub( s, -l ) )
+end
+registerLuaFunctionHighlight('cls')
+registerLuaFunctionHighlight('hex')
+registerLuaFunctionHighlight('printhex')
+registerLuaFunctionHighlight('LaunchMonoDataCollector')
+registerLuaFunctionHighlight('mono_symbolLookupCallback')
+registerLuaFunctionHighlight('mono_findClass')
+registerLuaFunctionHighlight('mono_class_getStaticFieldAddress')
+
+function EnableMono(enable)
+  if enable and not monopipe then
+    LaunchMonoDataCollector()
+  end
+  if not enable and monopipe then
+    local show = getLuaEngine().cbShowOnPrint.Checked
+    getLuaEngine().cbShowOnPrint.Checked = false
+    monopipe.OnTimeout()
+    getLuaEngine().cbShowOnPrint.Checked = show
+  end
+end
+registerLuaFunctionHighlight('EnableMono')
+
+function Jit(symbol)
+  return mono_symbolLookupCallback(symbol)
+end
+registerLuaFunctionHighlight('Jit')
+
+function bNand(a,b)
+  return bAnd(a,bNot(b))
+end
+registerLuaFunctionHighlight('bNand')
+
+function bincmp(a,b)
+  if bAnd(a,b)&gt;0 then return '1' else return '0' end
+end
+registerLuaFunctionHighlight('bincmp')
+
+function printbin( by )
+  if by == nil then return print('00000000') end
+  local s = ''
+  s = bincmp(by,0x01)..s
+  s = bincmp(by,0x02)..s
+  s = bincmp(by,0x04)..s
+  s = bincmp(by,0x08)..s
+  s = bincmp(by,0x10)..s
+  s = bincmp(by,0x20)..s
+  s = bincmp(by,0x40)..s
+  s = bincmp(by,0x80)..s
+  if by &gt; 0xFF then
+    s = bincmp(by,0x0100)..' '..s
+    s = bincmp(by,0x0200)..s
+    s = bincmp(by,0x0400)..s
+    s = bincmp(by,0x0800)..s
+    s = bincmp(by,0x1000)..s
+    s = bincmp(by,0x2000)..s
+    s = bincmp(by,0x4000)..s
+    s = bincmp(by,0x8000)..s
+  end
+  print( s )
+end
+registerLuaFunctionHighlight('printbin')
+
+function getbyte(v,d)
+  if not v then return 0 end
+  return (v&gt;&gt;(8*d))&amp;0xFF
+end
+
+function aobScanEx( aob )
+  -- thanks panraven for this function!
+  -- https://forum.cheatengine.org/viewtopic.php?t=577536
+  -- simplified for my needs
+  local p, a, n, s, e = nil or '*X*W', nil or fsmNotAligned, nil or '0', getAddress( process ) or 0x0, ( getAddress( process ) + getModuleSize( process ) ) or 0xffffffffffffffff
+  local ms = pb and createMemScan( pb ) or createMemScan()
+  local fl = createFoundList( ms )
+  ms.firstScan( soExactValue, vtByteArray, nil, aob, nil, s, e, p, a, n, true, false, false, false )
+  ms.waitTillDone()
+  fl.initialize()
+  local result = nil
+  if fl ~= nil and fl.getCount() &gt; 0 then
+    result = createStringlist()
+    for i = 1, fl.getCount() do result.add( fl.getAddress( i - 1 ) ) end
+  end
+  fl.destroy()
+  ms.destroy()
+  if result and result.Count &gt; 0 then return tonumber( result[0], 16 ) end
+  return nil
+end
+registerLuaFunctionHighlight('aobScanEx')
+
+function aobScan( index, aob )
+  local p, a, n, s, e = nil or '*X*W', nil or fsmNotAligned, nil or '0', 0x0, 0xffffffffffffffff
+  local ms = pb and createMemScan( pb ) or createMemScan()
+  local fl = createFoundList( ms )
+  ms.firstScan( soExactValue, vtByteArray, nil, aob, nil, s, e, p, a, n, true, false, false, false )
+  ms.waitTillDone()
+  fl.initialize()
+  local result = nil
+  if fl ~= nil and fl.getCount() &gt; 0 then
+    result = createStringlist()
+    for i = 1, fl.getCount() do result.add( fl.getAddress( i - 1 ) ) end
+  end
+  fl.destroy()
+  ms.destroy()
+  if result and result.Count &gt; 0 then return tonumber( result[index], 16 ) end
+  return nil
+end
+registerLuaFunctionHighlight('aobScan')
+
+function aobScanRange( startAddress, offset, aob )
+  local p, a, n, s = nil or '*X*W', nil or fsmNotAligned, nil or '0', startAddress or 0x0
+  local e = startAddress + (offset or 0x100000000)
+  local ms = pb and createMemScan( pb ) or createMemScan()
+  local fl = createFoundList( ms )
+  ms.firstScan( soExactValue, vtByteArray, nil, aob, nil, s, e, p, a, n, true, false, false, false )
+  ms.waitTillDone()
+  fl.initialize()
+  local result = nil
+  if fl ~= nil and fl.getCount() &gt; 0 then
+    result = createStringlist()
+    for i = 1, fl.getCount() do result.add( fl.getAddress( i - 1 ) ) end
+  end
+  fl.destroy()
+  ms.destroy()
+  if result and result.Count &gt; 0 then return tonumber( result[0], 16 ) end
+  return nil
+end
+registerLuaFunctionHighlight('aobScanRange')
+
+function string.fromhex( s )
+  return ( s:gsub( '..', function ( cc )
+    return string.char( tonumber( cc, 16 ) )
+  end ) )
+end
+
+function aobScanSmall( aob, s, e )
+  local i = byteTableToString( readBytes( s, e, true ) ):find( string.fromhex( aob ), 1, true )
+  if i == nil then i = 1 end
+  return ( s + i - 1 )
+end
+
+function getStaticFieldValue( domain, class, field )
+  local c = mono_findClass( domain, class )
+  local v = mono_class_getVTable( c )
+  local f = mono_class_enumFields( c )
+
+  for i=1, #f do
+    if f[i].isStatic and f[i].name == field then
+      return mono_class_getStaticFieldValue( a, f[i].field )
+    end
+  end
+end
+registerLuaFunctionHighlight('getStaticFieldValue')
+
+function split(s, delimiter)
+    result = {}
+    for match in (s .. delimiter):gmatch('(.-)' .. delimiter) do
+        table.insert(result, match)
+    end
+    return result
+end
+registerLuaFunctionHighlight('split')
+
+function getFormByName( pattern )
+  local fc = getFormCount()
+  for i = 0, fc-1 do
+    local tf = getForm(i)
+    local s = tf.caption
+    local m = s:match(pattern) or ''
+    if m &gt; '' then
+      return tf
+    end
+  end
+end
+registerLuaFunctionHighlight('getFormByName')
+
+local function allocSymbol(args, syntaxcheck)
+    if ExitOnSyntaxCheck and syntaxcheck then return end
+    args = split(args, ',')
+    if args[1] == nil then
+        return nil, translate('Incorrect parameters for "allocsymbol(name,[nearbyAddress])" custom AA command.')
+    end
+    if args[2] then
+        local str = 'alloc(%s,8,%s)  registersymbol(%s)  %s:'
+        return str:gsub('  ','\r\n'):format(args[1],args[2],args[1],args[1])
+    end
+    local str = 'alloc(%s,8)  registersymbol(%s)  %s:'
+    return str:gsub('  ','\r\n'):format(args[1],args[1],args[1])
+end
+
+local function deallocSymbol(args, syntaxcheck)
+    if ExitOnSyntaxCheck and syntaxcheck then return end
+    if args == nil then
+        return nil, translate('Wrong number of parameters for "deallocsymbol(name)" custom AA command.')
+    end
+    local str = '%s:  dq 0  dealloc(%s)  unregistersymbol(%s)'
+    return str:gsub('  ','\r\n'):format(args,args,args)
+end
+
+registerAutoAssemblerCommand('allocsymbol', allocSymbol)
+registerAutoAssemblerCommand('deallocsymbol', deallocSymbol)
+
+function CreateRecord( parent, size, desc, addr )
+  local mr = AddressList.createMemoryRecord()
+  mr.DontSave = true
+  mr.Color = 0x444444
+  mr.description = desc
+  mr.Type = size
+  mr.Address = addr
+  mr.appendToEntry(parent)
+  return mr
+end
+registerLuaFunctionHighlight('CreateRecord')
+
+function CreateDDRecord( parent, size, desc, addr, ref )
+  local mr = AddressList.createMemoryRecord()
+  mr.DontSave = true
+  --mr.Color = 0x666666
+  mr.DropDownLinked = true
+  mr.DisplayAsDropDownListItem = true
+  mr.description = desc
+  mr.Type = size
+  mr.Address = addr
+  mr.DropDownLinkedMemrec = ref
+  mr.appendToEntry(parent)
+  return mr
+end
+registerLuaFunctionHighlight('CreateDDRecord')
+
+local function cycleFullCompact(sender,force)
+    local state = not(compactmenuitem.Caption == 'Compact View')
+    if force~=nil then
+      state = not force
+    end
+    compactmenuitem.Caption = state and 'Compact View' or 'Full View'
+    getMainForm().Splitter1.Visible = state;
+    getMainForm().Panel4.Visible    = state;
+    getMainForm().Panel5.Visible    = state;
+end
+
+local function addCompactMenu()
+    if compactmenualreadyexists then return end
+    local parent = getMainForm().Menu.Items
+    compactmenuitem = createMenuItem(parent)
+    parent.add(compactmenuitem)
+    compactmenuitem.Caption = 'Compact View'
+    compactmenuitem.OnClick = cycleFullCompact
+    compactmenualreadyexists = 'yes'
+end
+
+local function addAAMenu()
+    if aamenualreadyexists then return end
+    local parent = getMainForm().Menu.Items
+    aamenuitem = createMenuItem(parent)
+    parent.add(aamenuitem)
+    aamenuitem.Caption = 'Lua Engine'
+    aamenuitem.OnClick = getLuaEngine().Show
+    aamenualreadyexists = true
+end
+
+local function convertToHWOffset()
+    local mr = AddressList.getSelectedRecord()
+    if not mr then return end
+    local curr_addr = mr.CurrentAddress
+    if not curr_addr and curr_addr &lt;= 0 then return end
+    local hw_offset = curr_addr - getAddress( 'heap' )
+
+    if hw_offset &gt; 0 then
+       mr.address = 'heap + ' .. string.format( '%X', hw_offset )
+    end
+end
+
+local function addHWOffsetMenu()
+    if hwoffsetmenualreadyexists then return end;
+    local parent = getMainForm().Menu.Items
+    hwoffsetmenuitem = createMenuItem(parent)
+    parent.add(hwoffsetmenuitem)
+    hwoffsetmenuitem.Caption = 'Convert to HW Offset'
+    hwoffsetmenuitem.OnClick = convertToHWOffset
+    hwoffsetmenualreadyexists = 'yes'
+end
+
+local function addStructureDissect()
+    if dissectalreadyexists then return end;
+    local parent = getMainForm().Menu.Items
+    dissectmenuitem = createMenuItem(parent)
+    parent.add(dissectmenuitem)
+    dissectmenuitem.Caption = 'Structure'
+    dissectmenuitem.OnClick = createStructureForm
+    dissectalreadyexists = 'yes'
+end
+
+local function autoAttachTimer_tick( timer )
+  -- Keycombo to kill timer
+  if ( isKeyPressed(VK_CONTROL) and isKeyPressed(VK_SHIFT) and isKeyPressed(VK_Z) ) then
+    cls()
+    print( 'timer destroyed' )
+    timer.destroy()
+    return
+  end
+
+  if processsymbol and cheatTick then
+    cheatTick()
+    return
+  end
+
+  if not processsymbol and readInteger( process ) then
+    if not getAddressSafe( 'process' ) then
+      unregisterSymbol( 'process' )
+      main = getAddress( process )
+      registerSymbol( 'process', main )
+      return
+    end
+
+    if getAddressSafe( 'process' ) then
+      processsymbol = true
+    end
+  end
+end
+
+autoAttachTimerInterval = 250
+autoAttachTimer = nil
+
+processsymbol = false
+
+addCompactMenu()
+--addStructureDissect()
+--addHWOffsetMenu()
+--addAAMenu()
+cycleFullCompact(nil,true)
+
+--autoAttachTimer = createTimer(MainForm)
+--autoAttachTimer.Interval = autoAttachTimerInterval
+--autoAttachTimer.OnTimer = autoAttachTimer_tick
+
+[DISABLE]
+if autoAttachTimer then autoAttachTimer.destroy() end
+unregisterSymbol( 'process' )
+processsymbol = false
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>24550</ID>
+          <Description>"Invincible"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+aobscanmodule(invincible_aob,METAL GEAR SOLID3.exe,B3 D0 41 89 04 89 41 8B 10)
+registersymbol(invincible_aob)
+alloc(newmem,$1000,invincible_aob)
+label(return)
+
+newmem:
+  mov [r9+rcx*4],eax
+  cmp ecx,7
+  jne @exit
+  mov [r9+rcx*4],01000000
+@exit:
+  mov edx,[r8]
+  jmp return
+
+invincible_aob+02:
+  jmp newmem
+  nop 2
+return:
+
+
+[DISABLE]
+invincible_aob+02:
+  db 41 89 04 89 41 8B 10
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>24512</ID>
+          <Description>"Inf. Health"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+aobscanmodule(hp_aob,METAL GEAR SOLID3.exe,0F B7 88 84 06 00 00 44)
+registersymbol(hp_aob)
+alloc(newmem,$1000,hp_aob)
+label(return)
+
+newmem:
+  movzx ecx,word ptr [rax+00000686]
+  mov [rax+00000684],cx
+  movzx ecx,word ptr [rax+00000684]
+  jmp return
+
+hp_aob:
+  jmp newmem
+  nop 2
+return:
+
+
+[DISABLE]
+hp_aob:
+  db 0F B7 88 84 06 00 00
+unregistersymbol(*)
+dealloc(*)
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>24517</ID>
+          <Description>"Inf. Stamina"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+aobscanmodule(stamina_aob,METAL GEAR SOLID3.exe,0F B7 88 4A 0A 00 00 66 89 4B)
+registersymbol(stamina_aob)
+alloc(newmem,$1000,stamina_aob)
+label(return)
+
+newmem:
+  movzx ecx,word ptr [rax+00000A4C]
+  mov [rax+00000A4A],cx
+  movzx ecx,word ptr [rax+00000A4A]
+  jmp return
+
+stamina_aob:
+  jmp newmem
+  nop 2
+return:
+
+
+[DISABLE]
+stamina_aob:
+  db 0F B7 88 4A 0A 00 00
+
+unregistersymbol(*)
+dealloc(*)
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>24521</ID>
+          <Description>"Inf. Breath"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+aobscanmodule(breath_aob,METAL GEAR SOLID3.exe,66 01 93 12 07 00 00 66)
+registersymbol(breath_aob)
+breath_aob:
+  nop 7
+
+[DISABLE]
+breath_aob:
+  db 66 01 93 12 07 00 00
+unregistersymbol(*)
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>24526</ID>
+          <Description>"Inf. Strength"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+aobscanmodule(strength_aob,METAL GEAR SOLID3.exe,66 01 93 16 07 00 00 BA)
+registersymbol(strength_aob)
+strength_aob:
+  nop 7
+
+[DISABLE]
+strength_aob:
+  db 66 01 93 16 07 00 00
+unregistersymbol(*)
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>24505</ID>
+          <Description>"Inf. Battery"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+aobscanmodule(battery_aob,METAL GEAR SOLID3.exe,66 29 88 4E 0A 00 00)
+registersymbol(battery_aob)
+battery_aob:
+  nop 7
+
+[DISABLE]
+battery_aob:
+  db 66 29 88 4E 0A 00 00
+unregistersymbol(*)
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>24492</ID>
+          <Description>"100% Stealth"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+aobscanmodule(stealth_aob,METAL GEAR SOLID3.exe,2B CF 0F 28 7C 24 50)
+registersymbol(stealth_aob)
+alloc(newmem,$1000,stealth_aob)
+label(return)
+
+newmem:
+  mov eax,#1000
+  sub ecx,edi
+  movaps xmm7,[rsp+50]
+  jmp return
+
+stealth_aob:
+  jmp newmem
+  nop 2
+return:
+
+
+[DISABLE]
+stealth_aob:
+  db 2B CF 0F 28 7C 24 50
+
+unregistersymbol(*)
+dealloc(*)
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>24537</ID>
+          <Description>"Inf. Ammo"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+aobscanmodule(ammo_aob,METAL GEAR SOLID3.exe,45 0F BF 4E 26)
+registersymbol(ammo_aob)
+alloc(newmem,$1000,ammo_aob)
+label(return)
+
+newmem:
+  movsx r9d,word ptr [r14+26]
+  mov [r14+24],r9l
+  dec [r14+24]
+  jmp return
+
+ammo_aob:
+  jmp newmem
+return:
+
+
+[DISABLE]
+ammo_aob:
+  db 45 0F BF 4E 26
+unregistersymbol(*)
+dealloc(*)
+
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>24538</ID>
+          <Description>"No Reload"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+aobscanmodule(noreload_aob,METAL GEAR SOLID3.exe,41 0F BF 46 2A)
+registersymbol(noreload_aob)
+alloc(newmem,$1000,noreload_aob)
+label(return)
+
+newmem:
+  movsx eax,word ptr [r14+2A]
+  mov [r14+28],ax
+  jmp return
+
+noreload_aob:
+  jmp newmem
+return:
+
+[DISABLE]
+noreload_aob:
+  db 41 0F BF 46 2A
+unregistersymbol(*)
+dealloc(*)
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>24493</ID>
+          <Description>"Inf. Suppressor"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+aobscanmodule(suppressor_aob,METAL GEAR SOLID3.exe,0F BF 48 24 66 83 F9 FF)
+registersymbol(suppressor_aob)
+alloc(suppressor_newmem,$1000,suppressor_aob)
+label(suppressor_return)
+
+suppressor_newmem:
+  mov word ptr [rax+24], #300
+  movsx ecx,word ptr [rax+24]
+  cmp cx,-01
+  jmp suppressor_return
+
+suppressor_aob:
+  jmp suppressor_newmem
+  nop 3
+suppressor_return:
+
+[DISABLE]
+suppressor_aob:
+  db 0F BF 48 24 66 83 F9 FF
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>24548</ID>
+          <Description>"Inf. Health (EVA)"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+aobscanmodule(hpeva_aob,METAL GEAR SOLID3.exe,0F BF 90 88 18 00 00 E8 E6)
+registersymbol(hpeva_aob)
+alloc(newmem,$1000,hpeva_aob)
+label(return)
+
+newmem:
+  movsx edx,word ptr [rax+0000188A]
+  mov [rax+00001888],dx
+  movsx edx,word ptr [rax+00001888]
+  jmp return
+
+hpeva_aob:
+  jmp newmem
+  nop 2
+return:
+
+[DISABLE]
+hpeva_aob:
+  db 0F BF 90 88 18 00 00
+unregistersymbol(*)
+dealloc(*)
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>24547</ID>
+          <Description>"Inf. Stamina (EVA)"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+aobscanmodule(staminaeva_aob,METAL GEAR SOLID3.exe,0F BF 90 8C 18 00 00 E8 EC)
+registersymbol(staminaeva_aob)
+alloc(newmem,$1000,staminaeva_aob)
+label(return)
+
+newmem:
+  movsx edx,word ptr [rax+0000188E]
+  mov [rax+0000188C],dx
+  movsx edx,word ptr [rax+0000188C]
+  jmp return
+
+staminaeva_aob:
+  jmp newmem
+  nop 2
+return:
+
+
+[DISABLE]
+staminaeva_aob:
+  db 0F BF 90 8C 18 00 00
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>24497</ID>
+          <Description>""</Description>
+          <Options moHideChildren="1"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>24541</ID>
+              <Description>"HP"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>metal gear solid3.exe+AE39D8</Address>
+              <Offsets>
+                <Offset>684</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>24513</ID>
+              <Description>"HP Max"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>metal gear solid3.exe+AE39D8</Address>
+              <Offsets>
+                <Offset>686</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>24511</ID>
+              <Description>"Stamina"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>metal gear solid3.exe+AE39D8</Address>
+              <Offsets>
+                <Offset>A4A</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>24514</ID>
+              <Description>"Stamina Max"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>metal gear solid3.exe+AE39D8</Address>
+              <Offsets>
+                <Offset>A4C</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>24515</ID>
+              <Description>"Battery"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>metal gear solid3.exe+AE39D8</Address>
+              <Offsets>
+                <Offset>A4E</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>24516</ID>
+              <Description>"Battery Max"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>metal gear solid3.exe+AE39D8</Address>
+              <Offsets>
+                <Offset>A50</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>24518</ID>
+              <Description>"HP (EVA)"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>metal gear solid3.exe+AE39D8</Address>
+              <Offsets>
+                <Offset>1888</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>24542</ID>
+              <Description>"HP Max (EVA)"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>metal gear solid3.exe+AE39D8</Address>
+              <Offsets>
+                <Offset>188A</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>24543</ID>
+              <Description>"Stamina (EVA)"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>metal gear solid3.exe+AE39D8</Address>
+              <Offsets>
+                <Offset>188C</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>24544</ID>
+              <Description>"Stamina Max (EVA)"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>2 Bytes</VariableType>
+              <Address>metal gear solid3.exe+AE39D8</Address>
+              <Offsets>
+                <Offset>188E</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>24549</ID>
+              <Description>"Immunity Frames"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"METAL GEAR SOLID3.exe"+1E2B0D4</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>24494</ID>
+              <Description>"No Reload old"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+aobscanmodule(noreload_aob,METAL GEAR SOLID3.exe,66 FF C8 66 89 41 28)
+registersymbol(noreload_aob)
+noreload_aob:
+  nop 3
+
+[DISABLE]
+noreload_aob:
+  db 66 FF C8
+unregistersymbol(*)
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>24495</ID>
+              <Description>"Inf. Ammo old"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+aobscanmodule(ammo_aob,METAL GEAR SOLID3.exe,66 FF 49 24 48 8B 05 ? ? ? ? 48 89 0D ? ? ? ? 0F B7 51 28)
+registersymbol(ammo_aob)
+ammo_aob:
+  nop 4
+
+[DISABLE]
+ammo_aob:
+  db 66 FF 49 24 48 8B 05 82 D5 A6 00
+unregistersymbol(*)
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>24531</ID>
+              <Description>"Current Weapon"</Description>
+              <Options moHideChildren="1"/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+aobscanmodule(wpn_aob,METAL GEAR SOLID3.exe,0F B6 48 20 85 C9 75)
+registersymbol(wpn_aob)
+alloc(newmem,$1000,wpn_aob)
+label(return)
+
+allocsymbol(_wpn,wpn_aob)
+
+newmem:
+  mov [_wpn],rax
+  //movzx rcx,word ptr[rax+26]
+  //test cx,cx
+  //je @exit
+  //dec cx
+  //mov [rax+24],cx
+//@exit:
+  movzx ecx,byte ptr [rax+20]
+  test ecx,ecx
+  jmp return
+
+wpn_aob:
+  jmp newmem
+  nop
+return:
+
+
+[DISABLE]
+wpn_aob:
+  db 0F B6 48 20 85 C9
+
+unregistersymbol(*)
+dealloc(*)
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>24533</ID>
+                  <Description>"ammo"</Description>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>_wpn</Address>
+                  <Offsets>
+                    <Offset>24</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>24534</ID>
+                  <Description>"max ammo"</Description>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>_wpn</Address>
+                  <Offsets>
+                    <Offset>26</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>24535</ID>
+                  <Description>"clip"</Description>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>_wpn</Address>
+                  <Offsets>
+                    <Offset>28</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>24536</ID>
+                  <Description>"max clip"</Description>
+                  <VariableType>2 Bytes</VariableType>
+                  <Address>_wpn</Address>
+                  <Offsets>
+                    <Offset>2A</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <CheatCodes>
+    <CodeEntry>
+      <Description>Change of jne GoldDigger.PanningVolume:FixedUpdate+8d3</Description>
+      <AddressString>1DCD2C2C4CF</AddressString>
+      <Before>
+        <Byte>C9</Byte>
+        <Byte>66</Byte>
+        <Byte>0F</Byte>
+        <Byte>2F</Byte>
+        <Byte>C8</Byte>
+      </Before>
+      <Actual>
+        <Byte>0F</Byte>
+        <Byte>85</Byte>
+        <Byte>2E</Byte>
+        <Byte>02</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>0F</Byte>
+        <Byte>8A</Byte>
+        <Byte>28</Byte>
+        <Byte>02</Byte>
+        <Byte>00</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Change of jp GoldDigger.PanningVolume:FixedUpdate+8d3</Description>
+      <AddressString>1DCD2C2C4D5</AddressString>
+      <Before>
+        <Byte>90</Byte>
+        <Byte>90</Byte>
+        <Byte>90</Byte>
+        <Byte>90</Byte>
+        <Byte>90</Byte>
+      </Before>
+      <Actual>
+        <Byte>0F</Byte>
+        <Byte>8A</Byte>
+        <Byte>28</Byte>
+        <Byte>02</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>0F</Byte>
+        <Byte>82</Byte>
+        <Byte>22</Byte>
+        <Byte>02</Byte>
+        <Byte>00</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Change of jb GoldDigger.PanningVolume:FixedUpdate+8d3</Description>
+      <AddressString>1DCD2C2C4DB</AddressString>
+      <Before>
+        <Byte>90</Byte>
+        <Byte>90</Byte>
+        <Byte>90</Byte>
+        <Byte>90</Byte>
+        <Byte>90</Byte>
+      </Before>
+      <Actual>
+        <Byte>0F</Byte>
+        <Byte>82</Byte>
+        <Byte>22</Byte>
+        <Byte>02</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>C6</Byte>
+        <Byte>86</Byte>
+        <Byte>A1</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Change of mov [rdi+000000B0],00000003</Description>
+      <AddressString>GameAssembly.dll+1637E3A</AddressString>
+      <Before>
+        <Byte>9F</Byte>
+        <Byte>A8</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>C7</Byte>
+        <Byte>87</Byte>
+        <Byte>B0</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>03</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>48</Byte>
+        <Byte>85</Byte>
+        <Byte>C9</Byte>
+        <Byte>0F</Byte>
+        <Byte>84</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Change of call r11</Description>
+      <AddressString>1FFA374B7F0</AddressString>
+      <Before>
+        <Byte>A3</Byte>
+        <Byte>FF</Byte>
+        <Byte>01</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>41</Byte>
+        <Byte>FF</Byte>
+        <Byte>D3</Byte>
+      </Actual>
+      <After>
+        <Byte>E9</Byte>
+        <Byte>A2</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Change of addsd xmm0,xmm1</Description>
+      <AddressString>1E862292CB8</AddressString>
+      <Before>
+        <Byte>E8</Byte>
+        <Byte>F3</Byte>
+        <Byte>0F</Byte>
+        <Byte>5A</Byte>
+        <Byte>C9</Byte>
+      </Before>
+      <Actual>
+        <Byte>F2</Byte>
+        <Byte>0F</Byte>
+        <Byte>58</Byte>
+        <Byte>C1</Byte>
+      </Actual>
+      <After>
+        <Byte>F2</Byte>
+        <Byte>0F</Byte>
+        <Byte>5A</Byte>
+        <Byte>E8</Byte>
+        <Byte>F3</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Change of dec word ptr [rcx+24]</Description>
+      <AddressString>METAL GEAR SOLID3.exe+7644B</AddressString>
+      <Before>
+        <Byte>28</Byte>
+        <Byte>85</Byte>
+        <Byte>D2</Byte>
+        <Byte>74</Byte>
+        <Byte>04</Byte>
+      </Before>
+      <Actual>
+        <Byte>66</Byte>
+        <Byte>FF</Byte>
+        <Byte>49</Byte>
+        <Byte>24</Byte>
+      </Actual>
+      <After>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>05</Byte>
+        <Byte>82</Byte>
+        <Byte>D5</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Change of mov ["METAL GEAR SOLID3.exe"+1E2B0B4],eax</Description>
+      <AddressString>METAL GEAR SOLID3.exe+74F681</AddressString>
+      <Before>
+        <Byte>BE</Byte>
+        <Byte>FF</Byte>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>CB</Byte>
+      </Before>
+      <Actual>
+        <Byte>89</Byte>
+        <Byte>05</Byte>
+        <Byte>2D</Byte>
+        <Byte>BA</Byte>
+        <Byte>6D</Byte>
+        <Byte>01</Byte>
+      </Actual>
+      <After>
+        <Byte>E8</Byte>
+        <Byte>04</Byte>
+        <Byte>F7</Byte>
+        <Byte>FF</Byte>
+        <Byte>FF</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Change of mov [rbx+rbp+24],eax</Description>
+      <AddressString>METAL GEAR SOLID3.exe+32FA57</AddressString>
+      <Before>
+        <Byte>DE</Byte>
+        <Byte>48</Byte>
+        <Byte>C1</Byte>
+        <Byte>E3</Byte>
+        <Byte>07</Byte>
+      </Before>
+      <Actual>
+        <Byte>89</Byte>
+        <Byte>44</Byte>
+        <Byte>2B</Byte>
+        <Byte>24</Byte>
+      </Actual>
+      <After>
+        <Byte>3D</Byte>
+        <Byte>E8</Byte>
+        <Byte>03</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </After>
+    </CodeEntry>
+  </CheatCodes>
+  <UserdefinedSymbols>
+    <SymbolEntry>
+      <Name>_time</Name>
+      <Address>7FF668CB5964</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Money</Name>
+      <Address>7FF66E864FA0</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>Time</Name>
+      <Address>7FF66E866010</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>PPoints</Name>
+      <Address>7FF66E86AC08</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>NPCPool</Name>
+      <Address>7FF66E86C498</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>cjb</Name>
+      <Address>21081610000</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>itemcount</Name>
+      <Address>211265A2700</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>_skilldata</Name>
+      <Address>1F8C7FCFC30</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>_manager</Name>
+      <Address>1FAEDE0C870</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>_rad</Name>
+      <Address>27B68346E04</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>_currency</Name>
+      <Address>21675968108</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>_game</Name>
+      <Address>215E4860D78</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>_dev</Name>
+      <Address>2159C433C80</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>_calc</Name>
+      <Address>2576351D540</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>_quest</Name>
+      <Address>62</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>_quests</Name>
+      <Address>27</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>_data</Name>
+      <Address>2A8C4F33920</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>BuyUpgrade</Name>
+      <Address>673D710</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>_artifacts</Name>
+      <Address>6083E10</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>_bank</Name>
+      <Address>6083E38</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>_heroes</Name>
+      <Address>6083E60</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>ClickBuy</Name>
+      <Address>672C3F0</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>_resources</Name>
+      <Address>29</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>_resource</Name>
+      <Address>27D39085B48</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>_spell</Name>
+      <Address>27D39085B38</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>_ritual</Name>
+      <Address>27D43C3C810</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>_profile</Name>
+      <Address>8E44F28</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>_desc</Name>
+      <Address>1FEDFF50</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>_give</Name>
+      <Address>21F58DE6E80</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>_curr</Name>
+      <Address>1408AAAAC</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>_itemsdb</Name>
+      <Address>2124ADD4560</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>_main</Name>
+      <Address>208FA533AF0</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>_gm</Name>
+      <Address>64237E8</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>_items</Name>
+      <Address>23DDB5E1F18</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>_fuel</Name>
+      <Address>1DCFB28B5D4</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>_lvl</Name>
+      <Address>1C31694C9F0</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>_save</Name>
+      <Address>1C4077E76F0</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>_hp</Name>
+      <Address>143F5C04810</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>_plr</Name>
+      <Address>2BB079F8960</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>_inv</Name>
+      <Address>2BB079F83F0</Address>
+    </SymbolEntry>
+  </UserdefinedSymbols>
+  <Comments>4D 61 6E 61 67 65 72 73 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 4D 65 73 68 56 65 72 74 65 78 46 6F 72 6D 61 74 4D 61 6E 61 67 65 72
+</Comments>
+</CheatTable>

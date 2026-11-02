@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="52">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>1</ID>
+      <Description>"Inf. Ammo"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(ammo,Crysis3Remastered.exe,85 C0 7E ** 3B C6 8B DE 0F 4C D8 E8 ** ** ** ** 89 18 EB **)
+registersymbol(ammo)
+ammo+10:
+  db 89 28
+
+[DISABLE]
+ammo+10:
+  db 89 18
+
+unregistersymbol(ammo)
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>2</ID>
+      <Description>"Inf. Energy"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(energy,Crysis3Remastered.exe,C5 FA 11 0B 48 8B 5C 24 70 48 83 C4 60)
+alloc(newmem,$1000,energy)
+label(code)
+label(return)
+
+newmem:
+  vmovss xmm1,[rbx+40]
+
+code:
+  vmovss [rbx],xmm1
+  mov rbx,[rsp+70]
+  jmp return
+
+energy:
+  jmp newmem
+  nop 4
+return:
+registersymbol(energy)
+
+[DISABLE]
+energy:
+  db C5 FA 11 0B 48 8B 5C 24 70
+
+unregistersymbol(energy)
+dealloc(newmem)
+</AssemblerScript>
+    </CheatEntry>
+  </CheatEntries>
+  <CheatCodes/>
+  <UserdefinedSymbols/>
+</CheatTable>

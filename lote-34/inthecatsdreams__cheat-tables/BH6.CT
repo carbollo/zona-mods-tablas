@@ -1,0 +1,743 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="24">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>49</ID>
+      <Description>"Infinite Health"</Description>
+      <Options moHideChildren="1" moManualExpandCollapse="1"/>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>//Resident Evil 6
+//Infinite Health
+//Steve Andrew
+[enable]
+alloc(InfiniteHealth,64)
+aobscan(HealthAddress,66 8b 44 24 04 66 29 81 10 0f 00 00 79)
+label(HealthAddy)
+label(FullPlayerHealth)
+label(OneHitKill)
+label(HealthRet)
+registersymbol(HealthAddy)
+registersymbol(OneHitKill)
+
+InfiniteHealth:
+cmp [ecx+38],1
+jne FullPlayerHealth
+
+//kills enemies in one hit ;)
+cmp [OneHitKill],1
+je HealthRet+2
+
+//decreases enemy health normally
+sub [ecx+f10],ax
+jmp HealthRet
+
+FullPlayerHealth:
+mov ax,[ecx+f12]
+mov [ecx+f10],ax
+jmp HealthRet+0b
+
+OneHitKill:
+dd 0
+
+HealthAddress+5:
+HealthAddy:
+jmp InfiniteHealth
+db 90 90
+HealthRet:
+
+[disable]
+
+HealthAddy:
+sub [ecx+f10],ax
+
+dealloc(InfiniteHealth)
+unregistersymbol(HealthAddy)
+unregistersymbol(OneHitKill)
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>54</ID>
+          <Description>"One Hit Kill"</Description>
+          <VariableType>4 Bytes</VariableType>
+          <Address>OneHitKill</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>15</ID>
+      <Description>"Infinite Ammo + No Reload + Herbs (All Other Characters)"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>//Resident Evil 6
+//Infinite Ammo + No Reload + Herbs
+//Steve Andrew
+[enable]
+aobscan(AmmoHerbsAddress,66 29 54 41 0a 79 07 33 d2 66 89 54 41 0a)
+label(AmmoHerbsAddy)
+registersymbol(AmmoHerbsAddy)
+
+AmmoHerbsAddress:
+AmmoHerbsAddy:
+db 90 90 90 90 90 eb
+
+[disable]
+
+AmmoHerbsAddy:
+db 66 29 54 41 0a 79
+//sub [ecx+eax*2+0a],dx
+
+unregistersymbol(AmmoHerbsAddy)
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>178</ID>
+      <Description>"Infinite Ammo + No Reload + Herbs (Leon)"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>//Resident Evil 6
+//Infinite Ammo + No Reload + Herbs
+//Steve Andrew
+[enable]
+alloc(DualWieldSafety,64)
+aobscan(AmmoHerbsAddress,66 29 54 41 0a 79 07 33 d2 66 89 54 41 0a)
+aobscan(LeonDualWingShootersSafety,66 01 54 41 0a 0f bf 44 41 0a c2)
+label(AmmoHerbsAddy)
+label(WingShootersSafetyAddy)
+registersymbol(AmmoHerbsAddy)
+registersymbol(WingShootersSafetyAddy)
+
+DualWieldSafety:
+mov dx,#36
+mov [ecx+eax*2+0a],dx
+jmp WingShootersSafetyAddy+5
+
+AmmoHerbsAddress:
+AmmoHerbsAddy:
+db 90 90 90 90 90 eb
+
+LeonDualWingShootersSafety:
+WingShootersSafetyAddy:
+jmp DualWieldSafety
+
+[disable]
+
+AmmoHerbsAddy:
+db 66 29 54 41 0a 79
+//sub [ecx+eax*2+0a],dx
+//jns *
+
+WingShootersSafetyAddy:
+db 66 01 54 41 0a
+//add [ecx+eax*2+0a],dx
+
+unregistersymbol(AmmoHerbsAddy)
+unregistersymbol(WingShootersSafetyAddy)
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>91</ID>
+      <Description>"Infinite Skill Points"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>//Resident Evil 6
+//Infinite Skill Points
+//Steve Andrew
+[enable]
+alloc(InfiniteSkillPoints,64)
+aobscan(SkillPointsAddress,8b 96 ? ? ? ? 03 c0 8b 8c c6 ? ? ? ? 29 8e 88 05)
+aobscan(SkillPointsAddress2,8b 8e ? ? ? ? 8b 47 08 29 86 88 05 00 00 51)
+label(InfiniteSkillPoints2)
+label(SkillPointsAddy)
+label(SkillPointsAddy2)
+registersymbol(SkillPointsAddy)
+registersymbol(SkillPointsAddy2)
+
+InfiniteSkillPoints:
+mov ecx,1467f9
+mov [esi+588],ecx
+jmp SkillPointsAddy+6
+
+InfiniteSkillPoints2:
+mov eax,1467f9
+mov [esi+588],eax
+jmp SkillPointsAddy2+6
+
+SkillPointsAddress+0f:
+SkillPointsAddy:
+jmp InfiniteSkillPoints
+nop
+
+SkillPointsAddress2+9:
+SkillPointsAddy2:
+jmp InfiniteSkillPoints2
+nop
+
+[disable]
+
+SkillPointsAddy:
+db 29 8e 88 05 00 00
+//mov [esi+588],ecx
+
+SkillPointsAddy2:
+db 29 86 88 05 00 00
+//mov [esi+588],eax
+
+dealloc(InfiniteSkillPoints)
+unregistersymbol(SkillPointsAddy)
+unregistersymbol(SkillPointsAddy2)
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>196</ID>
+      <Description>"Auto Button Mash"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[enable]
+alloc(AutoButtonMash,64)
+aobscan(ButtonMashAddress1,f3 0f 11 86 0c 2a 00 00 0f b6 86 ? ? ? ? 0f b6 8e)
+aobscan(ButtonMashAddress2,72 25 8b 56 ? f3 0f 11 62 ? d9 46 ? 8b 46)
+aobscan(ButtonMashAddress3,0f 2f dc 72 0a 5f 5d 8a c3 5b 5e 59 c2 0c 00)
+label(ButtonMashAddy1)
+label(ButtonMashAddy2)
+label(ButtonMashAddy3)
+label(OneHundred)
+registersymbol(ButtonMashAddy1)
+registersymbol(ButtonMashAddy2)
+registersymbol(ButtonMashAddy3)
+
+AutoButtonMash:
+movss xmm0,[OneHundred]
+movss [esi+2a0c],xmm0
+movss [esi+3074],xmm0
+jmp ButtonMashAddy1+8
+
+OneHundred:
+dd (float)100.0
+
+ButtonMashAddress1: //Opening doors, pulling levers, etc...
+ButtonMashAddy1:
+jmp AutoButtonMash
+db 90 90 90
+
+ButtonMashAddress2: //Zombie grabs, opening boxes, etc...
+ButtonMashAddy2:
+db 90 90
+
+ButtonMashAddress3+3: //Zombie grabs address 2
+ButtonMashAddy3:
+db 90 90
+
+[disable]
+
+ButtonMashAddy1:
+db f3 0f 11 86 0c 2a 00 00
+//movss [esi+2a0c],xmm0
+
+ButtonMashAddy2:
+db 72 25
+//jb +25
+
+ButtonMashAddy3:
+db 72 0a
+//jb +0a
+
+dealloc(AutoButtonMash)
+unregistersymbol(ButtonMashAddy1)
+unregistersymbol(ButtonMashAddy2)
+unregistersymbol(ButtonMashAddy3)
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>179</ID>
+      <Description>"No Recoil [Full Credit To: l0wb1t]"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>//Full Credit To: l0wb1t
+//I only borrowed it from his CT :D
+[enable]
+alloc(NoRecoil,64)
+aobscan(NoRecoilAddress,f3 0f 10 8e fc 4a 00 00 c1 e9 06 f3 0f 11 44 24)
+label(NoRecoilAddy)
+registersymbol(NoRecoilAddy)
+
+NoRecoil:
+xorps xmm1,xmm1
+movss [esi+4afc],xmm1
+jmp NoRecoilAddy+8
+
+NoRecoilAddress:
+NoRecoilAddy:
+jmp NoRecoil
+db 90 90 90
+
+[disable]
+
+NoRecoilAddy:
+db f3 0f 10 8e fc 4a 00 00
+//movss xmm1,[esi+00004AFC]
+
+dealloc(NoRecoil)
+unregistersymbol(NoRecoilAddy)
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>217</ID>
+      <Description>"Infinite Oxygen (when underwater)"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[enable]
+alloc(InfiniteOxygen,64)
+aobscan(OxygenAddress,f3 0f 11 86 00 3b 00 00 85 c0 79 08 f3 0f 11 9e)
+label(OxygenAddy)
+label(FullOxygen)
+registersymbol(OxygenAddy)
+
+InfiniteOxygen:
+movss xmm0,[FullOxygen]
+movss [esi+3b00],xmm0
+jmp OxygenAddy+8
+
+FullOxygen:
+dd (float)800.0
+
+OxygenAddress:
+OxygenAddy:
+jmp InfiniteOxygen
+db 90 90 90
+
+[disable]
+
+OxygenAddy:
+db f3 0f 11 86 00 3b 00 00
+//movss [esi+3b00],xmm0
+
+dealloc(InfiniteOxygen)
+unregistersymbol(OxygenAddy)
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>173</ID>
+      <Description>"Player Teleport Fly"</Description>
+      <Options moHideChildren="1" moManualExpandCollapse="1"/>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[enable]
+alloc(PlayerTeleportFly,256)
+alloc(TeleportFlyKeyHandlerThread,256)
+aobscan(TeleportFlyAddress,f3 0f 10 56 58 f3 0f 5c 57 58 f3 0f 59 c0)
+label(TeleportFlyAddy)
+label(TeleportFlyEnabled)
+label(CurrentCoords)
+label(FlySpeed)
+label(Fly)
+label(TeleportFlyFullyDisabled)
+label(ExitKeyHandler)
+label(ToggleOnOff)
+label(TestKeyAndIncreaseDecreaseIfNeeded)
+label(NotPressed)
+label(IncreaseIt)
+createthread(TeleportFlyKeyHandlerThread)
+registersymbol(TeleportFlyAddy)
+registersymbol(TeleportFlyFullyDisabled)
+registersymbol(FlySpeed)
+
+PlayerTeleportFly:
+movss xmm2,[esi+58]
+cmp [TeleportFlyEnabled],1
+jne TeleportFlyAddy+5
+cmp [CurrentCoords],0
+jne Fly
+
+movss xmm2,[esi+50]
+movss [CurrentCoords],xmm2
+movss xmm2,[esi+54]
+movss [CurrentCoords+4],xmm2
+movss xmm2,[esi+58]
+movss [CurrentCoords+8],xmm2
+
+Fly:
+movss xmm2,[CurrentCoords]   //X
+movss [esi+50],xmm2
+movss xmm2,[CurrentCoords+4] //Z
+movss [esi+54],xmm2
+movss xmm2,[CurrentCoords+8] //Y
+movss [esi+58],xmm2
+jmp TeleportFlyAddy+5
+
+TeleportFlyKeyHandlerThread:
+push 0a
+call Sleep
+
+cmp [TeleportFlyFullyDisabled],1
+je ExitKeyHandler
+
+push 70 //F1
+call GetAsyncKeyState
+test ax,ax
+jne ToggleOnOff
+
+cmp [TeleportFlyEnabled],1
+jne TeleportFlyKeyHandlerThread
+
+push CurrentCoords //X
+push 1 //increase it if key is down
+push 'D' //Key: 'D'
+call TestKeyAndIncreaseDecreaseIfNeeded
+
+push CurrentCoords //X
+push 0 //decrease it if key is down
+push 'A' //Key: 'A'
+call TestKeyAndIncreaseDecreaseIfNeeded
+
+push CurrentCoords+8 //Y
+push 1
+push 'W'
+call TestKeyAndIncreaseDecreaseIfNeeded
+
+push CurrentCoords+8 //Y
+push 0
+push 'S'
+call TestKeyAndIncreaseDecreaseIfNeeded
+
+push CurrentCoords+4 //Z
+push 1
+push a0 //Key: 'left shift'
+call TestKeyAndIncreaseDecreaseIfNeeded
+
+push CurrentCoords+4 //Z
+push 0
+push a2 //Key: 'left control'
+call TestKeyAndIncreaseDecreaseIfNeeded
+jmp TeleportFlyKeyHandlerThread
+
+ToggleOnOff:
+xor eax,eax
+mov [CurrentCoords],eax
+xor [TeleportFlyEnabled],1
+push 96
+call Sleep
+jmp TeleportFlyKeyHandlerThread
+
+ExitKeyHandler:
+ret
+
+//void __stdcall TestKeyAndIncDec(int Key, bool IncOrDec, float *pFloatValue)
+TestKeyAndIncreaseDecreaseIfNeeded:
+push [esp+4] //Key
+call GetAsyncKeyState
+test ax,ax
+je NotPressed
+
+mov eax,[esp+0c] //Address of the coordinate
+fld dword ptr [eax]
+
+cmp [esp+8],1 //Increase or decrease it?
+je IncreaseIt
+
+fsub dword ptr [FlySpeed]
+fstp dword ptr [eax]
+jmp NotPressed
+
+IncreaseIt:
+fadd dword ptr [FlySpeed]
+fstp dword ptr [eax]
+
+NotPressed:
+ret 0c
+
+TeleportFlyEnabled:
+dd 1
+
+TeleportFlyFullyDisabled:
+dd 0
+
+FlySpeed:
+dd (float)5.0
+
+CurrentCoords:
+dd 0 0 0
+
+TeleportFlyAddress:
+TeleportFlyAddy:
+jmp PlayerTeleportFly
+
+[disable]
+
+TeleportFlyAddy:
+db f3 0f 10 56 58
+//movss xmm2,[esi+58]
+
+TeleportFlyFullyDisabled:
+dd 1
+
+dealloc(PlayerTeleportFly)
+unregistersymbol(TeleportFlyAddy)
+unregistersymbol(TeleportFlyFullyDisabled)
+unregistersymbol(FlySpeed)
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>174</ID>
+          <Description>"Fly Speed"</Description>
+          <VariableType>Float</VariableType>
+          <Address>FlySpeed</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>167</ID>
+      <Description>"Zombie Vac 1.0"</Description>
+      <Options moHideChildren="1" moManualExpandCollapse="1"/>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[enable]
+alloc(ZombieVac,256)
+alloc(KeyHandlerThread,256)
+aobscan(ZombieVacAddress,f3 0f 11 4c 24 14 f3 0f 11 54 24 ? f3 0f 11 00 f3 0f 10 44 24)
+label(ZombieVacAddy)
+label(ZombieVacEnabled)
+label(CurrentVacCoords)
+label(VacMoveSpeed)
+label(GetCoordsFirst)
+label(ZombieVacFullyDisabled)
+label(ExitKeyHandler)
+label(ToggleOnOff)
+label(TestKeyAndIncreaseDecreaseIfNeeded)
+label(NotPressed)
+label(IncreaseIt)
+createthread(KeyHandlerThread)
+registersymbol(ZombieVacAddy)
+registersymbol(ZombieVacFullyDisabled)
+registersymbol(VacMoveSpeed)
+
+ZombieVac:
+movss [eax],xmm0
+movss xmm0,[esp+14]
+cmp [ZombieVacEnabled],1
+jne ZombieVacAddy+0a
+cmp [CurrentVacCoords],0
+je GetCoordsFirst
+
+cmp [eax-18],1 //Don't vac player ;)
+jne ZombieVacAddy+0a
+
+movss xmm0,[CurrentVacCoords]   //X
+movss [eax],xmm0
+movss xmm0,[CurrentVacCoords+4] //Z
+movss [eax+4],xmm0
+movss xmm0,[CurrentVacCoords+8] //Y
+movss [eax+8],xmm0
+jmp ZombieVacAddy+1a
+
+GetCoordsFirst:
+cmp [eax-18],1
+je ZombieVacAddy+0a
+
+//Use player coords as vac starting position
+movss xmm0,[eax]
+movss [CurrentVacCoords],xmm0
+movss xmm0,[eax+4]
+movss [CurrentVacCoords+4],xmm0
+movss xmm0,[eax+8]
+movss [CurrentVacCoords+8],xmm0
+jmp ZombieVacAddy+1a
+
+KeyHandlerThread:
+push 0a
+call Sleep
+
+cmp [ZombieVacFullyDisabled],1
+je ExitKeyHandler
+
+push 71 //F2
+call GetAsyncKeyState
+test ax,ax
+jne ToggleOnOff
+
+cmp [ZombieVacEnabled],1
+jne KeyHandlerThread
+
+push CurrentVacCoords //X
+push 1 //increase it if key is down
+push 27 //Key: 'D'
+call TestKeyAndIncreaseDecreaseIfNeeded
+
+push CurrentVacCoords //X
+push 0 //decrease it if key is down
+push 25 //Key: 'A'
+call TestKeyAndIncreaseDecreaseIfNeeded
+
+push CurrentVacCoords+8 //Y
+push 1
+push 26
+call TestKeyAndIncreaseDecreaseIfNeeded
+
+push CurrentVacCoords+8 //Y
+push 0
+push 28
+call TestKeyAndIncreaseDecreaseIfNeeded
+
+push CurrentVacCoords+4 //Z
+push 1
+push a3 //Key: 'right control'
+call TestKeyAndIncreaseDecreaseIfNeeded
+
+push CurrentVacCoords+4 //Z
+push 0
+push a5 //Key: 'right alt'
+call TestKeyAndIncreaseDecreaseIfNeeded
+jmp KeyHandlerThread
+
+ToggleOnOff:
+xor eax,eax
+mov [CurrentVacCoords],eax
+xor [ZombieVacEnabled],1
+push 96
+call Sleep
+jmp KeyHandlerThread
+
+ExitKeyHandler:
+ret
+
+//void __stdcall TestKeyAndIncDec(int Key, bool IncOrDec, float *pFloatValue)
+TestKeyAndIncreaseDecreaseIfNeeded:
+push [esp+4] //Key
+call GetAsyncKeyState
+test ax,ax
+je NotPressed
+
+mov eax,[esp+0c] //Address of the coordinate
+fld dword ptr [eax]
+
+cmp [esp+8],1 //Increase or decrease it?
+je IncreaseIt
+
+fsub dword ptr [VacMoveSpeed]
+fstp dword ptr [eax]
+jmp NotPressed
+
+IncreaseIt:
+fadd dword ptr [VacMoveSpeed]
+fstp dword ptr [eax]
+
+NotPressed:
+ret 0c
+
+ZombieVacEnabled:
+dd 1
+
+ZombieVacFullyDisabled:
+dd 0
+
+VacMoveSpeed:
+dd (float)5.0
+
+CurrentVacCoords:
+dd 0 0 0
+
+ZombieVacAddress+0c:
+ZombieVacAddy:
+jmp ZombieVac
+db 90 90 90 90 90
+
+[disable]
+
+ZombieVacAddy:
+db f3 0f 11 00 f3 0f 10 44 24 14
+//movss [eax],xmm0
+//movss xmm0,[esp+14]
+
+ZombieVacFullyDisabled:
+dd 1
+
+dealloc(ZombieVac)
+unregistersymbol(ZombieVacAddy)
+unregistersymbol(ZombieVacFullyDisabled)
+unregistersymbol(VacMoveSpeed)
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>168</ID>
+          <Description>"Vac Move Speed"</Description>
+          <VariableType>Float</VariableType>
+          <Address>VacMoveSpeed</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>201</ID>
+      <Description>"Freeze Mercenaries Mode Timer"</Description>
+      <Options moHideChildren="1" moManualExpandCollapse="1"/>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[enable]
+alloc(FreezeMercsTimer,64)
+aobscan(MercsTimerAddress,f3 0f 11 86 6c 48 00 00 f3 0f 11 8e ? ? ? ? 75)
+label(MercsTimerAddy)
+label(FreezeTime)
+label(LockTimer)
+registersymbol(MercsTimerAddy)
+registersymbol(FreezeTime)
+
+FreezeMercsTimer:
+cmp [FreezeTime],0
+jne LockTimer
+
+movss [FreezeTime],xmm0
+
+LockTimer:
+movss xmm0,[FreezeTime]
+movss [esi+486c],xmm0
+jmp MercsTimerAddy+8
+
+FreezeTime:
+dd 0
+
+MercsTimerAddress:
+MercsTimerAddy:
+jmp FreezeMercsTimer
+db 90 90 90
+
+[disable]
+
+MercsTimerAddy:
+db f3 0f 11 86 6c 48 00 00
+//movss [esi+486c],xmm0
+
+dealloc(FreezeMercsTimer)
+unregistersymbol(MercsTimerAddy)
+unregistersymbol(FreezeTime)
+</AssemblerScript>
+      <Hotkeys>
+        <Hotkey>
+          <Action>Toggle Activation</Action>
+          <Keys>
+            <Key>123</Key>
+          </Keys>
+          <ID>0</ID>
+        </Hotkey>
+      </Hotkeys>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>202</ID>
+          <Description>"Freeze Time"</Description>
+          <VariableType>Float</VariableType>
+          <Address>FreezeTime</Address>
+          <Hotkeys>
+            <Hotkey>
+              <Action>Increase Value</Action>
+              <Keys>
+                <Key>122</Key>
+              </Keys>
+              <Value>5</Value>
+              <Description>Add 5 seconds to clock</Description>
+              <ID>0</ID>
+            </Hotkey>
+          </Hotkeys>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

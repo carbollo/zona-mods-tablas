@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+Cheat Table for Guns, Gore & Cannoli
+
+Originally written by STN on the "FearLess Cheat Engine" forum.
+Link: https://fearlessrevolution.com/viewtopic.php?t=1551
+
+Updated by Kenneth Ballard, 2026, for version 1.2.21
+-->
+
+<CheatTable CheatEngineTableVersion="46">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>8</ID>
+      <Description>"----&gt; Health"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>
+[Enable]
+
+alloc(health, 64)
+
+// If the infinite health cheat fails to load with a new version of the
+// executable, and Cheat Engine complains about not being able to load
+// aob_health, likely the last 4 bytes need to be updated. Search for the
+// first 4 or 5 bytes and update the rest.
+
+aobscan(aob_health, D9 45 0C D9 9E 2C 02 00 00)
+registersymbol(aob_health)
+label(returnhere_health)
+
+label(infinite_health)
+label(want_infinite_health)
+registersymbol(want_infinite_health)
+
+label(one_hit_kill)
+label(want_one_hit_kill)
+label(kill_target)
+registersymbol(want_one_hit_kill)
+
+label(one_hit_die)
+label(want_one_hit_die)
+registersymbol(want_one_hit_die)
+
+label(health_orig)
+
+//--------------------------------------------------//
+
+health:
+
+// Key off some offset in the object that should differentiate the player 
+// from enemies. The offset will need to be changed if the cheat stops working
+// as expected - e.g., enemies are invincible but the player isn't. It should
+// be an offset value that is ALWAYS zero for an enemy, ALWAYS non-zero for
+// the player.
+
+cmp [esi+18], 0
+jne infinite_health
+jmp one_hit_kill
+
+//--------------------------------------------------//
+
+// If "Infinite Health" stops working or, worse, crashes the game with a new
+// version, it's likely due to the 22C offset in the fstp and mov statements.
+// That offset has probably changed and needs to be updated. Manually search
+// for aob_health to get the memory address and disassemble the code to update
+// the offsets here if necessary.
+
+infinite_health:
+
+cmp [want_infinite_health], 1
+jne one_hit_die
+fld dword ptr [ebp+0C]
+fstp dword ptr [esi+0000022C]
+mov [esi+0000022C], (float)100
+jmp returnhere_health
+
+want_infinite_health:
+dd 0
+
+//--------------------------------------------------//
+
+one_hit_kill:
+
+// As it says on the tin...
+
+cmp [want_one_hit_kill], 1
+jne health_orig
+
+kill_target:
+
+// The same code is used to update the health for the player and enemies.
+
+fld dword ptr [ebp+0C]
+fstp dword ptr [esi+0000022C]
+mov [esi+0000022C], (float)0
+jmp returnhere_health
+
+want_one_hit_kill:
+dd 0
+
+//--------------------------------------------------//
+
+one_hit_die:
+
+// As it says on the tin...
+
+cmp [want_one_hit_die], 1
+jne health_orig
+jmp kill_target
+
+want_one_hit_die:
+dd 0
+
+//--------------------------------------------------//
+
+health_orig:
+
+fld dword ptr [ebp+0C]
+fstp dword ptr [esi+0000022C]
+jmp returnhere_health
+
+//--------------------------------------------------//
+
+aob_health:
+
+jmp health
+nop
+nop
+nop
+nop
+
+returnhere_health:
+
+[Disable]
+
+aob_health:
+db D9 45 0C D9 9E 2C 02 00 00
+unregistersymbol(aob_health)
+dealloc(health)
+
+unregistersymbol(want_infinite_health)
+unregistersymbol(want_one_hit_kill)
+      </AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>13</ID>
+          <Description>"Fool! I'm immortal!"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[Enable]
+
+want_infinite_health:
+dd 1
+
+[Disable]
+
+want_infinite_health:
+dd 0
+        </AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>14</ID>
+          <Description>"A Little Overkill..."</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[Enable]
+
+want_one_hit_kill:
+dd 1
+
+[Disable]
+
+want_one_hit_kill:
+dd 0
+        </AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>15</ID>
+          <Description>"Yea, though I walk through the valley of the shadow of death"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>
+[Enable]
+
+// Override Infinite Health if One Hit Death is turned ON.
+
+want_one_hit_die:
+dd 1
+
+[Disable]
+
+want_one_hit_die:
+dd 0
+        </AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>22</ID>
+      <Description>"50 bullets, no waiting!"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>
+[Enable]
+
+alloc(infinite_ammo, 64)
+
+// No reload
+
+label(reload_not_needed)
+label(no_reload)
+aobscan(aob_no_reload, 8B 4D 0C 8B 45 08 89 48 14 83 EC 0C 50)
+registersymbol(aob_no_reload)
+label(return_here_noreload)
+
+// Infinite ammo capacity
+
+label(infinite_ammo_capacity)
+aobscan(aob_infinite_ammo_capacity, 8B 47 10 48 89 47 10 8D)
+registersymbol(aob_infinite_ammo_capacity)
+label(return_here_iac)
+
+//--------------------------------------------------//
+
+infinite_ammo:
+
+no_reload:
+
+// Check the current magazine against the attempted reload capacity. If the
+// current mag is less, allow the reload.
+
+cmp [eax+14], ecx
+jne reload_not_needed
+mov [eax+14], ecx
+
+reload_not_needed:
+sub esp,0C
+
+jmp return_here_noreload
+
+//--------------------------------------------------//
+
+infinite_ammo_capacity:
+
+mov eax,[edi+10]
+mov [edi+10],eax
+jmp return_here_iac
+
+//--------------------------------------------------//
+
+aob_no_reload+6:
+jmp no_reload
+nop
+return_here_noreload:
+
+aob_infinite_ammo_capacity:
+jmp infinite_ammo_capacity
+nop
+nop
+return_here_iac:
+
+[Disable]
+
+// Restore the original code
+
+unregistersymbol(aob_infinite_ammo)
+dealloc(infinite_ammo)
+
+aob_no_reload+6:
+db 89 48 14 83 EC 0C
+unregistersymbol(aob_no_reload)
+
+aob_infinite_ammo_capacity:
+db 8B 47 10 48 89 47 10
+unregistersymbol(aob_infinite_ammo_capacity)
+
+</AssemblerScript>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

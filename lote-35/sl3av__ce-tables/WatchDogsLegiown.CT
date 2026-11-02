@@ -1,0 +1,1363 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="38">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>24116</ID>
+      <Description>"Compact Mode"</Description>
+      <LastState/>
+      <Color>C0C0C0</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{$lua}
+
+if syntaxcheck then return end
+
+[ENABLE]
+
+function cycleFullCompact( sender, force )
+  local state = not( compactmenuitem.Caption == 'Compact View Mode' )
+  if force ~= nil then
+    state = not force
+  end
+  compactmenuitem.Caption = state and 'Compact View Mode' or 'Full View Mode'
+  getMainForm().Splitter1.Visible = state
+  getMainForm().Panel4.Visible = state
+  getMainForm().Panel5.Visible = state
+end
+
+function addCompactMenu()
+  if compactmenualreadyexists then return end
+    local parent = getMainForm().Menu.Items
+    compactmenuitem = createMenuItem( parent )
+    parent.add( compactmenuitem )
+    compactmenuitem.Caption = 'Compact View Mode'
+    compactmenuitem.OnClick = cycleFullCompact
+    compactmenualreadyexists = 'yes'
+end
+
+addCompactMenu()
+cycleFullCompact( nil, true )
+return "assert (true)"
+
+[DISABLE]
+
+cycleFullCompact( nil, false )
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>24785</ID>
+      <Description>"Activate Teleport"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <LastState/>
+      <Color>A00000</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript Async="1">[ENABLE]
+
+aobscanregion(_AobWaypoint,00007ff000000000,00007fffffffffff,F3 0F 5D 86 B8 00 00 00)
+alloc(newmem,$1000,_AobWaypoint)
+
+label(code)
+label(return)
+label(XCord_Waypoint)
+label(YCord_Waypoint)
+label(ZCord_Waypoint)
+
+newmem:
+push rsi
+mov rsi,[rsi+00000018]
+movss xmm0,[rsi+00000070]
+movss [XCord_Waypoint],xmm0
+movss xmm0,[rsi+00000078]
+movss [YCord_Waypoint],xmm0
+movss xmm0,[rsi+00000074]
+movss [ZCord_Waypoint],xmm0
+pop rsi
+jmp code
+
+code:
+  minss xmm0,[rsi+000000B8]
+  jmp return
+
+XCord_Waypoint:
+dd 0
+
+YCord_Waypoint:
+dd 0
+
+ZCord_Waypoint:
+dd 0
+
+_AobWaypoint:
+  jmp newmem
+  nop 3
+return:
+registersymbol(_AobWaypoint)
+registersymbol(XCord_Waypoint)
+registersymbol(YCord_Waypoint)
+registersymbol(ZCord_Waypoint)
+
+[DISABLE]
+
+_AobWaypoint:
+  db F3 0F 5D 86 B8 00 00 00
+
+unregistersymbol(_AobWaypoint)
+unregistersymbol(XCord_Waypoint)
+unregistersymbol(YCord_Waypoint)
+unregistersymbol(ZCord_Waypoint)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "DuniaDemo_clang_64_dx12_plus.dll"+2151356
+
+"DuniaDemo_clang_64_dx12_plus.dll"+2151326: F2 0F 10 54 88 04        -  movsd xmm2,[rax+rcx*4+04]
+"DuniaDemo_clang_64_dx12_plus.dll"+215132C: 0F 5C CA                 -  subps xmm1,xmm2
+"DuniaDemo_clang_64_dx12_plus.dll"+215132F: F3 0F 59 C0              -  mulss xmm0,xmm0
+"DuniaDemo_clang_64_dx12_plus.dll"+2151333: 0F 59 C9                 -  mulps xmm1,xmm1
+"DuniaDemo_clang_64_dx12_plus.dll"+2151336: F3 0F 58 C1              -  addss xmm0,xmm1
+"DuniaDemo_clang_64_dx12_plus.dll"+215133A: F3 0F 16 C9              -  movshdup xmm1,xmm1
+"DuniaDemo_clang_64_dx12_plus.dll"+215133E: F3 0F 58 C8              -  addss xmm1,xmm0
+"DuniaDemo_clang_64_dx12_plus.dll"+2151342: F3 0F 10 05 3E 1E AF 08  -  movss xmm0,[DuniaDemo_clang_64_dx12_plus.dll+AC43188]
+"DuniaDemo_clang_64_dx12_plus.dll"+215134A: F3 0F 58 C1              -  addss xmm0,xmm1
+"DuniaDemo_clang_64_dx12_plus.dll"+215134E: F3 0F 5D 05 2E 1E AF 08  -  minss xmm0,[DuniaDemo_clang_64_dx12_plus.dll+AC43184]
+// ---------- INJECTING HERE ----------
+"DuniaDemo_clang_64_dx12_plus.dll"+2151356: F3 0F 5D 86 B8 00 00 00  -  minss xmm0,[rsi+000000B8]
+// ---------- DONE INJECTING  ----------
+"DuniaDemo_clang_64_dx12_plus.dll"+215135E: F3 0F 11 86 B8 00 00 00  -  movss [rsi+000000B8],xmm0
+"DuniaDemo_clang_64_dx12_plus.dll"+2151366: 0F 2E C8                 -  ucomiss xmm1,xmm0
+"DuniaDemo_clang_64_dx12_plus.dll"+2151369: 76 0D                    -  jna DuniaDemo_clang_64_dx12_plus.dll+2151378
+"DuniaDemo_clang_64_dx12_plus.dll"+215136B: 8A 86 B4 00 00 00        -  mov al,[rsi+000000B4]
+"DuniaDemo_clang_64_dx12_plus.dll"+2151371: 0C 04                    -  or al,04
+"DuniaDemo_clang_64_dx12_plus.dll"+2151373: E9 44 01 00 00           -  jmp DuniaDemo_clang_64_dx12_plus.dll+21514BC
+"DuniaDemo_clang_64_dx12_plus.dll"+2151378: 48 8B 46 30              -  mov rax,[rsi+30]
+"DuniaDemo_clang_64_dx12_plus.dll"+215137C: 48 8D 48 F8              -  lea rcx,[rax-08]
+"DuniaDemo_clang_64_dx12_plus.dll"+2151380: 48 85 C0                 -  test rax,rax
+"DuniaDemo_clang_64_dx12_plus.dll"+2151383: 48 0F 44 C8              -  cmove rcx,rax
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>237</ID>
+          <Description>"Teleport (Without Vehicle)"</Description>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript Async="1">[ENABLE]
+
+aobscanregion(_AobPlayerID,00007ff000000000,00007fffffffffff,48 8B B8 D8 02 00 00 48 85 FF 0F * * * * * 48 8B 07 48 89 F9 FF 90 B8)
+alloc(newmem3,$1000,_AobPlayerID)
+
+label(code3)
+label(return3)
+label(PlayerPtr)
+
+newmem3:
+
+code3:
+  mov rdi,[rax+000002D8]
+  mov [PlayerPtr],rdi
+  jmp return3
+
+PlayerPtr:
+dd 0
+
+_AobPlayerID:
+  jmp newmem3
+  nop 2
+return3:
+registersymbol(_AobPlayerID)
+registersymbol(PlayerPtr)
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+aobscanregion(_AobTeleport,00007ff000000000,00007fffffffffff,48 8B 89 80 00 00 00 48 89 08 89)
+alloc(newmem,$1000,_AobTeleport)
+
+label(code)
+label(return)
+label(XCord)
+label(YCord)
+label(ZCord)
+label(XCord_Undo)
+label(YCord_Undo)
+label(ZCord_Undo)
+label(Load)
+label(Save)
+label(Undo)
+label(SaveCords)
+label(LoadCords)
+label(LoadCords_Waypoint)
+label(Undo_Teleport)
+label(Coords)
+
+newmem:
+cmp [PlayerPtr],rbx
+jne code
+mov [Coords],rcx
+
+cmp [SaveCords],1
+je Save
+cmp [LoadCords],1
+je Load
+cmp [LoadCords_Waypoint],1
+je Waypoint
+cmp [Undo_Teleport],1
+je Undo
+jmp code
+
+Save:
+mov [SaveCords],0
+movss xmm3,[rcx+80]
+movss [XCord],xmm3
+movss xmm3,[rcx+88]
+movss [YCord],xmm3
+movss xmm3,[rcx+84]
+movss [ZCord],xmm3
+jmp code
+
+Load:
+mov [LoadCords],0
+cmp [XCord],0
+je code
+movss xmm3,[rcx+80]
+movss [XCord_Undo],xmm3
+movss xmm3,[rcx+88]
+movss [YCord_Undo],xmm3
+movss xmm3,[rcx+84]
+movss [ZCord_Undo],xmm3
+
+movss xmm3,[XCord]
+movss [rcx+80],xmm3
+movss xmm3,[YCord]
+movss [rcx+88],xmm3
+movss xmm3,[ZCord]
+movss [rcx+84],xmm3
+jmp code
+
+Waypoint:
+mov [LoadCords_Waypoint],0
+cmp [XCord_Waypoint],0
+je code
+movss xmm3,[rcx+80]
+movss [XCord_Undo],xmm3
+movss xmm3,[rcx+88]
+movss [YCord_Undo],xmm3
+movss xmm3,[rcx+84]
+movss [ZCord_Undo],xmm3
+
+movss xmm3,[XCord_Waypoint]
+movss [rcx+80],xmm3
+movss xmm3,[YCord_Waypoint]
+movss [rcx+88],xmm3
+movss xmm3,[ZCord_Waypoint]
+movss [rcx+84],xmm3
+jmp code
+
+Undo:
+mov [Undo_Teleport],0
+cmp [XCord_Undo],0
+je code
+movss xmm3,[XCord_Undo]
+movss [rcx+80],xmm3
+movss xmm3,[YCord_Undo]
+movss [rcx+88],xmm3
+movss xmm3,[ZCord_Undo]
+movss [rcx+84],xmm3
+jmp code
+
+code:
+  mov rcx,[rcx+00000080]
+  jmp return
+
+XCord:
+dd 0
+
+YCord:
+dd 0
+
+ZCord:
+dd 0
+
+XCord_Undo:
+dd 0
+
+YCord_Undo:
+dd 0
+
+ZCord_Undo:
+dd 0
+
+SaveCords:
+dd 0
+
+LoadCords:
+dd 0
+
+LoadCords_Waypoint:
+dd 0
+
+Undo_Teleport:
+dd 0
+
+Coords:
+dd 0
+
+_AobTeleport:
+  jmp newmem
+  nop 2
+return:
+registersymbol(_AobTeleport)
+registersymbol(XCord)
+registersymbol(YCord)
+registersymbol(ZCord)
+registersymbol(XCord_Undo)
+registersymbol(YCord_Undo)
+registersymbol(ZCord_Undo)
+registersymbol(SaveCords)
+registersymbol(LoadCords)
+registersymbol(LoadCords_Waypoint)
+registersymbol(Undo_Teleport)
+registersymbol(Coords)
+
+[DISABLE]
+
+_AobPlayerID:
+  db 48 8B B8 D8 02 00 00
+
+_AobTeleport:
+  db 48 8B 89 80 00 00 00
+
+unregistersymbol(_AobTeleport)
+unregistersymbol(_AobPlayerID)
+unregistersymbol(PlayerPtr)
+unregistersymbol(XCord)
+unregistersymbol(YCord)
+unregistersymbol(ZCord)
+unregistersymbol(XCord_Undo)
+unregistersymbol(YCord_Undo)
+unregistersymbol(ZCord_Undo)
+unregistersymbol(SaveCords)
+unregistersymbol(LoadCords)
+unregistersymbol(LoadCords_Waypoint)
+unregistersymbol(Undo_Teleport)
+unregistersymbol(Coords)
+dealloc(newmem)
+dealloc(newmem3)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "DuniaDemo_clang_64_dx12_plus.dll"+28BFD45
+
+"DuniaDemo_clang_64_dx12_plus.dll"+28BFD13: 0F 29 74 24 40              -  movaps [rsp+40],xmm6
+"DuniaDemo_clang_64_dx12_plus.dll"+28BFD18: 48 8B 05 19 48 3D 08        -  mov rax,[DuniaDemo_clang_64_dx12_plus.dll+AC94538]
+"DuniaDemo_clang_64_dx12_plus.dll"+28BFD1F: 48 31 E0                    -  xor rax,rsp
+"DuniaDemo_clang_64_dx12_plus.dll"+28BFD22: 48 89 44 24 38              -  mov [rsp+38],rax
+"DuniaDemo_clang_64_dx12_plus.dll"+28BFD27: 48 83 79 48 00              -  cmp qword ptr [rcx+48],00
+"DuniaDemo_clang_64_dx12_plus.dll"+28BFD2C: 0F 84 8E 02 00 00           -  je DuniaDemo_clang_64_dx12_plus.dll+28BFFC0
+"DuniaDemo_clang_64_dx12_plus.dll"+28BFD32: 48 89 CE                    -  mov rsi,rcx
+"DuniaDemo_clang_64_dx12_plus.dll"+28BFD35: 48 8B 81 70 02 00 00        -  mov rax,[rcx+00000270]
+"DuniaDemo_clang_64_dx12_plus.dll"+28BFD3C: 48 85 C0                    -  test rax,rax
+"DuniaDemo_clang_64_dx12_plus.dll"+28BFD3F: 0F 84 7B 02 00 00           -  je DuniaDemo_clang_64_dx12_plus.dll+28BFFC0
+// ---------- INJECTING HERE ----------
+"DuniaDemo_clang_64_dx12_plus.dll"+28BFD45: 48 8B B8 D8 02 00 00        -  mov rdi,[rax+000002D8]
+// ---------- DONE INJECTING  ----------
+"DuniaDemo_clang_64_dx12_plus.dll"+28BFD4C: 48 85 FF                    -  test rdi,rdi
+"DuniaDemo_clang_64_dx12_plus.dll"+28BFD4F: 0F 84 6B 02 00 00           -  je DuniaDemo_clang_64_dx12_plus.dll+28BFFC0
+"DuniaDemo_clang_64_dx12_plus.dll"+28BFD55: 48 8B 07                    -  mov rax,[rdi]
+"DuniaDemo_clang_64_dx12_plus.dll"+28BFD58: 48 89 F9                    -  mov rcx,rdi
+"DuniaDemo_clang_64_dx12_plus.dll"+28BFD5B: FF 90 B8 01 00 00           -  call qword ptr [rax+000001B8]
+"DuniaDemo_clang_64_dx12_plus.dll"+28BFD61: 84 C0                       -  test al,al
+"DuniaDemo_clang_64_dx12_plus.dll"+28BFD63: 0F 85 57 02 00 00           -  jne DuniaDemo_clang_64_dx12_plus.dll+28BFFC0
+"DuniaDemo_clang_64_dx12_plus.dll"+28BFD69: 48 8B 07                    -  mov rax,[rdi]
+"DuniaDemo_clang_64_dx12_plus.dll"+28BFD6C: 48 89 F9                    -  mov rcx,rdi
+"DuniaDemo_clang_64_dx12_plus.dll"+28BFD6F: FF 90 B0 01 00 00           -  call qword ptr [rax+000001B0]
+}
+
+{
+// ORIGINAL CODE - INJECTION POINT: "DuniaDemo_clang_64_dx12_plus.dll"+7947A20
+
+"DuniaDemo_clang_64_dx12_plus.dll"+7947A02: E8 69 FE FF FF                 -  call DuniaDemo_clang_64_dx12_plus.dll+7947870
+"DuniaDemo_clang_64_dx12_plus.dll"+7947A07: 90                             -  nop
+"DuniaDemo_clang_64_dx12_plus.dll"+7947A08: 48 83 C4 28                    -  add rsp,28
+"DuniaDemo_clang_64_dx12_plus.dll"+7947A0C: C3                             -  ret
+"DuniaDemo_clang_64_dx12_plus.dll"+7947A0D: CC                             -  int 3
+"DuniaDemo_clang_64_dx12_plus.dll"+7947A0E: CC                             -  int 3
+"DuniaDemo_clang_64_dx12_plus.dll"+7947A0F: CC                             -  int 3
+"DuniaDemo_clang_64_dx12_plus.dll"+7947A10: 48 89 D0                       -  mov rax,rdx
+"DuniaDemo_clang_64_dx12_plus.dll"+7947A13: 48 8B 89 00 04 00 00           -  mov rcx,[rcx+00000400]
+"DuniaDemo_clang_64_dx12_plus.dll"+7947A1A: 8B 91 88 00 00 00              -  mov edx,[rcx+00000088]
+// ---------- INJECTING HERE ----------
+"DuniaDemo_clang_64_dx12_plus.dll"+7947A20: 48 8B 89 80 00 00 00           -  mov rcx,[rcx+00000080]
+// ---------- DONE INJECTING  ----------
+"DuniaDemo_clang_64_dx12_plus.dll"+7947A27: 48 89 08                       -  mov [rax],rcx
+"DuniaDemo_clang_64_dx12_plus.dll"+7947A2A: 89 50 08                       -  mov [rax+08],edx
+"DuniaDemo_clang_64_dx12_plus.dll"+7947A2D: C3                             -  ret
+"DuniaDemo_clang_64_dx12_plus.dll"+7947A2E: CC                             -  int 3
+"DuniaDemo_clang_64_dx12_plus.dll"+7947A2F: CC                             -  int 3
+"DuniaDemo_clang_64_dx12_plus.dll"+7947A30: 41 57                          -  push r15
+"DuniaDemo_clang_64_dx12_plus.dll"+7947A32: 41 56                          -  push r14
+"DuniaDemo_clang_64_dx12_plus.dll"+7947A34: 56                             -  push rsi
+"DuniaDemo_clang_64_dx12_plus.dll"+7947A35: 57                             -  push rdi
+"DuniaDemo_clang_64_dx12_plus.dll"+7947A36: 53                             -  push rbx
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>3164</ID>
+              <Description>"Save Position (Num 1)"</Description>
+              <VariableType>4 Bytes</VariableType>
+              <Address>SaveCords</Address>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Set Value</Action>
+                  <Keys>
+                    <Key>97</Key>
+                  </Keys>
+                  <Value>1</Value>
+                  <ID>0</ID>
+                  <ActivateSound TTS="EN">Save Position</ActivateSound>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>3165</ID>
+              <Description>"Load Position (Num 2)"</Description>
+              <VariableType>4 Bytes</VariableType>
+              <Address>LoadCords</Address>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Set Value</Action>
+                  <Keys>
+                    <Key>98</Key>
+                  </Keys>
+                  <Value>1</Value>
+                  <ID>0</ID>
+                  <ActivateSound TTS="EN">Load Position</ActivateSound>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>3171</ID>
+              <Description>"Teleport to Waypoint (Num 3)"</Description>
+              <VariableType>4 Bytes</VariableType>
+              <Address>LoadCords_Waypoint</Address>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Set Value</Action>
+                  <Keys>
+                    <Key>99</Key>
+                  </Keys>
+                  <Value>1</Value>
+                  <ID>0</ID>
+                  <ActivateSound TTS="EN">Teleport to Waypoint</ActivateSound>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>3166</ID>
+              <Description>"Undo Teleport (Num 4)"</Description>
+              <VariableType>4 Bytes</VariableType>
+              <Address>Undo_Teleport</Address>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Set Value</Action>
+                  <Keys>
+                    <Key>100</Key>
+                  </Keys>
+                  <Value>1</Value>
+                  <ID>0</ID>
+                  <ActivateSound TTS="EN">Undo Teleport</ActivateSound>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>24772</ID>
+              <Description>"X Pos"</Description>
+              <VariableType>Float</VariableType>
+              <Address>[Coords]+80</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>24773</ID>
+              <Description>"Y Pos"</Description>
+              <VariableType>Float</VariableType>
+              <Address>[Coords]+88</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>24774</ID>
+              <Description>"Z Pos"</Description>
+              <VariableType>Float</VariableType>
+              <Address>[Coords]+84</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>24756</ID>
+          <Description>"Teleport (With Vehicle)"</Description>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript Async="1">[ENABLE]
+
+aobscanregion(_AobVehID,00007ff000000000,00007fffffffffff,41 8B 85 F8 01 00 00 48 8B)
+alloc(newmem,$1000,_AobVehID)
+
+label(code)
+label(return)
+label(VehID)
+
+newmem:
+
+code:
+  push rsi
+  mov eax,[r13+000001F8]
+  lea rsi,[r13+000001F8]
+  mov [VehID],rsi
+  pop rsi
+  jmp return
+
+VehID:
+dd 0
+
+_AobVehID:
+  jmp newmem
+  nop 2
+return:
+registersymbol(_AobVehID)
+registersymbol(VehID)
+
+//////////////////////////////////////////////////////////////////////////////////////
+
+aobscanregion(_AobVehicleTeleport,00007ff000000000,00007fffffffffff,43 8B 4C 3D 00 43)
+alloc(newmem2,$1000,_AobVehicleTeleport)
+
+label(code2)
+label(return2)
+label(vXCord)
+label(vYCord)
+label(vZCord)
+label(vXCord_Undo)
+label(vYCord_Undo)
+label(vZCord_Undo)
+label(vLoad)
+label(vSave)
+label(vUndo)
+label(vSaveCords)
+label(vLoadCords)
+label(vLoadCords_Waypoint)
+label(vUndo_Teleport)
+label(Speed)
+label(vaddss)
+label(vCoords)
+
+newmem2:
+cmp [VehID],rsi
+jne code2
+push rsi
+lea rsi,[r13+r15]
+mov [vCoords],rsi
+pop rsi
+cmp [vSaveCords],1
+je vSave
+cmp [vLoadCords],1
+je vLoad
+cmp [vLoadCords_Waypoint],1
+je vWaypoint
+cmp [vUndo_Teleport],1
+je vUndo
+cmp [Speed],1
+je lSpeed
+jmp code2
+
+vSave:
+mov [vSaveCords],0
+movss xmm3,[r13+r15]
+movss [vXCord],xmm3
+movss xmm3,[r13+r15+08]
+movss [vYCord],xmm3
+movss xmm3,[r13+r15+04]
+movss [vZCord],xmm3
+jmp code2
+
+vLoad:
+mov [vLoadCords],0
+cmp [vXCord],0
+je code2
+movss xmm3,[r13+r15]
+movss [vXCord_Undo],xmm3
+movss xmm3,[r13+r15+08]
+movss [vYCord_Undo],xmm3
+movss xmm3,[r13+r15+04]
+movss [vZCord_Undo],xmm3
+
+movss xmm3,[vXCord]
+movss [r13+r15],xmm3
+movss xmm3,[vYCord]
+movss [r13+r15+08],xmm3
+movss xmm3,[vZCord]
+movss [r13+r15+04],xmm3
+jmp code2
+
+vWaypoint:
+mov [vLoadCords_Waypoint],0
+cmp [XCord_Waypoint],0
+je code2
+movss xmm3,[r13+r15]
+movss [vXCord_Undo],xmm3
+movss xmm3,[r13+r15+08]
+addss xmm3,[vaddss]
+movss [vYCord_Undo],xmm3
+movss xmm3,[rr13+r15+04]
+movss [vZCord_Undo],xmm3
+
+movss xmm3,[XCord_Waypoint]
+movss [r13+r15],xmm3
+movss xmm3,[YCord_Waypoint]
+addss xmm3,[vaddss]
+movss [r13+r15+08],xmm3
+movss xmm3,[ZCord_Waypoint]
+movss [r13+r15+04],xmm3
+jmp code2
+
+vUndo:
+mov [vUndo_Teleport],0
+cmp [vXCord_Undo],0
+je code2
+movss xmm3,[vXCord_Undo]
+movss [r13+r15],xmm3
+movss xmm3,[vYCord_Undo]
+movss [r13+r15+08],xmm3
+movss xmm3,[vZCord_Undo]
+movss [r13+r15+04],xmm3
+jmp code2
+
+lSpeed:
+mov [Speed],0
+movss xmm0,[r13+r15+40]
+addss xmm0,[r13+r15+40]
+movss [r13+r15+40],xmm0
+
+movss xmm0,[r13+r15+44]
+addss xmm0,[r13+r15+44]
+movss [r13+r15+44],xmm0
+
+movss xmm0,[r13+r15+48]
+addss xmm0,[r13+r15+48]
+movss [r13+r15+48],xmm0
+jmp code2
+
+code2:
+  mov ecx,[r13+r15+00]
+  jmp return2
+
+vXCord:
+dd 0
+
+vYCord:
+dd 0
+
+vZCord:
+dd 0
+
+vXCord_Undo:
+dd 0
+
+vYCord_Undo:
+dd 0
+
+vZCord_Undo:
+dd 0
+
+vSaveCords:
+dd 0
+
+vLoadCords:
+dd 0
+
+vLoadCords_Waypoint:
+dd 0
+
+vUndo_Teleport:
+dd 0
+
+Speed:
+dd 0
+
+vaddss:
+dd 40A00000
+
+vCoords:
+dd 0
+
+_AobVehicleTeleport:
+  jmp newmem2
+return2:
+registersymbol(_AobVehicleTeleport)
+registersymbol(vXCord)
+registersymbol(vYCord)
+registersymbol(vZCord)
+registersymbol(vXCord_Undo)
+registersymbol(vYCord_Undo)
+registersymbol(vZCord_Undo)
+registersymbol(vSaveCords)
+registersymbol(vLoadCords)
+registersymbol(vLoadCords_Waypoint)
+registersymbol(vUndo_Teleport)
+registersymbol(Speed)
+registersymbol(vaddss)
+registersymbol(vCoords)
+
+[DISABLE]
+
+_AobVehID:
+  db 41 8B 85 F8 01 00 00
+
+_AobVehicleTeleport:
+  db 43 8B 4C 3D 00
+
+unregistersymbol(_AobVehID)
+unregistersymbol(VehID)
+unregistersymbol(_AobVehicleTeleport)
+unregistersymbol(vXCord)
+unregistersymbol(vYCord)
+unregistersymbol(vZCord)
+unregistersymbol(vXCord_Undo)
+unregistersymbol(vYCord_Undo)
+unregistersymbol(vZCord_Undo)
+unregistersymbol(vSaveCords)
+unregistersymbol(vLoadCords)
+unregistersymbol(vLoadCords_Waypoint)
+unregistersymbol(vUndo_Teleport)
+unregistersymbol(Speed)
+unregistersymbol(vaddss)
+unregistersymbol(vCoords)
+dealloc(newmem)
+dealloc(newmem2)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "DuniaDemo_clang_64_dx12_plus.dll"+79C52E7
+
+"DuniaDemo_clang_64_dx12_plus.dll"+79C52AE: 81 E6 FF FF FF 7F              -  and esi,7FFFFFFF
+"DuniaDemo_clang_64_dx12_plus.dll"+79C52B4: 41 8D 54 24 01                 -  lea edx,[r12+01]
+"DuniaDemo_clang_64_dx12_plus.dll"+79C52B9: 4C 89 F9                       -  mov rcx,r15
+"DuniaDemo_clang_64_dx12_plus.dll"+79C52BC: E8 1F D5 7D F8                 -  call DuniaDemo_clang_64_dx12_plus.dll+1A27E0
+"DuniaDemo_clang_64_dx12_plus.dll"+79C52C1: 44 39 E6                       -  cmp esi,r12d
+"DuniaDemo_clang_64_dx12_plus.dll"+79C52C4: 0F 87 A8 00 00 00              -  ja DuniaDemo_clang_64_dx12_plus.dll+79C5372
+"DuniaDemo_clang_64_dx12_plus.dll"+79C52CA: 4D 8D B5 98 02 00 00           -  lea r14,[r13+00000298]
+"DuniaDemo_clang_64_dx12_plus.dll"+79C52D1: 66 2E 0F 1F 84 00 00 00 00 00  -  nop word ptr cs:[rax+rax+00000000]
+"DuniaDemo_clang_64_dx12_plus.dll"+79C52DB: 0F 1F 44 00 00                 -  nop dword ptr [rax+rax+00]
+"DuniaDemo_clang_64_dx12_plus.dll"+79C52E0: 48 8B 0D 21 51 86 03           -  mov rcx,[DuniaDemo_clang_64_dx12_plus.dll+B22A408]
+// ---------- INJECTING HERE ----------
+"DuniaDemo_clang_64_dx12_plus.dll"+79C52E7: 41 8B 85 F8 01 00 00           -  mov eax,[r13+000001F8]
+// ---------- DONE INJECTING  ----------
+"DuniaDemo_clang_64_dx12_plus.dll"+79C52EE: 48 8B 79 28                    -  mov rdi,[rcx+28]
+"DuniaDemo_clang_64_dx12_plus.dll"+79C52F2: 25 FF FF FF 00                 -  and eax,00FFFFFF
+"DuniaDemo_clang_64_dx12_plus.dll"+79C52F7: 89 F6                          -  mov esi,esi
+"DuniaDemo_clang_64_dx12_plus.dll"+79C52F9: 49 83 BD 90 02 00 00 00        -  cmp qword ptr [r13+00000290],00
+"DuniaDemo_clang_64_dx12_plus.dll"+79C5301: 78 0D                          -  js DuniaDemo_clang_64_dx12_plus.dll+79C5310
+"DuniaDemo_clang_64_dx12_plus.dll"+79C5303: 49 8B 1E                       -  mov rbx,[r14]
+"DuniaDemo_clang_64_dx12_plus.dll"+79C5306: EB 0B                          -  jmp DuniaDemo_clang_64_dx12_plus.dll+79C5313
+"DuniaDemo_clang_64_dx12_plus.dll"+79C5308: 0F 1F 84 00 00 00 00 00        -  nop dword ptr [rax+rax+00000000]
+"DuniaDemo_clang_64_dx12_plus.dll"+79C5310: 4C 89 F3                       -  mov rbx,r14
+"DuniaDemo_clang_64_dx12_plus.dll"+79C5313: 48 69 E8 B0 00 00 00           -  imul rbp,rax,000000B0
+}
+
+{
+// ORIGINAL CODE - INJECTION POINT: "DuniaDemo_clang_64_dx12_plus.dll"+7971924
+
+"DuniaDemo_clang_64_dx12_plus.dll"+79718F1: 48 8B 05 10 8B 8B 03           -  mov rax,[DuniaDemo_clang_64_dx12_plus.dll+B22A408]
+"DuniaDemo_clang_64_dx12_plus.dll"+79718F8: 8B 0A                          -  mov ecx,[rdx]
+"DuniaDemo_clang_64_dx12_plus.dll"+79718FA: 4C 8B 70 28                    -  mov r14,[rax+28]
+"DuniaDemo_clang_64_dx12_plus.dll"+79718FE: 4C 8B A8 58 01 00 00           -  mov r13,[rax+00000158]
+"DuniaDemo_clang_64_dx12_plus.dll"+7971905: 81 E1 FF FF FF 00              -  and ecx,00FFFFFF
+"DuniaDemo_clang_64_dx12_plus.dll"+797190B: 4C 69 E1 B0 00 00 00           -  imul r12,rcx,000000B0
+"DuniaDemo_clang_64_dx12_plus.dll"+7971912: 4F 63 7C 26 40                 -  movsxd  r15,dword ptr [r14+r12+40]
+"DuniaDemo_clang_64_dx12_plus.dll"+7971917: 49 C1 E7 07                    -  shl r15,07
+"DuniaDemo_clang_64_dx12_plus.dll"+797191B: 43 8B 44 3D 08                 -  mov eax,[r13+r15+08]
+"DuniaDemo_clang_64_dx12_plus.dll"+7971920: 89 44 24 54                    -  mov [rsp+54],eax
+// ---------- INJECTING HERE ----------
+"DuniaDemo_clang_64_dx12_plus.dll"+7971924: 43 8B 4C 3D 00                 -  mov ecx,[r13+r15+00]
+// ---------- DONE INJECTING  ----------
+"DuniaDemo_clang_64_dx12_plus.dll"+7971929: 43 8B 54 3D 04                 -  mov edx,[r13+r15+04]
+"DuniaDemo_clang_64_dx12_plus.dll"+797192E: 41 8B 41 08                    -  mov eax,[r9+08]
+"DuniaDemo_clang_64_dx12_plus.dll"+7971932: 89 4C 24 5C                    -  mov [rsp+5C],ecx
+"DuniaDemo_clang_64_dx12_plus.dll"+7971936: 89 8C 24 98 01 00 00           -  mov [rsp+00000198],ecx
+"DuniaDemo_clang_64_dx12_plus.dll"+797193D: 89 54 24 58                    -  mov [rsp+58],edx
+"DuniaDemo_clang_64_dx12_plus.dll"+7971941: 89 94 24 9C 01 00 00           -  mov [rsp+0000019C],edx
+"DuniaDemo_clang_64_dx12_plus.dll"+7971948: 89 84 24 A0 01 00 00           -  mov [rsp+000001A0],eax
+"DuniaDemo_clang_64_dx12_plus.dll"+797194F: 48 8B 0D 12 8B 8B 03           -  mov rcx,[DuniaDemo_clang_64_dx12_plus.dll+B22A468]
+"DuniaDemo_clang_64_dx12_plus.dll"+7971956: 48 8D 94 24 98 01 00 00        -  lea rdx,[rsp+00000198]
+"DuniaDemo_clang_64_dx12_plus.dll"+797195E: E8 2D 4C F8 FF                 -  call DuniaDemo_clang_64_dx12_plus.dll+78F6590
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>24760</ID>
+              <Description>"Save Position (Num 5)"</Description>
+              <VariableType>4 Bytes</VariableType>
+              <Address>vSaveCords</Address>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Set Value</Action>
+                  <Keys>
+                    <Key>101</Key>
+                  </Keys>
+                  <Value>1</Value>
+                  <ID>0</ID>
+                  <ActivateSound TTS="EN">Save Position</ActivateSound>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>24761</ID>
+              <Description>"Load Position  (Num 6)"</Description>
+              <VariableType>4 Bytes</VariableType>
+              <Address>vLoadCords</Address>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Set Value</Action>
+                  <Keys>
+                    <Key>102</Key>
+                  </Keys>
+                  <Value>1</Value>
+                  <ID>0</ID>
+                  <ActivateSound TTS="EN">Load Position</ActivateSound>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>24762</ID>
+              <Description>"Teleport to Waypoint  (Num 7)"</Description>
+              <VariableType>4 Bytes</VariableType>
+              <Address>vLoadCords_Waypoint</Address>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Set Value</Action>
+                  <Keys>
+                    <Key>103</Key>
+                  </Keys>
+                  <Value>1</Value>
+                  <ID>0</ID>
+                  <ActivateSound TTS="EN">Teleport to Waypoint</ActivateSound>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>24763</ID>
+              <Description>"Undo Teleport  (Num 8)"</Description>
+              <VariableType>4 Bytes</VariableType>
+              <Address>vUndo_Teleport</Address>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Set Value</Action>
+                  <Keys>
+                    <Key>104</Key>
+                  </Keys>
+                  <Value>1</Value>
+                  <ID>0</ID>
+                  <ActivateSound TTS="EN">Undo Teleport</ActivateSound>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>24786</ID>
+              <Description>"X Pos"</Description>
+              <VariableType>Float</VariableType>
+              <Address>[vCoords]</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>24787</ID>
+              <Description>"Y Pos"</Description>
+              <VariableType>Float</VariableType>
+              <Address>[vCoords]+8</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>24788</ID>
+              <Description>"Z Pos"</Description>
+              <VariableType>Float</VariableType>
+              <Address>[vCoords]+4</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>226</ID>
+      <Description>"No Wanted Level"</Description>
+      <Options moDeactivateChildrenAsWell="1"/>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript Async="1">[ENABLE]
+
+NoWntLvl:
+dd 1
+
+[DISABLE]
+
+NoWntLvl:
+dd 0
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>24770</ID>
+      <Description>"Fast End Search"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript Async="1">[ENABLE]
+
+aobscanregion(_AobFastSearch,00007ff000000000,00007fffffffffff,F3 0F 58 B6 88 02 00 00)
+alloc(newmem,$100,_AobFastSearch)
+
+label(code)
+label(return)
+label(val)
+
+newmem:
+
+code:
+  fld [rsi+00000288]
+  fmul [val]
+  fstp [rsi+00000288]
+  addss xmm6,[rsi+00000288]
+  jmp return
+
+val:
+dd 40000000
+
+_AobFastSearch:
+  jmp newmem
+  nop 3
+return:
+registersymbol(_AobFastSearch)
+registersymbol(val)
+
+[DISABLE]
+
+_AobFastSearch:
+  db F3 0F 58 B6 88 02 00 00
+
+unregistersymbol(_AobFastSearch)
+unregistersymbol(val)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "DuniaDemo_clang_64_dx12_plus.dll"+4C4A259
+
+"DuniaDemo_clang_64_dx12_plus.dll"+4C4A22D: BA 10 00 02 00           -  mov edx,00020010
+"DuniaDemo_clang_64_dx12_plus.dll"+4C4A232: 23 91 B8 00 00 00        -  and edx,[rcx+000000B8]
+"DuniaDemo_clang_64_dx12_plus.dll"+4C4A238: 81 FA 00 00 02 00        -  cmp edx,00020000
+"DuniaDemo_clang_64_dx12_plus.dll"+4C4A23E: 75 19                    -  jne DuniaDemo_clang_64_dx12_plus.dll+4C4A259
+"DuniaDemo_clang_64_dx12_plus.dll"+4C4A240: 48 89 7C 24 28           -  mov [rsp+28],rdi
+"DuniaDemo_clang_64_dx12_plus.dll"+4C4A245: 83 C0 02                 -  add eax,02
+"DuniaDemo_clang_64_dx12_plus.dll"+4C4A248: 89 47 08                 -  mov [rdi+08],eax
+"DuniaDemo_clang_64_dx12_plus.dll"+4C4A24B: 48 8D 4C 24 28           -  lea rcx,[rsp+28]
+"DuniaDemo_clang_64_dx12_plus.dll"+4C4A250: E8 6B 12 28 FD           -  call DuniaDemo_clang_64_dx12_plus.dll+1ECB4C0
+"DuniaDemo_clang_64_dx12_plus.dll"+4C4A255: F3 0F 59 F0              -  mulss xmm6,xmm0
+// ---------- INJECTING HERE ----------
+"DuniaDemo_clang_64_dx12_plus.dll"+4C4A259: F3 0F 58 B6 88 02 00 00  -  addss xmm6,[rsi+00000288]
+// ---------- DONE INJECTING  ----------
+"DuniaDemo_clang_64_dx12_plus.dll"+4C4A261: F3 0F 11 B6 88 02 00 00  -  movss [rsi+00000288],xmm6
+"DuniaDemo_clang_64_dx12_plus.dll"+4C4A269: 48 8B 4E 10              -  mov rcx,[rsi+10]
+"DuniaDemo_clang_64_dx12_plus.dll"+4C4A26D: E8 DE 81 4F 01           -  call DuniaDemo_clang_64_dx12_plus.dll+6142450
+"DuniaDemo_clang_64_dx12_plus.dll"+4C4A272: 0F 57 C0                 -  xorps xmm0,xmm0
+"DuniaDemo_clang_64_dx12_plus.dll"+4C4A275: F3 0F 5F 86 88 02 00 00  -  maxss xmm0,[rsi+00000288]
+"DuniaDemo_clang_64_dx12_plus.dll"+4C4A27D: 84 C0                    -  test al,al
+"DuniaDemo_clang_64_dx12_plus.dll"+4C4A27F: 75 0A                    -  jne DuniaDemo_clang_64_dx12_plus.dll+4C4A28B
+"DuniaDemo_clang_64_dx12_plus.dll"+4C4A281: F3 0F 5D 05 7F D4 C6 04  -  minss xmm0,[DuniaDemo_clang_64_dx12_plus.dll+98B7708]
+"DuniaDemo_clang_64_dx12_plus.dll"+4C4A289: EB 08                    -  jmp DuniaDemo_clang_64_dx12_plus.dll+4C4A293
+"DuniaDemo_clang_64_dx12_plus.dll"+4C4A28B: F3 0F 5D 05 BD C6 C4 04  -  minss xmm0,[DuniaDemo_clang_64_dx12_plus.dll+9896950]
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>24809</ID>
+          <Description>"Fast End Search Multiplier"</Description>
+          <VariableType>Float</VariableType>
+          <Address>val</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>24852</ID>
+      <Description>"Freeze Hack Time"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript Async="1">[ENABLE]
+
+aobscanregion(_AobHackTime,00007ff000000000,00007fffffffffff,F3 0F 5C C6 F3 0F 11 86 E4 00 00 00) // should be unique
+
+_AobHackTime:
+  db 90 90 90 90
+
+registersymbol(_AobHackTime)
+
+[DISABLE]
+
+_AobHackTime:
+  db F3 0F 5C C6
+
+unregistersymbol(_AobHackTime)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "DuniaDemo_clang_64_dx12_plus.dll"+2FEC269
+
+"DuniaDemo_clang_64_dx12_plus.dll"+2FEC236: 23 88 B8 00 00 00        -  and ecx,[rax+000000B8]
+"DuniaDemo_clang_64_dx12_plus.dll"+2FEC23C: 81 F9 00 00 02 00        -  cmp ecx,00020000
+"DuniaDemo_clang_64_dx12_plus.dll"+2FEC242: 75 31                    -  jne DuniaDemo_clang_64_dx12_plus.dll+2FEC275
+"DuniaDemo_clang_64_dx12_plus.dll"+2FEC244: 48 8B 86 18 01 00 00     -  mov rax,[rsi+00000118]
+"DuniaDemo_clang_64_dx12_plus.dll"+2FEC24B: 80 B8 28 02 00 00 00     -  cmp byte ptr [rax+00000228],00
+"DuniaDemo_clang_64_dx12_plus.dll"+2FEC252: 75 21                    -  jne DuniaDemo_clang_64_dx12_plus.dll+2FEC275
+"DuniaDemo_clang_64_dx12_plus.dll"+2FEC254: 48 8B 05 45 C8 01 08     -  mov rax,[DuniaDemo_clang_64_dx12_plus.dll+B008AA0]
+"DuniaDemo_clang_64_dx12_plus.dll"+2FEC25B: 80 78 08 00              -  cmp byte ptr [rax+08],00
+"DuniaDemo_clang_64_dx12_plus.dll"+2FEC25F: 74 14                    -  je DuniaDemo_clang_64_dx12_plus.dll+2FEC275
+"DuniaDemo_clang_64_dx12_plus.dll"+2FEC261: F3 0F 10 86 E4 00 00 00  -  movss xmm0,[rsi+000000E4]
+// ---------- INJECTING HERE ----------
+"DuniaDemo_clang_64_dx12_plus.dll"+2FEC269: F3 0F 5C C6              -  subss xmm0,xmm6
+"DuniaDemo_clang_64_dx12_plus.dll"+2FEC26D: F3 0F 11 86 E4 00 00 00  -  movss [rsi+000000E4],xmm0
+// ---------- DONE INJECTING  ----------
+"DuniaDemo_clang_64_dx12_plus.dll"+2FEC275: 0F 57 C0                 -  xorps xmm0,xmm0
+"DuniaDemo_clang_64_dx12_plus.dll"+2FEC278: 0F 2E 86 E4 00 00 00     -  ucomiss xmm0,[rsi+000000E4]
+"DuniaDemo_clang_64_dx12_plus.dll"+2FEC27F: 73 2C                    -  jae DuniaDemo_clang_64_dx12_plus.dll+2FEC2AD
+"DuniaDemo_clang_64_dx12_plus.dll"+2FEC281: 0F 57 C0                 -  xorps xmm0,xmm0
+"DuniaDemo_clang_64_dx12_plus.dll"+2FEC284: 0F 2E 86 D4 00 00 00     -  ucomiss xmm0,[rsi+000000D4]
+"DuniaDemo_clang_64_dx12_plus.dll"+2FEC28B: 72 43                    -  jb DuniaDemo_clang_64_dx12_plus.dll+2FEC2D0
+"DuniaDemo_clang_64_dx12_plus.dll"+2FEC28D: 8B 86 CC 00 00 00        -  mov eax,[rsi+000000CC]
+"DuniaDemo_clang_64_dx12_plus.dll"+2FEC293: 3B 86 D0 00 00 00        -  cmp eax,[rsi+000000D0]
+"DuniaDemo_clang_64_dx12_plus.dll"+2FEC299: 75 24                    -  jne DuniaDemo_clang_64_dx12_plus.dll+2FEC2BF
+"DuniaDemo_clang_64_dx12_plus.dll"+2FEC29B: C6 86 D8 00 00 00 00     -  mov byte ptr [rsi+000000D8],00
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>148</ID>
+      <Description>"Hacker Skills Instant Cooldowns"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript Async="1">[ENABLE]
+
+aobscanregion(_AobHackerSkills,00007ff000000000,00007fffffffffff,F3 41 0F 10 4C 34 10)
+alloc(newmem,$100,_AobHackerSkills)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  mov [r12+rsi+10],0
+  movss xmm1,[r12+rsi+10]
+  jmp return
+
+_AobHackerSkills:
+  jmp newmem
+  nop 2
+return:
+registersymbol(_AobHackerSkills)
+
+[DISABLE]
+
+_AobHackerSkills:
+  db F3 41 0F 10 4C 34 10
+
+unregistersymbol(_AobHackerSkills)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "DuniaDemo_clang_64_dx12_plus.dll"+2A4C0EE
+
+"DuniaDemo_clang_64_dx12_plus.dll"+2A4C0CB: 48 8B 09                       -  mov rcx,[rcx]
+"DuniaDemo_clang_64_dx12_plus.dll"+2A4C0CE: 49 3B 08                       -  cmp rcx,[r8]
+"DuniaDemo_clang_64_dx12_plus.dll"+2A4C0D1: 74 0B                          -  je DuniaDemo_clang_64_dx12_plus.dll+2A4C0DE
+"DuniaDemo_clang_64_dx12_plus.dll"+2A4C0D3: 48 83 C6 18                    -  add rsi,18
+"DuniaDemo_clang_64_dx12_plus.dll"+2A4C0D7: 49 39 F2                       -  cmp r10,rsi
+"DuniaDemo_clang_64_dx12_plus.dll"+2A4C0DA: 75 B4                          -  jne DuniaDemo_clang_64_dx12_plus.dll+2A4C090
+"DuniaDemo_clang_64_dx12_plus.dll"+2A4C0DC: EB 28                          -  jmp DuniaDemo_clang_64_dx12_plus.dll+2A4C106
+"DuniaDemo_clang_64_dx12_plus.dll"+2A4C0DE: 48 8B 05 BB 86 29 08           -  mov rax,[DuniaDemo_clang_64_dx12_plus.dll+ACE47A0]
+"DuniaDemo_clang_64_dx12_plus.dll"+2A4C0E5: F2 0F 10 40 40                 -  movsd xmm0,[rax+40]
+"DuniaDemo_clang_64_dx12_plus.dll"+2A4C0EA: F2 0F 5A C0                    -  cvtsd2ss xmm0,xmm0
+// ---------- INJECTING HERE ----------
+"DuniaDemo_clang_64_dx12_plus.dll"+2A4C0EE: F3 41 0F 10 4C 34 10           -  movss xmm1,[r12+rsi+10]
+// ---------- DONE INJECTING  ----------
+"DuniaDemo_clang_64_dx12_plus.dll"+2A4C0F5: F3 0F 5C C8                    -  subss xmm1,xmm0
+"DuniaDemo_clang_64_dx12_plus.dll"+2A4C0F9: F3 41 0F 11 0F                 -  movss [r15],xmm1
+"DuniaDemo_clang_64_dx12_plus.dll"+2A4C0FE: 41 8B 44 34 14                 -  mov eax,[r12+rsi+14]
+"DuniaDemo_clang_64_dx12_plus.dll"+2A4C103: 41 89 06                       -  mov [r14],eax
+"DuniaDemo_clang_64_dx12_plus.dll"+2A4C106: 48 83 C4 28                    -  add rsp,28
+"DuniaDemo_clang_64_dx12_plus.dll"+2A4C10A: 5B                             -  pop rbx
+"DuniaDemo_clang_64_dx12_plus.dll"+2A4C10B: 5F                             -  pop rdi
+"DuniaDemo_clang_64_dx12_plus.dll"+2A4C10C: 5E                             -  pop rsi
+"DuniaDemo_clang_64_dx12_plus.dll"+2A4C10D: 41 5C                          -  pop r12
+"DuniaDemo_clang_64_dx12_plus.dll"+2A4C10F: 41 5E                          -  pop r14
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>24847</ID>
+      <Description>"Max Drone Range"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript Async="1">[ENABLE]
+
+aobscanregion(_AobDroneRange,00007ff000000000,00007fffffffffff,F3 0F 59 86 C8 01 00 00 F3)
+alloc(newmem,$100,_AobDroneRange)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  mov [rsi+000001C0],43960000
+  mulss xmm0,[rsi+000001C8]
+  jmp return
+
+_AobDroneRange:
+  jmp newmem
+  nop 3
+return:
+registersymbol(_AobDroneRange)
+
+[DISABLE]
+
+_AobDroneRange:
+  db F3 0F 59 86 C8 01 00 00
+
+unregistersymbol(_AobDroneRange)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "DuniaDemo_clang_64_dx12_plus.dll"+1BAED49
+
+"DuniaDemo_clang_64_dx12_plus.dll"+1BAED1F: CC                       -  int 3 
+"DuniaDemo_clang_64_dx12_plus.dll"+1BAED20: 56                       -  push rsi
+"DuniaDemo_clang_64_dx12_plus.dll"+1BAED21: 48 83 EC 40              -  sub rsp,40
+"DuniaDemo_clang_64_dx12_plus.dll"+1BAED25: 0F 29 7C 24 30           -  movaps [rsp+30],xmm7
+"DuniaDemo_clang_64_dx12_plus.dll"+1BAED2A: 0F 29 74 24 20           -  movaps [rsp+20],xmm6
+"DuniaDemo_clang_64_dx12_plus.dll"+1BAED2F: 0F 28 F1                 -  movaps xmm6,xmm1
+"DuniaDemo_clang_64_dx12_plus.dll"+1BAED32: 48 89 CE                 -  mov rsi,rcx
+"DuniaDemo_clang_64_dx12_plus.dll"+1BAED35: F3 0F 10 B9 F8 02 00 00  -  movss xmm7,[rcx+000002F8]
+"DuniaDemo_clang_64_dx12_plus.dll"+1BAED3D: 48 8D 91 98 00 00 00     -  lea rdx,[rcx+00000098]
+"DuniaDemo_clang_64_dx12_plus.dll"+1BAED44: E8 17 FE FF FF           -  call DuniaDemo_clang_64_dx12_plus.dll+1BAEB60
+// ---------- INJECTING HERE ----------
+"DuniaDemo_clang_64_dx12_plus.dll"+1BAED49: F3 0F 59 86 C8 01 00 00  -  mulss xmm0,[rsi+000001C8]
+// ---------- DONE INJECTING  ----------
+"DuniaDemo_clang_64_dx12_plus.dll"+1BAED51: F3 0F 58 C6              -  addss xmm0,xmm6
+"DuniaDemo_clang_64_dx12_plus.dll"+1BAED55: F3 0F 59 C0              -  mulss xmm0,xmm0
+"DuniaDemo_clang_64_dx12_plus.dll"+1BAED59: 0F 2E C7                 -  ucomiss xmm0,xmm7
+"DuniaDemo_clang_64_dx12_plus.dll"+1BAED5C: 0F 92 C0                 -  setb al
+"DuniaDemo_clang_64_dx12_plus.dll"+1BAED5F: 0F 28 74 24 20           -  movaps xmm6,[rsp+20]
+"DuniaDemo_clang_64_dx12_plus.dll"+1BAED64: 0F 28 7C 24 30           -  movaps xmm7,[rsp+30]
+"DuniaDemo_clang_64_dx12_plus.dll"+1BAED69: 48 83 C4 40              -  add rsp,40
+"DuniaDemo_clang_64_dx12_plus.dll"+1BAED6D: 5E                       -  pop rsi
+"DuniaDemo_clang_64_dx12_plus.dll"+1BAED6E: C3                       -  ret 
+"DuniaDemo_clang_64_dx12_plus.dll"+1BAED6F: CC                       -  int 3 
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>24879</ID>
+      <Description>"Activate Drone Health"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript Async="1">[ENABLE]
+
+aobscanregion(_AoBpDrone,00007ff000000000,00007fffffffffff,49 8B BE 20 01 00 00 48 C1 EB) // should be unique
+alloc(newmem,$1000,_AoBpDrone)
+
+label(code)
+label(return)
+label(pDrone)
+
+newmem:
+
+code:
+push rdx
+mov rdx,[r14+00000148]
+mov [pDrone],rdx
+pop rdx
+  mov rdi,[r14+00000120]
+  jmp return
+
+pDrone:
+dd 0
+
+_AoBpDrone:
+  jmp newmem
+  nop 2
+return:
+registersymbol(_AoBpDrone)
+registersymbol(pDrone)
+
+[DISABLE]
+
+_AoBpDrone:
+  db 49 8B BE 20 01 00 00
+
+unregistersymbol(_AoBpDrone)
+unregistersymbol(pDrone)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "DuniaDemo_clang_64_dx12_plus.dll"+1BB3D0B
+
+"DuniaDemo_clang_64_dx12_plus.dll"+1BB3CE2: E8 39 A3 19 04              -  call DuniaDemo_clang_64_dx12_plus.dll+5D4E020
+"DuniaDemo_clang_64_dx12_plus.dll"+1BB3CE7: 8B 44 24 30                 -  mov eax,[rsp+30]
+"DuniaDemo_clang_64_dx12_plus.dll"+1BB3CEB: 41 89 45 00                 -  mov [r13+00],eax
+"DuniaDemo_clang_64_dx12_plus.dll"+1BB3CEF: 8B 44 24 34                 -  mov eax,[rsp+34]
+"DuniaDemo_clang_64_dx12_plus.dll"+1BB3CF3: 41 89 45 04                 -  mov [r13+04],eax
+"DuniaDemo_clang_64_dx12_plus.dll"+1BB3CF7: 8B 44 24 38                 -  mov eax,[rsp+38]
+"DuniaDemo_clang_64_dx12_plus.dll"+1BB3CFB: 41 89 45 08                 -  mov [r13+08],eax
+"DuniaDemo_clang_64_dx12_plus.dll"+1BB3CFF: 49 8B 9E 18 01 00 00        -  mov rbx,[r14+00000118]
+"DuniaDemo_clang_64_dx12_plus.dll"+1BB3D06: 48 85 DB                    -  test rbx,rbx
+"DuniaDemo_clang_64_dx12_plus.dll"+1BB3D09: 78 19                       -  js DuniaDemo_clang_64_dx12_plus.dll+1BB3D24
+// ---------- INJECTING HERE ----------
+"DuniaDemo_clang_64_dx12_plus.dll"+1BB3D0B: 49 8B BE 20 01 00 00        -  mov rdi,[r14+00000120]
+// ---------- DONE INJECTING  ----------
+"DuniaDemo_clang_64_dx12_plus.dll"+1BB3D12: 48 C1 EB 20                 -  shr rbx,20
+"DuniaDemo_clang_64_dx12_plus.dll"+1BB3D16: 48 81 E3 FF FF FF 7F        -  and rbx,7FFFFFFF
+"DuniaDemo_clang_64_dx12_plus.dll"+1BB3D1D: 75 19                       -  jne DuniaDemo_clang_64_dx12_plus.dll+1BB3D38
+"DuniaDemo_clang_64_dx12_plus.dll"+1BB3D1F: E9 87 00 00 00              -  jmp DuniaDemo_clang_64_dx12_plus.dll+1BB3DAB
+"DuniaDemo_clang_64_dx12_plus.dll"+1BB3D24: 49 8D BE 20 01 00 00        -  lea rdi,[r14+00000120]
+"DuniaDemo_clang_64_dx12_plus.dll"+1BB3D2B: 48 C1 EB 20                 -  shr rbx,20
+"DuniaDemo_clang_64_dx12_plus.dll"+1BB3D2F: 48 81 E3 FF FF FF 7F        -  and rbx,7FFFFFFF
+"DuniaDemo_clang_64_dx12_plus.dll"+1BB3D36: 74 73                       -  je DuniaDemo_clang_64_dx12_plus.dll+1BB3DAB
+"DuniaDemo_clang_64_dx12_plus.dll"+1BB3D38: 48 C1 E3 03                 -  shl rbx,03
+"DuniaDemo_clang_64_dx12_plus.dll"+1BB3D3C: 31 F6                       -  xor esi,esi
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>24884</ID>
+          <Description>"Inf.Drone Health"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript Async="1">[ENABLE]
+
+aobscanregion(_AobDroneHp,00007ff000000000,00007fffffffffff,F3 0F 11 71 18 48)
+alloc(newmem,$1000,_AobDroneHp)
+
+label(code)
+label(return)
+
+newmem:
+push rsi
+mov rsi,[rcx+08]
+cmp [pDrone],rsi
+jne code
+movss xmm6,[rcx+20]
+movss [rcx+18],xmm6
+jmp code
+
+code:
+ pop rsi
+  movss [rcx+18],xmm6
+  jmp return
+
+_AobDroneHp:
+  jmp newmem
+return:
+registersymbol(_AobDroneHp)
+
+[DISABLE]
+
+_AobDroneHp:
+  db F3 0F 11 71 18
+
+unregistersymbol(_AobDroneHp)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "DuniaDemo_clang_64_dx12_plus.dll"+667D6D5
+
+"DuniaDemo_clang_64_dx12_plus.dll"+667D6A6: 48 8B 05 8B 4E 62 04        -  mov rax,[DuniaDemo_clang_64_dx12_plus.dll+ACA2538]
+"DuniaDemo_clang_64_dx12_plus.dll"+667D6AD: 48 31 E0                    -  xor rax,rsp
+"DuniaDemo_clang_64_dx12_plus.dll"+667D6B0: 48 89 84 24 88 00 00 00     -  mov [rsp+00000088],rax
+"DuniaDemo_clang_64_dx12_plus.dll"+667D6B8: F3 0F 5D 71 1C              -  minss xmm6,[rcx+1C]
+"DuniaDemo_clang_64_dx12_plus.dll"+667D6BD: F3 0F 10 79 18              -  movss xmm7,[rcx+18]
+"DuniaDemo_clang_64_dx12_plus.dll"+667D6C2: 0F 2E F7                    -  ucomiss xmm6,xmm7
+"DuniaDemo_clang_64_dx12_plus.dll"+667D6C5: 0F 84 CC 00 00 00           -  je DuniaDemo_clang_64_dx12_plus.dll+667D797
+"DuniaDemo_clang_64_dx12_plus.dll"+667D6CB: 48 89 CE                    -  mov rsi,rcx
+"DuniaDemo_clang_64_dx12_plus.dll"+667D6CE: 4C 89 CF                    -  mov rdi,r9
+"DuniaDemo_clang_64_dx12_plus.dll"+667D6D1: 4C 89 49 28                 -  mov [rcx+28],r9
+// ---------- INJECTING HERE ----------
+"DuniaDemo_clang_64_dx12_plus.dll"+667D6D5: F3 0F 11 71 18              -  movss [rcx+18],xmm6
+// ---------- DONE INJECTING  ----------
+"DuniaDemo_clang_64_dx12_plus.dll"+667D6DA: 48 83 79 08 00              -  cmp qword ptr [rcx+08],00
+"DuniaDemo_clang_64_dx12_plus.dll"+667D6DF: 0F 84 B2 00 00 00           -  je DuniaDemo_clang_64_dx12_plus.dll+667D797
+"DuniaDemo_clang_64_dx12_plus.dll"+667D6E5: 80 7E 14 00                 -  cmp byte ptr [rsi+14],00
+"DuniaDemo_clang_64_dx12_plus.dll"+667D6E9: 0F 84 A8 00 00 00           -  je DuniaDemo_clang_64_dx12_plus.dll+667D797
+"DuniaDemo_clang_64_dx12_plus.dll"+667D6EF: 44 89 C3                    -  mov ebx,r8d
+"DuniaDemo_clang_64_dx12_plus.dll"+667D6F2: 44 8B A4 24 30 01 00 00     -  mov r12d,[rsp+00000130]
+"DuniaDemo_clang_64_dx12_plus.dll"+667D6FA: 4C 8B AC 24 28 01 00 00     -  mov r13,[rsp+00000128]
+"DuniaDemo_clang_64_dx12_plus.dll"+667D702: 48 8B AC 24 20 01 00 00     -  mov rbp,[rsp+00000120]
+"DuniaDemo_clang_64_dx12_plus.dll"+667D70A: 44 8B 3D 6B 46 A5 04        -  mov r15d,[DuniaDemo_clang_64_dx12_plus.dll+B0D1D7C]
+"DuniaDemo_clang_64_dx12_plus.dll"+667D711: 4C 8D 74 24 28              -  lea r14,[rsp+28]
+}
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>24796</ID>
+      <Description>"Turret Gun No Overheat"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript Async="1">[ENABLE]
+
+aobscanregion(_AobTurrentNoOverheat,00007ff000000000,00007fffffffffff,41 0F 2E 86 E0 07 00 00)
+alloc(newmem,$100,_AobTurrentNoOverheat)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  mov [r14+000007E0],0
+  ucomiss xmm0,[r14+000007e0]
+  jmp return
+
+_AobTurrentNoOverheat:
+  jmp newmem
+  nop 3
+return:
+registersymbol(_AobTurrentNoOverheat)
+
+[DISABLE]
+
+_AobTurrentNoOverheat:
+  db 41 0F 2E 86 E0 07 00 00
+
+unregistersymbol(_AobTurrentNoOverheat)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "DuniaDemo_clang_64_dx12_plus.dll"+2B5CE37
+
+"DuniaDemo_clang_64_dx12_plus.dll"+2B5CE09: 0F 84 17 02 00 00        -  je DuniaDemo_clang_64_dx12_plus.dll+2B5D026
+"DuniaDemo_clang_64_dx12_plus.dll"+2B5CE0F: 41 89 D0                 -  mov r8d,edx
+"DuniaDemo_clang_64_dx12_plus.dll"+2B5CE12: 41 83 E0 01              -  and r8d,01
+"DuniaDemo_clang_64_dx12_plus.dll"+2B5CE16: 83 FA 01                 -  cmp edx,01
+"DuniaDemo_clang_64_dx12_plus.dll"+2B5CE19: 0F 85 B0 01 00 00        -  jne DuniaDemo_clang_64_dx12_plus.dll+2B5CFCF
+"DuniaDemo_clang_64_dx12_plus.dll"+2B5CE1F: 31 C9                    -  xor ecx,ecx
+"DuniaDemo_clang_64_dx12_plus.dll"+2B5CE21: 4D 85 C0                 -  test r8,r8
+"DuniaDemo_clang_64_dx12_plus.dll"+2B5CE24: 0F 85 E7 01 00 00        -  jne DuniaDemo_clang_64_dx12_plus.dll+2B5D011
+"DuniaDemo_clang_64_dx12_plus.dll"+2B5CE2A: E9 F7 01 00 00           -  jmp DuniaDemo_clang_64_dx12_plus.dll+2B5D026
+"DuniaDemo_clang_64_dx12_plus.dll"+2B5CE2F: F3 0F 10 05 19 9B D3 06  -  movss xmm0,[DuniaDemo_clang_64_dx12_plus.dll+9896950]
+// ---------- INJECTING HERE ----------
+"DuniaDemo_clang_64_dx12_plus.dll"+2B5CE37: 41 0F 2E 86 D0 07 00 00  -  ucomiss xmm0,[r14+000007D0]
+// ---------- DONE INJECTING  ----------
+"DuniaDemo_clang_64_dx12_plus.dll"+2B5CE3F: 0F 87 2A 04 00 00        -  ja DuniaDemo_clang_64_dx12_plus.dll+2B5D26F
+"DuniaDemo_clang_64_dx12_plus.dll"+2B5CE45: 48 8B 1D 34 C1 67 08     -  mov rbx,[DuniaDemo_clang_64_dx12_plus.dll+B1D8F80]
+"DuniaDemo_clang_64_dx12_plus.dll"+2B5CE4C: 48 85 DB                 -  test rbx,rbx
+"DuniaDemo_clang_64_dx12_plus.dll"+2B5CE4F: 0F 85 AF 03 00 00        -  jne DuniaDemo_clang_64_dx12_plus.dll+2B5D204
+"DuniaDemo_clang_64_dx12_plus.dll"+2B5CE55: B9 48 00 00 00           -  mov ecx,00000048
+"DuniaDemo_clang_64_dx12_plus.dll"+2B5CE5A: BA 10 00 00 00           -  mov edx,00000010
+"DuniaDemo_clang_64_dx12_plus.dll"+2B5CE5F: E8 1C BD A8 FD           -  call DuniaDemo_clang_64_dx12_plus.dll+5E8B80
+"DuniaDemo_clang_64_dx12_plus.dll"+2B5CE64: 48 89 C3                 -  mov rbx,rax
+"DuniaDemo_clang_64_dx12_plus.dll"+2B5CE67: 0F 57 C0                 -  xorps xmm0,xmm0
+"DuniaDemo_clang_64_dx12_plus.dll"+2B5CE6A: 0F 11 00                 -  movups [rax],xmm0
+}
+</AssemblerScript>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

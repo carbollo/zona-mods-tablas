@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>1</ID>
+      <Description>"Don't Spend Research Points"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : shapez 2
+  Version: 
+  Date   : 2025-02-09
+  Author : omativi
+}
+
+[ENABLE]
+
+aobscan(ResearchSpend,F0 89 08 48 8B 46 10)
+registersymbol(ResearchSpend)
+
+ResearchSpend+01:
+  db 90 90
+
+[DISABLE]
+
+ResearchSpend+01:
+  db 89 08 48 8B 46 10
+
+unregistersymbol(ResearchSpend)
+{
+// ORIGINAL CODE - INJECTION POINT: 221053BCE53
+
+221053BCE2B: 48 63 45 D8                    - movsxd  rax,dword ptr [rbp-28]
+221053BCE2F: 48 63 4D E0                    - movsxd  rcx,dword ptr [rbp-20]
+221053BCE33: 2B C1                          - sub eax,ecx
+221053BCE35: C7 45 E8 00 00 00 00           - mov [rbp-18],00000000
+221053BCE3C: 89 45 E8                       - mov [rbp-18],eax
+221053BCE3F: 89 45 F0                       - mov [rbp-10],eax
+221053BCE42: 48 85 F6                       - test rsi,rsi
+221053BCE45: 0F 84 78 00 00 00              - je 221053BCEC3
+221053BCE4B: 48 8D 46 18                    - lea rax,[rsi+18]
+221053BCE4F: 48 63 4D F0                    - movsxd  rcx,dword ptr [rbp-10]
+// ---------- INJECTING HERE ----------
+221053BCE53: 89 08                          - mov [rax],ecx
+// ---------- DONE INJECTING  ----------
+221053BCE55: 48 8B 46 10                    - mov rax,[rsi+10]
+221053BCE59: 48 8B C8                       - mov rcx,rax
+221053BCE5C: 83 38 00                       - cmp dword ptr [rax],00
+221053BCE5F: 48 8D AD 00 00 00 00           - lea rbp,[rbp+00000000]
+221053BCE66: 49 BB B0 51 5F 29 23 02 00 00  - mov r11,00000223295F51B0
+221053BCE70: 41 FF D3                       - call r11
+221053BCE73: 48 8B 75 F8                    - mov rsi,[rbp-08]
+221053BCE77: 48 8D 65 00                    - lea rsp,[rbp+00]
+221053BCE7B: 5D                             - pop rbp
+221053BCE7C: C3                             - ret 
+}
+</AssemblerScript>
+    </CheatEntry>
+  </CheatEntries>
+  <CheatCodes>
+    <CodeEntry>
+      <Description>Change of mov [rax],ecx</Description>
+      <AddressString>221053BCE53</AddressString>
+      <Before>
+        <Byte>18</Byte>
+        <Byte>48</Byte>
+        <Byte>63</Byte>
+        <Byte>4D</Byte>
+        <Byte>F0</Byte>
+      </Before>
+      <Actual>
+        <Byte>89</Byte>
+        <Byte>08</Byte>
+      </Actual>
+      <After>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>46</Byte>
+        <Byte>10</Byte>
+        <Byte>48</Byte>
+      </After>
+    </CodeEntry>
+  </CheatCodes>
+  <UserdefinedSymbols/>
+</CheatTable>

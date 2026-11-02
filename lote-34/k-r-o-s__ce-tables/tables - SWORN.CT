@@ -1,0 +1,1034 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="46">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>770</ID>
+      <Description>"→ Enable (Auto-Attach Game Process) 自动附加游戏进程"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+OpenProcess("SWORN.exe")
+{$asm}
+[DISABLE]
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>769</ID>
+          <Description>"→ Initialize Mono 初始化符号信息"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+{$lua}
+mono_initialize()
+LaunchMonoDataCollector()
+{$asm}
+
+
+[DISABLE]
+
+
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>811</ID>
+              <Description>"Always Spawn Legendary Blessings 祝福永远是史诗品质 (F3 开启 F4 关闭)"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>//Send@FearlessRevolution|Sintrix
+[ENABLE]
+//BlessingGenerator.GenerateBlessingRarity
+
+aobscanmodule(legendaryblessingchance,GameAssembly.dll,F3 45 0F 10 4F 24)
+alloc(newmem,$1000,legendaryblessingchance)
+label(code return)
+
+newmem:
+mov [r15+24],(float)9999999 //0.004999999888
+code:
+  movss xmm9,[r15+24]
+  jmp return
+
+legendaryblessingchance:
+  jmp newmem
+  nop
+return:
+registersymbol(legendaryblessingchance)
+
+[DISABLE]
+
+legendaryblessingchance:
+  db F3 45 0F 10 4F 24
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Activate</Action>
+                  <Keys>
+                    <Key>114</Key>
+                  </Keys>
+                  <ID>0</ID>
+                  <ActivateSound TTS="EN">Activated</ActivateSound>
+                </Hotkey>
+                <Hotkey>
+                  <Action>Deactivate</Action>
+                  <Keys>
+                    <Key>115</Key>
+                  </Keys>
+                  <ID>1</ID>
+                  <DeactivateSound TTS="EN">Deactivated</DeactivateSound>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>808</ID>
+              <Description>"Set Gold On Gain/Spend 金币获取/消耗时设置为此值 (F3 开启 F4 关闭)"</Description>
+              <Options moHideChildren="1"/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{ Game   : SWORN.exe
+  Version:
+  Date   : 2025-04-07
+  Author : kros
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(gold,GameAssembly.dll,CE 02 00 00 8B 94 24 80 00 00 00 48 63 C5 48 03 C0 89 54 C6 2C B0 01) // should be unique
+alloc(newmem,$1000,gold)
+
+label(code)
+label(return)
+label(new_gold_amount)
+label(_tmp_gold)
+
+registersymbol(new_gold_amount)
+registersymbol(_tmp_gold)
+
+newmem:
+  mov [_tmp_gold],rbx
+  mov rbx, [new_gold_amount]
+  mov [rsi+rax*8+2C],rbx
+  mov rbx,[_tmp_gold]
+
+code:
+  mov al,01
+  jmp return
+
+align 10 CC
+new_gold_amount:
+  dq (int)350
+_tmp_gold:
+  dq 0
+
+gold+11:
+  jmp newmem
+  nop
+return:
+registersymbol(gold)
+
+[DISABLE]
+
+gold+11:
+  db 89 54 C6 2C B0 01
+
+unregistersymbol(new_gold_amount)
+unregistersymbol(_tmp_gold)
+unregistersymbol(gold)
+
+dealloc(newmem)
+
+</AssemblerScript>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Activate</Action>
+                  <Keys>
+                    <Key>114</Key>
+                  </Keys>
+                  <ID>0</ID>
+                </Hotkey>
+                <Hotkey>
+                  <Action>Deactivate</Action>
+                  <Keys>
+                    <Key>115</Key>
+                  </Keys>
+                  <ID>1</ID>
+                </Hotkey>
+              </Hotkeys>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>826</ID>
+                  <Description>"金币值"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>new_gold_amount</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>822</ID>
+              <Description>"Infinite dice 骰子不消耗 (F3 开启 F4 关闭)"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{ Game   : SWORN.exe
+  Version:
+  Date   : 2025-04-04
+  Author : kros
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+
+
+
+aobscanmodule(_roll,GameAssembly.dll,89 47 40 75 13) // should be unique
+alloc(newmem,$1000,_roll)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  // mov [rdi+40],eax
+  jne _roll+18
+  jmp return
+
+_roll:
+  jmp newmem
+return:
+registersymbol(_roll)
+
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+_roll:
+  db 89 47 40 75 13
+
+unregistersymbol(_roll)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: _roll
+
+GameAssembly.dll+B9F415: 48 8B FA              - mov rdi,rdx
+GameAssembly.dll+B9F418: 44 8B 72 40           - mov r14d,[rdx+40]
+GameAssembly.dll+B9F41C: 83 B9 E0 00 00 00 00  - cmp dword ptr [rcx+000000E0],00
+GameAssembly.dll+B9F423: 75 05                 - jne GameAssembly.dll+B9F42A
+GameAssembly.dll+B9F425: E8 26 80 A0 FF        - call GameAssembly.il2cpp_runtime_class_init
+GameAssembly.dll+B9F42A: 45 33 C0              - xor r8d,r8d
+GameAssembly.dll+B9F42D: 8B D3                 - mov edx,ebx
+GameAssembly.dll+B9F42F: 33 C9                 - xor ecx,ecx
+GameAssembly.dll+B9F431: E8 CA 4D 1C 02        - call System.Math.Max
+GameAssembly.dll+B9F436: 80 3D 9B BA 81 04 00  - cmp byte ptr [GameAssembly.dll+53BAED8],00
+// ---------- INJECTING HERE ----------
+_roll: 89 47 40              - mov [rdi+40],eax
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+B9F440: 75 13                 - jne GameAssembly.dll+B9F455
+GameAssembly.dll+B9F442: 48 8D 0D 6F F0 4E 04  - lea rcx,[GameAssembly.dll+508E4B8]
+GameAssembly.dll+B9F449: E8 B2 1A A4 FF        - call GameAssembly.dll+5E0F00
+GameAssembly.dll+B9F44E: C6 05 83 BA 81 04 01  - mov byte ptr [GameAssembly.dll+53BAED8],01
+GameAssembly.dll+B9F455: 48 8B 15 5C F0 4E 04  - mov rdx,[GameAssembly.dll+508E4B8]
+GameAssembly.dll+B9F45C: 48 8B 82 B8 00 00 00  - mov rax,[rdx+000000B8]
+GameAssembly.dll+B9F463: 48 8B 08              - mov rcx,[rax]
+GameAssembly.dll+B9F466: 48 85 C9              - test rcx,rcx
+GameAssembly.dll+B9F469: 0F 84 6E 02 00 00     - je GameAssembly.dll+B9F6DD
+GameAssembly.dll+B9F46F: 8B 79 40              - mov edi,[rcx+40]
+}
+</AssemblerScript>
+              <Hotkeys>
+                <Hotkey>
+                  <Action>Activate</Action>
+                  <Keys>
+                    <Key>114</Key>
+                  </Keys>
+                  <ID>0</ID>
+                </Hotkey>
+                <Hotkey>
+                  <Action>Deactivate</Action>
+                  <Keys>
+                    <Key>115</Key>
+                  </Keys>
+                  <ID>1</ID>
+                </Hotkey>
+              </Hotkeys>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>788</ID>
+              <Description>"Health 生命"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>//Send@FearlessRevolution|Sintrix
+
+[ENABLE]
+//PlayerAction.HasEnoughHealth
+//PlayerAction.get_HasEnoughHealth
+
+aobscanmodule(php,GameAssembly.dll,F3 0F 10 B7 B8 00 00 00 48 85)
+alloc(newmem,$1000,php)
+
+label(code)
+label(return)
+label(_base)
+registersymbol(_base)
+label(_inf_health_flag)
+registersymbol(_inf_health_flag)
+label(_player)
+registersymbol(_player)
+
+newmem:
+  mov [_player], rcx
+  mov [_base], rdi
+  cmp [_inf_health_flag], 0
+  je code
+  mov [rdi+B8],(float)9999
+
+code:
+  movss xmm6,[rdi+000000B8]
+  jmp return
+
+align 10 CC
+_base:
+  dq 0
+_player:
+  dq 0
+_inf_health_flag:
+  dd 0
+
+php:
+  jmp newmem
+  nop 3
+return:
+registersymbol(php)
+
+[DISABLE]
+
+php:
+  db F3 0F 10 B7 B8 00 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>841</ID>
+                  <Description>"Infinite Health 无限生命 (F1)"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>{$lua}
+
+local addr = getAddress("_inf_health_flag")
+
+[ENABLE]
+writeInteger(addr, 1)
+
+[DISABLE]
+writeInteger(addr, 0)
+</AssemblerScript>
+                  <Hotkeys>
+                    <Hotkey>
+                      <Action>Toggle Activation</Action>
+                      <Keys>
+                        <Key>112</Key>
+                      </Keys>
+                      <ID>0</ID>
+                      <ActivateSound>Activate</ActivateSound>
+                      <DeactivateSound>Deactivate</DeactivateSound>
+                    </Hotkey>
+                  </Hotkeys>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>832</ID>
+                  <Description>"生命"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>_base</Address>
+                  <Offsets>
+                    <Offset>B8</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>836</ID>
+                  <Description>"可复活次数"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>_base</Address>
+                  <Offsets>
+                    <Offset>C0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>790</ID>
+                  <Description>"Two Hit Kill 敌人受两击就死 (x)"</Description>
+                  <Color>0000FF</Color>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>// CharacterHealth.AddCurrentInternal
+
+[ENABLE]
+
+aobscanmodule(deal_damage_on_enemy,GameAssembly.dll,F3 0F 11 8B B8 00 00 00 41) // should be unique
+alloc(newmem,$1000,deal_damage_on_enemy)
+
+label(code)
+label(return)
+label(other)
+label(addr_float_1)
+registersymbol(addr_float_1)
+
+newmem:
+  cmp [_base], rbx
+  jne other
+  comiss xmm1, [addr_float_1]
+  jbe return
+  jmp code
+
+other:
+  comiss xmm1, [addr_float_1]
+  jbe code
+  mov [rbx+000000B8],(float)1
+  jmp return
+
+code:
+  movss [rbx+000000B8],xmm1
+  jmp return
+
+align 10 CC
+addr_float_1:
+  dd (float)1
+
+deal_damage_on_enemy:
+  jmp newmem
+  nop 3
+return:
+registersymbol(deal_damage_on_enemy)
+
+[DISABLE]
+
+deal_damage_on_enemy:
+  db F3 0F 11 8B B8 00 00 00
+
+unregistersymbol(addr_float_1)
+unregistersymbol(deal_damage_on_enemy)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+9F5369
+
+GameAssembly.dll+9F5348: F3 0F 58 CF              - addss xmm1,xmm7
+GameAssembly.dll+9F534C: 0F 2F F1                 - comiss xmm6,xmm1
+GameAssembly.dll+9F534F: 77 12                    - ja GameAssembly.dll+9F5363
+GameAssembly.dll+9F5351: F3 0F 10 83 BC 00 00 00  - movss xmm0,[rbx+000000BC]
+GameAssembly.dll+9F5359: 0F 2F C8                 - comiss xmm1,xmm0
+GameAssembly.dll+9F535C: 76 08                    - jna GameAssembly.dll+9F5366
+GameAssembly.dll+9F535E: 0F 28 C8                 - movaps xmm1,xmm0
+GameAssembly.dll+9F5361: EB 03                    - jmp GameAssembly.dll+9F5366
+GameAssembly.dll+9F5363: 0F 57 C9                 - xorps xmm1,xmm1
+GameAssembly.dll+9F5366: 45 33 C9                 - xor r9d,r9d
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+9F5369: F3 0F 11 8B B8 00 00 00  - movss [rbx+000000B8],xmm1
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+9F5371: 41 0F 28 D1              - movaps xmm2,xmm9
+GameAssembly.dll+9F5375: 48 8B CB                 - mov rcx,rbx
+GameAssembly.dll+9F5378: E8 F3 30 02 00           - call EntityHealth.InvokeCurrentChanged
+GameAssembly.dll+9F537D: 0F 2F B3 B8 00 00 00     - comiss xmm6,[rbx+000000B8]
+GameAssembly.dll+9F5384: 72 2D                    - jb GameAssembly.dll+9F53B3
+GameAssembly.dll+9F5386: 33 D2                    - xor edx,edx
+GameAssembly.dll+9F5388: 48 8B CB                 - mov rcx,rbx
+GameAssembly.dll+9F538B: E8 30 6A 66 03           - call Windwalk.Net.Entity.EntityBase.get_IsOwner
+GameAssembly.dll+9F5390: 84 C0                    - test al,al
+GameAssembly.dll+9F5392: 74 1F                    - je GameAssembly.dll+9F53B3
+}
+</AssemblerScript>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>804</ID>
+              <Description>"Mana 魔法"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{ Game  : SWORN.exe
+  Version:
+  Date   : 2025-07-28
+  Author : kros
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(mana_use,GameAssembly.dll,F3 0F 11 73 78 7A) // should be unique
+alloc(newmem,$1000,mana_use)
+
+label(code)
+label(return)
+label(_mana_base)
+registersymbol(_mana_base)
+label(_inf_mana_flag)
+registersymbol(_inf_mana_flag)
+unregistersymbol(_inf_mana_flag)
+
+newmem:
+  mov [_mana_base], rbx
+  cmp [_inf_mana_flag], 0
+  je code
+
+  mov [rbx+78] (float)3
+  jmp return
+
+code:
+  movss [rbx+78],xmm6
+  jmp return
+
+align 10 CC
+_mana_base:
+  dq 0
+_inf_mana_flag:
+  dd 0
+
+mana_use:
+  jmp newmem
+return:
+registersymbol(mana_use)
+
+[DISABLE]
+
+mana_use:
+  db F3 0F 11 73 78
+
+unregistersymbol(_mana_base)
+unregistersymbol(mana_use)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+BBBF98
+
+GameAssembly.dll+BBBF79: E8 62 F8 FF FF        - call ManaStats.get_MaxMana
+GameAssembly.dll+BBBF7E: 45 0F 57 C9           - xorps xmm9,xmm9
+GameAssembly.dll+BBBF82: 44 0F 2F CE           - comiss xmm9,xmm6
+GameAssembly.dll+BBBF86: 77 0A                 - ja GameAssembly.dll+BBBF92
+GameAssembly.dll+BBBF88: 0F 2F F0              - comiss xmm6,xmm0
+GameAssembly.dll+BBBF8B: 76 08                 - jna GameAssembly.dll+BBBF95
+GameAssembly.dll+BBBF8D: 0F 28 F0              - movaps xmm6,xmm0
+GameAssembly.dll+BBBF90: EB 03                 - jmp GameAssembly.dll+BBBF95
+GameAssembly.dll+BBBF92: 0F 57 F6              - xorps xmm6,xmm6
+GameAssembly.dll+BBBF95: 0F 2E F7              - ucomiss xmm6,xmm7
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+BBBF98: F3 0F 11 73 78        - movss [rbx+78],xmm6
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+BBBF9D: 7A 02                 - jp GameAssembly.dll+BBBFA1
+GameAssembly.dll+BBBF9F: 74 1D                 - je GameAssembly.dll+BBBFBE
+GameAssembly.dll+BBBFA1: 48 8B 8B 88 00 00 00  - mov rcx,[rbx+00000088]
+GameAssembly.dll+BBBFA8: 48 85 C9              - test rcx,rcx
+GameAssembly.dll+BBBFAB: 74 11                 - je GameAssembly.dll+BBBFBE
+GameAssembly.dll+BBBFAD: 48 8B 41 18           - mov rax,[rcx+18]
+GameAsembly.dll+BBBFB1: 0F 28 CE              - movaps xmm1,xmm6
+GameAssembly.dll+BBBFB4: 4C 8B 41 28           - mov r8,[rcx+28]
+GameAssembly.dll+BBBFB8: 48 8B 49 40           - mov rcx,[rcx+40]
+GameAssembly.dll+BBBFBC: FF D0                 - call rax
+}
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>840</ID>
+                  <Description>"魔法"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>_mana_base</Address>
+                  <Offsets>
+                    <Offset>78</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>850</ID>
+                  <Description>"Infinite Mana 无限魔法 (F2)"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>{$lua}
+
+local addr = getAddress("_inf_mana_flag")
+
+[ENABLE]
+writeInteger(addr, 1)
+
+[DISABLE]
+writeInteger(addr, 0)
+</AssemblerScript>
+                  <Hotkeys>
+                    <Hotkey>
+                      <Action>Toggle Activation</Action>
+                      <Keys>
+                        <Key>113</Key>
+                      </Keys>
+                      <ID>0</ID>
+                      <ActivateSound>Activate</ActivateSound>
+                      <DeactivateSound>Deactivate</DeactivateSound>
+                    </Hotkey>
+                  </Hotkeys>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>793</ID>
+              <Description>"Set Resources (Press Tab) 按 Tab 时设置资源值"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{ Game   : SWORN.exe
+  Version:
+  Date   : 2025-09-25
+  Author : kros
+}
+
+define(address,"GameAssembly.dll"+E48C9D)
+define(bytes,8B 40 18 48 8D 4C 24 50)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,"GameAssembly.dll"+E48C9D)
+
+label(code)
+label(return)
+
+newmem:
+  mov [rax+18],#299
+
+code:
+  mov eax,[rax+18]
+  lea rcx,[rsp+50]
+  jmp return
+
+address:
+  jmp newmem
+  nop 3
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+  // mov eax,[rax+18]
+  // lea rcx,[rsp+50]
+
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+E48C9D
+
+GameAssembly.dll+E48C6E: 48 8D 0D 8B DD 4A 04  - lea rcx,[GameAssembly.dll+52F6A00]
+GameAssembly.dll+E48C75: E8 26 64 7B FF        - call GameAssembly.dll+5FF0A0
+GameAssembly.dll+E48C7A: C6 05 78 AD 7A 04 01  - mov byte ptr [GameAssembly.dll+55F39F9],01
+GameAssembly.dll+E48C81: 48 8B 0B              - mov rcx,[rbx]
+GameAssembly.dll+E48C84: 33 D2                 - xor edx,edx
+GameAssembly.dll+E48C86: 48 8B 7B 10           - mov rdi,[rbx+10]
+GameAssembly.dll+E48C8A: 48 89 6C 24 58        - mov [rsp+58],rbp
+GameAssembly.dll+E48C8F: E8 8C 1B DA FF        - call MetaCurrencyManager.GetCurrency
+GameAssembly.dll+E48C94: 48 85 C0              - test rax,rax
+GameAssembly.dll+E48C97: 0F 84 0A 01 00 00     - je GameAssembly.dll+E48DA7
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+E48C9D: 8B 40 18              - mov eax,[rax+18]
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+E48CA0: 48 8D 4C 24 50        - lea rcx,[rsp+50]
+GameAssembly.dll+E48CA5: 33 D2                 - xor edx,edx
+GameAssembly.dll+E48CA7: 89 44 24 50           - mov [rsp+50],eax
+GameAssembly.dll+E48CAB: E8 10 54 0C 02        - call System.Int32.ToString
+GameAssembly.dll+E48CB0: 48 85 FF              - test rdi,rdi
+GameAssembly.dll+E48CB3: 0F 84 EE 00 00 00     - je GameAssembly.dll+E48DA7
+GameAssembly.dll+E48CB9: 4C 8B 0F              - mov r9,[rdi]
+GameAssembly.dll+E48CBC: 48 8B D0              - mov rdx,rax
+GameAssembly.dll+E48CBF: 48 8B CF              - mov rcx,rdi
+GameAssembly.dll+E48CC2: 4D 8B 81 60 05 00 00  - mov r8,[r9+00000560]
+}
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>800</ID>
+              <Description>"Instant Complete Luna Blossom 采水浇花事件直接完成"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>//Send@FearlessRevolution|Sintrix
+[ENABLE]
+
+aobscanmodule(lunaplant,GameAssembly.dll,66 0F 6E 81 CC 00 00 00)
+alloc(newmem,$1000,lunaplant)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  mov [rcx+CC],#99
+  movd xmm0,[rcx+000000CC]
+  jmp return
+
+lunaplant:
+  jmp newmem
+  nop 3
+return:
+registersymbol(lunaplant)
+
+[DISABLE]
+
+lunaplant:
+  db 66 0F 6E 81 CC 00 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>823</ID>
+              <Description>"Fire charge not decrease 火焰充能不消耗"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{ Game   : SWORN.exe
+  Version:
+  Date   : 2025-09-25
+  Author : kros
+}
+
+[ENABLE]
+
+aobscanmodule(on_flame_decrease,GameAssembly.dll,FF 4B 78 48 8B 4B 20) // should be unique
+alloc(newmem,$1000,on_flame_decrease)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  // dec [rbx+78]
+  mov rcx,[rbx+20]
+  jmp return
+
+on_flame_decrease:
+  jmp newmem
+  nop 2
+return:
+registersymbol(on_flame_decrease)
+
+[DISABLE]
+
+on_flame_decrease:
+  db FF 4B 78 48 8B 4B 20
+
+unregistersymbol(on_flame_decrease)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+192A0F7
+
+GameAssembly.dll+192A0CE: 48 85 FF              - test rdi,rdi
+GameAssembly.dll+192A0D1: 0F 84 7C 01 00 00     - je GameAssembly.dll+192A253
+GameAssembly.dll+192A0D7: 4C 8B 05 7A 8F A2 03  - mov r8,[GameAssembly.dll+5353058]
+GameAssembly.dll+192A0DE: 0F B6 D0              - movzx edx,al
+GameAssembly.dll+192A0E1: 48 8B CF              - mov rcx,rdi
+GameAssembly.dll+192A0E4: E8 E7 D6 B5 FF        - call GameAssembly.dll+14877D0
+GameAssembly.dll+192A0E9: 84 C0                 - test al,al
+GameAssembly.dll+192A0EB: 75 0D                 - jne GameAssembly.dll+192A0FA
+GameAssembly.dll+192A0ED: 83 7B 78 00           - cmp dword ptr [rbx+78],00
+GameAssembly.dll+192A0F1: 0F 84 4C 01 00 00     - je GameAssembly.dll+192A243
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+192A0F7: FF 4B 78              - dec [rbx+78]
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+192A0FA: 48 8B 4B 20           - mov rcx,[rbx+20]
+GameAssembly.dll+192A0FE: 48 85 C9              - test rcx,rcx
+GameAssembly.dll+192A101: 0F 84 4C 01 00 00     - je GameAssembly.dll+192A253
+GameAssembly.dll+192A107: 33 D2                 - xor edx,edx
+GameAssembly.dll+192A109: E8 B2 1C 73 02        - call Windwalk.Net.Entity.EntityBase.get_IsOwner
+GameAssembly.dll+192A10E: 84 C0                 - test al,al
+GameAssembly.dll+192A110: 0F 84 16 01 00 00     - je GameAssembly.dll+192A22C
+GameAssembly.dll+192A116: 83 7B 78 00           - cmp dword ptr [rbx+78],00
+GameAssembly.dll+192A11A: 0F 85 0C 01 00 00     - jne GameAssembly.dll+192A22C
+GameAssembly.dll+192A120: 48 8B 0D E1 2E 9F 03  - mov rcx,[GameAssembly.dll+531D008]
+}
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>825</ID>
+              <Description>"Max fury with one hit 一次击中获得满层愤怒"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{ Game   : SWORN.exe
+  Version:
+  Date   : 2025-09-25
+  Author : kros
+}
+
+define(address,FuryStatus.AddStacksInternal+170)
+define(bytes,89 4B 54 44 3B F7)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,FuryStatus.AddStacksInternal+170)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  // mov [rbx+54],ecx
+  mov [rbx+54],#17
+  cmp r14d,edi
+  jmp return
+
+address:
+  jmp newmem
+  nop
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+  // mov [rbx+54],ecx
+  // cmp r14d,edi
+
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll.il2cpp+63C1C0
+
+GameAssembly.dll.il2cpp+63C1A7: 48 8B CD           - mov rcx,rbp
+GameAssembly.dll.il2cpp+63C1AA: E8 F1 FA F2 FF     - call Mana.AddCurrent
+GameAssembly.dll.il2cpp+63C1AF: 8B 4B 54           - mov ecx,[rbx+54]
+GameAssembly.dll.il2cpp+63C1B2: 03 CE              - add ecx,esi
+GameAssembly.dll.il2cpp+63C1B4: 78 08              - js GameAssembly.dll.il2cpp+63C1BE
+GameAssembly.dll.il2cpp+63C1B6: 3B CF              - cmp ecx,edi
+GameAssembly.dll.il2cpp+63C1B8: 7E 06              - jle GameAssembly.dll.il2cpp+63C1C0
+GameAssembly.dll.il2cpp+63C1BA: 8B CF              - mov ecx,edi
+GameAssembly.dll.il2cpp+63C1BC: EB 02              - jmp GameAssembly.dll.il2cpp+63C1C0
+GameAssembly.dll.il2cpp+63C1BE: 33 C9              - xor ecx,ecx
+// ---------- INJECTING HERE ----------
+GameAssembly.dll.il2cpp+63C1C0: 89 4B 54           - mov [rbx+54],ecx
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll.il2cpp+63C1C3: 44 3B F7           - cmp r14d,edi
+GameAssembly.dll.il2cpp+63C1C6: 7D 34              - jnl GameAssembly.dll.il2cpp+63C1FC
+GameAssembly.dll.il2cpp+63C1C8: 48 8B 4B 20        - mov rcx,[rbx+20]
+GameAssembly.dll.il2cpp+63C1CC: 48 85 C9           - test rcx,rcx
+GameAssembly.dll.il2cpp+63C1CF: 0F 84 0D 02 00 00  - je GameAssembly.dll.il2cpp+63C3E2
+GameAssembly.dll.il2cpp+63C1D5: 33 D2              - xor edx,edx
+GameAssembly.dll.il2cpp+63C1D7: E8 E4 BB 38 03     - call Windwalk.Net.Entity.EntityBase.get_IsOwner
+GameAssembly.dll.il2cpp+63C1DC: 84 C0              - test al,al
+GameAssembly.dll.il2cpp+63C1DE: 74 1C              - je GameAssembly.dll.il2cpp+63C1FC
+GameAssembly.dll.il2cpp+63C1E0: 48 8B 4B 70        - mov rcx,[rbx+70]
+}
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>828</ID>
+              <Description>"Scythe max seeds 镰刀种子总是最大"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>// SowStatusBehaviour.AddScytheComboInternal
+
+[ENABLE]
+
+aobscanmodule(sickle_seed_update,GameAssembly.dll,89 4B 30 48 8B 0D A1 C8 5D 04) // should be unique
+alloc(newmem,$1000,sickle_seed_update)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  // mov [rbx+30],ecx
+  mov [rbx+30], #10
+  mov rcx,[GameAssembly.dll+531D008]
+  jmp return
+
+sickle_seed_update:
+  jmp newmem
+  nop 5
+return:
+registersymbol(sickle_seed_update)
+
+[DISABLE]
+
+sickle_seed_update:
+  db 89 4B 30 48 8B 0D A1 C8 5D 04
+
+unregistersymbol(sickle_seed_update)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+D4075D
+
+GameAssembly.dll+D40744: 8B 4B 30              - mov ecx,[rbx+30]
+GameAssembly.dll+D40747: 03 CF                 - add ecx,edi
+GameAssembly.dll+D40749: 78 0C                 - js GameAssembly.dll+D40757
+GameAssembly.dll+D4074B: 41 8B 40 20           - mov eax,[r8+20]
+GameAssembly.dll+D4074F: 3B C8                 - cmp ecx,eax
+GameAssembly.dll+D40751: 7E 06                 - jle GameAssembly.dll+D40759
+GameAssembly.dll+D40753: 8B C8                 - mov ecx,eax
+GameAssembly.dll+D40755: EB 02                 - jmp GameAssembly.dll+D40759
+GameAssembly.dll+D40757: 33 C9                 - xor ecx,ecx
+GameAssembly.dll+D40759: 48 8B 7B 40           - mov rdi,[rbx+40]
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+D4075D: 89 4B 30              - mov [rbx+30],ecx
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+D40760: 48 8B 0D A1 C8 5D 04  - mov rcx,[GameAssembly.dll+531D008]
+GameAssembly.dll+D40767: 83 B9 E0 00 00 00 00  - cmp dword ptr [rcx+000000E0],00
+GameAssembly.dll+D4076E: 75 05                 - jne GameAssembly.dll+D40775
+GameAssembly.dll+D40770: E8 7B 3D 88 FF        - call GameAssembly.il2cpp_runtime_class_init
+GameAssembly.dll+D40775: 45 33 C0              - xor r8d,r8d
+GameAssembly.dll+D40778: 33 D2                 - xor edx,edx
+GameAssembly.dll+D4077A: 48 8B CF              - mov rcx,rdi
+GameAssembly.dll+D4077D: E8 4E 19 06 03        - call UnityEngine.Object.op_Inequality
+GameAssembly.dll+D40782: 84 C0                 - test al,al
+GameAssembly.dll+D40784: 74 21                 - je GameAssembly.dll+D407A7
+}
+</AssemblerScript>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>459</ID>
+      <Description>"--------------------------------"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>461</ID>
+      <Description>"⚡Original author 原作者: Send"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>827</ID>
+      <Description>"⚡Updated by 更新者: Kros"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>454</ID>
+      <Description>"⚡Version 版本: SWORN.exe v0.51.1.1.593"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>460</ID>
+      <Description>"⚡Send's Discord "</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+{$lua}
+shellExecute("https://discord.gg/NTFcdAUWxb")
+
+{$asm}
+[DISABLE]
+
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>458</ID>
+      <Description>"--------------------------------"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+  </CheatEntries>
+  <CheatCodes>
+    <CodeEntry>
+      <Description>Change of movss [rbx+000000B8],xmm1</Description>
+      <AddressString>GameAssembly.dll+9619D9</AddressString>
+      <Before>
+        <Byte>57</Byte>
+        <Byte>C9</Byte>
+        <Byte>45</Byte>
+        <Byte>33</Byte>
+        <Byte>C9</Byte>
+      </Before>
+      <Actual>
+        <Byte>F3</Byte>
+        <Byte>0F</Byte>
+        <Byte>11</Byte>
+        <Byte>8B</Byte>
+        <Byte>B8</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>41</Byte>
+        <Byte>0F</Byte>
+        <Byte>28</Byte>
+        <Byte>D1</Byte>
+        <Byte>48</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Change of cmp byte ptr [GameAssembly.dll+52C53A2],00</Description>
+      <AddressString>GameAssembly.dll+AD75F7</AddressString>
+      <Before>
+        <Byte>84</Byte>
+        <Byte>53</Byte>
+        <Byte>01</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>80</Byte>
+        <Byte>3D</Byte>
+        <Byte>A4</Byte>
+        <Byte>DD</Byte>
+        <Byte>7E</Byte>
+        <Byte>04</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>84</Byte>
+        <Byte>24</Byte>
+        <Byte>B0</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :mov [rdi+40],eax</Description>
+      <AddressString>GameAssembly.dll+B9F43D</AddressString>
+      <Before>
+        <Byte>9B</Byte>
+        <Byte>BA</Byte>
+        <Byte>81</Byte>
+        <Byte>04</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>89</Byte>
+        <Byte>47</Byte>
+        <Byte>40</Byte>
+      </Actual>
+      <After>
+        <Byte>75</Byte>
+        <Byte>13</Byte>
+        <Byte>48</Byte>
+        <Byte>8D</Byte>
+        <Byte>0D</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Code :mov [rbx+5C],ecx // wind_inc</Description>
+      <AddressString>GameAssembly.dll+C0D62A</AddressString>
+      <Before>
+        <Byte>CF</Byte>
+        <Byte>EB</Byte>
+        <Byte>02</Byte>
+        <Byte>33</Byte>
+        <Byte>C9</Byte>
+      </Before>
+      <Actual>
+        <Byte>89</Byte>
+        <Byte>4B</Byte>
+        <Byte>5C</Byte>
+      </Actual>
+      <After>
+        <Byte>3B</Byte>
+        <Byte>F7</Byte>
+        <Byte>7D</Byte>
+        <Byte>34</Byte>
+        <Byte>48</Byte>
+      </After>
+    </CodeEntry>
+  </CheatCodes>
+  <UserdefinedSymbols/>
+</CheatTable>

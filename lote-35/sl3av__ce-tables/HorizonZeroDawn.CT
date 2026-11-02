@@ -1,0 +1,4678 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="31">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>24111</ID>
+      <Description>"Horizon Zero Dawn"</Description>
+      <LastState Value="" RealAddress="00000000"/>
+      <Color>6260EC</Color>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>25</ID>
+      <Description>"Version: Steam [HRZ-PCR / 09:53 - Wed Sep 02 2020]"</Description>
+      <LastState Value="" RealAddress="00000000"/>
+      <Color>CED299</Color>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>24115</ID>
+      <Description>"-----------------------------------------------------------"</Description>
+      <LastState Value="" RealAddress="00000000"/>
+      <Color>554E4B</Color>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>24116</ID>
+      <Description>"Compact Mode"</Description>
+      <LastState/>
+      <Color>7C7570</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{$lua}
+
+if syntaxcheck then return end
+
+[ENABLE]
+
+function cycleFullCompact( sender, force )
+  local state = not( compactmenuitem.Caption == 'Compact View Mode' )
+  if force ~= nil then
+    state = not force
+  end
+  compactmenuitem.Caption = state and 'Compact View Mode' or 'Full View Mode'
+  getMainForm().Splitter1.Visible = state
+  getMainForm().Panel4.Visible = state
+  getMainForm().Panel5.Visible = state
+end
+
+function addCompactMenu()
+  if compactmenualreadyexists then return end
+    local parent = getMainForm().Menu.Items
+    compactmenuitem = createMenuItem( parent )
+    parent.add( compactmenuitem )
+    compactmenuitem.Caption = 'Compact View Mode'
+    compactmenuitem.OnClick = cycleFullCompact
+    compactmenualreadyexists = 'yes'
+end
+
+addCompactMenu()
+cycleFullCompact( nil, true )
+return "assert (true)"
+
+[DISABLE]
+
+cycleFullCompact( nil, false )
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>25470</ID>
+      <Description>"[ Enable ]"</Description>
+      <Options moHideChildren="1"/>
+      <LastState Activated="1"/>
+      <Color>A96974</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript Async="1">{$STRICT}
+
+{$lua}
+
+if syntaxcheck then return end
+
+function stopExec( s )
+  error( string.format( "\r\n&gt;&gt; %s &lt;&lt;", s ) )
+end
+
+function aobScanEx( aob )
+  -- thanks panraven for this function!
+  -- https://forum.cheatengine.org/viewtopic.php?t=577536
+  -- simplified for my needs
+  local p, a, n, s, e = nil or '*X*W', nil or fsmNotAligned, nil or '0', getAddress( process ) or 0x0, ( getAddress( process ) + getModuleSize( process ) ) or 0xffffffffffffffff
+  local ms = pb and createMemScan( pb ) or createMemScan()
+  local fl = createFoundList( ms )
+  ms.firstScan( soExactValue, vtByteArray, nil, aob, nil, s, e, p, a, n, true, false, false, false )
+  ms.waitTillDone()
+  fl.initialize()
+  local result = nil
+  if fl ~= nil and fl.getCount() &gt; 0 then
+    result = createStringlist()
+    for i = 1, fl.getCount() do result.add( fl.getAddress( i - 1 ) ) end
+  end
+  fl.destroy()
+  ms.destroy()
+  return result
+end
+
+function string.fromhex( s )
+    return ( s:gsub( '..', function ( cc )
+        return string.char( tonumber( cc, 16 ) )
+    end ) )
+end
+
+function aobScanSmall( aob, s, e )
+  local i = byteTableToString( readBytes( s, e, true ) ):find( string.fromhex( aob ), 1, true )
+  if i == nil then i = 1 end
+  return ( s + i - 1 )
+end
+
+function getAssemblySpot()
+  local start = getAddressSafe( "CodeCave" )
+  local addr = aobScanSmall( "DEADC0DE00", start, 0xB00 )
+  if addr ~= start then
+    local pad = { 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC }
+    writeBytes( addr + 0x4, pad )
+    addr = addr + 0x10
+  end
+  return addr
+end
+
+function GetRTTIClass( p )
+  return executeCodeEx( 0, nil, readQword( readQword( p ) ) ) or 0
+end
+
+function FindNamedComponentByRTTIClass( p, s )
+  local r = 0
+  local ComponentsArray = p + 0x8
+  local ComponentsArraySize = readInteger( p ) - 0x1 -- to skip the NULL ptr at the end of table
+  local ArrayStart = readQword( ComponentsArray )
+  local ArrayEnd = ArrayStart + ComponentsArraySize * 8
+  for i = ArrayStart, ArrayEnd, 8 do
+    local Component = readQword( i )
+    local RTTIClass = GetRTTIClass( Component )
+    local Name = readString( readQword( RTTIClass + 0x38 ) )
+    if Name == s then
+      r = Component
+      break
+    end
+  end
+  return r
+end
+
+function Init()
+
+  local sl, t, u = 0, 0, 0
+
+  -- get BuildId
+
+  local aob_BuildId = "BA????????488D4C24??488BF8E8"
+  sl = aobScanEx( aob_BuildId )
+  if not sl or sl.Count &lt; 1 then stopExec( "'aob_BuildId' not found." ) end
+  t = tonumber( sl[0], 16 )
+  t = aobScanSmall( "488D15", t, 0x100 )
+  local Build = readString( t + readInteger( t + 0x3, true ) + 0x7, 60000 )
+  t = aobScanSmall( "488BCB4C8D05", t + 0x1, 0x100 ) + 0x3
+  local Id = readString( t + readInteger( t + 0x3, true ) + 0x7, 60000 )
+  local BuildId = string.format( "%s / %s", Build, Id )
+
+  local TableBuildId = addresslist_getMemoryRecord( getAddressList(), 1 )
+  TableBuildId = memoryrecord_getDescription( TableBuildId )
+  TableBuildId = string.match( TableBuildId, '[[](.*)[]]' )
+
+  if TableBuildId == BuildId then
+
+    -- cave stuff
+
+  local moduleBase = getAddressSafe( process )
+  local offset = 0x500
+  t = moduleBase + offset
+  fullAccess( t, 0x1000 - offset )
+  executeCodeEx( 0, nil, getAddressSafe( "RtlZeroMemory" ), t, 0x1000 - offset )
+  unregisterSymbol( "CodeCave" )
+  registerSymbol( "CodeCave", t, true )
+
+  -- scan time!
+
+  local aob_g_Application = "488D0D????????E8????????84C074??488D0D????????E8????????48"
+  sl = aobScanEx( aob_g_Application )
+  if not sl or sl.Count &lt; 1 then stopExec( "'aob_g_Application' not found." ) end
+  t = tonumber( sl[0], 16 )
+  t = t + readInteger( t + 0x3, true ) + 0x7
+  unregisterSymbol( "g_Application" )
+  registerSymbol( "g_Application", t, true )
+
+  u = t + 0xF38
+  unregisterSymbol( "g_GameModule" )
+  registerSymbol( "g_GameModule", u, true )
+
+  u = t + 0xF40
+  unregisterSymbol( "g_MenuModule" )
+  registerSymbol( "g_MenuModule", u, true )
+
+  u = t + 0xF48
+  unregisterSymbol( "g_GameState" )
+  registerSymbol( "g_GameState", u, true )
+
+  u = t + 0xF50
+  unregisterSymbol( "g_PlayerProfile" )
+  registerSymbol( "g_PlayerProfile", u, true )
+
+  u = t + 0xF58
+  unregisterSymbol( "g_DebugSettings" )
+  registerSymbol( "g_DebugSettings", u, true )
+
+  u = t + 0xF60
+  unregisterSymbol( "g_PlayerRanksResource" )
+  registerSymbol( "g_PlayerRanksResource", u, true )
+
+  u = t + 0xF68
+  unregisterSymbol( "g_TrophySystem" )
+  registerSymbol( "g_TrophySystem", u, true )
+
+  u = t + 0xF70
+  unregisterSymbol( "g_NetManagerGame" )
+  registerSymbol( "g_NetManagerGame", u, true )
+
+  local aob_g_Viewport = "48833D????????000F84????????488379??000F"
+  sl = aobScanEx( aob_g_Viewport )
+  if not sl or sl.Count &lt; 1 then stopExec( "'aob_g_Viewport' not found." ) end
+  t = tonumber( sl[0], 16 )
+  t = t + readInteger( t + 0x3, true ) + 0x8
+  unregisterSymbol( "g_Viewport" )
+  registerSymbol( "g_Viewport", t, true )
+
+  local aob_CharacterProgressionComponent_SetCurrentLevel = "4883EC??488B41??4C8BC9488B40??4885C0"
+  sl = aobScanEx( aob_CharacterProgressionComponent_SetCurrentLevel )
+  if not sl or sl.Count &lt; 1 then stopExec( "'aob_CharacterProgressionComponent_SetCurrentLevel' not found." ) end
+  t = tonumber( sl[0], 16 )
+  unregisterSymbol( "CharacterProgressionComponent_SetCurrentLevel" )
+  registerSymbol( "CharacterProgressionComponent_SetCurrentLevel", t, true )
+
+  local aob_CountdownTimer_StartTimer = "4885C90F84????????534883EC??488379??00488BD974"
+  sl = aobScanEx( aob_CountdownTimer_StartTimer )
+  if not sl or sl.Count &lt; 1 then stopExec( "'aob_CountdownTimer_StartTimer' not found." ) end
+  t = tonumber( sl[0], 16 )
+  unregisterSymbol( "CountdownTimer_StartTimer" )
+  registerSymbol( "CountdownTimer_StartTimer", t, true )
+
+  local aob_CountdownTimer_PauseTimer = "4885C974??534883EC??488379??00488BD974??48" -- 2 identical results
+  sl = aobScanEx( aob_CountdownTimer_PauseTimer )
+  if not sl or sl.Count &lt; 1 then stopExec( "'aob_CountdownTimer_PauseTimer' not found." ) end
+  t = tonumber( sl[0], 16 )
+  unregisterSymbol( "CountdownTimer_PauseTimer" )
+  registerSymbol( "CountdownTimer_PauseTimer", t, true )
+
+  local aob_GetLocalPlayer = "48895C24??48896C24??48897424??574883EC??4863E985C90F85"
+  sl = aobScanEx( aob_GetLocalPlayer )
+  if not sl or sl.Count &lt; 1 then stopExec( "'aob_GetLocalPlayer' not found." ) end
+  t = tonumber( sl[0], 16 )
+  unregisterSymbol( "GetLocalPlayer" )
+  registerSymbol( "GetLocalPlayer", t, true )
+
+  t = aobScanSmall( "33C0488B5C24", t, 0x200 ) + 0x2
+  unregisterSymbol( "hk_GetLocalPlayer" )
+  registerSymbol( "hk_GetLocalPlayer", t, true )
+
+  local get_LocalPlayer = getAssemblySpot()
+  unregisterSymbol( "get_LocalPlayer" )
+  registerSymbol( "get_LocalPlayer", get_LocalPlayer, true )
+
+  u = string.format( "%X", t )
+
+  autoAssemble([[
+
+    label( LocalPlayer )
+    registersymbol( LocalPlayer )
+
+    get_LocalPlayer:
+    readmem( ]]..u..[[, 5 )
+    mov [LocalPlayer],rax
+    jmp hk_GetLocalPlayer+5
+
+    align 10 CC
+
+    LocalPlayer:
+    dq 0
+
+    align 10 CC
+
+    db DE AD C0 DE
+
+    ]]..u..[[:
+    jmp get_LocalPlayer
+
+  ]])
+
+  else
+
+    showMessage( "This table is designed for BuildId: \r\n&gt;&gt; " .. TableBuildId .. "\r\n\r\nYours is: \r\n&gt;&gt; " .. BuildId .. "\r\n\r\nTable version doesn't match the current game version. Good luck, bitch!" )
+    return "assert(true)"
+
+  end
+
+end
+
+[ENABLE]
+
+return Init()
+
+[DISABLE]
+
+autoAssemble([[
+
+  hk_GetLocalPlayer:
+  readmem( get_LocalPlayer, 5 )
+
+  unregistersymbol( LocalPlayer )
+  unregistersymbol( get_LocalPlayer )
+  unregistersymbol( hk_GetLocalPlayer )
+  unregistersymbol( GetLocalPlayer )
+
+  unregistersymbol( g_Viewport )
+  unregistersymbol( g_NetManagerGame )
+  unregistersymbol( g_TrophySystem )
+  unregistersymbol( g_PlayerRanksResource )
+  unregistersymbol( g_DebugSettings )
+  unregistersymbol( g_PlayerProfile )
+  unregistersymbol( g_GameState )
+  unregistersymbol( g_MenuModule )
+  unregistersymbol( g_GameModule )
+  unregistersymbol( g_Application )
+
+]])
+
+local t = getAddressSafe( "CodeCave" )
+executeCodeEx( 0, nil, getAddressSafe( "RtlZeroMemory" ), t, 0xB00 )
+unregisterSymbol( "CodeCave" )
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>25097</ID>
+          <Description>"[ Pointers/Structures ]"</Description>
+          <Options moHideChildren="1"/>
+          <LastState Value="" RealAddress="00000000"/>
+          <Color>8EA5F5</Color>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>26385</ID>
+              <Description>"LocalPlayer ['PlayerGame']"</Description>
+              <LastState Value="000002A149C69100" RealAddress="7FF7562D0520"/>
+              <ShowAsHex>1</ShowAsHex>
+              <VariableType>8 Bytes</VariableType>
+              <Address>LocalPlayer</Address>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>26386</ID>
+                  <Description>"[0070] Entity ['Soldier']"</Description>
+                  <LastState Value="000002A6A784D510" RealAddress="2A149C69170"/>
+                  <ShowAsHex>1</ShowAsHex>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>+0</Address>
+                  <Offsets>
+                    <Offset>70</Offset>
+                  </Offsets>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>26387</ID>
+                      <Description>"[000C] UUID"</Description>
+                      <LastState Value="7D 97 34 E2 B3 5C 46 82 93 26 66 4F DA 90 C5 87" RealAddress="2A6A784D51C"/>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>Array of byte</VariableType>
+                      <ByteLength>16</ByteLength>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>C</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>26415</ID>
+                      <Description>"[0038] Name"</Description>
+                      <LastState RealAddress="2A6A784D4F0"/>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>String</VariableType>
+                      <Length>100</Length>
+                      <Unicode>0</Unicode>
+                      <CodePage>0</CodePage>
+                      <ZeroTerminate>1</ZeroTerminate>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>0</Offset>
+                        <Offset>38</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>26389</ID>
+                      <Description>"[01C0] EntityRep"</Description>
+                      <LastState Value="000002A6A784DEA0" RealAddress="2A6A784D6D0"/>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>1C0</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>26391</ID>
+                      <Description>"[01C8] ControlledEntity"</Description>
+                      <LastState Value="0000000000000000" RealAddress="2A6A784D6D8"/>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>1C8</Offset>
+                      </Offsets>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>26419</ID>
+                          <Description>"[0038] p-&gt;Name"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>String</VariableType>
+                          <Length>100</Length>
+                          <Unicode>0</Unicode>
+                          <CodePage>0</CodePage>
+                          <ZeroTerminate>1</ZeroTerminate>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>0</Offset>
+                            <Offset>38</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26430</ID>
+                          <Description>"[01D0] ControllerEntity"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>1D0</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26409</ID>
+                          <Description>"[01F0] Destructibility"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>1F0</Offset>
+                          </Offsets>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>26413</ID>
+                              <Description>"[0030] DestructibilityResource"</Description>
+                              <ShowAsHex>1</ShowAsHex>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>30</Offset>
+                              </Offsets>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>26418</ID>
+                                  <Description>"[0020] p-&gt;Name"</Description>
+                                  <ShowAsHex>1</ShowAsHex>
+                                  <VariableType>String</VariableType>
+                                  <Length>100</Length>
+                                  <Unicode>0</Unicode>
+                                  <CodePage>0</CodePage>
+                                  <ZeroTerminate>1</ZeroTerminate>
+                                  <Address>+0</Address>
+                                  <Offsets>
+                                    <Offset>0</Offset>
+                                    <Offset>20</Offset>
+                                  </Offsets>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>26453</ID>
+                                  <Description>"[002C] BaseHealth"</Description>
+                                  <VariableType>Float</VariableType>
+                                  <Address>+0</Address>
+                                  <Offsets>
+                                    <Offset>2C</Offset>
+                                  </Offsets>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>26410</ID>
+                              <Description>"[0060] Invulnerable"</Description>
+                              <ShowAsHex>1</ShowAsHex>
+                              <VariableType>Byte</VariableType>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>60</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>26411</ID>
+                              <Description>"[0064] Health"</Description>
+                              <VariableType>Float</VariableType>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>64</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>26412</ID>
+                              <Description>"[0068] MaxHealth (= BaseHealth + UpgradeHealth)"</Description>
+                              <VariableType>Float</VariableType>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>68</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>26454</ID>
+                              <Description>"[0074] ExtendedMaxHealth"</Description>
+                              <VariableType>Float</VariableType>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>74</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26467</ID>
+                          <Description>"[0228] AIFaction"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>228</Offset>
+                          </Offsets>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>26468</ID>
+                              <Description>"[0020] p-&gt;Name"</Description>
+                              <ShowAsHex>1</ShowAsHex>
+                              <VariableType>String</VariableType>
+                              <Length>100</Length>
+                              <Unicode>0</Unicode>
+                              <CodePage>0</CodePage>
+                              <ZeroTerminate>1</ZeroTerminate>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>0</Offset>
+                                <Offset>20</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26447</ID>
+                          <Description>"[0120] X"</Description>
+                          <VariableType>Double</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>120</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26448</ID>
+                          <Description>"[0128] Y"</Description>
+                          <VariableType>Double</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>128</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26449</ID>
+                          <Description>"[0130] Z"</Description>
+                          <VariableType>Double</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>130</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>26392</ID>
+                      <Description>"[0120] X"</Description>
+                      <LastState Value="2842.27124023438" RealAddress="2A6A784D630"/>
+                      <VariableType>Double</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>120</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>26427</ID>
+                      <Description>"[0128] Y"</Description>
+                      <LastState Value="2802.51708984375" RealAddress="2A6A784D638"/>
+                      <VariableType>Double</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>128</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>26426</ID>
+                      <Description>"[0130] Z"</Description>
+                      <LastState Value="640.89737546444" RealAddress="2A6A784D640"/>
+                      <VariableType>Double</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>130</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>26424</ID>
+                      <Description>"[01D0] LeftMostChild"</Description>
+                      <LastState Value="000002A6A920F0F0" RealAddress="2A6A784D6E0"/>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>1D0</Offset>
+                      </Offsets>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>26425</ID>
+                          <Description>"[0038] p-&gt;Name"</Description>
+                          <LastState RealAddress="2A12695E990"/>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>String</VariableType>
+                          <Length>100</Length>
+                          <Unicode>0</Unicode>
+                          <CodePage>0</CodePage>
+                          <ZeroTerminate>1</ZeroTerminate>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>0</Offset>
+                            <Offset>38</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>26458</ID>
+                      <Description>"[01D8] RightSibling"</Description>
+                      <LastState Value="0000000000000000" RealAddress="2A6A784D6E8"/>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>1D8</Offset>
+                      </Offsets>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>26459</ID>
+                          <Description>"[0038] p-&gt;Name"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>String</VariableType>
+                          <Length>100</Length>
+                          <Unicode>0</Unicode>
+                          <CodePage>0</CodePage>
+                          <ZeroTerminate>1</ZeroTerminate>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>0</Offset>
+                            <Offset>38</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>26408</ID>
+                      <Description>"[01E0] MounterMover"</Description>
+                      <LastState Value="000002A6A78E11E0" RealAddress="2A6A784D6F0"/>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>1E0</Offset>
+                      </Offsets>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>26396</ID>
+                          <Description>"[0030] MounterMoverResource"</Description>
+                          <LastState Value="000002A18BF11680" RealAddress="2A6A78E1210"/>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>30</Offset>
+                          </Offsets>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>26421</ID>
+                              <Description>"[0020] p-&gt;Name"</Description>
+                              <LastState RealAddress="2A127129270"/>
+                              <ShowAsHex>1</ShowAsHex>
+                              <VariableType>String</VariableType>
+                              <Length>100</Length>
+                              <Unicode>0</Unicode>
+                              <CodePage>0</CodePage>
+                              <ZeroTerminate>1</ZeroTerminate>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>0</Offset>
+                                <Offset>20</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>26417</ID>
+                      <Description>"[01E8] SkinnedModel"</Description>
+                      <LastState Value="000002A6A78F0180" RealAddress="2A6A784D6F8"/>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>1E8</Offset>
+                      </Offsets>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>26422</ID>
+                          <Description>"[0030] SkinnedModelResource"</Description>
+                          <LastState Value="000002A188745A80" RealAddress="2A6A78F01B0"/>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>30</Offset>
+                          </Offsets>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>26423</ID>
+                              <Description>"[0020] p-&gt;Name"</Description>
+                              <LastState RealAddress="2A126DDD9D0"/>
+                              <ShowAsHex>1</ShowAsHex>
+                              <VariableType>String</VariableType>
+                              <Length>100</Length>
+                              <Unicode>0</Unicode>
+                              <CodePage>0</CodePage>
+                              <ZeroTerminate>1</ZeroTerminate>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>0</Offset>
+                                <Offset>20</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>26390</ID>
+                      <Description>"[01F0] Destructibility"</Description>
+                      <LastState Value="000002A6A78E1470" RealAddress="2A6A784D700"/>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>1F0</Offset>
+                      </Offsets>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>26394</ID>
+                          <Description>"[0030] DestructibilityResource"</Description>
+                          <LastState Value="000002A18E084D00" RealAddress="2A6A78E14A0"/>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>30</Offset>
+                          </Offsets>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>26395</ID>
+                              <Description>"[0020] p-&gt;Name"</Description>
+                              <LastState RealAddress="2A1271D1660"/>
+                              <ShowAsHex>1</ShowAsHex>
+                              <VariableType>String</VariableType>
+                              <Length>100</Length>
+                              <Unicode>0</Unicode>
+                              <CodePage>0</CodePage>
+                              <ZeroTerminate>1</ZeroTerminate>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>0</Offset>
+                                <Offset>20</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>26451</ID>
+                              <Description>"[002C] BaseHealth"</Description>
+                              <LastState Value="200" RealAddress="2A18E084D2C"/>
+                              <VariableType>Float</VariableType>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>2C</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26450</ID>
+                          <Description>"[0060] Invulnerable"</Description>
+                          <LastState Value="00" RealAddress="2A6A78E14D0"/>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>Byte</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>60</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26406</ID>
+                          <Description>"[0064] Health"</Description>
+                          <LastState Value="720.0003052" RealAddress="2A6A78E14D4"/>
+                          <VariableType>Float</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>64</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26407</ID>
+                          <Description>"[0068] MaxHealth (= BaseHealth + UpgradeHealth)"</Description>
+                          <LastState Value="800" RealAddress="2A6A78E14D8"/>
+                          <VariableType>Float</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>68</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26452</ID>
+                          <Description>"[0074] UpgradeHealth"</Description>
+                          <LastState Value="600" RealAddress="2A6A78E14E4"/>
+                          <VariableType>Float</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>74</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>26416</ID>
+                      <Description>"[0228] AIFaction"</Description>
+                      <LastState Value="000002A18036C900" RealAddress="2A6A784D738"/>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>228</Offset>
+                      </Offsets>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>26429</ID>
+                          <Description>"[0020] p-&gt;Name"</Description>
+                          <LastState RealAddress="2A169068280"/>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>String</VariableType>
+                          <Length>100</Length>
+                          <Unicode>0</Unicode>
+                          <CodePage>0</CodePage>
+                          <ZeroTerminate>1</ZeroTerminate>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>0</Offset>
+                            <Offset>20</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>26466</ID>
+                      <Description>"[0288] Components_table_size"</Description>
+                      <LastState Value="000000A2" RealAddress="2A6A784D798"/>
+                      <ShowAsHex>1</ShowAsHex>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>288</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>26469</ID>
+                      <Description>"[0290] p-&gt;Components_table"</Description>
+                      <LastState Value="000002A6A769B2E0" RealAddress="2A6A784D7A0"/>
+                      <ShowAsHex>1</ShowAsHex>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>290</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>26428</ID>
+                      <Description>"[0758] Player"</Description>
+                      <LastState Value="000002A149C69100" RealAddress="2A6A784DC68"/>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>758</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>26440</ID>
+                      <Description>"[0808] CapsuleComponent"</Description>
+                      <LastState Value="00007FF758017320" RealAddress="2A6A78EFA90"/>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>-20</Offset>
+                        <Offset>808</Offset>
+                      </Offsets>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>26441</ID>
+                          <Description>"[0068] PhysicsCharacterMoverProxy"</Description>
+                          <LastState Value="000002A6A78EFB50" RealAddress="2A6A78EFAF8"/>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>+68</Address>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>26442</ID>
+                              <Description>"[0058] PhysicsWorld"</Description>
+                              <LastState Value="000002A169BDA9C0" RealAddress="2A6A78EFBA8"/>
+                              <ShowAsHex>1</ShowAsHex>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>58</Offset>
+                              </Offsets>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>26443</ID>
+                              <Description>"[00E0] PlayerXYZ"</Description>
+                              <LastState Value="000002A6A8A04480" RealAddress="2A6A78EFC30"/>
+                              <ShowAsHex>1</ShowAsHex>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>E0</Offset>
+                              </Offsets>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>26444</ID>
+                                  <Description>"[0070] X"</Description>
+                                  <LastState Value="2842.27124" RealAddress="2A6A8A044F0"/>
+                                  <VariableType>Float</VariableType>
+                                  <Address>+0</Address>
+                                  <Offsets>
+                                    <Offset>70</Offset>
+                                  </Offsets>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>26446</ID>
+                                  <Description>"[0074] Y"</Description>
+                                  <LastState Value="2802.51709" RealAddress="2A6A8A044F4"/>
+                                  <VariableType>Float</VariableType>
+                                  <Address>+0</Address>
+                                  <Offsets>
+                                    <Offset>74</Offset>
+                                  </Offsets>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>26445</ID>
+                                  <Description>"[0078] Z"</Description>
+                                  <LastState Value="641.7473755" RealAddress="2A6A8A044F8"/>
+                                  <VariableType>Float</VariableType>
+                                  <Address>+0</Address>
+                                  <Offsets>
+                                    <Offset>78</Offset>
+                                  </Offsets>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>26400</ID>
+                  <Description>"[0078] IsHuman"</Description>
+                  <LastState Value="01" RealAddress="2A149C69178"/>
+                  <ShowAsHex>1</ShowAsHex>
+                  <VariableType>Byte</VariableType>
+                  <Address>+0</Address>
+                  <Offsets>
+                    <Offset>78</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>26404</ID>
+                  <Description>"[0079] IsLocal"</Description>
+                  <LastState Value="00" RealAddress="2A149C69179"/>
+                  <ShowAsHex>1</ShowAsHex>
+                  <VariableType>Byte</VariableType>
+                  <Address>+0</Address>
+                  <Offsets>
+                    <Offset>79</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>26402</ID>
+                  <Description>"[0080] Faction"</Description>
+                  <LastState Value="000002A18036C900" RealAddress="2A149C69180"/>
+                  <ShowAsHex>1</ShowAsHex>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>+0</Address>
+                  <Offsets>
+                    <Offset>80</Offset>
+                  </Offsets>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>26403</ID>
+                      <Description>"[0020] p-&gt;Name"</Description>
+                      <LastState RealAddress="2A169068280"/>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>String</VariableType>
+                      <Length>100</Length>
+                      <Unicode>0</Unicode>
+                      <CodePage>0</CodePage>
+                      <ZeroTerminate>1</ZeroTerminate>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>0</Offset>
+                        <Offset>20</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>26475</ID>
+                  <Description>"[00D0] GameViewGame"</Description>
+                  <LastState Value="000002A149D60190" RealAddress="2A149C691D0"/>
+                  <ShowAsHex>1</ShowAsHex>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>+0</Address>
+                  <Offsets>
+                    <Offset>D0</Offset>
+                  </Offsets>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>26476</ID>
+                      <Description>"[0350] HUD"</Description>
+                      <LastState Value="000002A6A784E3E0" RealAddress="2A149D604E0"/>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>350</Offset>
+                      </Offsets>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>26477</ID>
+                          <Description>"[0128] HUDLogicComponents_table_size"</Description>
+                          <LastState Value="00000024" RealAddress="2A6A784E508"/>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>4 Bytes</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>128</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26478</ID>
+                          <Description>"[0130] p-&gt;HUDLogicComponents_table"</Description>
+                          <LastState Value="000002A6A78D92C0" RealAddress="2A6A784E510"/>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>130</Offset>
+                          </Offsets>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>26479</ID>
+                              <Description>"[00XX] HUDCountdownTimerLogic"</Description>
+                              <LastState Value="000002A6A78BCBC0" RealAddress="2A6A78D92D0"/>
+                              <ShowAsHex>1</ShowAsHex>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+0</Address>
+                              <Offsets>
+                                <Offset>10</Offset>
+                              </Offsets>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>26480</ID>
+                                  <Description>"[0060] CountdownTimer"</Description>
+                                  <LastState Value="000002A6A94D9DA0" RealAddress="2A6A78BCC20"/>
+                                  <ShowAsHex>1</ShowAsHex>
+                                  <VariableType>8 Bytes</VariableType>
+                                  <Address>+0</Address>
+                                  <Offsets>
+                                    <Offset>60</Offset>
+                                  </Offsets>
+                                  <CheatEntries>
+                                    <CheatEntry>
+                                      <ID>26481</ID>
+                                      <Description>"[0020] CountdownTimerSave"</Description>
+                                      <LastState Value="000002A6A62FE0D0" RealAddress="2A6A94D9DC0"/>
+                                      <ShowAsHex>1</ShowAsHex>
+                                      <VariableType>8 Bytes</VariableType>
+                                      <Address>+0</Address>
+                                      <Offsets>
+                                        <Offset>20</Offset>
+                                      </Offsets>
+                                      <CheatEntries>
+                                        <CheatEntry>
+                                          <ID>26482</ID>
+                                          <Description>"[001C] Timer"</Description>
+                                          <LastState Value="1.801800609" RealAddress="2A6A62FE0EC"/>
+                                          <VariableType>Float</VariableType>
+                                          <Address>+0</Address>
+                                          <Offsets>
+                                            <Offset>1C</Offset>
+                                          </Offsets>
+                                        </CheatEntry>
+                                      </CheatEntries>
+                                    </CheatEntry>
+                                  </CheatEntries>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>2</ID>
+              <Description>"g_DebugSettings"</Description>
+              <LastState Value="000002A162EDC610" RealAddress="7FF75D3F25D8"/>
+              <ShowAsHex>1</ShowAsHex>
+              <VariableType>8 Bytes</VariableType>
+              <Address>g_DebugSettings</Address>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>26388</ID>
+                  <Description>"[0008] ??"</Description>
+                  <LastState Value="1" RealAddress="2A162EDC618"/>
+                  <VariableType>Byte</VariableType>
+                  <Address>+0</Address>
+                  <Offsets>
+                    <Offset>8</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>26497</ID>
+                  <Description>"[000C] ??"</Description>
+                  <LastState Value="1" RealAddress="2A162EDC61C"/>
+                  <VariableType>Byte</VariableType>
+                  <Address>+0</Address>
+                  <Offsets>
+                    <Offset>C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>3</ID>
+                  <Description>"[0010] ShowInfo ( -&gt; 1 )"</Description>
+                  <LastState Value="0" RealAddress="2A162EDC620"/>
+                  <VariableType>Byte</VariableType>
+                  <Address>+0</Address>
+                  <Offsets>
+                    <Offset>10</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>26498</ID>
+                  <Description>"[0012] ??"</Description>
+                  <LastState Value="0" RealAddress="2A162EDC622"/>
+                  <VariableType>Byte</VariableType>
+                  <Address>+0</Address>
+                  <Offsets>
+                    <Offset>12</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>26496</ID>
+                  <Description>"[0022] ??"</Description>
+                  <LastState Value="0" RealAddress="2A162EDC632"/>
+                  <VariableType>Byte</VariableType>
+                  <Address>+0</Address>
+                  <Offsets>
+                    <Offset>22</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>4</ID>
+                  <Description>"[0024] God ( -&gt; 2 )"</Description>
+                  <LastState Value="0" RealAddress="2A162EDC634"/>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>+0</Address>
+                  <Offsets>
+                    <Offset>24</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1</ID>
+                  <Description>"[0028] InfiniteAmmo ( -&gt; 1 )"</Description>
+                  <LastState Value="0" RealAddress="2A162EDC638"/>
+                  <VariableType>Byte</VariableType>
+                  <Address>+0</Address>
+                  <Offsets>
+                    <Offset>28</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>6</ID>
+                  <Description>"[0029] ??"</Description>
+                  <LastState Value="0" RealAddress="2A162EDC639"/>
+                  <VariableType>Byte</VariableType>
+                  <Address>+0</Address>
+                  <Offsets>
+                    <Offset>29</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>26500</ID>
+                  <Description>"[002B] ??"</Description>
+                  <LastState Value="0" RealAddress="2A162EDC63B"/>
+                  <VariableType>Byte</VariableType>
+                  <Address>+0</Address>
+                  <Offsets>
+                    <Offset>2B</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>26501</ID>
+                  <Description>"[0034] InfiniteClip ( -&gt; 1 )"</Description>
+                  <LastState Value="0" RealAddress="2A162EDC644"/>
+                  <VariableType>Byte</VariableType>
+                  <Address>+0</Address>
+                  <Offsets>
+                    <Offset>34</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>26378</ID>
+              <Description>"g_GameModule"</Description>
+              <LastState Value="000002A169B8BB10" RealAddress="7FF75D3F25B8"/>
+              <ShowAsHex>1</ShowAsHex>
+              <VariableType>8 Bytes</VariableType>
+              <Address>g_GameModule</Address>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>26375</ID>
+                  <Description>"[0058] WorldState"</Description>
+                  <LastState Value="000002A127B82590" RealAddress="2A169B8BB68"/>
+                  <ShowAsHex>1</ShowAsHex>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>+0</Address>
+                  <Offsets>
+                    <Offset>58</Offset>
+                  </Offsets>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>26376</ID>
+                      <Description>"[0098] TimeOfDay"</Description>
+                      <LastState Value="23.39733505" RealAddress="2A127B82628"/>
+                      <VariableType>Float</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>98</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>26383</ID>
+                      <Description>"[00A4] ??"</Description>
+                      <LastState Value="01" RealAddress="2A127B82634"/>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>Byte</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>A4</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>26384</ID>
+                      <Description>"[00A5] ??"</Description>
+                      <LastState Value="00" RealAddress="2A127B82635"/>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>Byte</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>A5</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>26382</ID>
+                  <Description>"[00A0] Tick"</Description>
+                  <LastState Value="0" RealAddress="2A169B8BBB0"/>
+                  <VariableType>Float</VariableType>
+                  <Address>+0</Address>
+                  <Offsets>
+                    <Offset>A0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>26493</ID>
+                  <Description>"[04D1] ObserverPositionOverride (despawns world)"</Description>
+                  <LastState Value="00" RealAddress="2A169B8BFE1"/>
+                  <ShowAsHex>1</ShowAsHex>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Byte</VariableType>
+                  <Address>+0</Address>
+                  <Offsets>
+                    <Offset>4D1</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>26503</ID>
+                  <Description>"[0950] EquipmentStatsDisplaySystem"</Description>
+                  <LastState Value="000002A6A76E2590" RealAddress="2A169B8C460"/>
+                  <ShowAsHex>1</ShowAsHex>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>+0</Address>
+                  <Offsets>
+                    <Offset>950</Offset>
+                  </Offsets>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>26526</ID>
+                      <Description>"[0020] EquipmentStatsDisplaySystemResource"</Description>
+                      <LastState Value="000002A189CB7B60" RealAddress="2A6A76E25B0"/>
+                      <ShowAsHex>1</ShowAsHex>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>20</Offset>
+                      </Offsets>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>26527</ID>
+                          <Description>"[00C0] Stats"</Description>
+                          <LastState Value="20" RealAddress="2A189CB7C20"/>
+                          <VariableType>4 Bytes</VariableType>
+                          <Address>+0</Address>
+                          <Offsets>
+                            <Offset>C0</Offset>
+                          </Offsets>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>26525</ID>
+                  <Description>"[0A78] IsNewGamePlus"</Description>
+                  <LastState Value="1" RealAddress="2A169B8C588"/>
+                  <VariableType>Byte</VariableType>
+                  <Address>+0</Address>
+                  <Offsets>
+                    <Offset>A78</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>26379</ID>
+              <Description>"g_Viewport"</Description>
+              <LastState Value="000002A127789E60" RealAddress="7FF75D3ECDD8"/>
+              <ShowAsHex>1</ShowAsHex>
+              <VariableType>8 Bytes</VariableType>
+              <Address>g_Viewport</Address>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>26380</ID>
+                  <Description>"[0098] AmbienceManager"</Description>
+                  <LastState Value="000002A127789E60" RealAddress="7FF75D3ECDD8"/>
+                  <ShowAsHex>1</ShowAsHex>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>g_Viewport</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>26494</ID>
+              <Description>"g_WeatherSystem"</Description>
+              <LastState Value="0000000000000000" RealAddress="7FF759211598"/>
+              <ShowAsHex>1</ShowAsHex>
+              <VariableType>8 Bytes</VariableType>
+              <Address>HorizonZeroDawn.exe+2F41598</Address>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>26495</ID>
+                  <Description>"[0310] ResetWeather"</Description>
+                  <ShowAsHex>1</ShowAsHex>
+                  <VariableType>Byte</VariableType>
+                  <Address>+0</Address>
+                  <Offsets>
+                    <Offset>310</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>25098</ID>
+          <Description>"[ Scripts ]"</Description>
+          <Options moHideChildren="1"/>
+          <LastState Value="" Activated="1" RealAddress="00000000"/>
+          <Color>8EA5F5</Color>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>26487</ID>
+              <Description>"[Player] God Mode"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+
+{$lua}
+
+if syntaxcheck then return end
+
+local DebugSettings = readQword( getAddressSafe( "g_DebugSettings" ) )
+
+[ENABLE]
+
+writeInteger( DebugSettings + 0x24, 2 )
+
+[DISABLE]
+
+writeInteger( DebugSettings + 0x24, 0 )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>26492</ID>
+              <Description>"[Player] Infinite Ammo"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+
+{$lua}
+
+if syntaxcheck then return end
+
+local DebugSettings = readQword( getAddressSafe( "g_DebugSettings" ) )
+
+[ENABLE]
+
+writeBytes( DebugSettings + 0x28, 1 )
+
+[DISABLE]
+
+writeBytes( DebugSettings + 0x28, 0 )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>26502</ID>
+              <Description>"[Player] Infinite Clip / Fast Fire"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+
+{$lua}
+
+if syntaxcheck then return end
+
+local DebugSettings = readQword( getAddressSafe( "g_DebugSettings" ) )
+
+[ENABLE]
+
+writeBytes( DebugSettings + 0x34, 1 )
+
+[DISABLE]
+
+writeBytes( DebugSettings + 0x34, 0 )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>26491</ID>
+              <Description>"[Player] Set Current Level"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+
+{$lua}
+
+if syntaxcheck then return end
+
+[ENABLE]
+
+local level = inputQuery( '', 'Level:', '' )
+level = tonumber( level, 10 )
+if level then
+  local sym_LocalPlayer = getAddressSafe( "LocalPlayer" )
+  if sym_LocalPlayer == nil then end
+    LocalPlayer = readQword( sym_LocalPlayer )
+    if LocalPlayer == 0x0 then end
+      local Entity = readQword( LocalPlayer + 0x70 )
+      if Entity == 0x0 then end
+        local CharacterProgressionComponent = FindNamedComponentByRTTIClass( Entity + 0x288, "CharacterProgressionComponent" )
+        if CharacterProgressionComponent == 0x0 then end
+          local CharacterProgressionComponent_SetCurrentLevel = getAddressSafe( "CharacterProgressionComponent_SetCurrentLevel" )
+          executeCodeEx( 0, nil, CharacterProgressionComponent_SetCurrentLevel, CharacterProgressionComponent, level )
+end
+return "assert(true)"
+
+[DISABLE]
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>26532</ID>
+              <Description>"[Trials] Lock Trial Timer At 00:00"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+
+{$lua}
+
+if syntaxcheck then return end
+
+function ResetTimer( CountdownTimer )
+  if CountdownTimer ~= 0x0 then
+    if readQword( CountdownTimer + 0x40 ) ~= 0x0 then
+      local CountdownTimerSave = readQword( CountdownTimer + 0x20 )
+      if CountdownTimerSave ~= 0x0 then
+        writeInteger( CountdownTimerSave + 0x1C, 0 )
+      end
+    end
+  end
+end
+
+[ENABLE]
+
+local sym_LocalPlayer = getAddressSafe( "LocalPlayer" )
+if sym_LocalPlayer == nil then end
+local LocalPlayer = readQword( sym_LocalPlayer )
+if LocalPlayer == 0x0 then end
+local GameViewGame = readQword( LocalPlayer + 0xD0 )
+if GameViewGame == 0x0 then end
+local HUD = readQword( GameViewGame + 0x350 )
+if HUD == 0x0 then end
+local HUDCountdownTimerLogic = FindNamedComponentByRTTIClass( HUD + 0x128, "HUDCountdownTimerLogic" )
+if HUDCountdownTimerLogic ~= 0x0 then
+  local CountdownTimer = readQword( HUDCountdownTimerLogic + 0x60 )
+  if CountdownTimer ~= 0x0 then
+    local StartTimer = getAddressSafe( "CountdownTimer_StartTimer" )
+    StartTimer = string.format( "%X", StartTimer )
+    autoAssemble([[
+    ]]..StartTimer..[[:
+    db C3 // ret
+    nop 2
+    ]])
+    local PauseTimer = getAddressSafe( "CountdownTimer_PauseTimer" )
+    executeCodeEx( 0, nil, PauseTimer, CountdownTimer )
+    ResetTimer( CountdownTimer )
+  end
+end
+
+[DISABLE]
+
+local StartTimer = getAddressSafe( "CountdownTimer_StartTimer" )
+StartTimer = string.format( "%X", StartTimer )
+autoAssemble([[
+]]..StartTimer..[[:
+db 48 85 C9 // test rcx,rcx
+]])
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>26508</ID>
+              <Description>"[Game Progression] Change Normal &lt;-&gt; NG+"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+
+{$lua}
+
+if syntaxcheck then return end
+
+[ENABLE]
+
+local isInGame = messageDialog( 'Are you in game world (not at main menu)?', mtConfirmation, mbYes, mbNo )
+if isInGame == 0x7 then end
+local gametype = inputQuery( '', 'Type: 0 - normal; 1 - NG+', '1' )
+gametype = tonumber( gametype, 10 )
+if gametype then
+  local sym_g_GameModule = getAddressSafe( "g_GameModule" )
+  if sym_g_GameModule == nil then end
+    GameModule = readQword( sym_g_GameModule )
+    if GameModule == 0x0 then end
+      writeBytes( GameModule + 0xA78, gametype )
+      messageDialog( "Now Quick Save at a Campfire, then hit Esc, RESTART FROM SAVE.", mtInformation, mbOK )
+end
+return "assert(true)"
+
+[DISABLE]
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>26529</ID>
+              <Description>"[Existing Inventory] Inventory Editor"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+
+{$lua}
+
+if syntaxcheck then return end
+
+[ENABLE]
+
+local memRecIds = {}
+local addressList = getAddressList()
+local memRec = addressList.getMemoryRecordByID( "26529" ) -- gets "[I &gt; Modifications &gt; Click Item &gt; R, then Esc &gt; E] Coil|Weave Dupe" memory record
+if memRec.Count ~= 0x0 then
+  for i = 1, memRec.Count - 1 do
+    table.insert( memRecIds, memoryrecord_getID( memRec.Child[i] ) )
+  end
+  for _, v in pairs( memRecIds ) do
+    local mr = addresslist_getMemoryRecordByID( addressList, v )
+    if mr ~= nil then memoryrecord_delete( mr ) end
+  end
+end
+
+local sym_LocalPlayer = getAddressSafe( "LocalPlayer" )
+if sym_LocalPlayer == nil then end
+LocalPlayer = readQword( sym_LocalPlayer )
+if LocalPlayer == 0x0 then end
+local PlayerEntity = readQword( LocalPlayer + 0x70 )
+if PlayerEntity == 0x0 then end
+
+local HumanoidInventory = FindNamedComponentByRTTIClass( PlayerEntity + 0x288, "HumanoidInventory" )
+if HumanoidInventory == 0x0 then end
+
+InventoryEntitiesTable = HumanoidInventory + 0x60
+InventoryEntitiesTableSize = readInteger( HumanoidInventory + 0x58 )
+ArrayStart = readQword( InventoryEntitiesTable )
+ArrayEnd = ArrayStart + ( InventoryEntitiesTableSize - 1 ) * 8
+
+local filter = inputQuery( 'Want to find only a specific Item?', 'Filter:', '' )
+
+if filter ~= nil then
+
+  -- filtered run-down
+  -- process each InventoryEntity
+  local i = 0
+  for i = ArrayStart, ArrayEnd, 8 do
+
+    local InventoryEntity = readQword( i )
+
+    local InventoryItemComponent = FindNamedComponentByRTTIClass( InventoryEntity + 0x288, "InventoryItemComponent" )
+
+    local Price = 0x0
+    local ItemPriceInfo = 0x0
+    if InventoryItemComponent ~= 0x0 then
+      local InventoryItemComponentResource = readQword( InventoryItemComponent + 0x30 )
+      p_Name = readQword( InventoryItemComponentResource + 0x28 )
+      InventoryItemComponentName = readQword( p_Name + 0x20 )
+      dw_Size = readInteger( p_Name + 0x28 )
+      sz_ItemName = readString( InventoryItemComponentName, dw_Size )
+      ItemPriceInfo = readQword( InventoryItemComponentResource + 0x38 )
+      local dwPrice = 0
+      if ItemPriceInfo ~= 0x0 then
+        Price = ItemPriceInfo + 0x2C
+      end
+    end
+
+    local lsz_ItemName = string.lower( sz_ItemName )
+    local found = string.find( lsz_ItemName, filter )
+
+    if found ~= nil then
+
+      local StackableComponent = FindNamedComponentByRTTIClass( InventoryEntity + 0x288, "StackableComponent" )
+
+      local Quantity = 0x0
+      local StackQuantity = 0x0
+      if StackableComponent ~= 0x0 then
+        local StackableComponentResource = readQword( StackableComponent + 0x30 )
+        Quantity = StackableComponent + 0x58
+        StackQuantity = StackableComponentResource + 0x30
+      end
+
+      if InventoryItemComponent ~= 0x0 then
+
+        ir = addressList.createMemoryRecord()
+        ir.appendToEntry( memRec )
+        ir.Type = vtQword
+        ir.setAddress( i )
+        ir.ShowAsHex = true
+        ir.DontSave = true
+        ir.setDescription( sz_ItemName )
+
+        if ItemPriceInfo ~= 0x0 then
+          pr = addressList.createMemoryRecord()
+          pr.appendToEntry( ir )
+          pr.Parent = ir
+          pr.setDescription( "Price" )
+          pr.setAddress( Price )
+          pr.Type = vtDword
+          pr.DontSave = true
+        end
+
+        if Quantity ~= 0x0 then
+          qr = addressList.createMemoryRecord()
+          qr.appendToEntry( ir )
+          qr.Parent = ir
+          qr.setDescription( "Quantity" )
+          qr.setAddress( Quantity )
+          qr.Type = vtDword
+          qr.DontSave = true
+        end
+
+        if StackQuantity ~= 0x0 then
+          sr = addressList.createMemoryRecord()
+          sr.appendToEntry( ir )
+          sr.Parent = ir
+          sr.setDescription( "Stack Quantity" )
+          sr.setAddress( StackQuantity )
+          sr.Type = vtDword
+          sr.DontSave = true
+        end
+
+        -- Item
+        ir.Options = "[moManualExpandCollapse, moAllowManualCollapseAndExpand]"
+        ir.Collapsed = true
+
+      end
+      break
+
+    end
+    processMessages()
+
+  end
+
+else
+
+  -- normal run-down, all
+  -- process each InventoryEntity
+  local i = 0
+  for i = ArrayStart, ArrayEnd, 8 do
+
+    local InventoryEntity = readQword( i )
+
+    local InventoryItemComponent = FindNamedComponentByRTTIClass( InventoryEntity + 0x288, "InventoryItemComponent" )
+    local StackableComponent = FindNamedComponentByRTTIClass( InventoryEntity + 0x288, "StackableComponent" )
+
+    local Price = 0x0
+    local ItemPriceInfo = 0x0
+    if InventoryItemComponent ~= 0x0 then
+      local InventoryItemComponentResource = readQword( InventoryItemComponent + 0x30 )
+      p_Name = readQword( InventoryItemComponentResource + 0x28 )
+      InventoryItemComponentName = readQword( p_Name + 0x20 )
+      dw_Size = readInteger( p_Name + 0x28 )
+      sz_ItemName = readString( InventoryItemComponentName, dw_Size )
+      ItemPriceInfo = readQword( InventoryItemComponentResource + 0x38 )
+      local dwPrice = 0
+      if ItemPriceInfo ~= 0x0 then
+        Price = ItemPriceInfo + 0x2C
+      end
+    end
+
+    local Quantity = 0x0
+    local StackQuantity = 0x0
+    if StackableComponent ~= 0x0 then
+      local StackableComponentResource = readQword( StackableComponent + 0x30 )
+      Quantity = StackableComponent + 0x58
+      StackQuantity = StackableComponentResource + 0x30
+    end
+
+    if InventoryItemComponent ~= 0x0 then
+      ir = addressList.createMemoryRecord()
+      ir.appendToEntry( memRec )
+      ir.Type = vtQword
+      ir.setAddress( i )
+      ir.ShowAsHex = true
+      ir.DontSave = true
+      ir.setDescription( sz_ItemName )
+    end
+
+    if ItemPriceInfo ~= 0x0 then
+      pr = addressList.createMemoryRecord()
+      pr.appendToEntry( ir )
+      pr.setDescription( "Price" )
+      pr.setAddress( Price )
+      pr.Type = vtDword
+      pr.DontSave = true
+    end
+
+    if Quantity ~= 0x0 then
+      qr = addressList.createMemoryRecord()
+      qr.appendToEntry( ir )
+      qr.setDescription( "Quantity" )
+      qr.setAddress( Quantity )
+      qr.Type = vtDword
+      qr.DontSave = true
+    end
+
+    if StackQuantity ~= 0x0 then
+      sr = addressList.createMemoryRecord()
+      sr.appendToEntry( ir )
+      sr.setDescription( "Stack Quantity" )
+      sr.setAddress( StackQuantity )
+      sr.Type = vtDword
+      sr.DontSave = true
+    end
+
+    -- Item
+    ir.Options = "[moManualExpandCollapse, moAllowManualCollapseAndExpand]"
+    ir.Collapsed = true
+    processMessages()
+
+  end
+
+end
+messageDialog( "Done.", mtInformation, mbOK )
+
+[DISABLE]
+
+local memRecIds = {}
+local addressList = getAddressList()
+local memRec = addressList.getMemoryRecordByID( "26529" ) -- gets "[I &gt; Modifications &gt; Click Item &gt; R, then Esc &gt; E] Coil|Weave Dupe" memory record
+if memRec.Count ~= 0x0 then
+  for i = 1, memRec.Count - 1 do
+    table.insert( memRecIds, memoryrecord_getID( memRec.Child[i] ) )
+  end
+  for _, v in pairs( memRecIds ) do
+    local mr = addresslist_getMemoryRecordByID( addressList, v )
+    if mr ~= nil then memoryrecord_delete( mr ) end
+  end
+end
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>26531</ID>
+                  <Description>"Collapse All"</Description>
+                  <LastState/>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>{$STRICT}
+
+{$lua}
+
+if syntaxcheck then return end
+
+[ENABLE]
+
+-- collapse Child entries
+local addressList = getAddressList()
+local memRec = addressList.getMemoryRecordByID( "26529" )
+if memRec.Count ~= 0x0 then
+  for i = 1, memRec.Count - 1 do
+    cr = addressList.getMemoryRecordByID( memoryrecord_getID( memRec.Child[i] ) )
+    cr.Collapsed = true
+  end
+end
+return "assert(true)"
+
+[DISABLE]
+</AssemblerScript>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>16256</ID>
+              <Description>"[I &gt; Crafting &gt; Modify &gt; Click Item &gt; F &gt; F] Get Weapon Coil|Outfit Weave Stats"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+
+{$lua}
+
+if syntaxcheck then return end
+
+function debugger_onBreakpoint()
+
+  local ModificationViewController = R14
+
+  --[[
+  frm = getLuaEngine()
+  log = frm.mOutput
+  log.Color = '0x000000'
+  log.Font.Name = "Consolas"
+  log.Font.Size = 9
+  log.Font.Color = '1030655'
+  frm.show()
+  ]]
+
+  local al = getAddressList()
+  local pr = al.getMemoryRecordByID( "16256" ) -- gets "[I &gt; Crafting &gt; Modify &gt; Click Item &gt; F &gt; F] Get Weapon Coil|Outfit Weave Stats" memory record
+  if pr.Count ~= 0x0 then
+    for i = 0, pr.Count - 1 do
+      pr.Child[0].destroy()
+    end
+  end
+
+  -- note that if you apply spaces at start of row, they get carried over in the .Text property
+  local rarity_list = [[
+0:Common
+1:Uncommon
+2:Rare
+3:Very Rare
+]]
+
+  -- [ModificationViewController + 0x08] - 0x20 = ViewDependentEntity (Weapon/Outfit selected for modding)
+  local ViewDependentEntity = 0x0
+  local p = readQword( ModificationViewController + 0x08 )
+  if p ~= 0x0 then
+    ViewDependentEntity = p - 0x20
+  end
+  --print( string.format( "%016X ┉› ViewDependentEntity", ViewDependentEntity ) )
+
+  -- [ModificationViewController + 0x38] - 0x20 = InventoryEntity (Coil/Weave you're hovering mouse on)
+  local InventoryEntity = 0x0
+  local p = readQword( ModificationViewController + 0x38 )
+  if p ~= 0x0 then
+    InventoryEntity = p - 0x20
+  end
+  --print( string.format( "%016X ┉› InventoryEntity", InventoryEntity ) )
+
+  local InventoryItemComponent = FindNamedComponentByRTTIClass( InventoryEntity + 0x288, "InventoryItemComponent" )
+  local InventoryItemComponentResource = readQword( InventoryItemComponent + 0x30 )
+  local InventoryItemComponentResource_LocalizedTextResource = readQword( InventoryItemComponentResource + 0x28 )
+  local len_InventoryItemComponentResource_LocalizedTextResource = readInteger( InventoryItemComponentResource_LocalizedTextResource + 0x28 )
+  local pstr_InventoryItemComponentResource_LocalizedTextResource = readQword( InventoryItemComponentResource_LocalizedTextResource + 0x20 )
+  local name_InventoryItemComponent = readString( pstr_InventoryItemComponentResource_LocalizedTextResource, len_InventoryItemComponentResource_LocalizedTextResource )
+  --print( string.format( "%016X    ╰→ InventoryItemComponent", InventoryItemComponent ) )
+  if name_InventoryItemComponent == "Weapon Coil" then name_InventoryItemComponent = string.gsub( name_InventoryItemComponent, "Weapon ", "" ) end
+  if name_InventoryItemComponent == "Outfit Weave" then name_InventoryItemComponent = ( string.gsub( name_InventoryItemComponent, "Outfit ", "" ) ) end
+  --print( name_InventoryItemComponent )
+
+  local ItemPriceInfo = readQword( InventoryItemComponentResource + 0x38 )
+  local Price = 0x0
+  local dwPrice = 0
+  if ItemPriceInfo ~= 0x0 then
+    Price = ItemPriceInfo + 0x2C
+    dwPrice = readInteger( Price )
+  end
+  --print( string.format( "%016X       ╰→ Value: %d", Price, dwPrice ) )
+
+  local LootItemDescriptionResource = readQword( InventoryItemComponentResource + 0x68 )
+  local Rarity = 0x0
+  local szRarity = "None"
+  if LootItemDescriptionResource ~= 0x0 then
+    Rarity = LootItemDescriptionResource + 0x48
+    szRarity = readInteger( LootItemDescriptionResource + 0x48 )
+    if szRarity == 0x0 then szRarity = "Common" end
+    if szRarity == 0x1 then szRarity = "Uncommon" end
+    if szRarity == 0x2 then szRarity = "Rare" end
+    if szRarity == 0x3 then szRarity = "Very Rare" end
+  end
+  --print( string.format( "%016X       ╰→ Rarity: %s", Rarity, szRarity ) )
+
+  -- RAX contains the EquipmentModificationItemComponent of the Coil/Weave in focus
+  local EquipmentModificationItemComponent = RAX
+  --print( string.format( "%016X    ╰→ EquipmentModificationItemComponent", EquipmentModificationItemComponent ) )
+
+  local EquipmentModificationComponentResource = readQword( EquipmentModificationItemComponent + 0x30 )
+  local len_StatModification_Table = readInteger( EquipmentModificationItemComponent + 0x58 )
+  local ptr_StatModification_Table = EquipmentModificationItemComponent + 0x60
+
+  local ArrayStart = readQword( ptr_StatModification_Table )
+  local ArrayEnd = ArrayStart + (len_StatModification_Table - 1) * 8 * 4
+
+  for i = ArrayStart, ArrayEnd, 8 * 4 do
+
+    local Stat = i + 0x10
+    local dwStat = readInteger( i + 0x10 )
+    local StatModificationTypeResource = readQword( i + 0x18 )
+    local pstr_StatModificationTypeResource = readQword( StatModificationTypeResource + 0x20 )
+    local name_Stat = readString( pstr_StatModificationTypeResource )
+
+    local ModifierStatDisplayEntry = readQword( StatModificationTypeResource + 0x30 )
+    local CurveResource = readQword( ModifierStatDisplayEntry + 0x30 )
+    -- note that [CurveResource + 0x64] contains a float limiter value
+    --print( string.format( "%016X       ╰→ ModifierStatDisplayEntry", ModifierStatDisplayEntry ) )
+
+    local BonusPercent = executeCodeEx( 0, nil, getAddressSafe( "funcWrapper" ), ModifierStatDisplayEntry, dwStat )
+    BonusPercent = byteTableToFloat( dwordToByteTable( BonusPercent ) ) * 100
+    BonusPercent = math.floor( BonusPercent + 0.5 )
+    --print( val )
+
+    -- none for Handling
+    -- none for Damage
+    if name_Stat == "Impact" then name_Stat = "Tear" end
+    if name_Stat == "FireElemental" then name_Stat = "Fire" end
+    -- none for Corruption
+    if name_Stat == "ShockElemental" then name_Stat = "Shock" end
+    if name_Stat == "CryoElemental" then name_Stat = "Freeze" end
+    if name_Stat == "Resistance_Ranged" then name_Stat = "Resist Ranged Attacks" end
+    if name_Stat == "Resistance_Melee" then name_Stat = "Resist Melee Attacks" end
+    -- none for Stealth
+    if name_Stat == "Resistance_Fire" then name_Stat = "Resist Fire" end
+    if name_Stat == "Resistance_Poison" then name_Stat = "Resist Corruption" end
+    if name_Stat == "Resistance_Electricity" then name_Stat = "Resist Shock" end
+    if name_Stat == "Resistance_Cryo" then name_Stat = "Resist Freeze" end
+
+    local Item = ""
+    --if i - ArrayStart == 0 then print( string.format( "\t\t       ┉› +%d%% %s %s", BonusPercent, name_Stat, name_InventoryItemComponent ) ) end
+    if i - ArrayStart == 0 then
+      Item = string.format( "+%d%% %s %s", BonusPercent, name_Stat, name_InventoryItemComponent )
+      ir = al.createMemoryRecord()
+      ir.appendToEntry( pr )
+      ir.setDescription( Item )
+      ir.isGroupHeader = true
+      ir.DontSave = true
+      -- Rarity
+      if Rarity ~= 0x0 then
+        -- Value
+        rr = al.createMemoryRecord()
+        rr.appendToEntry( ir )
+        rr.setDescription( "Rarity" )
+        rr.setAddress( Rarity )
+        rr.DontSave = true
+        rr.DropDownList.Text = rarity_list
+        rr.DropDownReadOnly = true -- Disallow manual user input
+        rr.DropDownDescriptionOnly = true -- Only show the description part
+        rr.DisplayAsDropDownListItem = true -- Make the record display values like the dropdownlist
+      end
+      -- Price
+      if Price ~= 0x0 then
+        vr = al.createMemoryRecord()
+        vr.appendToEntry( ir )
+        vr.setDescription( "Price" )
+        vr.setAddress( Price )
+        vr.DontSave = true
+      end
+      tbr = al.createMemoryRecord()
+      tbr.appendToEntry( ir )
+      tbr.setDescription( "Stats Table" )
+      tbr.setAddress( EquipmentModificationItemComponent + 0x60 )
+      tbr.Type = vtQword
+      tbr.DontSave = true
+      tbr.ShowAsHex = true
+      nmr = al.createMemoryRecord()
+      nmr.appendToEntry( ir )
+      nmr.setDescription( "Stats Num" )
+      nmr.setAddress( EquipmentModificationItemComponent + 0x58 )
+      nmr.Type = vtDword
+      nmr.DontSave = true
+    end
+    --print( string.format( "%016X          ╰→ Stat: %s", i, name_Stat ) )
+    --print( string.format( "%016X             ╰→ Bonus: %d [+%d%%]", Stat, dwStat, BonusPercent ) )
+    sr = al.createMemoryRecord()
+    sr.appendToEntry( ir )
+    sr.setDescription( string.format( "Stat #%d: %s [+%d%%]", ( ( i - ArrayStart ) / 8 / 4 ) + 1, name_Stat, BonusPercent ) )
+    sr.setAddress( Stat )
+    sr.DontSave = true
+    tr = al.createMemoryRecord()
+    tr.appendToEntry( ir )
+    tr.setDescription( string.format( "Stat #%d Table", ( ( i - ArrayStart ) / 8 / 4 ) + 1 ) )
+    tr.setAddress( Stat - 0x10 )
+    tr.Type = vtByteArray
+    tr.Aob.Size = 0x20
+    tr.DontSave = true
+    tr.ShowAsHex = true
+  end
+  --print( "" )
+
+  str = al.createMemoryRecord()
+  str.appendToEntry( ir )
+  str.setDescription( "Stats Edit" )
+  str.isGroupHeader = true
+  str.DontSave = true
+  str1 = al.createMemoryRecord()
+  str1.appendToEntry( str )
+  str1.setDescription( "Stat #1" )
+  str1.setAddress( getAddressSafe( "statsEdit" ) + 0x00 )
+  str1.Type = vtByteArray
+  str1.Aob.Size = 0x20
+  str1.DontSave = true
+  str1.ShowAsHex = true
+  str2 = al.createMemoryRecord()
+  str2.appendToEntry( str )
+  str2.setDescription( "Stat #2" )
+  str2.setAddress( getAddressSafe( "statsEdit" ) + 0x20 )
+  str2.Type = vtByteArray
+  str2.Aob.Size = 0x20
+  str2.DontSave = true
+  str2.ShowAsHex = true
+  str3 = al.createMemoryRecord()
+  str3.appendToEntry( str )
+  str3.setDescription( "Stat #3" )
+  str3.setAddress( getAddressSafe( "statsEdit" ) + 0x40 )
+  str3.Type = vtByteArray
+  str3.Aob.Size = 0x20
+  str3.DontSave = true
+  str3.ShowAsHex = true
+  str4 = al.createMemoryRecord()
+  str4.appendToEntry( str )
+  str4.setDescription( "Stat #4" )
+  str4.setAddress( getAddressSafe( "statsEdit" ) + 0x60 )
+  str4.Type = vtByteArray
+  str4.Aob.Size = 0x20
+  str4.DontSave = true
+  str4.ShowAsHex = true
+  str5 = al.createMemoryRecord()
+  str5.appendToEntry( str )
+  str5.setDescription( "Stat #5" )
+  str5.setAddress( getAddressSafe( "statsEdit" ) + 0x80 )
+  str5.Type = vtByteArray
+  str5.Aob.Size = 0x20
+  str5.DontSave = true
+  str5.ShowAsHex = true
+  str6 = al.createMemoryRecord()
+  str6.appendToEntry( str )
+  str6.setDescription( "Stat #6" )
+  str6.setAddress( getAddressSafe( "statsEdit" ) + 0xA0 )
+  str6.Type = vtByteArray
+  str6.Aob.Size = 0x20
+  str6.DontSave = true
+  str6.ShowAsHex = true
+  str7 = al.createMemoryRecord()
+  str7.appendToEntry( str )
+  str7.setDescription( "Stat #7" )
+  str7.setAddress( getAddressSafe( "statsEdit" ) + 0xC0 )
+  str7.Type = vtByteArray
+  str7.Aob.Size = 0x20
+  str7.DontSave = true
+  str7.ShowAsHex = true
+  str8 = al.createMemoryRecord()
+  str8.appendToEntry( str )
+  str8.setDescription( "Stat #8" )
+  str8.setAddress( getAddressSafe( "statsEdit" ) + 0xE0 )
+  str8.Type = vtByteArray
+  str8.Aob.Size = 0x20
+  str8.DontSave = true
+  str8.ShowAsHex = true
+
+  debug_continueFromBreakpoint( co_run )
+  return 1
+
+end
+
+[ENABLE]
+
+local aob_ModifierStatDisplayEntry_CalculateStatModification = "40534883EC??488B49??8BC28BDA4883C1??99"
+sl = aobScanEx( aob_ModifierStatDisplayEntry_CalculateStatModification )
+if not sl or sl.Count &lt; 1 then stopExec( "'aob_ModifierStatDisplayEntry_CalculateStatModification' not found." ) end
+t = tonumber( sl[0], 16 )
+unregisterSymbol( "ModifierStatDisplayEntry_CalculateStatModification" )
+registerSymbol( "ModifierStatDisplayEntry_CalculateStatModification", t, true )
+
+local aob_in_MenuModule_ModifyItem = "488BF8EB03498BFF41"
+sl = aobScanEx( aob_in_MenuModule_ModifyItem )
+if not sl or sl.Count &lt; 1 then stopExec( "'aob_in_MenuModule_ModifyItem' not found." ) end
+t = tonumber( sl[0], 16 )
+
+local funcWrapper = allocateMemory( 64 )
+unregisterSymbol( "funcWrapper" )
+registerSymbol( "funcWrapper", funcWrapper, true )
+
+autoAssemble([[
+  funcWrapper:
+  sub rsp,28
+  call ModifierStatDisplayEntry_CalculateStatModification
+  movd eax,xmm0
+  add rsp,28
+  ret
+]])
+
+local statsEdit = allocateMemory( 64 )
+unregisterSymbol( "statsEdit" )
+registerSymbol( "statsEdit", statsEdit, true )
+
+debugProcess()
+debug_setBreakpoint( t )
+
+[DISABLE]
+
+debugger_onBreakpoint = nil
+debug_removeBreakpoint( t )
+autoAssemble([[
+  unregistersymbol( ModifierStatDisplayEntry_CalculateStatModification )
+]])
+deAlloc( getAddressSafe( "statsEdit" ) )
+deAlloc( getAddressSafe( "funcWrapper" ) )
+local al = getAddressList()
+local pr = al.getMemoryRecordByID( "16256" ) -- gets "[I &gt; Crafting &gt; Modify &gt; Click Item &gt; F &gt; F] Get Weapon Coil|Outfit Weave Stats" memory record
+if pr.Count ~= 0x0 then
+  for i = 0, pr.Count - 1 do
+    pr.Child[0].destroy()
+  end
+end
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>26530</ID>
+              <Description>"[I &gt; Modifications &gt; Click Item &gt; R, then Esc &gt; E] Coil|Weave Dupe"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+
+{$lua}
+
+if syntaxcheck then return end
+
+[ENABLE]
+
+local sym_LocalPlayer = getAddressSafe( "LocalPlayer" )
+if sym_LocalPlayer == nil then end
+LocalPlayer = readQword( sym_LocalPlayer )
+if LocalPlayer == 0x0 then end
+local PlayerEntity = readQword( LocalPlayer + 0x70 )
+if PlayerEntity == 0x0 then end
+local LastPickedUpItem = readQword( PlayerEntity + 0x1D0 )
+if LastPickedUpItem == 0x0 then end
+
+local offset_ComponentsTable = 0x290
+local offset_ComponentsTableSize = 0x288
+local ComponentsTable = PlayerEntity + offset_ComponentsTable
+local ComponentsTableSize = readInteger( PlayerEntity + offset_ComponentsTableSize )
+local ArrayStart = readQword( ComponentsTable )
+local ArrayEnd = ArrayStart + ( ComponentsTableSize - 1 ) * 8
+
+local HumanoidInventory = 0x0
+
+for i = ArrayStart, ArrayEnd, 8 do
+  local PlayerEntityComponent = readQword( i )
+  local vftable = readQword( PlayerEntityComponent )
+  local GetRTTIClass = readQword( vftable + 0x0 )
+  local RTTIClass = executeCodeEx( 0, nil, GetRTTIClass )
+  local Name = readQword( RTTIClass + 0x38 )
+  if readString( Name ) == "HumanoidInventory" then
+    HumanoidInventory = PlayerEntityComponent
+	break
+  end
+end
+
+if HumanoidInventory == 0x0 then end
+
+offset_InventoryEntitiesTable = 0x60
+offset_InventoryEntitiesTableSize = 0x58
+InventoryEntitiesTable = HumanoidInventory + offset_InventoryEntitiesTable
+InventoryEntitiesTableSize = readInteger( HumanoidInventory + offset_InventoryEntitiesTableSize )
+ArrayStart = readQword( InventoryEntitiesTable )
+ArrayEnd = ArrayStart + ( InventoryEntitiesTableSize - 1 ) * 8
+
+local al = getAddressList()
+local mr = al.getMemoryRecordByID( "26530" ) -- gets "[I &gt; Modifications &gt; Click Item &gt; R, then Esc &gt; E] Coil|Weave Dupe" memory record
+if mr.Count ~= 0x0 then
+  for i = 0, mr.Count - 1 do
+    mr.Child[0].destroy()
+  end
+end
+-- LastPickedUpItem
+lr = al.createMemoryRecord()
+lr.appendToEntry( mr )
+lr.setDescription( "LastPickedUpItem" )
+lr.Type = vtQword
+lr.setAddress( PlayerEntity + 0x1D0 )
+lr.ShowAsHex = true
+lr.DontSave = true
+-- Inventory
+ir = al.createMemoryRecord()
+ir.appendToEntry( mr )
+ir.setDescription( "HumanoidInventory" )
+ir.Type = vtQword
+ir.setAddress( HumanoidInventory )
+ir.ShowAsHex = true
+ir.DontSave = true
+-- InventoryEntity
+cr = al.createMemoryRecord()
+cr.appendToEntry( ir )
+cr.setDescription( "p-&gt;InventoryEntities" )
+cr.Type = vtQword
+cr.setAddress( HumanoidInventory + offset_InventoryEntitiesTable )
+cr.ShowAsHex = true
+cr.DontSave = true
+szr = al.createMemoryRecord()
+szr.appendToEntry( ir )
+szr.setDescription( "NumInventoryEntities" )
+szr.Type = vtDword
+szr.setAddress( HumanoidInventory + offset_InventoryEntitiesTableSize )
+szr.DontSave = true
+-- LastInventoryEntity+1
+writeQword( ArrayEnd + 0x8, 0 )
+ler = al.createMemoryRecord()
+ler.appendToEntry( ir )
+ler.setDescription( "LastInventoryEntity+1" )
+ler.Type = vtQword
+ler.setAddress( ArrayEnd + 0x8 )
+ler.ShowAsHex = true
+ler.DontSave = true
+
+[DISABLE]
+
+local al = getAddressList()
+local mr = al.getMemoryRecordByID( "26530" ) -- gets "[I &gt; Modifications &gt; Click Item &gt; R, then Esc &gt; E] Coil|Weave Dupe" memory record
+if mr.Count ~= 0x0 then
+  for i = 0, mr.Count - 1 do
+    mr.Child[0].destroy()
+  end
+end
+</AssemblerScript>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>24107</ID>
+          <Description>"[ Debug ]"</Description>
+          <Options moHideChildren="1"/>
+          <LastState Value="" RealAddress="00000000"/>
+          <Color>D0D1C7</Color>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>25198</ID>
+              <Description>"GetName"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+
+{$lua}
+
+if syntaxcheck then return end
+
+function GetName( input )
+  local p = readQword( input )    -- pointer to virtual functions table
+  local f = readQword( p + 0x00 ) -- function at 0x0
+
+  --[[ hopefully all of these 0x00 functions will look like this:
+      lea rax,[ds.exe+offset]
+      ret
+  ]]
+
+  -- making sure there's no JMP to JMP
+  if readBytes( f + 0x00, 1 ) == 0xE9 then
+    f = f + readInteger( f + 0x1, true ) + 0x5
+      if readBytes( f + 0x00, 1 ) == 0xE9 then
+        f = f + readInteger( f + 0x1, true ) + 0x5
+      end
+  end
+  -- to make sure, let's check the ASM for a LEA RAX,[] (488D05xxxxxxxx)
+  if readBytes( f + 0x00, 1 ) == 0x48 then
+    if readBytes( f + 0x01, 1 ) == 0x8D then
+      if readBytes( f + 0x02, 1 ) == 0x05 then
+        local addr = f + readInteger( f + 0x3, true ) + 0x7
+        local str = readString( readQword( addr + 0x38 ) )
+        print( string.format( "Name:   %s", str ) )
+        print( "" )
+        print( "* * *")
+      end
+    end
+  end
+end
+
+[ENABLE]
+
+addr = inputQuery( '', 'Address:', '' ) -- CE freezes here
+GetName( addr )
+return "assert(true)"
+
+[DISABLE]
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>25131</ID>
+              <Description>"Test_SetVisible [HZD]"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <Color>D0D1C7</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+
+{$lua}
+return [[alloc( KeyHandlerThread, 0x1000, ]] .. process .. [[ )]]
+{$asm}
+registersymbol( KeyHandlerThread )
+CreateThread( KeyHandlerThread )
+label( KeyHandlerOff )
+registersymbol( KeyHandlerOff )
+label( KeyHandlerThread_loop )
+
+KeyHandlerThread:
+sub rsp,28
+
+KeyHandlerThread_loop:
+mov rcx,A
+call Sleep
+
+cmp [KeyHandlerOff],1
+jne short @f
+  add rsp,28
+  mov [KeyHandlerOff],2
+  ret
+@@:
+
+  // VK_NUMPAD.
+  mov rcx,6E
+  call GetAsyncKeyState
+  test ax,ax
+  je @f
+
+    mov rcx,[LocalPlayer]
+    mov rcx,[rcx+70] // Entity
+    mov eax,[rcx+230]
+    shr eax,1
+    and al,1
+    test al,al
+    setne al
+    mov dl,al
+    call HorizonZeroDawn.exe+BB7700 // Entity_SetVisible
+
+    mov rcx,C8
+    call Sleep
+
+  @@:
+  jmp KeyHandlerThread_loop
+
+align 10 CC
+
+KeyHandlerOff:
+dd 0
+
+align 10 CC
+
+[DISABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  local starttime = getTickCount()
+
+  if readInteger( "KeyHandlerOff" ) == 0 then --could be 2 already
+    writeInteger( "KeyHandlerOff", 1 ) --tell the thread to kill itself
+  end
+
+  while( getTickCount() &lt; starttime + 1000 ) and ( readInteger( "KeyHandlerOff" ) ~= 2 ) do --wait till it has finished
+    sleep( 20 )
+  end
+
+  if( getTickCount() &gt; starttime + 1000 ) then --could happen when the window is shown
+    showMessage( 'Disabling the thread failed!' )
+    error( 'Thread disabling failed!' )
+  end
+    sleep( 1 )
+  end
+
+{$asm}
+
+unregistersymbol( KeyHandlerOff )
+unregistersymbol( KeyHandlerThread )
+dealloc( KeyHandlerThread )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>26436</ID>
+              <Description>"Test_SetFaction [HZD]"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <Color>D0D1C7</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+
+{$lua}
+return [[alloc( KeyHandlerThread, 0x1000, ]] .. process .. [[ )]]
+{$asm}
+registersymbol( KeyHandlerThread )
+CreateThread( KeyHandlerThread )
+label( KeyHandlerOff )
+registersymbol( KeyHandlerOff )
+label( KeyHandlerThread_loop )
+
+label( p )
+registersymbol( p )
+label( q )
+registersymbol( q )
+
+KeyHandlerThread:
+sub rsp,28
+
+KeyHandlerThread_loop:
+mov rcx,A
+call Sleep
+
+cmp [KeyHandlerOff],1
+jne short @f
+  add rsp,28
+  mov [KeyHandlerOff],2
+  ret
+@@:
+
+  // VK_NUMPAD.
+  mov rcx,6E
+  call GetAsyncKeyState
+  test ax,ax
+  je @f
+
+    mov rdx,[LocalPlayer]
+    mov rdx,[rdx+70] // Entity
+    mov rdx,[rdx+228] // AIFaction
+    mov [p],rdx
+    mov rdx,[p] // AIFaction
+    mov rcx,[q] // Entity
+    call HorizonZeroDawn.exe+BB7530 // Entity_SetFaction
+    mov rcx,C8
+    call Sleep
+
+  @@:
+  jmp KeyHandlerThread_loop
+
+align 10 CC
+
+p:
+dq 0
+
+align 10 CC
+
+q:
+dq 0
+
+align 10 CC
+
+KeyHandlerOff:
+dd 0
+
+align 10 CC
+
+[DISABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  local starttime = getTickCount()
+
+  if readInteger( "KeyHandlerOff" ) == 0 then --could be 2 already
+    writeInteger( "KeyHandlerOff", 1 ) --tell the thread to kill itself
+  end
+
+  while( getTickCount() &lt; starttime + 1000 ) and ( readInteger( "KeyHandlerOff" ) ~= 2 ) do --wait till it has finished
+    sleep( 20 )
+  end
+
+  if( getTickCount() &gt; starttime + 1000 ) then --could happen when the window is shown
+    showMessage( 'Disabling the thread failed!' )
+    error( 'Thread disabling failed!' )
+  end
+    sleep( 1 )
+  end
+
+{$asm}
+
+unregistersymbol( q )
+unregistersymbol( p )
+
+unregistersymbol( KeyHandlerOff )
+unregistersymbol( KeyHandlerThread )
+dealloc( KeyHandlerThread )
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>26437</ID>
+                  <Description>"p"</Description>
+                  <ShowAsHex>1</ShowAsHex>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>p</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>26438</ID>
+                  <Description>"q"</Description>
+                  <ShowAsHex>1</ShowAsHex>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>q</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>26439</ID>
+              <Description>"Test_GetLinearSpeed [HZD]"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <Color>D0D1C7</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+
+{$lua}
+return [[alloc( KeyHandlerThread, 0x1000, ]] .. process .. [[ )]]
+{$asm}
+registersymbol( KeyHandlerThread )
+CreateThread( KeyHandlerThread )
+label( KeyHandlerOff )
+registersymbol( KeyHandlerOff )
+label( KeyHandlerThread_loop )
+
+label( p )
+registersymbol( p )
+label( q )
+registersymbol( q )
+
+KeyHandlerThread:
+sub rsp,28
+
+KeyHandlerThread_loop:
+mov rcx,A
+call Sleep
+
+cmp [KeyHandlerOff],1
+jne short @f
+  add rsp,28
+  mov [KeyHandlerOff],2
+  ret
+@@:
+
+  // VK_NUMPAD.
+  mov rcx,6E
+  call GetAsyncKeyState
+  test ax,ax
+  je @f
+
+    mov rcx,[LocalPlayer]
+    mov rcx,[rcx+70] // Entity
+    call HorizonZeroDawn.exe+B9CD80 // Entity_GetLinearSpeed
+    mov rcx,C8
+    call Sleep
+
+  @@:
+  jmp KeyHandlerThread_loop
+
+align 10 CC
+
+p:
+dq 0
+
+align 10 CC
+
+q:
+dq 0
+
+align 10 CC
+
+KeyHandlerOff:
+dd 0
+
+align 10 CC
+
+[DISABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  local starttime = getTickCount()
+
+  if readInteger( "KeyHandlerOff" ) == 0 then --could be 2 already
+    writeInteger( "KeyHandlerOff", 1 ) --tell the thread to kill itself
+  end
+
+  while( getTickCount() &lt; starttime + 1000 ) and ( readInteger( "KeyHandlerOff" ) ~= 2 ) do --wait till it has finished
+    sleep( 20 )
+  end
+
+  if( getTickCount() &gt; starttime + 1000 ) then --could happen when the window is shown
+    showMessage( 'Disabling the thread failed!' )
+    error( 'Thread disabling failed!' )
+  end
+    sleep( 1 )
+  end
+
+{$asm}
+
+unregistersymbol( q )
+unregistersymbol( p )
+
+unregistersymbol( KeyHandlerOff )
+unregistersymbol( KeyHandlerThread )
+dealloc( KeyHandlerThread )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>26528</ID>
+              <Description>"Hook Entity::GetModel"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{ Game   : HorizonZeroDawn.exe
+  Version: 
+  Date   : 2020-08-23
+  Author : SunBeam
+
+  This script does blah blah blah
+}
+
+define(address,"HorizonZeroDawn.exe"+BA32D0)
+define(bytes,48 8B 89 E8 01 00 00)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,"HorizonZeroDawn.exe"+BA32D0)
+
+label(code)
+label(return)
+
+label( pEntity )
+registersymbol( pEntity )
+
+newmem:
+
+code:
+  mov [pEntity],rcx
+  mov rcx,[rcx+000001E8]
+  jmp return
+
+align 10 CC
+
+pEntity:
+dq 0
+
+address:
+  jmp newmem
+  nop 2
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+  // mov rcx,[rcx+000001E8]
+
+unregistersymbol( pEntity )
+dealloc(newmem)
+
+
+{
+// ORIGINAL CODE - INJECTION POINT: "HorizonZeroDawn.exe"+BA32D0
+
+"HorizonZeroDawn.exe"+BA32BE: CC                    -  int 3 
+"HorizonZeroDawn.exe"+BA32BF: CC                    -  int 3 
+"HorizonZeroDawn.exe"+BA32C0: 48 8B 81 C8 01 00 00  -  mov rax,[rcx+000001C8]
+"HorizonZeroDawn.exe"+BA32C7: 48 89 02              -  mov [rdx],rax
+"HorizonZeroDawn.exe"+BA32CA: C3                    -  ret 
+"HorizonZeroDawn.exe"+BA32CB: CC                    -  int 3 
+"HorizonZeroDawn.exe"+BA32CC: CC                    -  int 3 
+"HorizonZeroDawn.exe"+BA32CD: CC                    -  int 3 
+"HorizonZeroDawn.exe"+BA32CE: CC                    -  int 3 
+"HorizonZeroDawn.exe"+BA32CF: CC                    -  int 3 
+// ---------- INJECTING HERE ----------
+"HorizonZeroDawn.exe"+BA32D0: 48 8B 89 E8 01 00 00  -  mov rcx,[rcx+000001E8]
+// ---------- DONE INJECTING  ----------
+"HorizonZeroDawn.exe"+BA32D7: 48 85 C9              -  test rcx,rcx
+"HorizonZeroDawn.exe"+BA32DA: 0F 85 40 22 05 00     -  jne HorizonZeroDawn.exe+BF5520
+"HorizonZeroDawn.exe"+BA32E0: B8 FF FF FF FF        -  mov eax,FFFFFFFF
+"HorizonZeroDawn.exe"+BA32E5: C3                    -  ret 
+"HorizonZeroDawn.exe"+BA32E6: CC                    -  int 3 
+"HorizonZeroDawn.exe"+BA32E7: CC                    -  int 3 
+"HorizonZeroDawn.exe"+BA32E8: CC                    -  int 3 
+"HorizonZeroDawn.exe"+BA32E9: CC                    -  int 3 
+"HorizonZeroDawn.exe"+BA32EA: CC                    -  int 3 
+"HorizonZeroDawn.exe"+BA32EB: CC                    -  int 3 
+}
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>26455</ID>
+              <Description>"Test_EntityKill [HZD]"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <Color>D0D1C7</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+
+{$lua}
+return [[alloc( KeyHandlerThread, 0x1000, ]] .. process .. [[ )]]
+{$asm}
+registersymbol( KeyHandlerThread )
+CreateThread( KeyHandlerThread )
+label( KeyHandlerOff )
+registersymbol( KeyHandlerOff )
+label( KeyHandlerThread_loop )
+
+label( p )
+registersymbol( p )
+
+KeyHandlerThread:
+sub rsp,28
+
+KeyHandlerThread_loop:
+mov rcx,A
+call Sleep
+
+cmp [KeyHandlerOff],1
+jne short @f
+  add rsp,28
+  mov [KeyHandlerOff],2
+  ret
+@@:
+
+  // VK_NUMPAD.
+  mov rcx,6E
+  call GetAsyncKeyState
+  test ax,ax
+  je @f
+
+    xor r8,r8    // 0
+    xor rdx,rdx  // 0
+    mov rcx,[pEntity]  // Entity
+    test rcx,rcx
+    je short @f
+      call HorizonZeroDawn.exe+BB9D50 // Entity_Kill
+    @@:
+    mov rcx,C8
+    call Sleep
+
+  @@:
+  jmp KeyHandlerThread_loop
+
+align 10 CC
+
+p:
+dq 0
+
+align 10 CC
+
+KeyHandlerOff:
+dd 0
+
+align 10 CC
+
+[DISABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  local starttime = getTickCount()
+
+  if readInteger( "KeyHandlerOff" ) == 0 then --could be 2 already
+    writeInteger( "KeyHandlerOff", 1 ) --tell the thread to kill itself
+  end
+
+  while( getTickCount() &lt; starttime + 1000 ) and ( readInteger( "KeyHandlerOff" ) ~= 2 ) do --wait till it has finished
+    sleep( 20 )
+  end
+
+  if( getTickCount() &gt; starttime + 1000 ) then --could happen when the window is shown
+    showMessage( 'Disabling the thread failed!' )
+    error( 'Thread disabling failed!' )
+  end
+    sleep( 1 )
+  end
+
+{$asm}
+
+unregistersymbol( q )
+unregistersymbol( p )
+
+unregistersymbol( KeyHandlerOff )
+unregistersymbol( KeyHandlerThread )
+dealloc( KeyHandlerThread )
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>26456</ID>
+                  <Description>"pEntity"</Description>
+                  <ShowAsHex>1</ShowAsHex>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>pEntity</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>26457</ID>
+              <Description>"Test_EntityGetChild [HZD]"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <Color>D0D1C7</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+
+{$lua}
+return [[alloc( KeyHandlerThread, 0x1000, ]] .. process .. [[ )]]
+{$asm}
+registersymbol( KeyHandlerThread )
+CreateThread( KeyHandlerThread )
+label( KeyHandlerOff )
+registersymbol( KeyHandlerOff )
+label( KeyHandlerThread_loop )
+
+KeyHandlerThread:
+sub rsp,28
+
+KeyHandlerThread_loop:
+mov rcx,A
+call Sleep
+
+cmp [KeyHandlerOff],1
+jne short @f
+  add rsp,28
+  mov [KeyHandlerOff],2
+  ret
+@@:
+
+  // VK_NUMPAD.
+  mov rcx,6E
+  call GetAsyncKeyState
+  test ax,ax
+  je @f
+
+    mov rcx,[LocalPlayer]
+    mov rcx,[rcx+70]
+    mov edx,1
+    call HorizonZeroDawn.exe+BB7070 // Entity_GetChild
+    mov rcx,C8
+    call Sleep
+
+  @@:
+  jmp KeyHandlerThread_loop
+
+align 10 CC
+
+KeyHandlerOff:
+dd 0
+
+align 10 CC
+
+[DISABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  local starttime = getTickCount()
+
+  if readInteger( "KeyHandlerOff" ) == 0 then --could be 2 already
+    writeInteger( "KeyHandlerOff", 1 ) --tell the thread to kill itself
+  end
+
+  while( getTickCount() &lt; starttime + 1000 ) and ( readInteger( "KeyHandlerOff" ) ~= 2 ) do --wait till it has finished
+    sleep( 20 )
+  end
+
+  if( getTickCount() &gt; starttime + 1000 ) then --could happen when the window is shown
+    showMessage( 'Disabling the thread failed!' )
+    error( 'Thread disabling failed!' )
+  end
+    sleep( 1 )
+  end
+
+{$asm}
+
+unregistersymbol( KeyHandlerOff )
+unregistersymbol( KeyHandlerThread )
+dealloc( KeyHandlerThread )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>26460</ID>
+              <Description>"Test_EntityGetChildrenCount [HZD]"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <Color>D0D1C7</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+
+{$lua}
+return [[alloc( KeyHandlerThread, 0x1000, ]] .. process .. [[ )]]
+{$asm}
+registersymbol( KeyHandlerThread )
+CreateThread( KeyHandlerThread )
+label( KeyHandlerOff )
+registersymbol( KeyHandlerOff )
+label( KeyHandlerThread_loop )
+
+KeyHandlerThread:
+sub rsp,28
+
+KeyHandlerThread_loop:
+mov rcx,A
+call Sleep
+
+cmp [KeyHandlerOff],1
+jne short @f
+  add rsp,28
+  mov [KeyHandlerOff],2
+  ret
+@@:
+
+  // VK_NUMPAD.
+  mov rcx,6E
+  call GetAsyncKeyState
+  test ax,ax
+  je @f
+
+    mov rcx,[LocalPlayer]
+    mov rcx,[rcx+70]
+    call HorizonZeroDawn.exe+BB7A40 // Entity_GetChildrenCount
+    mov rcx,C8
+    call Sleep
+
+  @@:
+  jmp KeyHandlerThread_loop
+
+align 10 CC
+
+KeyHandlerOff:
+dd 0
+
+align 10 CC
+
+[DISABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  local starttime = getTickCount()
+
+  if readInteger( "KeyHandlerOff" ) == 0 then --could be 2 already
+    writeInteger( "KeyHandlerOff", 1 ) --tell the thread to kill itself
+  end
+
+  while( getTickCount() &lt; starttime + 1000 ) and ( readInteger( "KeyHandlerOff" ) ~= 2 ) do --wait till it has finished
+    sleep( 20 )
+  end
+
+  if( getTickCount() &gt; starttime + 1000 ) then --could happen when the window is shown
+    showMessage( 'Disabling the thread failed!' )
+    error( 'Thread disabling failed!' )
+  end
+    sleep( 1 )
+  end
+
+{$asm}
+
+unregistersymbol( KeyHandlerOff )
+unregistersymbol( KeyHandlerThread )
+dealloc( KeyHandlerThread )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>26461</ID>
+              <Description>"Test_EntityGetChildByName [HZD]"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <Color>D0D1C7</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+
+{$lua}
+return [[alloc( KeyHandlerThread, 0x1000, ]] .. process .. [[ )]]
+{$asm}
+registersymbol( KeyHandlerThread )
+CreateThread( KeyHandlerThread )
+label( KeyHandlerOff )
+registersymbol( KeyHandlerOff )
+label( KeyHandlerThread_loop )
+
+label( s )
+registersymbol( s )
+
+KeyHandlerThread:
+sub rsp,28
+
+KeyHandlerThread_loop:
+mov rcx,A
+call Sleep
+
+cmp [KeyHandlerOff],1
+jne short @f
+  add rsp,28
+  mov [KeyHandlerOff],2
+  ret
+@@:
+
+  // VK_NUMPAD.
+  mov rcx,6E
+  call GetAsyncKeyState
+  test ax,ax
+  je @f
+
+    mov rcx,[LocalPlayer]
+    mov rcx,[rcx+70]
+    lea rdx,[s]
+    call HorizonZeroDawn.exe+BB6F90 // Entity_GetChildByName
+    mov rcx,C8
+    call Sleep
+
+  @@:
+  jmp KeyHandlerThread_loop
+
+align 10 CC
+
+KeyHandlerOff:
+dd 0
+
+align 10 CC
+
+s:
+db 'WeaponModificationItem_Tier2',0
+
+[DISABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  local starttime = getTickCount()
+
+  if readInteger( "KeyHandlerOff" ) == 0 then --could be 2 already
+    writeInteger( "KeyHandlerOff", 1 ) --tell the thread to kill itself
+  end
+
+  while( getTickCount() &lt; starttime + 1000 ) and ( readInteger( "KeyHandlerOff" ) ~= 2 ) do --wait till it has finished
+    sleep( 20 )
+  end
+
+  if( getTickCount() &gt; starttime + 1000 ) then --could happen when the window is shown
+    showMessage( 'Disabling the thread failed!' )
+    error( 'Thread disabling failed!' )
+  end
+    sleep( 1 )
+  end
+
+{$asm}
+
+unregistersymbol( s )
+
+unregistersymbol( KeyHandlerOff )
+unregistersymbol( KeyHandlerThread )
+dealloc( KeyHandlerThread )
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>26462</ID>
+                  <Description>"s"</Description>
+                  <VariableType>String</VariableType>
+                  <Length>100</Length>
+                  <Unicode>0</Unicode>
+                  <CodePage>0</CodePage>
+                  <ZeroTerminate>1</ZeroTerminate>
+                  <Address>s</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>26463</ID>
+              <Description>"Test_EntityGetChildren [HZD]"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <Color>D0D1C7</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+
+{$lua}
+return [[alloc( KeyHandlerThread, 0x1000, ]] .. process .. [[ )]]
+{$asm}
+registersymbol( KeyHandlerThread )
+CreateThread( KeyHandlerThread )
+label( KeyHandlerOff )
+registersymbol( KeyHandlerOff )
+label( KeyHandlerThread_loop )
+
+label( tbl )
+registersymbol( tbl )
+
+KeyHandlerThread:
+sub rsp,28
+
+KeyHandlerThread_loop:
+mov rcx,A
+call Sleep
+
+cmp [KeyHandlerOff],1
+jne short @f
+  add rsp,28
+  mov [KeyHandlerOff],2
+  ret
+@@:
+
+  // VK_NUMPAD.
+  mov rcx,6E
+  call GetAsyncKeyState
+  test ax,ax
+  je @f
+
+    mov rdx,[LocalPlayer]
+    mov rdx,[rdx+70]
+    lea rdx,[rdx+1D0]
+    lea rcx,[tbl]
+    call HorizonZeroDawn.exe+BB71B0 // Entity_GetChildren
+    mov rcx,C8
+    call Sleep
+
+  @@:
+  jmp KeyHandlerThread_loop
+
+align 10 CC
+
+KeyHandlerOff:
+dd 0
+
+align 10 CC
+
+tbl:
+dq 0
+
+[DISABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  local starttime = getTickCount()
+
+  if readInteger( "KeyHandlerOff" ) == 0 then --could be 2 already
+    writeInteger( "KeyHandlerOff", 1 ) --tell the thread to kill itself
+  end
+
+  while( getTickCount() &lt; starttime + 1000 ) and ( readInteger( "KeyHandlerOff" ) ~= 2 ) do --wait till it has finished
+    sleep( 20 )
+  end
+
+  if( getTickCount() &gt; starttime + 1000 ) then --could happen when the window is shown
+    showMessage( 'Disabling the thread failed!' )
+    error( 'Thread disabling failed!' )
+  end
+    sleep( 1 )
+  end
+
+{$asm}
+
+unregistersymbol( tbl )
+
+unregistersymbol( KeyHandlerOff )
+unregistersymbol( KeyHandlerThread )
+dealloc( KeyHandlerThread )
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>26464</ID>
+                  <Description>"tbl"</Description>
+                  <ShowAsHex>1</ShowAsHex>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>tbl</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>26483</ID>
+              <Description>"Test_PauseStartTimer [HZD]"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <Color>D0D1C7</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+
+{$lua}
+return [[alloc( KeyHandlerThread, 0x1000, ]] .. process .. [[ )]]
+{$asm}
+registersymbol( KeyHandlerThread )
+CreateThread( KeyHandlerThread )
+label( KeyHandlerOff )
+registersymbol( KeyHandlerOff )
+label( KeyHandlerThread_loop )
+label( KeyHandlerThread_back )
+
+label( FindComponentByRTTIClassName )
+label( FindComponentByRTTIClassName_exit )
+label( ResetTimer )
+
+KeyHandlerThread:
+sub rsp,28
+
+KeyHandlerThread_loop:
+mov rcx,A
+call Sleep
+
+cmp [KeyHandlerOff],1
+jne short @f
+  add rsp,28
+  mov [KeyHandlerOff],2
+  ret
+@@:
+
+  // VK_NUMPAD.
+  mov rcx,6E
+  call GetAsyncKeyState
+  test ax,ax
+  je KeyHandlerThread_back
+
+    xor ecx,ecx
+    call GetLocalPlayer
+    mov rcx,rax
+    mov rcx,[rcx+D0]                       // GameViewGame
+    mov rcx,[rcx+350]                      // HUD
+    lea rcx,[rcx+128]                      // table_size
+    call short FindComponentByRTTIClassName
+    test rax,rax                           // if HUDCountdownTimerLogic == NULL
+    je short @f                            // exit
+
+      mov rcx,[rax+60]                     // CountdownTimer
+      test rcx,rcx                         // if CountdownTimer == NULL
+      je short @f                          // exit
+
+        // ResetTimer
+        call short ResetTimer
+
+    @@:
+    mov rcx,C8
+    call Sleep
+
+  KeyHandlerThread_back:
+  jmp KeyHandlerThread_loop
+
+align 10 CC
+
+FindComponentByRTTIClassName:
+  sub rsp,28
+  mov rbx,[rcx+8]              // table_start
+  movsx rax,[rcx]              // size
+  lea rdi,[rbx+rax*8]          // table_end
+  @@:
+  cmp rbx,rdi                  // if current step == table_end
+  je short FindComponentByRTTIClassName_exit  // exit
+    mov rcx,[rbx]
+    mov rsi,rcx
+    mov rax,[rcx]
+    call [rax]                 // GetName
+    add rbx,8
+    mov rcx,[rax+38]           // RTTIClass-&gt;Name
+    lea rdx,[szHUDCountdownTimerLogic] // "HUDCountdownTimerLogic"
+    call strcmp
+    test eax,eax
+    jne short @b
+      mov rax,rsi
+      add rsp,28
+      ret
+  FindComponentByRTTIClassName_exit:
+  xor rax,rax
+  add rsp,28
+  ret
+
+align 10 CC
+
+ResetTimer:
+test rcx,rcx
+je short @f
+  cmp qword ptr [rcx+40],0
+  je short @f
+    mov rax,[rcx+20]
+    test rax,rax
+    je short @f
+      mov [rax+1C],0
+@@:
+ret
+
+align 10 CC
+
+szHUDCountdownTimerLogic:
+db 'HUDCountdownTimerLogic',0
+
+align 10 CC
+
+KeyHandlerOff:
+dd 0
+
+align 10 CC
+
+[DISABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  local starttime = getTickCount()
+
+  if readInteger( "KeyHandlerOff" ) == 0 then --could be 2 already
+    writeInteger( "KeyHandlerOff", 1 ) --tell the thread to kill itself
+  end
+
+  while( getTickCount() &lt; starttime + 1000 ) and ( readInteger( "KeyHandlerOff" ) ~= 2 ) do --wait till it has finished
+    sleep( 20 )
+  end
+
+  if( getTickCount() &gt; starttime + 1000 ) then --could happen when the window is shown
+    showMessage( 'Disabling the thread failed!' )
+    error( 'Thread disabling failed!' )
+  end
+    sleep( 1 )
+  end
+
+{$asm}
+
+unregistersymbol( KeyHandlerOff )
+unregistersymbol( KeyHandlerThread )
+dealloc( KeyHandlerThread )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>26484</ID>
+              <Description>"Test_Find_CharacterProgressionComponent [HZD]"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <Color>D0D1C7</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+
+{$lua}
+return [[alloc( KeyHandlerThread, 0x1000, ]] .. process .. [[ )]]
+{$asm}
+registersymbol( KeyHandlerThread )
+CreateThread( KeyHandlerThread )
+label( KeyHandlerOff )
+registersymbol( KeyHandlerOff )
+label( KeyHandlerThread_loop )
+label( KeyHandlerThread_back )
+
+label( p )
+registersymbol( p )
+
+KeyHandlerThread:
+sub rsp,28
+
+KeyHandlerThread_loop:
+mov rcx,A
+call Sleep
+
+cmp [KeyHandlerOff],1
+jne short @f
+  add rsp,28
+  mov [KeyHandlerOff],2
+  ret
+@@:
+
+  // VK_NUMPAD.
+  mov rcx,6E
+  call GetAsyncKeyState
+  test ax,ax
+  je short KeyHandlerThread_back
+
+    mov rcx,[LocalPlayer]
+    mov rcx,[rcx+70]
+    call HorizonZeroDawn.exe+EE53F0
+    test rax,rax
+    je short @f
+      mov [p],rax
+      mov edx,#12
+      mov rcx,rax
+      call HorizonZeroDawn.exe+144AD80
+    @@:
+    mov rcx,C8
+    call Sleep
+
+  KeyHandlerThread_back:
+  jmp KeyHandlerThread_loop
+
+align 10 CC
+
+p:
+dq 0
+
+align 10 CC
+
+KeyHandlerOff:
+dd 0
+
+align 10 CC
+
+[DISABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  local starttime = getTickCount()
+
+  if readInteger( "KeyHandlerOff" ) == 0 then --could be 2 already
+    writeInteger( "KeyHandlerOff", 1 ) --tell the thread to kill itself
+  end
+
+  while( getTickCount() &lt; starttime + 1000 ) and ( readInteger( "KeyHandlerOff" ) ~= 2 ) do --wait till it has finished
+    sleep( 20 )
+  end
+
+  if( getTickCount() &gt; starttime + 1000 ) then --could happen when the window is shown
+    showMessage( 'Disabling the thread failed!' )
+    error( 'Thread disabling failed!' )
+  end
+    sleep( 1 )
+  end
+
+{$asm}
+
+unregistersymbol( p )
+
+unregistersymbol( KeyHandlerOff )
+unregistersymbol( KeyHandlerThread )
+dealloc( KeyHandlerThread )
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>26485</ID>
+                  <Description>"p"</Description>
+                  <ShowAsHex>1</ShowAsHex>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>p</Address>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>26486</ID>
+                      <Description>"+5C == Level"</Description>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>+0</Address>
+                      <Offsets>
+                        <Offset>5C</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>26489</ID>
+              <Description>"Test_Find_WalletComponent [HZD]"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <Color>D0D1C7</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+
+{$lua}
+return [[alloc( KeyHandlerThread, 0x1000, ]] .. process .. [[ )]]
+{$asm}
+registersymbol( KeyHandlerThread )
+CreateThread( KeyHandlerThread )
+label( KeyHandlerOff )
+registersymbol( KeyHandlerOff )
+label( KeyHandlerThread_loop )
+label( KeyHandlerThread_back )
+
+label( p )
+registersymbol( p )
+
+KeyHandlerThread:
+sub rsp,28
+
+KeyHandlerThread_loop:
+mov rcx,A
+call Sleep
+
+cmp [KeyHandlerOff],1
+jne short @f
+  add rsp,28
+  mov [KeyHandlerOff],2
+  ret
+@@:
+
+  // VK_NUMPAD.
+  mov rcx,6E
+  call GetAsyncKeyState
+  test ax,ax
+  je short KeyHandlerThread_back
+
+    mov rcx,[LocalPlayer]
+    mov rcx,[rcx+70]
+    call HorizonZeroDawn.exe+EE5650
+    test rax,rax
+    je short @f
+      mov [p],rax
+      mov rdi,rax
+      mov r8l,1
+      mov rax,[rax+30]
+      mov rdx,[rax+28]
+      mov rbp,rdx
+      mov rcx,rdi
+      lea rcx,[rdi+00000288]
+      lea rdx,[HorizonZeroDawn.exe+2783E30] // Inventory
+      call HorizonZeroDawn.exe+B5B100
+      test rax,rax
+      je short @f
+        mov r8l,1
+        mov rdx,rbp
+        mov rcx,rax
+        call HorizonZeroDawn.exe+FD44C0
+    @@:
+    mov rcx,C8
+    call Sleep
+
+  KeyHandlerThread_back:
+  jmp KeyHandlerThread_loop
+
+align 10 CC
+
+p:
+dq 0
+
+align 10 CC
+
+KeyHandlerOff:
+dd 0
+
+align 10 CC
+
+[DISABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  local starttime = getTickCount()
+
+  if readInteger( "KeyHandlerOff" ) == 0 then --could be 2 already
+    writeInteger( "KeyHandlerOff", 1 ) --tell the thread to kill itself
+  end
+
+  while( getTickCount() &lt; starttime + 1000 ) and ( readInteger( "KeyHandlerOff" ) ~= 2 ) do --wait till it has finished
+    sleep( 20 )
+  end
+
+  if( getTickCount() &gt; starttime + 1000 ) then --could happen when the window is shown
+    showMessage( 'Disabling the thread failed!' )
+    error( 'Thread disabling failed!' )
+  end
+    sleep( 1 )
+  end
+
+{$asm}
+
+unregistersymbol( p )
+
+unregistersymbol( KeyHandlerOff )
+unregistersymbol( KeyHandlerThread )
+dealloc( KeyHandlerThread )
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>26490</ID>
+                  <Description>"p"</Description>
+                  <ShowAsHex>1</ShowAsHex>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>p</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>26505</ID>
+              <Description>"Test_Find_InventoryComponents [HZD]"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <Color>D0D1C7</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+
+{$lua}
+return [[alloc( KeyHandlerThread, 0x1000, ]] .. process .. [[ )]]
+{$asm}
+registersymbol( KeyHandlerThread )
+CreateThread( KeyHandlerThread )
+label( KeyHandlerOff )
+registersymbol( KeyHandlerOff )
+label( KeyHandlerThread_loop )
+label( KeyHandlerThread_back )
+
+label( p )
+registersymbol( p )
+label( q )
+registersymbol( q )
+
+KeyHandlerThread:
+sub rsp,28
+
+KeyHandlerThread_loop:
+mov rcx,A
+call Sleep
+
+cmp [KeyHandlerOff],1
+jne short @f
+  add rsp,28
+  mov [KeyHandlerOff],2
+  ret
+@@:
+
+  // VK_NUMPAD.
+  mov rcx,6E
+  call GetAsyncKeyState
+  test ax,ax
+  je short KeyHandlerThread_back
+
+    mov rcx,[LocalPlayer]
+    mov rcx,[rcx+70]
+    call HorizonZeroDawn.exe+EE5490 // HumanoidInventory
+    test rax,rax
+    je short @f
+      mov [p],rax
+    @@:
+    mov rcx,[LocalPlayer]
+    mov rcx,[rcx+70]
+    call HorizonZeroDawn.exe+EE54B0 // Inventory
+    test rax,rax
+    je short @f
+      mov [q],rax
+    @@:
+    mov rcx,C8
+    call Sleep
+
+  KeyHandlerThread_back:
+  jmp KeyHandlerThread_loop
+
+align 10 CC
+
+p:
+dq 0
+
+align 10 CC
+
+q:
+dq 0
+
+align 10 CC
+
+KeyHandlerOff:
+dd 0
+
+align 10 CC
+
+[DISABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  local starttime = getTickCount()
+
+  if readInteger( "KeyHandlerOff" ) == 0 then --could be 2 already
+    writeInteger( "KeyHandlerOff", 1 ) --tell the thread to kill itself
+  end
+
+  while( getTickCount() &lt; starttime + 1000 ) and ( readInteger( "KeyHandlerOff" ) ~= 2 ) do --wait till it has finished
+    sleep( 20 )
+  end
+
+  if( getTickCount() &gt; starttime + 1000 ) then --could happen when the window is shown
+    showMessage( 'Disabling the thread failed!' )
+    error( 'Thread disabling failed!' )
+  end
+    sleep( 1 )
+  end
+
+{$asm}
+
+unregistersymbol( q )
+unregistersymbol( p )
+
+unregistersymbol( KeyHandlerOff )
+unregistersymbol( KeyHandlerThread )
+dealloc( KeyHandlerThread )
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>26506</ID>
+                  <Description>"p"</Description>
+                  <ShowAsHex>1</ShowAsHex>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>p</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>26507</ID>
+                  <Description>"q"</Description>
+                  <ShowAsHex>1</ShowAsHex>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>q</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>25091</ID>
+              <Description>"Test_DSPlayerSystem_SetShoesLife [DS]"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <Color>D0D1C7</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+
+{$lua}
+return [[alloc( KeyHandlerThread, 0x1000, ]] .. process .. [[ )]]
+{$asm}
+registersymbol( KeyHandlerThread )
+CreateThread( KeyHandlerThread )
+label( KeyHandlerOff )
+registersymbol( KeyHandlerOff )
+label( KeyHandlerThread_loop )
+
+label( fValue )
+registersymbol( fValue )
+
+KeyHandlerThread:
+sub rsp,28
+
+KeyHandlerThread_loop:
+mov rcx,A
+call Sleep
+
+cmp [KeyHandlerOff],1
+jne short @f
+  add rsp,28
+  mov [KeyHandlerOff],2
+  ret
+@@:
+
+  // VK_NUMPAD.
+  mov rcx,6E
+  call GetAsyncKeyState
+  test ax,ax
+  je @f
+
+    movss xmm0,[fValue]      // (float)1500.0
+    mov rcx,[ds.exe+74B5E60] // DSPlayerSystem
+    call ds.exe+2507320      // DSPlayerSystem_SetShoesLife
+
+    mov rcx,C8
+    call Sleep
+
+  @@:
+  jmp KeyHandlerThread_loop
+
+align 10 CC
+
+KeyHandlerOff:
+dd 0
+
+align 10 CC
+
+fValue:
+dd (float)1500.0
+
+align 10 CC
+
+[DISABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  local starttime = getTickCount()
+
+  if readInteger( "KeyHandlerOff" ) == 0 then --could be 2 already
+    writeInteger( "KeyHandlerOff", 1 ) --tell the thread to kill itself
+  end
+
+  while( getTickCount() &lt; starttime + 1000 ) and ( readInteger( "KeyHandlerOff" ) ~= 2 ) do --wait till it has finished
+    sleep( 20 )
+  end
+
+  if( getTickCount() &gt; starttime + 1000 ) then --could happen when the window is shown
+    showMessage( 'Disabling the thread failed!' )
+    error( 'Thread disabling failed!' )
+  end
+    sleep( 1 )
+  end
+
+{$asm}
+
+unregistersymbol( fValue )
+
+unregistersymbol( KeyHandlerOff )
+unregistersymbol( KeyHandlerThread )
+dealloc( KeyHandlerThread )
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>25094</ID>
+                  <Description>"fValue"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>fValue</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>25099</ID>
+              <Description>"Test_DSPlayerSystem_AddChiralCrystalCount [DS]"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <Color>D0D1C7</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+
+{$lua}
+return [[alloc( KeyHandlerThread, 0x1000, ]] .. process .. [[ )]]
+{$asm}
+registersymbol( KeyHandlerThread )
+CreateThread( KeyHandlerThread )
+label( KeyHandlerOff )
+registersymbol( KeyHandlerOff )
+label( KeyHandlerThread_loop )
+
+label( dwValue )
+registersymbol( dwValue )
+
+KeyHandlerThread:
+sub rsp,28
+
+KeyHandlerThread_loop:
+mov rcx,A
+call Sleep
+
+cmp [KeyHandlerOff],1
+jne short @f
+  add rsp,28
+  mov [KeyHandlerOff],2
+  ret
+@@:
+
+  // VK_NUMPAD.
+  mov rcx,6E
+  call GetAsyncKeyState
+  test ax,ax
+  je @f
+
+    mov ecx,[dwValue]        // 1
+    call ds.exe+2506345      // DSPlayerSystem_SetShoesLife
+
+    mov rcx,C8
+    call Sleep
+
+  @@:
+  jmp KeyHandlerThread_loop
+
+align 10 CC
+
+KeyHandlerOff:
+dd 0
+
+align 10 CC
+
+dwValue:
+dd 1
+
+align 10 CC
+
+[DISABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  local starttime = getTickCount()
+
+  if readInteger( "KeyHandlerOff" ) == 0 then --could be 2 already
+    writeInteger( "KeyHandlerOff", 1 ) --tell the thread to kill itself
+  end
+
+  while( getTickCount() &lt; starttime + 1000 ) and ( readInteger( "KeyHandlerOff" ) ~= 2 ) do --wait till it has finished
+    sleep( 20 )
+  end
+
+  if( getTickCount() &gt; starttime + 1000 ) then --could happen when the window is shown
+    showMessage( 'Disabling the thread failed!' )
+    error( 'Thread disabling failed!' )
+  end
+    sleep( 1 )
+  end
+
+{$asm}
+
+unregistersymbol( dwValue )
+
+unregistersymbol( KeyHandlerOff )
+unregistersymbol( KeyHandlerThread )
+dealloc( KeyHandlerThread )
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>25100</ID>
+                  <Description>"dwValue"</Description>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>dwValue</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>25335</ID>
+              <Description>"Test_RequestBBPodBagCry [DS]"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <Color>D0D1C7</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+
+{$lua}
+return [[alloc( KeyHandlerThread, 0x1000, ]] .. process .. [[ )]]
+{$asm}
+registersymbol( KeyHandlerThread )
+CreateThread( KeyHandlerThread )
+label( KeyHandlerOff )
+registersymbol( KeyHandlerOff )
+label( KeyHandlerThread_loop )
+
+KeyHandlerThread:
+sub rsp,28
+
+KeyHandlerThread_loop:
+mov rcx,A
+call Sleep
+
+cmp [KeyHandlerOff],1
+jne short @f
+  add rsp,28
+  mov [KeyHandlerOff],2
+  ret
+@@:
+
+  // VK_NUMPAD.
+  mov rcx,6E
+  call GetAsyncKeyState
+  test ax,ax
+  je @f
+
+
+    call ds.exe+2506EE0
+
+    mov rcx,C8
+    call Sleep
+
+  @@:
+  jmp KeyHandlerThread_loop
+
+align 10 CC
+
+KeyHandlerOff:
+dd 0
+
+align 10 CC
+
+[DISABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  local starttime = getTickCount()
+
+  if readInteger( "KeyHandlerOff" ) == 0 then --could be 2 already
+    writeInteger( "KeyHandlerOff", 1 ) --tell the thread to kill itself
+  end
+
+  while( getTickCount() &lt; starttime + 1000 ) and ( readInteger( "KeyHandlerOff" ) ~= 2 ) do --wait till it has finished
+    sleep( 20 )
+  end
+
+  if( getTickCount() &gt; starttime + 1000 ) then --could happen when the window is shown
+    showMessage( 'Disabling the thread failed!' )
+    error( 'Thread disabling failed!' )
+  end
+    sleep( 1 )
+  end
+
+{$asm}
+
+unregistersymbol( myPtr )
+
+unregistersymbol( KeyHandlerOff )
+unregistersymbol( KeyHandlerThread )
+dealloc( KeyHandlerThread )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>25340</ID>
+              <Description>"Test_SetWeatherOverride [DS]"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <Color>D0D1C7</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+
+{$lua}
+return [[alloc( KeyHandlerThread, 0x1000, ]] .. process .. [[ )]]
+{$asm}
+registersymbol( KeyHandlerThread )
+CreateThread( KeyHandlerThread )
+label( KeyHandlerOff )
+registersymbol( KeyHandlerOff )
+label( KeyHandlerThread_loop )
+
+KeyHandlerThread:
+sub rsp,28
+
+KeyHandlerThread_loop:
+mov rcx,A
+call Sleep
+
+cmp [KeyHandlerOff],1
+jne short @f
+  add rsp,28
+  mov [KeyHandlerOff],2
+  ret
+@@:
+
+  // VK_NUMPAD.
+  mov rcx,6E
+  call GetAsyncKeyState
+  test ax,ax
+  je @f
+
+    mov rcx,[ds.exe+74F3398]
+    mov rcx,[rcx]
+    test rcx,rcx
+    je short @f
+      call ds.exe+1871000
+    @@:
+    mov rcx,C8
+    call Sleep
+
+  @@:
+  jmp KeyHandlerThread_loop
+
+align 10 CC
+
+KeyHandlerOff:
+dd 0
+
+align 10 CC
+
+[DISABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  local starttime = getTickCount()
+
+  if readInteger( "KeyHandlerOff" ) == 0 then --could be 2 already
+    writeInteger( "KeyHandlerOff", 1 ) --tell the thread to kill itself
+  end
+
+  while( getTickCount() &lt; starttime + 1000 ) and ( readInteger( "KeyHandlerOff" ) ~= 2 ) do --wait till it has finished
+    sleep( 20 )
+  end
+
+  if( getTickCount() &gt; starttime + 1000 ) then --could happen when the window is shown
+    showMessage( 'Disabling the thread failed!' )
+    error( 'Thread disabling failed!' )
+  end
+    sleep( 1 )
+  end
+
+{$asm}
+
+unregistersymbol( myPtr )
+
+unregistersymbol( KeyHandlerOff )
+unregistersymbol( KeyHandlerThread )
+dealloc( KeyHandlerThread )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>25341</ID>
+              <Description>"Test_OpenTerminalTopMenuAtLastTerminal [DS]"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <Color>D0D1C7</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+
+{$lua}
+return [[alloc( KeyHandlerThread, 0x1000, ]] .. process .. [[ )]]
+{$asm}
+registersymbol( KeyHandlerThread )
+CreateThread( KeyHandlerThread )
+label( KeyHandlerOff )
+registersymbol( KeyHandlerOff )
+label( KeyHandlerThread_loop )
+
+KeyHandlerThread:
+sub rsp,28
+
+KeyHandlerThread_loop:
+mov rcx,A
+call Sleep
+
+cmp [KeyHandlerOff],1
+jne short @f
+  add rsp,28
+  mov [KeyHandlerOff],2
+  ret
+@@:
+
+  // VK_NUMPAD.
+  mov rcx,6E
+  call GetAsyncKeyState
+  test ax,ax
+  je @f
+
+    call ds.exe+2506C80
+
+    mov rcx,C8
+    call Sleep
+
+  @@:
+  jmp KeyHandlerThread_loop
+
+align 10 CC
+
+KeyHandlerOff:
+dd 0
+
+align 10 CC
+
+[DISABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  local starttime = getTickCount()
+
+  if readInteger( "KeyHandlerOff" ) == 0 then --could be 2 already
+    writeInteger( "KeyHandlerOff", 1 ) --tell the thread to kill itself
+  end
+
+  while( getTickCount() &lt; starttime + 1000 ) and ( readInteger( "KeyHandlerOff" ) ~= 2 ) do --wait till it has finished
+    sleep( 20 )
+  end
+
+  if( getTickCount() &gt; starttime + 1000 ) then --could happen when the window is shown
+    showMessage( 'Disabling the thread failed!' )
+    error( 'Thread disabling failed!' )
+  end
+    sleep( 1 )
+  end
+
+{$asm}
+
+unregistersymbol( myPtr )
+
+unregistersymbol( KeyHandlerOff )
+unregistersymbol( KeyHandlerThread )
+dealloc( KeyHandlerThread )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>25145</ID>
+              <Description>"Test_FloatAndMovePlayer [DS]"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <Color>D0D1C7</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+
+{$lua}
+return [[alloc( KeyHandlerThread, 0x1000, ]] .. process .. [[ )]]
+{$asm}
+registersymbol( KeyHandlerThread )
+CreateThread( KeyHandlerThread )
+label( KeyHandlerOff )
+registersymbol( KeyHandlerOff )
+label( KeyHandlerThread_loop )
+
+label( fValue )
+registersymbol( fValue )
+
+KeyHandlerThread:
+sub rsp,28
+
+KeyHandlerThread_loop:
+mov rcx,A
+call Sleep
+
+cmp [KeyHandlerOff],1
+jne short @f
+  add rsp,28
+  mov [KeyHandlerOff],2
+  ret
+@@:
+
+  // VK_NUMPAD.
+  mov rcx,6E
+  call GetAsyncKeyState
+  test ax,ax
+  je @f
+
+    movss xmm0,[fValue]
+    movss xmm1,[fValue]
+    movss xmm2,[fValue]
+    movss xmm3,[fValue]
+    call ds.exe+25096E0
+
+    mov rcx,C8
+    call Sleep
+
+  @@:
+  jmp KeyHandlerThread_loop
+
+align 10 CC
+
+KeyHandlerOff:
+dd 0
+
+align 10 CC
+
+fValue:
+dd (float)20.0
+
+align 10 CC
+
+[DISABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  local starttime = getTickCount()
+
+  if readInteger( "KeyHandlerOff" ) == 0 then --could be 2 already
+    writeInteger( "KeyHandlerOff", 1 ) --tell the thread to kill itself
+  end
+
+  while( getTickCount() &lt; starttime + 1000 ) and ( readInteger( "KeyHandlerOff" ) ~= 2 ) do --wait till it has finished
+    sleep( 20 )
+  end
+
+  if( getTickCount() &gt; starttime + 1000 ) then --could happen when the window is shown
+    showMessage( 'Disabling the thread failed!' )
+    error( 'Thread disabling failed!' )
+  end
+    sleep( 1 )
+  end
+
+{$asm}
+
+unregistersymbol( fValue )
+
+unregistersymbol( KeyHandlerOff )
+unregistersymbol( KeyHandlerThread )
+dealloc( KeyHandlerThread )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>25150</ID>
+              <Description>"Test_VehicleEntity_GetLife [DS]"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <Color>D0D1C7</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+
+{$lua}
+return [[alloc( KeyHandlerThread, 0x1000, ]] .. process .. [[ )]]
+{$asm}
+registersymbol( KeyHandlerThread )
+CreateThread( KeyHandlerThread )
+label( KeyHandlerOff )
+registersymbol( KeyHandlerOff )
+label( KeyHandlerThread_loop )
+
+label( DSVehicleMotorbike )
+registersymbol( DSVehicleMotorbike )
+label( bufA )
+label( bufB )
+
+KeyHandlerThread:
+sub rsp,28
+
+KeyHandlerThread_loop:
+mov rcx,A
+call Sleep
+
+cmp [KeyHandlerOff],1
+jne short @f
+  add rsp,28
+  mov [KeyHandlerOff],2
+  ret
+@@:
+
+  // VK_NUMPAD.
+  mov rcx,6E
+  call GetAsyncKeyState
+  test ax,ax
+  je @f
+
+    lea r8,[bufA]
+    lea rdx,[bufB]
+    mov rcx,[DSVehicleMotorbike]
+    call ds.exe+2C48410
+
+    mov rcx,C8
+    call Sleep
+
+  @@:
+  jmp KeyHandlerThread_loop
+
+align 10 CC
+
+KeyHandlerOff:
+dd 0
+
+align 10 CC
+
+DSVehicleMotorbike:
+dq 0
+
+align 10 CC
+
+bufA:
+dd 0
+
+align 10 CC
+
+bufB:
+dd 0
+
+align 10 CC
+
+[DISABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  local starttime = getTickCount()
+
+  if readInteger( "KeyHandlerOff" ) == 0 then --could be 2 already
+    writeInteger( "KeyHandlerOff", 1 ) --tell the thread to kill itself
+  end
+
+  while( getTickCount() &lt; starttime + 1000 ) and ( readInteger( "KeyHandlerOff" ) ~= 2 ) do --wait till it has finished
+    sleep( 20 )
+  end
+
+  if( getTickCount() &gt; starttime + 1000 ) then --could happen when the window is shown
+    showMessage( 'Disabling the thread failed!' )
+    error( 'Thread disabling failed!' )
+  end
+    sleep( 1 )
+  end
+
+{$asm}
+
+unregistersymbol( DSVehicleMotorbike )
+
+unregistersymbol( KeyHandlerOff )
+unregistersymbol( KeyHandlerThread )
+dealloc( KeyHandlerThread )
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>25151</ID>
+                  <Description>"DSVehicleMotorbike"</Description>
+                  <ShowAsHex>1</ShowAsHex>
+                  <VariableType>8 Bytes</VariableType>
+                  <Address>DSVehicleMotorbike</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>25160</ID>
+              <Description>"Test_VehicleEntity_Repair [DS]"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <Color>D0D1C7</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+
+{$lua}
+return [[alloc( KeyHandlerThread, 0x1000, ]] .. process .. [[ )]]
+{$asm}
+registersymbol( KeyHandlerThread )
+CreateThread( KeyHandlerThread )
+label( KeyHandlerOff )
+registersymbol( KeyHandlerOff )
+label( KeyHandlerThread_loop )
+
+label( fValue )
+
+KeyHandlerThread:
+sub rsp,28
+
+KeyHandlerThread_loop:
+mov rcx,A
+call Sleep
+
+cmp [KeyHandlerOff],1
+jne short @f
+  add rsp,28
+  mov [KeyHandlerOff],2
+  ret
+@@:
+
+  // VK_NUMPAD.
+  mov rcx,6E
+  call GetAsyncKeyState
+  test ax,ax
+  je @f
+
+    movss xmm0,[fValue]
+    mov rcx,[DSPlayerEntity]
+    mov rcx,[rcx+70] // DSVehicleMotorbike
+    movss [rcx+670],xmm0
+    call ds.exe+2C33EA0
+
+    mov rcx,C8
+    call Sleep
+
+  @@:
+  jmp KeyHandlerThread_loop
+
+align 10 CC
+
+KeyHandlerOff:
+dd 0
+
+align 10 CC
+
+fValue:
+dd (float)-7500.0
+
+align 10 CC
+
+[DISABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  local starttime = getTickCount()
+
+  if readInteger( "KeyHandlerOff" ) == 0 then --could be 2 already
+    writeInteger( "KeyHandlerOff", 1 ) --tell the thread to kill itself
+  end
+
+  while( getTickCount() &lt; starttime + 1000 ) and ( readInteger( "KeyHandlerOff" ) ~= 2 ) do --wait till it has finished
+    sleep( 20 )
+  end
+
+  if( getTickCount() &gt; starttime + 1000 ) then --could happen when the window is shown
+    showMessage( 'Disabling the thread failed!' )
+    error( 'Thread disabling failed!' )
+  end
+    sleep( 1 )
+  end
+
+{$asm}
+
+unregistersymbol( KeyHandlerOff )
+unregistersymbol( KeyHandlerThread )
+dealloc( KeyHandlerThread )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>25471</ID>
+              <Description>"Test_RtlZeroMemory"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <Color>D0D1C7</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+
+{$lua}
+return [[alloc( KeyHandlerThread, 0x1000, ]] .. process .. [[ )]]
+{$asm}
+registersymbol( KeyHandlerThread )
+CreateThread( KeyHandlerThread )
+label( KeyHandlerOff )
+registersymbol( KeyHandlerOff )
+label( KeyHandlerThread_loop )
+
+label( fValue )
+
+KeyHandlerThread:
+sub rsp,28
+
+KeyHandlerThread_loop:
+mov rcx,A
+call Sleep
+
+cmp [KeyHandlerOff],1
+jne short @f
+  add rsp,28
+  mov [KeyHandlerOff],2
+  ret
+@@:
+
+  // VK_NUMPAD.
+  mov rcx,6E
+  call GetAsyncKeyState
+  test ax,ax
+  je @f
+
+    mov rax,15D4E7020
+    mov rcx,rax
+    mov rdx,1000
+    call RtlZeroMemory
+
+    mov rcx,C8
+    call Sleep
+
+  @@:
+  jmp KeyHandlerThread_loop
+
+align 10 CC
+
+KeyHandlerOff:
+dd 0
+
+align 10 CC
+
+fValue:
+dd (float)-7500.0
+
+align 10 CC
+
+[DISABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  local starttime = getTickCount()
+
+  if readInteger( "KeyHandlerOff" ) == 0 then --could be 2 already
+    writeInteger( "KeyHandlerOff", 1 ) --tell the thread to kill itself
+  end
+
+  while( getTickCount() &lt; starttime + 1000 ) and ( readInteger( "KeyHandlerOff" ) ~= 2 ) do --wait till it has finished
+    sleep( 20 )
+  end
+
+  if( getTickCount() &gt; starttime + 1000 ) then --could happen when the window is shown
+    showMessage( 'Disabling the thread failed!' )
+    error( 'Thread disabling failed!' )
+  end
+    sleep( 1 )
+  end
+
+{$asm}
+
+unregistersymbol( KeyHandlerOff )
+unregistersymbol( KeyHandlerThread )
+dealloc( KeyHandlerThread )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>26504</ID>
+              <Description>"[Trials] Reset Trial Timer To 00:00"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$STRICT}
+
+{$lua}
+
+if syntaxcheck then return end
+
+[ENABLE]
+
+local LocalPlayer = readQword( getAddressSafe( "LocalPlayer" ) )
+local GameViewGame = readQword( LocalPlayer + 0xD0 )
+local HUD = readQword( GameViewGame + 0x350 )
+local HUDCountdownTimerLogic = executeCodeEx( 0, nil, FindNamedComponentByRTTIClass, HUD + 0x128, "HUDCountdownTimerLogic" )
+if HUDCountdownTimerLogic ~= 0x0 then
+  local CountdownTimer = readQword( HUDCountdownTimerLogic + 0x60 )
+  if CountdownTimer ~= 0x0 then
+    executeCodeEx( 0, nil, ResetTimer, CountdownTimer )
+  end
+end
+return "assert(true)"
+
+[DISABLE]
+</AssemblerScript>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>24117</ID>
+      <Description>"-----------------------------------------------------------"</Description>
+      <LastState Value="" RealAddress="00000000"/>
+      <Color>554E4B</Color>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>51</ID>
+      <Description>"Think I deserve a cookie? ツ"</Description>
+      <LastState Value="" RealAddress="00000000"/>
+      <Color>7C7570</Color>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>52</ID>
+      <Description>"https://www.paypal.me/sadjuk"</Description>
+      <LastState Value="" RealAddress="00000000"/>
+      <Color>7C7570</Color>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+  <Comments>Information or derivatives contained in this table are NOT to be leeched, shared, posted on YouTube channels or Discord servers without explicit approval from the author (post, PM, mail, DM, etc.). "Credit to SunBeam" without asking for my approval is not allowed.
+</Comments>
+  <Signature>
+    <SignedHash HashSize="132">0q8$vsS=egFQDD0!o_V#tjOew$pvdaJcl]wBmgSBO[}X1Q%LahyB(bs+3/LqEnUjk8G2AkHP4f?*WC)V@#lQUMDnkSa$T$/]Hm=I)Fvr5;yQM{_4UoNug[NxxAU[(Oy1sAAAKO{;QEYtllZ.Q[fF$7%s@#7V{V+s98qQD</SignedHash>
+    <PublicKey Size="3019">5dZ*HQ*y;zWn;@=c[34DZbD@YZHxc]07XMnH9]OY004,YdAcuzstQ.NhpCaQg6AIpKI?^QXluZR?y1@F5,b8P_8TaZPM}UYAu^tzILzkaeRya)Q_$+F-OiKgDNRcNHE^..L2(s2e#y#x)It_%SOsCw-_,ww=o.JqtVdFTsjG#Rp;qE#U{+d2.i5@Lc/Fbs[q5_W1MTu/vLRr=.^{-t004/lPDc$28VUda01Zh/L^b0%03ZMW03Zkk0001UdV2H#000JJOGiWi^^a60_De66lK:n!32.bRa^vGf6951U69E94oEQKA00)qQO,@Rc1R4/[FZfxb0000ACP[p:R9M5UmwR.8*s?FT:l9ON$t93WAYiZrfnY+NpcsS(7Ing-5+RJ(xFod-K1NnsA213!OtGTXL07HdgX!;S3)i:qhL:Ev89^KSMKlsh7C^9Z0)sw=]}3ax?0_JL?)[j9S,hKA^nl@oz0ZEEy{xVkv+E8CZ[DkMm8s9]ZT}.,4PC@GeR*B5$Gv/j$KP;BAArPfYVbc/d7huzG[NH3^NVBDXm_UAL_,.s0NnZ=6!UGJ[-kWIBQI25e}wPCpC_x2o}fAKx?5!xfb^B0aZcX-^HVI+s;%WX7u)u5Qoi+L/nj0LKl/f*UhuvHN8HZX#=-${=E^dBrECDzqyCPx]VoLNZmI#0+zo/Z,Z_t#Gw/V5@Uvz^RDienHsP*+$J.UYB7fo:;E80ULjV3BRPwh_F!CJCnePD5?mS@djEdLT^R$?NW,u/:N!GY0^D)0VW=!+Nw}Z#Ne_Tg3P_H!xG8?Co4pjnp?758mUndGyqS9}QZrZcn?V?HL[$rZHT]iOy(P{Ylu^]I[=fU[uFO4!oKmNp1PO8xTvkg_.2QsaJp}!TY3QY)=-aIen/Ho-HXSX2-dt71_Kx,MsdFIr0J%Ea;sJh;t@}S62TQh{q@E;LY835;hwse^o:b]XjQ{3YU#h$jsLqC+*%H.btRzQ)IM(Y+?#2S21kXvD)5Af+xFAb?IH8za}o(A/I7sOUyJ34W,eXCPkTpoI0SNqp{eItO[s*@+z,e6!.tN$Ro/SYtYq-$X22+fUv^ikEBYU$:@I*!6tC=M%dN@OUE^qwoDC;J?:$MZ92rb3.v)2M:meSg,.cYNIpf[0lN4j{X1-)%dc5@v3L%*6S-3+0RehP1!c-t0E)/P24]9{wJf[!y-DhbM^)8D]mhmUIz7Nx/UMWQwOwx6(L;vuSJz]NJX6pb[_/huz/p*[cL;cLCD%b:bA+vOYFWxpWDXnqYS/=b[wJ;G7Gp4h[c;%sF_I1LZ@cv?@x;o){kKg3?6,08LFk*/.1Wgu*E!Wl.6$QQjPMC6#3Xv^7kv-H7ykYGYp@%Dk,7rF)DQ5VCIF*g:Jb-Uq_6gL}]TE,y$5[+[P!H,hltTua*V^Ltsd^l^qe=g)ldPBL[Uif13w2$%v.:PMca6bqh}biEd2ZTSES^(bkV*mJfaqJ{3t=6CHNo);*JGSON*-;DBh*UXmjcw6USPX7%6=LQy6RJLTE%ybGej#PQ4OmX#(BQ%a4#+Bs(^NpyCnz0b,1_hzlHRzQOn=IDSn(t3H:;RGY9[5Q$OX/]z%1jwT8:S@0aB2z]H_(f(*koyb,phGde%Fu%-/s*K^+OP^wQzR7h@hRkkw0qUg@xR@3Ojt;nW1E9jJj!pXcQbf]=,q]c[:R%Kq3JZg9XhYkLXSd#{w?QI7OAp5uu45/myj]pJ-g8l*]V]jy-A7g-(R=hh,TKv39ticjJ,,G)W5UjPY-Fk]7DO1l#$Cxf./Pur2t^^TeU-3s[b+kbim)8k.ms10p?J[/oJo(32sOlJReLv1H[D968_/aLl0Ea*TXPA[)5IJL?;{?v9f7?_B8TOdp:7R619wNI.D)%TbU1#8D}_P;}Y;rMd(@v4/QreTt=0j){2.fErnDsujxvD$^:UP9(h[KVYkyCI@*4%uy/ut8N_/QtDTuR)(1thEaJxN,}V2qPi-1re}ga)z]F@D}VDXKzqXH]iUm#R2Fd2C[FOXptDO6iz_eHH-2qV*DPl];;W1,+H6%S=tl.IfFhj]DswzDw^:ljsc@LQP9O8nfl:2TG34(M?=+a(zai1=U#q#s6xj*Qh.sm!67qZL[]XLdU!y0Yur0{e^#lt*aOD+WDYL-L%?ZW!iu[(zDZheLsZgFk7{5dhYfdn)6/[BW,T:Cez^a!RqiWUYrN(.KL;HhGx(h6fWf)U]qjG{J-fcRb2fD5/3?^%u84#MFYEp*SdkmVt0NqgM];h@Cm=h$@zCSs9%Y}?,TmWHubp/NE*j}SX-xLLTeZ9-cF3DiWq/+VUcNAvNGI*F]@ezO.Qs+-e;IIIYG3P#b.BJ#h7i][.F}Bf6+)F*;vd5eeAqWOHq(L)ABUP7{hUrW^-40H7Tc5eQ/GxY7]Te5-mS,,=-9N.]J5HlJlEn^8^]-K(w3(+VXIKm#BuTr1J@K]gj!0H67Yyw06G.o=]$2wM*Q1/x[An]w$Bnn?v[,Fz.oJ{7)G{x$9@B]jZA5osPXBFo:0831Isc4Y.B]y%JgKZUQ=woOIFs;NSbUuQJ8im-]{8i/XgUmS=FvJOD,dXR20^BNNqC6P[^nKjoc/0$O]}9lNvgnCT1E)=K%*26pD%c#aUp;Fc5QYRsC@F:#2fbCoNS48h[Lq.k#eqb,Y/Gf*QRp87$}.1#?ICB4DYVC?LfeuEDJ(aP0KbTVF.$)/x%(iBC7KpL]WkvUf[u_W-n*?mTPa6QHpZH!pbQf^jPrfs,LO,qdj$lTDR?rgr],;y*D2^IHur0B+h{Hg$Ezk[}GpuK]RTgSQ:Juko?Z{1kYPV3:dhPQi[}n9ebRMhVf/Ll#+-2q@(Jq@@/:63N-(/[U-5IdouefS}FgViR)?XOMT%UHp#7q^OfdlQ:;f3W;4V_w50^i8EA7.xz3DogS*TDA-JqByZe/eIM;7%8lh?_j0.q_j#c11E,%blNv/4)Z2buN#rACXt?-uk#[?_r;%+@k!comiNK1MQ)hNalvxZa)*7LO]g^BEm.7diuhm0YydKu)SmPl73%nYi^M)ZOF6,YWEGP1lv@m=R0UGi1zH=AeI:6f1I:g)i=V3p*uQ{_5N)7=d[dv#meg[f.xaF_ZsOo:hfASo0nLt$4L/lO^Lk%0iD?*5c@7Agsk;$hZ79{ID^bJ;Xby(h;$N}udf$@6E):w(}_edh.dX6?_12yvTiUp7jF7k#1tPA_MlWsW$=tV^{-6bM]3H5m#C:5S9aPoUWn=?$11Si(oO=wIA*+P2#sy$29qJ$Z}73bt6cY)90[y($vm9%0S:eWMV!Nr3R8PgKWG(t25otTL{HZ)wo%.E;]PU1PUVB!$si2[rY;wVXnGZeGdA?0exj6C$H20IRm%%WS)7?BJkNf3+96X=3)+e+J1)n[W!*c;g8kt(2+!lu^flK}KK7*COo/JbYu?g0kZP^?b/o%Ci_gvuNny%:(Q!:f{YR=8)}RSo8l_%}ETti,g?mb:@6-^ZzJ(Jug;Zb7t{IR^-1%lLf%DfcjvD6MOaAS;M]j:*YIz03=4]gZy(mMY8Biqwl$tj?(Xe?U1xaHqX8!KXWj/CCmK[i?u?r=}{6sx2F76]}M3VK!Mw9)+!^P0000/MNUMnLSTY}00001XZi^(F#=O7]eM)7uRBu%n]bT=vOZV1$D.[G6uNS!4t$sN=:117^ai4HQvZM(kYLB]Ys8SuD.VIgPmfTD1pvGokqOhgjAgO*Y#0E1?:$y5^EJx7Gxdyyt[}hApw9;jcA{^5=3e{GlwM!%@D:iDnVkgGP7rDABB?5$ww(b</PublicKey>
+  </Signature>
+</CheatTable>

@@ -1,0 +1,1690 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="34">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>2428</ID>
+      <Description>"{(Only Works With Cheat Engine V7.1 Or Above) Tested With ^^nosTEAM^^ 51.3GB Version (All Cheats Work)}}"</Description>
+      <LastState Value="" RealAddress="00000000"/>
+      <Color>0000FF</Color>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>2424</ID>
+      <Description>"[ Activate First (Car Cheat Won't Activate Otherwise-Also Don't Use With Easy Kills Cheat)] {{Invulnerable/Indestructible Vehicle + Nitrous (ACTIVATE THE BOX TO THE LEFT &amp; EXPAND -+SIGN) THEN ENABLE THE BOX TO THE RIGHT OF I.V.H (Under Value) BELOW &amp; The One Under}}"</Description>
+      <Options moHideChildren="1" moManualExpandCollapse="1"/>
+      <LastState/>
+      <Color>808000</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(get_playerVehicle,JustCause4.exe,4D 89 A7 F8 00 00 00 49)
+aobscanmodule(get_playerAddr,JustCause4.exe,48 8B 06 48 89 F1 0F B7) //UNUSED
+alloc(newmem,$1000,"JustCause4.exe"+568E6F)
+label(code)
+label(code2)
+label(return)
+label(return2)
+alloc(playerVehicle,8)
+registersymbol(playerVehicle)
+alloc(playerAddr,8)
+registersymbol(playerAddr)
+
+newmem:
+push rax
+mov rax,[r15+000000F8]
+mov [playerVehicle],rax
+pop rax
+
+code:
+mov [r15+000000F8],r12
+jmp return
+
+newmem2:
+code2:
+mov [playerAddr],rsi
+mov rax,[rsi]
+mov rcx,rsi
+jmp return2
+
+get_playerVehicle:
+  jmp newmem
+  nop 2
+return:
+registersymbol(get_playerVehicle)
+
+get_playerAddr:
+  jmp newmem2
+  nop
+return2:
+registersymbol(get_playerAddr)
+
+[DISABLE]
+get_playerVehicle:
+  db 4D 89 A7 F8 00 00 00
+
+get_playerAddr:
+  db 48 8B 06 48 89 F1
+
+unregistersymbol(get_playerAddr)
+unregistersymbol(get_playerVehicle)
+dealloc(newmem)
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>72</ID>
+          <Description>"Infinite Vehicle Health Script {{(Activate Box To The Left) You Have To Combine 1 &amp; 2 Below In Order For The Vehicle Invincibility Cheat To Work}}"</Description>
+          <Options moHideChildren="1" moManualExpandCollapse="1"/>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+aobscanmodule(get_Health,JustCause4.exe,66 89 91 AC 03 00 00)
+alloc(newmem,$1000,"JustCause4.exe"+6532D40)
+label(code)
+label(return)
+label(isvalid)
+label(isplayervehicle)
+alloc(infVehicleHealth,1)
+registersymbol(infVehicleHealth)
+
+newmem:
+{$try}
+  push rax
+  push rdi
+  cmp rcx,[playerVehicle]
+  je isplayervehicle
+  mov rax,[rcx+A40]
+  mov rdi,[rax+510]
+  jmp isvalid
+{$except}
+  pop rdi
+  pop rax
+  jmp code
+
+isplayervehicle:
+  pop rdi
+  pop rax
+  cmp byte ptr [infVehicleHealth],00
+  je code
+  mov dx, word ptr [rcx+000003AA]
+  jmp code
+
+isvalid:
+  cmp [rax+510],rcx
+  pop rdi
+  pop rax
+  jne code
+  mov dx, word ptr [rcx+000003AE]
+
+code:
+  mov [rcx+000003AC],dx
+  jmp return
+
+get_Health:
+  jmp newmem
+  nop 2
+return:
+registersymbol(get_Health)
+
+[DISABLE]
+get_Health:
+  db 66 89 91 AC 03 00 00
+
+unregistersymbol(get_Health)
+dealloc(newmem)
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>1805</ID>
+              <Description>"1 Vehicle Won't Blow (Double Click The Box To The Right-Then Change Value To Enabled)"</Description>
+              <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">1:Enabled
+0:Disabled
+*:Unknown
+</DropDownList>
+              <VariableType>4 Bytes</VariableType>
+              <Address>infVehicleHealth</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>2069</ID>
+              <Description>"2 Vehicle Parts Don't Fall Apart {{(Activate Box In The Left) Parts May Fall Apart Occasionally But The Car Will Never Blow While You Are In It - If Both Are Enabled}}"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{ Game   : JustCause4.exe
+  Version: 
+  Date   : 2020-08-10
+  Author : Administrator
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,JustCause4.exe,89 7B 40 84 C0) // should be unique
+alloc(newmem,$1000,"JustCause4.exe"+E51FA)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  nop
+  //mov [rbx+40],edi
+  //test al,al
+  jmp return
+
+INJECT:
+  jmp newmem
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db 89 7B 40 84 C0
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "JustCause4.exe"+E51FA
+
+"JustCause4.exe"+E51D1: 44 85 7B 4C        -  test [rbx+4C],r15d
+"JustCause4.exe"+E51D5: 0F 85 15 01 00 00  -  jne JustCause4.exe+E52F0
+"JustCause4.exe"+E51DB: 4C 89 64 24 58     -  mov [rsp+58],r12
+"JustCause4.exe"+E51E0: 41 0F B6 D6        -  movzx edx,r14l
+"JustCause4.exe"+E51E4: 48 8B CB           -  mov rcx,rbx
+"JustCause4.exe"+E51E7: 4C 89 6C 24 60     -  mov [rsp+60],r13
+"JustCause4.exe"+E51EC: E8 3F 44 01 00     -  call JustCause4.exe+F9630
+"JustCause4.exe"+E51F1: 8B 7B 40           -  mov edi,[rbx+40]
+"JustCause4.exe"+E51F4: 44 0F B6 E8        -  movzx r13d,al
+"JustCause4.exe"+E51F8: 2B FE              -  sub edi,esi
+// ---------- INJECTING HERE ----------
+"JustCause4.exe"+E51FA: 89 7B 40           -  mov [rbx+40],edi
+"JustCause4.exe"+E51FD: 84 C0              -  test al,al
+// ---------- DONE INJECTING  ----------
+"JustCause4.exe"+E51FF: 75 27              -  jne JustCause4.exe+E5228
+"JustCause4.exe"+E5201: 48 8B 4B 38        -  mov rcx,[rbx+38]
+"JustCause4.exe"+E5205: B8 01 00 00 00     -  mov eax,00000001
+"JustCause4.exe"+E520A: 44 8B 41 14        -  mov r8d,[rcx+14]
+"JustCause4.exe"+E520E: 44 39 41 18        -  cmp [rcx+18],r8d
+"JustCause4.exe"+E5212: 44 0F 4C 41 18     -  cmovl r8d,[rcx+18]
+"JustCause4.exe"+E5217: 44 3B C0           -  cmp r8d,eax
+"JustCause4.exe"+E521A: 44 0F 4C C0        -  cmovl r8d,eax
+"JustCause4.exe"+E521E: 41 3B F8           -  cmp edi,r8d
+"JustCause4.exe"+E5221: 41 0F 4C F8        -  cmovl edi,r8d
+}
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>2410</ID>
+              <Description>"Infinite Car Nitrous (Activate Box In The Left)"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{ Game   : JustCause4.exe
+  Version: 
+  Date   : 2020-08-10
+  Author : Administrator
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,JustCause4.exe,F3 0F 11 8B 70 17 01 00 F3) // should be unique
+alloc(newmem,$1000,"JustCause4.exe"+A776B4B)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  mov [rbx+00011770],1065353216
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop
+  nop
+  nop
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db F3 0F 11 8B 70 17 01 00
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "JustCause4.exe"+A776B4B
+
+"JustCause4.exe"+A776B12: F3 0F 10 8B 70 17 01 00        -  movss xmm1,[rbx+00011770]
+"JustCause4.exe"+A776B1A: 0F 57 C0                       -  xorps xmm0,xmm0
+"JustCause4.exe"+A776B1D: 0F 2F C8                       -  comiss xmm1,xmm0
+"JustCause4.exe"+A776B20: 76 31                          -  jna JustCause4.exe+A776B53
+"JustCause4.exe"+A776B22: F3 41 0F 10 0F                 -  movss xmm1,[r15]
+"JustCause4.exe"+A776B27: 48 63 83 68 17 01 00           -  movsxd  rax,dword ptr [rbx+00011768]
+"JustCause4.exe"+A776B2E: F3 0F 58 C9                    -  addss xmm1,xmm1
+"JustCause4.exe"+A776B32: F3 0F 5E 8C 83 60 17 01 00     -  divss xmm1,[rbx+rax*4+00011760]
+"JustCause4.exe"+A776B3B: F3 0F 58 8B 70 17 01 00        -  addss xmm1,[rbx+00011770]
+"JustCause4.exe"+A776B43: F3 0F 5D 0D A1 7A 36 F7        -  minss xmm1,[JustCause4.exe+1ADE5EC]
+// ---------- INJECTING HERE ----------
+"JustCause4.exe"+A776B4B: F3 0F 11 8B 70 17 01 00        -  movss [rbx+00011770],xmm1
+// ---------- DONE INJECTING  ----------
+"JustCause4.exe"+A776B53: F3 0F 10 05 29 7D 36 F7        -  movss xmm0,[JustCause4.exe+1ADE884]
+"JustCause4.exe"+A776B5B: 48 63 C7                       -  movsxd  rax,edi
+"JustCause4.exe"+A776B5E: 89 BB 68 17 01 00              -  mov [rbx+00011768],edi
+"JustCause4.exe"+A776B64: F3 0F 5E 84 83 58 17 01 00     -  divss xmm0,[rbx+rax*4+00011758]
+"JustCause4.exe"+A776B6D: 0F 2F C8                       -  comiss xmm1,xmm0
+"JustCause4.exe"+A776B70: 73 05                          -  jae JustCause4.exe+A776B77
+"JustCause4.exe"+A776B72: 40 30 F6                       -  xor sil,sil
+"JustCause4.exe"+A776B75: EB 04                          -  jmp JustCause4.exe+A776B7B
+"JustCause4.exe"+A776B77: 41 0F B6 F6                    -  movzx esi,r14l
+"JustCause4.exe"+A776B7B: 48 8B 8B 50 18 01 00           -  mov rcx,[rbx+00011850]
+}
+</AssemblerScript>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>2425</ID>
+          <Description>"Current Vehicle (Visual Only Don't Edit)"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <VariableType>8 Bytes</VariableType>
+          <Address>playerVehicle</Address>
+          <Offsets>
+            <Offset>0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>2426</ID>
+          <Description>"Current Health (Visual Only Don't Edit)"</Description>
+          <VariableType>2 Bytes</VariableType>
+          <Address>playerVehicle</Address>
+          <Offsets>
+            <Offset>3AC</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>2427</ID>
+          <Description>"Max Health (Visual Only Don't Edit)"</Description>
+          <VariableType>2 Bytes</VariableType>
+          <Address>playerVehicle</Address>
+          <Offsets>
+            <Offset>3AE</Offset>
+          </Offsets>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>2419</ID>
+      <Description>"[ Activate Second ] {{XP/Chaos Gained Multiplier (ACTIVATE THE BOX TO THE LEFT THEN ACTIVATE BELOW &amp; CHANGE THE MULTIPLIER TO THE RIGHT TO YOUR LIKING)}}"</Description>
+      <Options moHideChildren="1" moManualExpandCollapse="1"/>
+      <LastState/>
+      <Color>808000</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : JustCause4.exe
+  Version: 
+  Date   : 2018-12-31
+  Author : Squall8
+}
+
+[ENABLE]
+
+aobscanmodule(chaosmult,JustCause4.exe,44 01 70 14 40 B6 01)
+alloc(newmem,$1000,chaosmult)
+
+label(code)
+label(return)
+label(chaosmultv)
+
+registersymbol(chaosmult)
+registersymbol(chaosmultv)
+
+newmem:
+  imul r14d,[chaosmultv]
+
+code:
+  add [rax+14],r14d
+  mov sil,01
+  jmp return
+
+chaosmultv:
+  dq 2
+
+chaosmult:
+  jmp newmem
+  nop
+  nop
+return:
+
+[DISABLE]
+
+chaosmult:
+  db 44 01 70 14 40 B6 01
+
+unregistersymbol(chaosmult)
+unregistersymbol(chaosmultv)
+dealloc(newmem)
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>2420</ID>
+          <Description>"Multiplier (XP/Chaos Level 14 Max/Top)"</Description>
+          <VariableType>4 Bytes</VariableType>
+          <Address>chaosmultv</Address>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>16</ID>
+      <Description>"[ Activate Third ] {{All Other Cheats (ACTIVATE THE BOX TO THE LEFT &amp; EXPAND -+SIGN)}}"</Description>
+      <Options moHideChildren="1" moManualExpandCollapse="1"/>
+      <LastState/>
+      <Color>808000</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+aobscanmodule(_AobPlayerID,JustCause4.exe,0F B7 9E AA 03 00 00)
+alloc(newmem,$100,JustCause4.exe)
+
+label(code)
+label(return)
+label(PlayerID)
+
+newmem:
+mov [PlayerID],rsi
+
+code:
+  movzx ebx,word ptr [rsi+000003AA]
+  jmp return
+
+PlayerID:
+dd 0
+
+_AobPlayerID:
+  jmp newmem
+  nop
+  nop
+return:
+registersymbol(_AobPlayerID)
+registersymbol(PlayerID)
+
+[DISABLE]
+
+_AobPlayerID:
+  db 0F B7 9E AA 03 00 00
+
+unregistersymbol(_AobPlayerID)
+unregistersymbol(PlayerID)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "JustCause4.exe"+A0B73B0
+
+"JustCause4.exe"+A0B7382: E8 A9 33 1C F6           -  call JustCause4.exe+27A730
+"JustCause4.exe"+A0B7387: 48 8D 57 28              -  lea rdx,[rdi+28]
+"JustCause4.exe"+A0B738B: 4C 89 7C 24 20           -  mov [rsp+20],r15
+"JustCause4.exe"+A0B7390: 48 8D 4F 10              -  lea rcx,[rdi+10]
+"JustCause4.exe"+A0B7394: 45 31 C9                 -  xor r9d,r9d
+"JustCause4.exe"+A0B7397: 4C 8D 05 02 CD 7A F8     -  lea r8,[JustCause4.exe+28640A0]
+"JustCause4.exe"+A0B739E: E8 FD 98 1B F6           -  call JustCause4.exe+270CA0
+"JustCause4.exe"+A0B73A3: C6 87 88 00 00 00 01     -  mov byte ptr [rdi+00000088],01
+"JustCause4.exe"+A0B73AA: 48 8B 06                 -  mov rax,[rsi]
+"JustCause4.exe"+A0B73AD: 48 89 F1                 -  mov rcx,rsi
+// ---------- INJECTING HERE ----------
+"JustCause4.exe"+A0B73B0: 0F B7 9E AA 03 00 00     -  movzx ebx,word ptr [rsi+000003AA]
+// ---------- DONE INJECTING  ----------
+"JustCause4.exe"+A0B73B7: FF 90 10 01 00 00        -  call qword ptr [rax+00000110]
+"JustCause4.exe"+A0B73BD: 66 39 D8                 -  cmp ax,bx
+"JustCause4.exe"+A0B73C0: 7D 6E                    -  jnl JustCause4.exe+A0B7430
+"JustCause4.exe"+A0B73C2: 48 8B 06                 -  mov rax,[rsi]
+"JustCause4.exe"+A0B73C5: 48 89 F1                 -  mov rcx,rsi
+"JustCause4.exe"+A0B73C8: FF 90 18 01 00 00        -  call qword ptr [rax+00000118]
+"JustCause4.exe"+A0B73CE: 84 C0                    -  test al,al
+"JustCause4.exe"+A0B73D0: 75 5E                    -  jne JustCause4.exe+A0B7430
+"JustCause4.exe"+A0B73D2: F3 0F 10 47 3C           -  movss xmm0,[rdi+3C]
+"JustCause4.exe"+A0B73D7: 0F 2F 47 40              -  comiss xmm0,[rdi+40]
+}
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>2403</ID>
+          <Description>"Infinite Player Health"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(_AobHealth,JustCause4.exe,0F B7 81 AC 03 00 00)
+alloc(newmem,$100,JustCause4.exe)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+cmp [PlayerID],rcx
+jne @f
+fild [rcx+000003AA]
+fistp [rcx+000003AC]
+@@:
+  movzx eax,word ptr [rcx+000003AC]
+  jmp return
+
+_AobHealth:
+  jmp newmem
+  nop
+  nop
+return:
+registersymbol(_AobHealth)
+
+[DISABLE]
+
+_AobHealth:
+  db 0F B7 81 AC 03 00 00
+
+unregistersymbol(_AobHealth)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "JustCause4.exe"+8950FB0
+
+"JustCause4.exe"+8950F8C: 48 8D 05 7D 0C 1D F9     -  lea rax,[JustCause4.exe+1B21C10]
+"JustCause4.exe"+8950F93: 48 8D 3D 9F 79 89 03     -  lea rdi,[JustCause4.exe+C1E8939]
+"JustCause4.exe"+8950F9A: 48 87 3C 24              -  xchg [rsp],rdi
+"JustCause4.exe"+8950F9E: C3                       -  ret 
+"JustCause4.exe"+8950F9F: 67 9D                    -  popfq 
+"JustCause4.exe"+8950FA1: 41 57                    -  push r15
+"JustCause4.exe"+8950FA3: 4C 8D 3D C6 F3 0A FF     -  lea r15,[JustCause4.exe+7A00370]
+"JustCause4.exe"+8950FAA: 4C 87 3C 24              -  xchg [rsp],r15
+"JustCause4.exe"+8950FAE: C3                       -  ret 
+"JustCause4.exe"+8950FAF: 90                       -  nop 
+// ---------- INJECTING HERE ----------
+"JustCause4.exe"+8950FB0: 0F B7 81 AC 03 00 00     -  movzx eax,word ptr [rcx+000003AC]
+// ---------- DONE INJECTING  ----------
+"JustCause4.exe"+8950FB7: C3                       -  ret 
+"JustCause4.exe"+8950FB8: 4C 8D 34 24              -  lea r14,[rsp]
+"JustCause4.exe"+8950FBC: 49 8B 3E                 -  mov rdi,[r14]
+"JustCause4.exe"+8950FBF: 48 8D 64 24 08           -  lea rsp,[rsp+08]
+"JustCause4.exe"+8950FC4: E9 35 09 42 00           -  jmp JustCause4.exe+8D718FE
+"JustCause4.exe"+8950FC9: 48 8B 3C 24              -  mov rdi,[rsp]
+"JustCause4.exe"+8950FCD: 48 8D 64 24 08           -  lea rsp,[rsp+08]
+"JustCause4.exe"+8950FD2: 9C                       -  pushfq 
+"JustCause4.exe"+8950FD3: 50                       -  push rax
+"JustCause4.exe"+8950FD4: 48 F7 D0                 -  not rax
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>2460</ID>
+          <Description>"Infinite Clip 1 *Best Of 4-Can Be Used Alone* [First Weapon - (Grenade Launcher PGL-6/AT3-X RPG Without Reload)]"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : JustCause4.exe
+  Version: 
+  Date   : 2020-09-04
+  Author : Administrator
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,JustCause4.exe,89 91 3C 05 00 00 C3) // should be unique
+alloc(newmem,$1000,"JustCause4.exe"+6CA28D)
+
+label(code)
+label(return)
+
+newmem:
+  mov [rcx+0000053C],#99
+  jmp return
+
+code:
+  mov [rcx+0000053C],edx
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db 89 91 3C 05 00 00
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "JustCause4.exe"+6CA28D
+
+"JustCause4.exe"+6CA263: 74 28                          -  je JustCause4.exe+6CA28D
+"JustCause4.exe"+6CA265: 80 B8 D1 03 00 00 00           -  cmp byte ptr [rax+000003D1],00
+"JustCause4.exe"+6CA26C: 74 1F                          -  je JustCause4.exe+6CA28D
+"JustCause4.exe"+6CA26E: 89 91 3C 05 00 00              -  mov [rcx+0000053C],edx
+"JustCause4.exe"+6CA274: 48 8B 80 38 06 00 00           -  mov rax,[rax+00000638]
+"JustCause4.exe"+6CA27B: 48 8B 08                       -  mov rcx,[rax]
+"JustCause4.exe"+6CA27E: 48 85 C9                       -  test rcx,rcx
+"JustCause4.exe"+6CA281: 74 10                          -  je JustCause4.exe+6CA293
+"JustCause4.exe"+6CA283: 48 8B 01                       -  mov rax,[rcx]
+"JustCause4.exe"+6CA286: 48 FF A0 08 02 00 00           -  jmp qword ptr [rax+00000208]
+// ---------- INJECTING HERE ----------
+"JustCause4.exe"+6CA28D: 89 91 3C 05 00 00              -  mov [rcx+0000053C],edx
+// ---------- DONE INJECTING  ----------
+"JustCause4.exe"+6CA293: C3                             -  ret 
+"JustCause4.exe"+6CA294: CC                             -  int 3 
+"JustCause4.exe"+6CA295: CC                             -  int 3 
+"JustCause4.exe"+6CA296: CC                             -  int 3 
+"JustCause4.exe"+6CA297: CC                             -  int 3 
+"JustCause4.exe"+6CA298: CC                             -  int 3 
+"JustCause4.exe"+6CA299: CC                             -  int 3 
+"JustCause4.exe"+6CA29A: CC                             -  int 3 
+"JustCause4.exe"+6CA29B: CC                             -  int 3 
+"JustCause4.exe"+6CA29C: CC                             -  int 3 
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>2462</ID>
+          <Description>"Infinite Clip 2 (Second Weapon-Also Current Weapon)"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : JustCause4.exe
+  Version: 
+  Date   : 2020-09-04
+  Author : Administrator
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,JustCause4.exe,41 89 38 41 B9 10 00 00 00) // should be unique
+alloc(newmem,$1000,"JustCause4.exe"+AEAD55A)
+
+label(code)
+label(return)
+
+newmem:
+  mov [r8],#99
+  nop
+  jmp return
+
+code:
+  mov [r8],edi
+  mov r9d,00000010
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop 4
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db 41 89 38 41 B9 10 00 00 00
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "JustCause4.exe"+AEAD55A
+
+"JustCause4.exe"+AEAD53D: 48 83 C4 58              -  add rsp,58
+"JustCause4.exe"+AEAD541: 41 5F                    -  pop r15
+"JustCause4.exe"+AEAD543: 41 5C                    -  pop r12
+"JustCause4.exe"+AEAD545: 5F                       -  pop rdi
+"JustCause4.exe"+AEAD546: 5D                       -  pop rbp
+"JustCause4.exe"+AEAD547: C3                       -  ret 
+"JustCause4.exe"+AEAD548: 4C 8B 84 24 98 00 00 00  -  mov r8,[rsp+00000098]
+"JustCause4.exe"+AEAD550: 41 3B 38                 -  cmp edi,[r8]
+"JustCause4.exe"+AEAD553: 74 14                    -  je JustCause4.exe+AEAD569
+"JustCause4.exe"+AEAD555: B8 08 00 00 00           -  mov eax,00000008
+// ---------- INJECTING HERE ----------
+"JustCause4.exe"+AEAD55A: 41 89 38                 -  mov [r8],edi
+"JustCause4.exe"+AEAD55D: 41 B9 10 00 00 00        -  mov r9d,00000010
+// ---------- DONE INJECTING  ----------
+"JustCause4.exe"+AEAD563: 41 0F 4C C1              -  cmovl eax,r9d
+"JustCause4.exe"+AEAD567: 09 C5                    -  or ebp,eax
+"JustCause4.exe"+AEAD569: 48 8B 84 24 A0 00 00 00  -  mov rax,[rsp+000000A0]
+"JustCause4.exe"+AEAD571: 3B 08                    -  cmp ecx,[rax]
+"JustCause4.exe"+AEAD573: 74 0E                    -  je JustCause4.exe+AEAD583
+"JustCause4.exe"+AEAD575: BA 04 00 00 00           -  mov edx,00000004
+"JustCause4.exe"+AEAD57A: 89 08                    -  mov [rax],ecx
+"JustCause4.exe"+AEAD57C: 44 0F 4C E2              -  cmovl r12d,edx
+"JustCause4.exe"+AEAD580: 44 09 E5                 -  or ebp,r12d
+"JustCause4.exe"+AEAD583: 89 E8                    -  mov eax,ebp
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>2405</ID>
+          <Description>"Infinite Clip 3 (No Reload-Doesn't Work With Sniper Rifle &amp; RPG)"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(_AobNoReload,JustCause4.exe,8B 83 3C 05 00 00 66 0F 6E C8)
+alloc(newmem,$100,JustCause4.exe)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  mov [rbx+0000053C],63
+  mov eax,[rbx+0000053C]
+  jmp return
+
+_AobNoReload:
+  jmp newmem
+  nop
+return:
+registersymbol(_AobNoReload)
+
+[DISABLE]
+
+_AobNoReload:
+  db 8B 83 3C 05 00 00
+
+unregistersymbol(_AobNoReload)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "JustCause4.exe"+91FC1B1
+
+"JustCause4.exe"+91FC18D: 48 85 C0                       -  test rax,rax
+"JustCause4.exe"+91FC190: 74 1F                          -  je JustCause4.exe+91FC1B1
+"JustCause4.exe"+91FC192: 80 B8 D1 03 00 00 00           -  cmp byte ptr [rax+000003D1],00
+"JustCause4.exe"+91FC199: 74 16                          -  je JustCause4.exe+91FC1B1
+"JustCause4.exe"+91FC19B: 48 8B 80 38 06 00 00           -  mov rax,[rax+00000638]
+"JustCause4.exe"+91FC1A2: 48 8B 08                       -  mov rcx,[rax]
+"JustCause4.exe"+91FC1A5: 48 85 C9                       -  test rcx,rcx
+"JustCause4.exe"+91FC1A8: 74 07                          -  je JustCause4.exe+91FC1B1
+"JustCause4.exe"+91FC1AA: E8 61 0D 4B F7                 -  call JustCause4.exe+6ACF10
+"JustCause4.exe"+91FC1AF: EB 06                          -  jmp JustCause4.exe+91FC1B7
+// ---------- INJECTING HERE ----------
+"JustCause4.exe"+91FC1B1: 8B 83 3C 05 00 00              -  mov eax,[rbx+0000053C]
+// ---------- DONE INJECTING  ----------
+"JustCause4.exe"+91FC1B7: 66 0F 6E C8                    -  movd xmm1,eax
+"JustCause4.exe"+91FC1BB: 66 0F 6E C5                    -  movd xmm0,ebp
+"JustCause4.exe"+91FC1BF: 0F 5B C9                       -  cvtdq2ps xmm1,xmm1
+"JustCause4.exe"+91FC1C2: 0F 5B C0                       -  cvtdq2ps xmm0,xmm0
+"JustCause4.exe"+91FC1C5: F3 0F 5E C8                    -  divss xmm1,xmm0
+"JustCause4.exe"+91FC1C9: EB 0D                          -  jmp JustCause4.exe+91FC1D8
+"JustCause4.exe"+91FC1CB: 0F 57 C9                       -  xorps xmm1,xmm1
+"JustCause4.exe"+91FC1CE: EB 08                          -  jmp JustCause4.exe+91FC1D8
+"JustCause4.exe"+91FC1D0: F3 0F 10 0D 14 24 8E F8        -  movss xmm1,[JustCause4.exe+1ADE5EC]
+"JustCause4.exe"+91FC1D8: 48 8B 5C 24 30                 -  mov rbx,[rsp+30]
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>2404</ID>
+          <Description>"Infinite Ammo Stash (Infinite Ammo \ Grenades)"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(_AobAmmo,JustCause4.exe,8B 84 81 28 02 00 00)
+alloc(newmem,$100,JustCause4.exe)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  fild [rcx+rax*4+000002DC]
+  fistp [rcx+rax*4+00000228]
+  mov eax,[rcx+rax*4+00000228]
+  jmp return
+
+_AobAmmo:
+  jmp newmem
+  nop
+  nop
+return:
+registersymbol(_AobAmmo)
+
+[DISABLE]
+
+_AobAmmo:
+  db 8B 84 81 28 02 00 00
+
+unregistersymbol(_AobAmmo)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "JustCause4.exe"+90A9B33
+
+"JustCause4.exe"+90A9B05: 49 F7 D0              -  not r8
+"JustCause4.exe"+90A9B08: 48 81 C2 6C A0 0A BB  -  add rdx,BB0AA06C
+"JustCause4.exe"+90A9B0F: 4C 21 82 94 5F F5 44  -  and [rdx+44F55F94],r8
+"JustCause4.exe"+90A9B16: 41 0F A4 F7 1B        -  shld r15d,esi,1B
+"JustCause4.exe"+90A9B1B: 41 58                 -  pop r8
+"JustCause4.exe"+90A9B1D: 41 81 D7 A4 BB 3D 41  -  adc r15d,413DBBA4
+"JustCause4.exe"+90A9B24: 0F 8B 96 00 86 01     -  jnp JustCause4.exe+A909BC0
+"JustCause4.exe"+90A9B2A: E9 2A BE B5 06        -  jmp JustCause4.exe+FC05959
+"JustCause4.exe"+90A9B2F: 3B 48 63              -  cmp ecx,[rax+63]
+"JustCause4.exe"+90A9B32: C2 8B                 - db C2 8B  // SHORTENED TO HIT INJECTION FROM:  ret 848B
+// ---------- INJECTING HERE ----------
+"JustCause4.exe"+90A9B34: 84 81 28 02 00 00     -  test [rcx+00000228],al
+// ---------- DONE INJECTING  ----------
+"JustCause4.exe"+90A9B3A: C3                    -  ret 
+"JustCause4.exe"+90A9B3B: 0F 89 48 60 80 FE     -  jns JustCause4.exe+78AFB89
+"JustCause4.exe"+90A9B41: 8B 1C 24              -  mov ebx,[rsp]
+"JustCause4.exe"+90A9B44: BB FF FF FF FF        -  mov ebx,FFFFFFFF
+"JustCause4.exe"+90A9B49: 87 1C 24              -  xchg [rsp],ebx
+"JustCause4.exe"+90A9B4C: 44 31 04 24           -  xor [rsp],r8d
+"JustCause4.exe"+90A9B50: 45 31 C0              -  xor r8d,r8d
+"JustCause4.exe"+90A9B53: 48 8D 2C 24           -  lea rbp,[rsp]
+"JustCause4.exe"+90A9B57: 48 F7 DD              -  neg rbp
+"JustCause4.exe"+90A9B5A: 48 81 ED 50 26 1B E8  -  sub rbp,E81B2650
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>2406</ID>
+          <Description>"Unlimited/Infinite Wingsuit Missiles 1 (Use Only One They're Written Differently But Achieve The Same Effect)"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : JustCause4.exe
+  Version: 
+  Date   : 2018-12-06
+  Author : FCE
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(wingsmissiles,JustCause4.exe,48 8D 52 0C 41 0F 46 C1) // should be unique
+alloc(newmem,$1000,wingsmissiles)
+
+label(code)
+label(return)
+
+newmem:
+mov [rdx-08],41100000
+
+code:
+  lea rdx,[rdx+0C]
+  cmovbe eax,r9d
+  jmp return
+
+wingsmissiles:
+  jmp newmem
+  nop
+  nop
+  nop
+return:
+registersymbol(wingsmissiles)
+
+[DISABLE]
+
+wingsmissiles:
+  db 48 8D 52 0C 41 0F 46 C1
+
+unregistersymbol(wingsmissiles)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "JustCause4.exe"+AEEF8F7
+
+"JustCause4.exe"+AEEF8C2: 48 89 D9                                      -  mov rcx,rbx
+"JustCause4.exe"+AEEF8C5: E8 16 99 AC F5                                -  call JustCause4.exe+9B91E0
+"JustCause4.exe"+AEEF8CA: F3 0F 10 05 1A ED BE F6                       -  movss xmm0,[JustCause4.exe+1ADE5EC]
+"JustCause4.exe"+AEEF8D2: 30 C9                                         -  xor cl,cl
+"JustCause4.exe"+AEEF8D4: 45 31 C0                                      -  xor r8d,r8d
+"JustCause4.exe"+AEEF8D7: 41 B9 01 00 00 00                             -  mov r9d,00000001
+"JustCause4.exe"+AEEF8DD: 48 8D 50 08                                   -  lea rdx,[rax+08]
+"JustCause4.exe"+AEEF8E1: 66 66 66 66 66 66 2E 0F 1F 84 00 00 00 00 00  -  nop cs:[rax+rax+00000000]
+"JustCause4.exe"+AEEF8F0: 0F 2F 42 F8                                   -  comiss xmm0,[rdx-08]
+"JustCause4.exe"+AEEF8F4: 0F B6 C1                                      -  movzx eax,cl
+// ---------- INJECTING HERE ----------
+"JustCause4.exe"+AEEF8F7: 48 8D 52 0C                                   -  lea rdx,[rdx+0C]
+"JustCause4.exe"+AEEF8FB: 41 0F 46 C1                                   -  cmovbe eax,r9d
+// ---------- DONE INJECTING  ----------
+"JustCause4.exe"+AEEF8FF: 0F 2F 42 F0                                   -  comiss xmm0,[rdx-10]
+"JustCause4.exe"+AEEF903: 0F B6 C8                                      -  movzx ecx,al
+"JustCause4.exe"+AEEF906: 41 0F 46 C9                                   -  cmovbe ecx,r9d
+"JustCause4.exe"+AEEF90A: 0F 2F 42 F4                                   -  comiss xmm0,[rdx-0C]
+"JustCause4.exe"+AEEF90E: 0F B6 C9                                      -  movzx ecx,cl
+"JustCause4.exe"+AEEF911: 41 0F 46 C9                                   -  cmovbe ecx,r9d
+"JustCause4.exe"+AEEF915: 41 83 C0 03                                   -  add r8d,03
+"JustCause4.exe"+AEEF919: 41 83 F8 03                                   -  cmp r8d,03
+"JustCause4.exe"+AEEF91D: 72 D1                                         -  jb JustCause4.exe+AEEF8F0
+"JustCause4.exe"+AEEF91F: 0F B6 C1                                      -  movzx eax,cl
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>2407</ID>
+          <Description>"Unlimited/Infinite Wingsuit Missiles 2 (Use Only One They're Written Differently But Achieve The Same Effect)"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : JustCause4.exe
+  Version: 
+  Date   : 2018-12-08
+  Author : FCE
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(wingsumiss,JustCause4.exe,0F 2F 42 F8 0F B6 C1) // should be unique
+alloc(newmem,$1000,wingsumiss)
+
+label(code)
+label(return)
+
+newmem:
+mov [rdx-08], (float)1
+code:
+  comiss xmm0,[rdx-08]
+  movzx eax,cl
+  jmp return
+
+wingsumiss:
+  jmp newmem
+  nop
+  nop
+return:
+registersymbol(wingsumiss)
+
+[DISABLE]
+
+wingsumiss:
+  db 0F 2F 42 F8 0F B6 C1
+
+unregistersymbol(wingsumiss)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "JustCause4.exe"+AEEF8F0
+
+"JustCause4.exe"+AEEF8BE: 84 C0                                         -  test al,al
+"JustCause4.exe"+AEEF8C0: 74 6B                                         -  je JustCause4.exe+AEEF92D
+"JustCause4.exe"+AEEF8C2: 48 89 D9                                      -  mov rcx,rbx
+"JustCause4.exe"+AEEF8C5: E8 16 99 AC F5                                -  call JustCause4.exe+9B91E0
+"JustCause4.exe"+AEEF8CA: F3 0F 10 05 1A ED BE F6                       -  movss xmm0,[JustCause4.exe+1ADE5EC]
+"JustCause4.exe"+AEEF8D2: 30 C9                                         -  xor cl,cl
+"JustCause4.exe"+AEEF8D4: 45 31 C0                                      -  xor r8d,r8d
+"JustCause4.exe"+AEEF8D7: 41 B9 01 00 00 00                             -  mov r9d,00000001
+"JustCause4.exe"+AEEF8DD: 48 8D 50 08                                   -  lea rdx,[rax+08]
+"JustCause4.exe"+AEEF8E1: 66 66 66 66 66 66 2E 0F 1F 84 00 00 00 00 00  -  nop cs:[rax+rax+00000000]
+// ---------- INJECTING HERE ----------
+"JustCause4.exe"+AEEF8F0: 0F 2F 42 F8                                   -  comiss xmm0,[rdx-08]
+"JustCause4.exe"+AEEF8F4: 0F B6 C1                                      -  movzx eax,cl
+// ---------- DONE INJECTING  ----------
+"JustCause4.exe"+AEEF8F7: 48 8D 52 0C                                   -  lea rdx,[rdx+0C]
+"JustCause4.exe"+AEEF8FB: 41 0F 46 C1                                   -  cmovbe eax,r9d
+"JustCause4.exe"+AEEF8FF: 0F 2F 42 F0                                   -  comiss xmm0,[rdx-10]
+"JustCause4.exe"+AEEF903: 0F B6 C8                                      -  movzx ecx,al
+"JustCause4.exe"+AEEF906: 41 0F 46 C9                                   -  cmovbe ecx,r9d
+"JustCause4.exe"+AEEF90A: 0F 2F 42 F4                                   -  comiss xmm0,[rdx-0C]
+"JustCause4.exe"+AEEF90E: 0F B6 C9                                      -  movzx ecx,cl
+"JustCause4.exe"+AEEF911: 41 0F 46 C9                                   -  cmovbe ecx,r9d
+"JustCause4.exe"+AEEF915: 41 83 C0 03                                   -  add r8d,03
+"JustCause4.exe"+AEEF919: 41 83 F8 03                                   -  cmp r8d,03
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>2408</ID>
+          <Description>"Unlimited/Infinite Wingsuit Boost 1 [(Constant) Only Stops With Parachute]"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : JustCause4.exe
+  Version: 
+  Date   : 2019-04-19
+  Author : FCE
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(wingboost,JustCause4.exe,0F 2F 07 77 0D) // should be unique
+alloc(newmem,$1000,wingboost)
+
+label(code)
+label(return)
+
+newmem:
+mov [rdi],41100000
+code:
+  comiss xmm0,[rdi]
+  //ja JustCause4.exe+7C26783
+  jmp return
+
+wingboost:
+  jmp newmem
+return:
+registersymbol(wingboost)
+
+[DISABLE]
+
+wingboost:
+  db 0F 2F 07 77 0D
+
+unregistersymbol(wingboost)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "JustCause4.exe"+7C26771
+
+"JustCause4.exe"+7C2674E: 84 C0                    -  test al,al
+"JustCause4.exe"+7C26750: 74 31                    -  je JustCause4.exe+7C26783
+"JustCause4.exe"+7C26752: 48 89 D9                 -  mov rcx,rbx
+"JustCause4.exe"+7C26755: E8 76 57 E5 F8           -  call JustCause4.exe+A7BED0
+"JustCause4.exe"+7C2675A: 48 89 D9                 -  mov rcx,rbx
+"JustCause4.exe"+7C2675D: 48 89 C7                 -  mov rdi,rax
+"JustCause4.exe"+7C26760: E8 4B 57 E5 F8           -  call JustCause4.exe+A7BEB0
+"JustCause4.exe"+7C26765: 84 C0                    -  test al,al
+"JustCause4.exe"+7C26767: 74 1A                    -  je JustCause4.exe+7C26783
+"JustCause4.exe"+7C26769: F3 0F 10 05 5B 32 FB F9  -  movss xmm0,[JustCause4.exe+1BD99CC]
+// ---------- INJECTING HERE ----------
+"JustCause4.exe"+7C26771: 0F 2F 07                 -  comiss xmm0,[rdi]
+"JustCause4.exe"+7C26774: 77 0D                    -  ja JustCause4.exe+7C26783
+// ---------- DONE INJECTING  ----------
+"JustCause4.exe"+7C26776: B0 01                    -  mov al,01
+"JustCause4.exe"+7C26778: 48 8B 5C 24 30           -  mov rbx,[rsp+30]
+"JustCause4.exe"+7C2677D: 48 83 C4 20              -  add rsp,20
+"JustCause4.exe"+7C26781: 5F                       -  pop rdi
+"JustCause4.exe"+7C26782: C3                       -  ret 
+"JustCause4.exe"+7C26783: 48 8B 5C 24 30           -  mov rbx,[rsp+30]
+"JustCause4.exe"+7C26788: 30 C0                    -  xor al,al
+"JustCause4.exe"+7C2678A: 48 83 C4 20              -  add rsp,20
+"JustCause4.exe"+7C2678E: 5F                       -  pop rdi
+"JustCause4.exe"+7C2678F: C3                       -  ret 
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>2409</ID>
+          <Description>"Unlimited/Infinite Wingsuit Boost 2 [(Better) Stoppable By Unpressing Shift]"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : JustCause4.exe
+  Version: 
+  Date   : 2018-12-30
+  Author : Squall8
+}
+
+[ENABLE]
+
+aobscanmodule(llwb1,JustCause4.exe,F3 0F 5E 73 40)
+alloc(newmem,$1000,llwb1)
+
+label(code)
+label(return)
+label(llwbx1)
+
+registersymbol(llwb1)
+registersymbol(llwbx1)
+
+aobscanmodule(llwb2,JustCause4.exe,F3 0F 58 C2 F3 0F 5F C4 F3 0F 5D C1 F3)
+alloc(newmem2,$1000,llwb2)
+
+label(code2)
+label(return2)
+label(llwbx2)
+label(llwbv2)
+
+registersymbol(llwb2)
+registersymbol(llwbx2)
+registersymbol(llwbv2)
+
+newmem:
+  cmp [llwbx1],1
+  jne code
+  mov [rbx+40],(float)10000
+  divss xmm6,[rbx+40]
+  jmp return
+
+code:
+  mov [rbx+40],(float)5
+  divss xmm6,[rbx+40]
+  jmp return
+
+llwbx1:
+  dq 1
+
+newmem2:
+  cmp [llwbx2],1
+  jne code2
+  movss xmm2,[llwbv2]
+  addss xmm0,xmm2
+  maxss xmm0,xmm4
+  jmp return2
+
+code2:
+  addss xmm0,xmm2
+  maxss xmm0,xmm4
+  jmp return2
+
+llwbx2:
+  dq 1
+
+llwbv2:
+  dq (float)1
+
+llwb1:
+  jmp newmem
+return:
+
+llwb2:
+  jmp newmem2
+  nop
+  nop
+  nop
+return2:
+
+[DISABLE]
+
+llwb1:
+  db F3 0F 5E 73 40
+
+unregistersymbol(llwb1)
+unregistersymbol(llwbx1)
+dealloc(newmem)
+
+llwb2:
+  db F3 0F 58 C2 F3 0F 5F C4
+
+unregistersymbol(llwb2)
+unregistersymbol(llwbx2)
+unregistersymbol(llwbv2)
+dealloc(newmem2)
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>2411</ID>
+          <Description>"Instant/No Supply Pilot Cooldown 1 (Use Only One They're Written Differently But Achieve The Same Effect)"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : JustCause4.exe
+  Version: 
+  Date   : 2018-12-07
+  Author : FCE
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(instantpilot,JustCause4.exe,F3 0F 10 4B 24 0F 2F) // should be unique
+alloc(newmem,$1000,instantpilot)
+
+label(code)
+label(return)
+
+newmem:
+mov [rbx+24], 0
+code:
+  movss xmm1,[rbx+24]
+  jmp return
+
+instantpilot:
+  jmp newmem
+return:
+registersymbol(instantpilot)
+
+[DISABLE]
+
+instantpilot:
+  db F3 0F 10 4B 24
+
+unregistersymbol(instantpilot)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "JustCause4.exe"+984ADDC
+
+"JustCause4.exe"+984ADC0: 48 C1 FA 03              -  sar rdx,03
+"JustCause4.exe"+984ADC4: 48 39 D0                 -  cmp rax,rdx
+"JustCause4.exe"+984ADC7: 73 06                    -  jae JustCause4.exe+984ADCF
+"JustCause4.exe"+984ADC9: 49 8B 1C 0E              -  mov rbx,[r14+rcx]
+"JustCause4.exe"+984ADCD: EB 02                    -  jmp JustCause4.exe+984ADD1
+"JustCause4.exe"+984ADCF: 31 DB                    -  xor ebx,ebx
+"JustCause4.exe"+984ADD1: 48 85 DB                 -  test rbx,rbx
+"JustCause4.exe"+984ADD4: 74 40                    -  je JustCause4.exe+984AE16
+"JustCause4.exe"+984ADD6: 80 7B 20 00              -  cmp byte ptr [rbx+20],00
+"JustCause4.exe"+984ADDA: 75 3A                    -  jne JustCause4.exe+984AE16
+// ---------- INJECTING HERE ----------
+"JustCause4.exe"+984ADDC: F3 0F 10 4B 24           -  movss xmm1,[rbx+24]
+// ---------- DONE INJECTING  ----------
+"JustCause4.exe"+984ADE1: 0F 2F CE                 -  comiss xmm1,xmm6
+"JustCause4.exe"+984ADE4: 76 30                    -  jna JustCause4.exe+984AE16
+"JustCause4.exe"+984ADE6: F3 0F 5C CF              -  subss xmm1,xmm7
+"JustCause4.exe"+984ADEA: 48 89 D9                 -  mov rcx,rbx
+"JustCause4.exe"+984ADED: E8 4E B4 FC F6           -  call JustCause4.exe+816240
+"JustCause4.exe"+984ADF2: 0F 2F 73 24              -  comiss xmm6,[rbx+24]
+"JustCause4.exe"+984ADF6: 72 1E                    -  jb JustCause4.exe+984AE16
+"JustCause4.exe"+984ADF8: 0F 28 CE                 -  movaps xmm1,xmm6
+"JustCause4.exe"+984ADFB: 48 89 D9                 -  mov rcx,rbx
+"JustCause4.exe"+984ADFE: E8 3D B4 FC F6           -  call JustCause4.exe+816240
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>2412</ID>
+          <Description>"Instant/No Supply Pilot Cooldown 2 (Use Only One They're Written Differently But Achieve The Same Effect)"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+aobscanmodule(get_supplyTimer,JustCause4.exe,F3 0F 11 77 24 EB 22)
+registersymbol(get_supplyTimer)
+
+get_supplyTimer:
+db 90 90 90 90 90
+
+[DISABLE]
+get_supplyTimer:
+db F3 0F 11 77 24
+
+unregistersymbol(get_supplyTimer)
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>2413</ID>
+          <Description>"Unlimited/Constant AR Scan (Stays Active With One Click)"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : JustCause4.exe
+  Version: 
+  Date   : 2018-12-06
+  Author : FCE
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(armod,JustCause4.exe,F3 0F 10 43 40 0F 2F C6 76) // should be unique
+alloc(newmem,$1000,armod)
+
+label(code)
+label(return)
+
+newmem:
+xorps xmm7, xmm7
+code:
+  movss xmm0,[rbx+40]
+  jmp return
+
+armod:
+  jmp newmem
+return:
+registersymbol(armod)
+
+[DISABLE]
+
+armod:
+  db F3 0F 10 43 40
+
+unregistersymbol(armod)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "JustCause4.exe"+CD6748
+
+"JustCause4.exe"+CD671A: 0F 2F 05 A3 AF E1 00  -  comiss xmm0,[JustCause4.exe+1AF16C4]
+"JustCause4.exe"+CD6721: 76 25                 -  jna JustCause4.exe+CD6748
+"JustCause4.exe"+CD6723: C7 41 38 02 00 00 00  -  mov [rcx+38],00000002
+"JustCause4.exe"+CD672A: 48 8B 01              -  mov rax,[rcx]
+"JustCause4.exe"+CD672D: F3 0F 11 74 24 28     -  movss [rsp+28],xmm6
+"JustCause4.exe"+CD6733: 48 89 7C 24 20        -  mov [rsp+20],rdi
+"JustCause4.exe"+CD6738: 45 33 C9              -  xor r9d,r9d
+"JustCause4.exe"+CD673B: 45 33 C0              -  xor r8d,r8d
+"JustCause4.exe"+CD673E: 48 8D 15 BB 11 01 01  -  lea rdx,[JustCause4.exe+1CE7900]
+"JustCause4.exe"+CD6745: FF 50 20              -  call qword ptr [rax+20]
+// ---------- INJECTING HERE ----------
+"JustCause4.exe"+CD6748: F3 0F 10 43 40        -  movss xmm0,[rbx+40]
+// ---------- DONE INJECTING  ----------
+"JustCause4.exe"+CD674D: 0F 2F C6              -  comiss xmm0,xmm6
+"JustCause4.exe"+CD6750: 76 46                 -  jna JustCause4.exe+CD6798
+"JustCause4.exe"+CD6752: F3 0F 5C C7           -  subss xmm0,xmm7
+"JustCause4.exe"+CD6756: F3 0F 11 43 40        -  movss [rbx+40],xmm0
+"JustCause4.exe"+CD675B: 0F 2F C6              -  comiss xmm0,xmm6
+"JustCause4.exe"+CD675E: 77 38                 -  ja JustCause4.exe+CD6798
+"JustCause4.exe"+CD6760: 89 7B 38              -  mov [rbx+38],edi
+"JustCause4.exe"+CD6763: 89 7B 44              -  mov [rbx+44],edi
+"JustCause4.exe"+CD6766: 48 8B 03              -  mov rax,[rbx]
+"JustCause4.exe"+CD6769: F3 0F 11 74 24 28     -  movss [rsp+28],xmm6
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>2414</ID>
+          <Description>"Unlock Grappling Hook Mods"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : JustCause4.exe
+  Version: 
+  Date   : 2018-12-31
+  Author : Squall8
+}
+
+[ENABLE]
+
+aobscanmodule(gears,JustCause4.exe,8B 40 14 48 8B 5C 24 08)
+alloc(newmem,$1000,gears)
+
+label(code)
+label(return)
+
+registersymbol(gears)
+
+newmem:
+
+code:
+  mov eax,[rax+14]
+  mov eax,1
+  mov rbx,[rsp+08]
+  jmp return
+
+gears:
+  jmp newmem
+  nop
+  nop
+  nop
+return:
+
+[DISABLE]
+
+gears:
+  db 8B 40 14 48 8B 5C 24 08
+
+unregistersymbol(gears)
+dealloc(newmem)
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>2415</ID>
+          <Description>"Stronger Hook Retraction"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+aobscanmodule(get_hRetractor,JustCause4.exe,F3 41 0F 10 B4 24 C0 01 00 00)
+alloc(newmem,$1000,JustCause4.exe+668A4AF)
+label(code)
+label(return)
+alloc(OGRetractor,8)
+registersymbol(OGRetractor)
+
+newmem:
+
+code:
+  mov [OGRetractor],r12
+  mov [r12+000001C0],(float)30
+  mov [r12+000001B4],(float)18000
+  movss xmm6,[r12+000001C0]
+  jmp return
+
+get_hRetractor:
+  jmp newmem
+  nop 5
+return:
+registersymbol(get_hRetractor)
+
+[DISABLE]
+{$lua}
+writeFloat("[OGRetractor]+1B4",9000)
+writeFloat("[OGRetractor]+1C0",15)
+{$asm}
+get_hRetractor:
+  db F3 41 0F 10 B4 24 C0 01 00 00
+
+unregistersymbol(get_hRetractor)
+dealloc(newmem)
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>2418</ID>
+          <Description>"Freeze/Stop Mission Time (Remember To Deactivate After Use)"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(_AobTime,JustCause4.exe,F3 0F 11 83 B0 00 00 00 44)
+registersymbol(_AobTime)
+
+_AobTime:
+  db 90 90 90 90 90 90 90 90
+
+[DISABLE]
+
+_AobTime:
+  db F3 0F 11 83 B0 00 00 00
+
+
+{
+// ORIGINAL CODE - INJECTION POINT: "JustCause4.exe"+9848E45
+
+"JustCause4.exe"+9848E22: 0F 94 D0                 -  sete al
+"JustCause4.exe"+9848E25: 44 0F 29 44 24 50        -  movaps [rsp+50],xmm8
+"JustCause4.exe"+9848E2B: 31 F6                    -  xor esi,esi
+"JustCause4.exe"+9848E2D: 45 0F 57 C0              -  xorps xmm8,xmm8
+"JustCause4.exe"+9848E31: 0F 28 C6                 -  movaps xmm0,xmm6
+"JustCause4.exe"+9848E34: 45 84 E4                 -  test r12l,r12l
+"JustCause4.exe"+9848E37: 74 1A                    -  je JustCause4.exe+9848E53
+"JustCause4.exe"+9848E39: F3 0F 5C C7              -  subss xmm0,xmm7
+"JustCause4.exe"+9848E3D: 44 0F B6 F8              -  movzx r15d,al
+"JustCause4.exe"+9848E41: 41 0F 2F C0              -  comiss xmm0,xmm8
+// ---------- INJECTING HERE ----------
+"JustCause4.exe"+9848E45: F3 0F 11 83 B0 00 00 00  -  movss [rbx+000000B0],xmm0
+// ---------- DONE INJECTING  ----------
+"JustCause4.exe"+9848E4D: 44 0F 47 FE              -  cmova r15d,esi
+"JustCause4.exe"+9848E51: EB 3B                    -  jmp JustCause4.exe+9848E8E
+"JustCause4.exe"+9848E53: F3 0F 10 8B 98 00 00 00  -  movss xmm1,[rbx+00000098]
+"JustCause4.exe"+9848E5B: F3 0F 58 C7              -  addss xmm0,xmm7
+"JustCause4.exe"+9848E5F: 0F 2F C1                 -  comiss xmm0,xmm1
+"JustCause4.exe"+9848E62: F3 0F 11 83 B0 00 00 00  -  movss [rbx+000000B0],xmm0
+"JustCause4.exe"+9848E6A: 72 22                    -  jb JustCause4.exe+9848E8E
+"JustCause4.exe"+9848E6C: 0F 2F F1                 -  comiss xmm6,xmm1
+"JustCause4.exe"+9848E6F: 44 0F B6 F8              -  movzx r15d,al
+"JustCause4.exe"+9848E73: F3 0F 11 8B B0 00 00 00  -  movss [rbx+000000B0],xmm1
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>2435</ID>
+          <Description>"Freeze/Stop Challenge Time (Remember To Deactivate After Use)"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : JustCause4.exe
+  Version: 
+  Date   : 2020-09-04
+  Author : Administrator
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(INJECT,JustCause4.exe,F3 0F 11 87 80 02 00 00 41) // should be unique
+alloc(newmem,$1000,"JustCause4.exe"+5BA039)
+
+label(code)
+label(return)
+
+newmem:
+  nop
+  jmp return
+
+code:
+  movss [rdi+00000280],xmm0
+  jmp return
+
+INJECT:
+  jmp newmem
+  nop 3
+return:
+registersymbol(INJECT)
+
+[DISABLE]
+
+INJECT:
+  db F3 0F 11 87 80 02 00 00
+
+unregistersymbol(INJECT)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "JustCause4.exe"+5BA039
+
+"JustCause4.exe"+5BA00C: 49 8B 06                       -  mov rax,[r14]
+"JustCause4.exe"+5BA00F: 49 8B CE                       -  mov rcx,r14
+"JustCause4.exe"+5BA012: FF 50 10                       -  call qword ptr [rax+10]
+"JustCause4.exe"+5BA015: 90                             -  nop 
+"JustCause4.exe"+5BA016: 4C 8B A5 B8 00 00 00           -  mov r12,[rbp+000000B8]
+"JustCause4.exe"+5BA01D: 45 0F 57 FF                    -  xorps xmm15,xmm15
+"JustCause4.exe"+5BA021: 80 BF 78 02 00 00 00           -  cmp byte ptr [rdi+00000278],00
+"JustCause4.exe"+5BA028: 74 33                          -  je JustCause4.exe+5BA05D
+"JustCause4.exe"+5BA02A: F3 0F 10 87 80 02 00 00        -  movss xmm0,[rdi+00000280]
+"JustCause4.exe"+5BA032: F3 41 0F 5C 44 24 20           -  subss xmm0,[r12+20]
+// ---------- INJECTING HERE ----------
+"JustCause4.exe"+5BA039: F3 0F 11 87 80 02 00 00        -  movss [rdi+00000280],xmm0
+// ---------- DONE INJECTING  ----------
+"JustCause4.exe"+5BA041: 41 0F 2F C7                    -  comiss xmm0,xmm15
+"JustCause4.exe"+5BA045: 77 49                          -  ja JustCause4.exe+5BA090
+"JustCause4.exe"+5BA047: C7 87 84 02 00 00 00 00 A0 40  -  mov [rdi+00000284],40A00000
+"JustCause4.exe"+5BA051: 33 D2                          -  xor edx,edx
+"JustCause4.exe"+5BA053: 48 8B CF                       -  mov rcx,rdi
+"JustCause4.exe"+5BA056: E8 B5 BE FF FF                 -  call JustCause4.exe+5B5F10
+"JustCause4.exe"+5BA05B: EB 2B                          -  jmp JustCause4.exe+5BA088
+"JustCause4.exe"+5BA05D: F3 0F 10 87 84 02 00 00        -  movss xmm0,[rdi+00000284]
+"JustCause4.exe"+5BA065: 41 0F 2F C7                    -  comiss xmm0,xmm15
+"JustCause4.exe"+5BA069: 76 25                          -  jna JustCause4.exe+5BA090
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>2416</ID>
+          <Description>"Instant Hacking - Some Missions/Other Missions Hacking Can't Be Skipped {{Activate During/While Hacking Only (After The Hacking Box Appears On-Screen "Remote Hack In Progress" &amp; Always Remember To Deactivate After)}}"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : JustCause4.exe
+  Version: 
+  Date   : 2018-12-06
+  Author : FCE
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(missiontimerr,JustCause4.exe,F3 0F 11 83 B0 00 00 00 44) // should be unique
+alloc(newmem,$1000,missiontimerr)
+
+label(code)
+label(return)
+
+newmem:
+xorps xmm0, xmm0
+code:
+  movss [rbx+000000B0],xmm0
+  jmp return
+
+missiontimerr:
+  jmp newmem
+  nop
+  nop
+  nop
+return:
+registersymbol(missiontimerr)
+
+[DISABLE]
+
+missiontimerr:
+  db F3 0F 11 83 B0 00 00 00
+
+unregistersymbol(missiontimerr)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "JustCause4.exe"+9848E45
+
+"JustCause4.exe"+9848E22: 0F 94 D0                 -  sete al
+"JustCause4.exe"+9848E25: 44 0F 29 44 24 50        -  movaps [rsp+50],xmm8
+"JustCause4.exe"+9848E2B: 31 F6                    -  xor esi,esi
+"JustCause4.exe"+9848E2D: 45 0F 57 C0              -  xorps xmm8,xmm8
+"JustCause4.exe"+9848E31: 0F 28 C6                 -  movaps xmm0,xmm6
+"JustCause4.exe"+9848E34: 45 84 E4                 -  test r12l,r12l
+"JustCause4.exe"+9848E37: 74 1A                    -  je JustCause4.exe+9848E53
+"JustCause4.exe"+9848E39: F3 0F 5C C7              -  subss xmm0,xmm7
+"JustCause4.exe"+9848E3D: 44 0F B6 F8              -  movzx r15d,al
+"JustCause4.exe"+9848E41: 41 0F 2F C0              -  comiss xmm0,xmm8
+// ---------- INJECTING HERE ----------
+"JustCause4.exe"+9848E45: F3 0F 11 83 B0 00 00 00  -  movss [rbx+000000B0],xmm0
+// ---------- DONE INJECTING  ----------
+"JustCause4.exe"+9848E4D: 44 0F 47 FE              -  cmova r15d,esi
+"JustCause4.exe"+9848E51: EB 3B                    -  jmp JustCause4.exe+9848E8E
+"JustCause4.exe"+9848E53: F3 0F 10 8B 98 00 00 00  -  movss xmm1,[rbx+00000098]
+"JustCause4.exe"+9848E5B: F3 0F 58 C7              -  addss xmm0,xmm7
+"JustCause4.exe"+9848E5F: 0F 2F C1                 -  comiss xmm0,xmm1
+"JustCause4.exe"+9848E62: F3 0F 11 83 B0 00 00 00  -  movss [rbx+000000B0],xmm0
+"JustCause4.exe"+9848E6A: 72 22                    -  jb JustCause4.exe+9848E8E
+"JustCause4.exe"+9848E6C: 0F 2F F1                 -  comiss xmm6,xmm1
+"JustCause4.exe"+9848E6F: 44 0F B6 F8              -  movzx r15d,al
+"JustCause4.exe"+9848E73: F3 0F 11 8B B0 00 00 00  -  movss [rbx+000000B0],xmm1
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>2417</ID>
+          <Description>"Easy Kills {{(Shared-Works For All Including Enemies-Can Interfere With Vehicle Invincibility Cheat-Causing Vehicle Burn) Use With Caution}}"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(_AobEasyKills,JustCause4.exe,0F BF 81 AA 03 00 00 48)
+alloc(newmem,$1000,JustCause4.exe)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+cmp [PlayerID],rcx
+je @f
+mov word ptr [rcx+000003AA],64
+@@:
+  movsx eax,word ptr [rcx+000003AA]
+  jmp return
+
+_AobEasyKills:
+  jmp newmem
+  nop
+  nop
+return:
+registersymbol(_AobEasyKills)
+
+[DISABLE]
+
+_AobEasyKills:
+  db 0F BF 81 AA 03 00 00
+
+unregistersymbol(_AobEasyKills)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "JustCause4.exe"+904128A
+
+"JustCause4.exe"+904125C: 4C 8D 3D 67 BB 68 05                 -  lea r15,[JustCause4.exe+E6CCDCA]
+"JustCause4.exe"+9041263: 49 23 88 72 6C D5 84                 -  and rcx,[r8-7B2A938E]
+"JustCause4.exe"+904126A: 48 01 D9                             -  add rcx,rbx
+"JustCause4.exe"+904126D: 48 8D 1C 24                          -  lea rbx,[rsp]
+"JustCause4.exe"+9041271: 48 C7 C5 00 01 00 00                 -  mov rbp,00000100
+"JustCause4.exe"+9041278: 41 FF E7                             -  jmp r15
+"JustCause4.exe"+904127B: 68 0F 1F 40 00                       -  push 00401F0F
+"JustCause4.exe"+9041280: 48 89 5C 24 08                       -  mov [rsp+08],rbx
+"JustCause4.exe"+9041285: 57                                   -  push rdi
+"JustCause4.exe"+9041286: 48 83 EC 50                          -  sub rsp,50
+// ---------- INJECTING HERE ----------
+"JustCause4.exe"+904128A: 0F BF 81 AA 03 00 00                 -  movsx eax,word ptr [rcx+000003AA]
+// ---------- DONE INJECTING  ----------
+"JustCause4.exe"+9041291: 48 89 CB                             -  mov rbx,rcx
+"JustCause4.exe"+9041294: F3 0F 10 0D 50 D3 A9 F8              -  movss xmm1,[JustCause4.exe+1ADE5EC]
+"JustCause4.exe"+904129C: 48 89 D7                             -  mov rdi,rdx
+"JustCause4.exe"+904129F: 4C 8B 8B 98 02 00 00                 -  mov r9,[rbx+00000298]
+"JustCause4.exe"+90412A6: 66 0F 6E C0                          -  movd xmm0,eax
+"JustCause4.exe"+90412AA: 0F BF 81 AE 03 00 00                 -  movsx eax,word ptr [rcx+000003AE]
+"JustCause4.exe"+90412B1: 0F 5B C0                             -  cvtdq2ps xmm0,xmm0
+"JustCause4.exe"+90412B4: 45 8B 41 78                          -  mov r8d,[r9+78]
+"JustCause4.exe"+90412B8: 66 0F 6E D8                          -  movd xmm3,eax
+"JustCause4.exe"+90412BC: 0F BF 81 AC 03 00 00                 -  movsx eax,word ptr [rcx+000003AC]
+}
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>23930</ID>
+      <Description>"Compact Mode"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript Async="1">[ENABLE]
+
+{$lua}
+
+if not syntaxcheck then
+
+  function cycleFullCompact( sender, force )
+    local state = not( compactmenuitem.Caption == 'Compact View Mode' )
+    if force ~= nil then
+      state = not force
+    end
+    compactmenuitem.Caption = state and 'Compact View Mode' or 'Full View Mode'
+    getMainForm().Splitter1.Visible = state
+    getMainForm().Panel4.Visible = state
+    getMainForm().Panel5.Visible = state
+  end
+
+  function addCompactMenu()
+    if compactmenualreadyexists then return end
+      local parent = getMainForm().Menu.Items
+      compactmenuitem = createMenuItem( parent )
+      parent.add( compactmenuitem )
+      compactmenuitem.Caption = 'Compact View Mode'
+      compactmenuitem.OnClick = cycleFullCompact
+      compactmenualreadyexists = 'yes'
+  end
+
+  addCompactMenu()
+  cycleFullCompact( nil, true )
+
+end
+
+[DISABLE]
+
+{$lua}
+
+if not syntaxcheck then
+  cycleFullCompact( nil, false )
+end
+</AssemblerScript>
+    </CheatEntry>
+  </CheatEntries>
+  <CheatCodes>
+    <CodeEntry Color="20000000">
+      <Description>Change of mov [rcx+04],r10d</Description>
+      <AddressString>JustCause4.exe+BFF3183</AddressString>
+      <Before>
+        <Byte>83</Byte>
+        <Byte>C0</Byte>
+        <Byte>08</Byte>
+        <Byte>01</Byte>
+        <Byte>C7</Byte>
+      </Before>
+      <Actual>
+        <Byte>44</Byte>
+        <Byte>89</Byte>
+        <Byte>51</Byte>
+        <Byte>04</Byte>
+      </Actual>
+      <After>
+        <Byte>41</Byte>
+        <Byte>FF</Byte>
+        <Byte>C2</Byte>
+        <Byte>49</Byte>
+        <Byte>83</Byte>
+      </After>
+    </CodeEntry>
+  </CheatCodes>
+  <UserdefinedSymbols/>
+</CheatTable>

@@ -1,0 +1,1622 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="28">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>0</ID>
+      <Description>"[ Initialize ]"</Description>
+      <Options moHideChildren="1"/>
+      <LastState/>
+      <Color>0000FF</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript Async="1">[ENABLE]
+
+aobscanmodule( GetPlayer, RAGE2.exe, 498B91????????488B8A????????8B51??488B49 )
+registersymbol( GetPlayer )
+label( GetPlayer_o )
+registersymbol( GetPlayer_o )
+alloc( Hook, 0x1000, RAGE2.exe )
+
+label( g_Player )
+registersymbol( g_Player)
+
+Hook:
+mov [g_Player],r9
+GetPlayer_o:
+readmem( GetPlayer, 7 )
+jmp GetPlayer+7
+
+align 10 CC
+
+g_Player:
+dq 0
+
+GetPlayer:
+jmp Hook
+db 90 90
+
+[DISABLE]
+
+GetPlayer:
+readmem( GetPlayer_o, 7 )
+
+unregistersymbol( g_Player)
+dealloc( Hook )
+unregistersymbol( GetPlayer_o )
+unregistersymbol( GetPlayer )
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>57</ID>
+          <Description>"[ Player ]"</Description>
+          <Options moHideChildren="1"/>
+          <LastState Value="" RealAddress="00000000"/>
+          <Color>FF0000</Color>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>29</ID>
+              <Description>"Perfect God Mode"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+
+aobscanmodule( DamageProcessing_AOB, RAGE2.exe, 488B05????????4833C4488985????????488BFA48895598488BF1 )
+define( DamageProcessing, DamageProcessing_AOB-52 )
+registersymbol( DamageProcessing )
+label( DamageProcessing_o )
+registersymbol( DamageProcessing_o )
+label( back )
+
+alloc( Hook, 0x1000, RAGE2.exe )
+
+Hook:
+cmp rcx,[g_Player]
+jne short @f
+  ret
+DamageProcessing_o:
+readmem( DamageProcessing, 5 )
+jmp back
+
+DamageProcessing:
+jmp Hook
+back:
+
+[DISABLE]
+
+DamageProcessing:
+readmem( DamageProcessing_o, 5 )
+
+dealloc( Hook )
+unregistersymbol( DamageProcessing_o )
+unregistersymbol( DamageProcessing )
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>4</ID>
+              <Description>"Unlimited Clip Ammo"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+
+aobscanmodule( ClipDecrease, RAGE2.exe, 8993??????004885FF74??488BCBE8 )
+registersymbol( ClipDecrease )
+label( ClipDecrease_o )
+registersymbol( ClipDecrease_o )
+alloc( Hook, 0x1000, RAGE2.exe )
+
+Hook:
+push rdx
+mov rdx,[g_Player]
+cmp [rbx+578],rdx            // is our player firing?
+pop rdx
+jne short @f
+  //mov edx,[rbx+404]        // get ClipMax
+  add edx,ebp                // give back subtracted unit
+  push rax
+  mov rax,[g_Player]
+  or byte ptr [rax+2DC9],2
+  pop rax
+ClipDecrease_o:
+readmem( ClipDecrease, 6 )   // original code will write 'edx'
+jmp ClipDecrease+6
+
+ClipDecrease:
+jmp Hook
+db 90
+
+[DISABLE]
+
+ClipDecrease:
+readmem( ClipDecrease_o, 6 )
+
+dealloc( Hook )
+unregistersymbol( ClipDecrease_o )
+unregistersymbol( ClipDecrease )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>34</ID>
+              <Description>"Unlimited Overdrive"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+
+aobscanmodule( OverdriveCheck, RAGE2.exe, 410F2F80????????77??41B601EB )
+registersymbol( OverdriveCheck )
+label( OverdriveCheck_o )
+registersymbol( OverdriveCheck_o )
+alloc( Hook, 0x1000, RAGE2.exe )
+
+Hook:
+cmp r8,[g_Player]
+jne short @f
+  mov [r8+D90],(float)1.0
+OverdriveCheck_o:
+readmem( OverdriveCheck, 8 )
+jmp OverdriveCheck+8
+
+OverdriveCheck:
+jmp Hook
+db 90 90 90
+
+[DISABLE]
+
+OverdriveCheck:
+readmem( OverdriveCheck_o, 8 )
+
+dealloc( Hook )
+unregistersymbol( OverdriveCheck_o )
+unregistersymbol( OverdriveCheck )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>124</ID>
+              <Description>"Overdrive Multiplier 10x"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+
+aobscanmodule( OverdriveMultiplierTimer, RAGE2.exe, F30F104F??F30F5C4F??F30F5D15????????F30F59CAF30F584F??F30F114F??EB )
+registersymbol( OverdriveMultiplierTimer )
+label( OverdriveMultiplierTimer_o )
+registersymbol( OverdriveMultiplierTimer_o )
+alloc( Hook, 0x1000, RAGE2.exe )
+
+label( pOverdriveMultiplier )
+registersymbol( pOverdriveMultiplier )
+
+Hook:
+cmp rsi,[g_Player]
+jne short @f
+  mov [pOverdriveMultiplier],rdi
+  mov [rdi+44],(float)100.0 // change this to whichever amount you want
+  mov ebx,A
+  mov [rdi+58],ebx          // max level
+  movd xmm2,ebx             // update it in MMX as well
+  cvtdq2ps xmm2,xmm2
+  divss xmm2,xmm0
+OverdriveMultiplierTimer_o:
+readmem( OverdriveMultiplierTimer, 5 )
+jmp OverdriveMultiplierTimer+5
+
+align 10 CC
+
+pOverdriveMultiplier:
+dq 0
+
+OverdriveMultiplierTimer:
+jmp Hook
+
+[DISABLE]
+
+[pOverdriveMultiplier]+44:
+dd (float)2.0
+
+OverdriveMultiplierTimer:
+readmem( OverdriveMultiplierTimer_o, 5 )
+
+unregistersymbol( pOverdriveMultiplier )
+dealloc( Hook )
+unregistersymbol( OverdriveMultiplierTimer_o )
+unregistersymbol( OverdriveMultiplierTimer )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>104</ID>
+              <Description>"Rapid Fire"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+
+aobscanmodule( FireTimer, RAGE2.exe, 80BB????????0074??897D??C7 )
+registersymbol( FireTimer )
+label( FireTimer_o )
+registersymbol( FireTimer_o )
+alloc( Hook, 0x1000, RAGE2.exe )
+
+Hook:
+push rax
+mov rax,[g_Player]
+cmp [rbx+578],rax
+pop rax
+jne short @f
+  jmp FireTimer+31
+FireTimer_o:
+readmem( FireTimer, 7 )
+jmp FireTimer+7
+
+FireTimer:
+jmp Hook
+db 90 90
+
+[DISABLE]
+
+FireTimer:
+readmem( FireTimer_o, 7 )
+
+dealloc( Hook )
+unregistersymbol( FireTimer_o )
+unregistersymbol( FireTimer )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>106</ID>
+              <Description>"Super Accuracy"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+
+aobscanmodule( SuperAccuracy, RAGE2.exe, F30F118B????????F30F1093????????0F57F60F2ED674 )
+registersymbol( SuperAccuracy )
+label( SuperAccuracy_o )
+registersymbol( SuperAccuracy_o )
+alloc( Hook, 0x1000, RAGE2.exe )
+
+Hook:
+push rax
+mov rax,[g_Player]
+cmp [rbx+578],rax
+pop rax
+jne short @f
+  xorps xmm1,xmm1
+SuperAccuracy_o:
+readmem( SuperAccuracy, 8 )
+jmp SuperAccuracy+8
+
+SuperAccuracy:
+jmp Hook
+db 90 90 90
+
+[DISABLE]
+
+SuperAccuracy:
+readmem( SuperAccuracy_o, 8 )
+
+dealloc( Hook )
+unregistersymbol( SuperAccuracy_o )
+unregistersymbol( SuperAccuracy )
+</AssemblerScript>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>56</ID>
+          <Description>"[ Vehicle ]"</Description>
+          <Options moHideChildren="1"/>
+          <LastState Value="" RealAddress="00000000"/>
+          <Color>008000</Color>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>55</ID>
+              <Description>"Unlimited Health"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+
+aobscanmodule( VehicleHealth, RAGE2.exe, 0FB781????????6685C07E??83BB????????0475 )
+registersymbol( VehicleHealth )
+label( VehicleHealth_o )
+registersymbol( VehicleHealth_o )
+alloc( Hook, 0x1000, RAGE2.exe )
+
+Hook:
+push rax
+mov rax,[g_Player]
+cmp [rcx+A90],rax                // this will make sure to update it just for the
+                                 // vehicle you're currently attached to (or "imprinted")
+pop rax
+jne short @f
+  movzx eax,word ptr [rcx+2F0]   // get Max
+  mov [rcx+2FE],ax               // fill Current
+VehicleHealth_o:
+readmem( VehicleHealth, 7 )
+jmp VehicleHealth+7
+
+VehicleHealth:
+jmp Hook
+db 90 90
+
+[DISABLE]
+
+VehicleHealth:
+readmem( VehicleHealth_o, 7 )
+
+dealloc( Hook )
+unregistersymbol( VehicleHealth_o )
+unregistersymbol( VehicleHealth )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>91</ID>
+              <Description>"Unlimited Ammo"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+aobscanmodule( VehicleAmmo, RAGE2.exe, 488D8F????????E8????????EB??8B )
+registersymbol( VehicleAmmo )
+label( VehicleAmmo_o )
+registersymbol( VehicleAmmo_o )
+alloc( Hook, 0x1000, RAGE2.exe )
+
+Hook:
+cmp rdi,[g_Player]           // is our comandered vechile firing?
+jne short @f
+  add r8d,ebp                // give back the subtracted unit
+  push rax
+  mov rax,[g_Player]
+  or byte ptr [rax+2DC9],2
+  pop rax
+VehicleAmmo_o:
+readmem( VehicleAmmo, 7 )
+jmp VehicleAmmo+7
+
+VehicleAmmo:
+jmp Hook
+db 90 90
+
+[DISABLE]
+
+VehicleAmmo:
+readmem( VehicleAmmo_o, 7 )
+
+dealloc( Hook )
+unregistersymbol( VehicleAmmo_o )
+unregistersymbol( VehicleAmmo )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>38</ID>
+              <Description>"Disable Overheat"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+
+aobscanmodule( OverheatMul, RAGE2.exe, F30F59B3????????F30F58B3????????F30F11B3????????EB )
+registersymbol( OverheatMul )
+label( OverheatMul_o )
+registersymbol( OverheatMul_o )
+alloc( Hook, 0x1000, RAGE2.exe )
+
+Hook:
+push rdx
+mov rdx,[g_Player]
+cmp [rbx+578],rdx
+pop rdx
+jne short @f
+  mov [rbx+61C],0
+OverheatMul_o:
+readmem( OverheatMul, 8 )
+jmp OverheatMul+8
+
+OverheatMul:
+jmp Hook
+db 90 90 90
+
+[DISABLE]
+
+OverheatMul:
+readmem( OverheatMul_o, 8 )
+
+dealloc( Hook )
+unregistersymbol( OverheatMul_o )
+unregistersymbol( OverheatMul )
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>44</ID>
+              <Description>"Unlimited Boost"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+
+aobscanmodule( BoostCheck, RAGE2.exe, F3450F59074C6383????????F30F1083 )
+registersymbol( BoostCheck )
+label( BoostCheck_o )
+registersymbol( BoostCheck_o )
+alloc( Hook, 0x1000, RAGE2.exe )
+
+Hook:
+push rdx
+mov rdx,[g_Player]
+cmp [rbx+A90],rdx
+pop rdx
+jne short @f
+  movss xmm0,[rbx+4E54]
+  movss [rbx+4E10],xmm0
+  jmp BoostCheck-11
+BoostCheck_o:
+readmem( BoostCheck, 5 )
+jmp BoostCheck+5
+
+BoostCheck:
+jmp Hook
+
+[DISABLE]
+
+BoostCheck:
+readmem( BoostCheck_o, 5 )
+
+dealloc( Hook )
+unregistersymbol( BoostCheck_o )
+unregistersymbol( BoostCheck )
+</AssemblerScript>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>58</ID>
+          <Description>"[ Time Of Day ]"</Description>
+          <Options moHideChildren="1"/>
+          <LastState Value="" RealAddress="00000000"/>
+          <Color>000080</Color>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>30</ID>
+              <Description>"Force Day Time"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+
+aobscanmodule( ForceDayTime_AOB, RAGE2.exe, BA4E74A251498BC9E8????????84C074??F30F100D )
+define( ForceDayTime, ForceDayTime_AOB+F )
+registersymbol( ForceDayTime )
+
+ForceDayTime+1:
+db 00
+
+[DISABLE]
+
+ForceDayTime+1:
+db 0A
+
+unregistersymbol( ForceDayTime )
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>31</ID>
+              <Description>"Force Night Time"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+
+aobscanmodule( ForceNightTime_AOB, RAGE2.exe, BAD9EE88BA498BC9E8????????84C074??410F28C9 )
+define( ForceNightTime, ForceNightTime_AOB+F )
+registersymbol( ForceNightTime )
+
+ForceNightTime+1:
+db 00
+
+[DISABLE]
+
+ForceNightTime+1:
+db 10
+
+unregistersymbol( ForceNightTime )
+
+</AssemblerScript>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>59</ID>
+          <Description>"[ Inventory ]"</Description>
+          <Options moHideChildren="1"/>
+          <LastState Value="" RealAddress="00000000"/>
+          <Color>FF8000</Color>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>49</ID>
+              <Description>"Read Resources"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+
+/*
+aobscanmodule( ReadResources, RAGE2.exe, C74424??02000000C74424??E3157D61 )
+registersymbol( ReadResources )
+label( ReadResources_o )
+registersymbol( ReadResources_o )
+*/
+//aobscanmodule( GetBase, RAGE2.exe, 4883EC28488B05????????4885C074??488B40??4885C074??48 )
+//registersymbol( GetBase )
+alloc( Hook, 0x1000, RAGE2.exe )
+CreateThread( Hook )
+
+label( pMoney )
+registersymbol( pMoney )
+label( pFeltrite )
+registersymbol( pFeltrite )
+label( pProjectPoints )
+registersymbol( pProjectPoints )
+label( pMutantBashTokens )
+registersymbol( pMutantBashTokens )
+
+label( FindPtr )
+registersymbol( FindPtr )
+
+Hook:
+//call GetBase
+//test rax,rax
+//je short @f
+//  mov rcx,[rax+50]   // GetPlayer
+mov rcx,[g_Player]
+lea rsi,[rcx+A38]
+mov r8,[rsi+0x208]
+mov rdx,617D15E3   // "CurrencyBase"
+mov rcx,rsi
+call short FindPtr
+mov [pMoney],rax
+mov r8,[rsi+0x1F8]
+mov rdx,86A6BE6A   // "IngredientFeltriteBlue"
+mov rcx,rsi
+call short FindPtr
+mov [pFeltrite],rax
+mov r8,[rsi+0x208]
+mov rdx,E9C1DB3D   // "CurrencyMetagameRewardPoint"
+mov rcx,rsi
+call short FindPtr
+mov [pProjectPoints],rax
+mov r8,[rsi+0x208] // "CurrencyMutantBashTokens"
+mov rdx,6077B815
+mov rcx,rsi
+call short FindPtr
+mov [pMutantBashTokens],rax
+@@:
+ret
+/*
+ReadResources_o:
+readmem( ReadResources, 8 )
+jmp ReadResources+8
+*/
+
+align 10 CC
+
+FindPtr:
+	mov rax,r8
+	mov rcx,[r8+0x8]
+	cmp byte ptr [rcx+0x19],0x0
+	jne short @L00000004
+
+@L00000001:
+	cmp dword ptr [rcx+0x1C],edx
+	jae short @L00000002
+	mov rcx,[rcx+0x10]
+	jmp short @L00000003
+
+@L00000002:
+	mov rax,rcx
+	mov rcx,[rcx]
+
+@L00000003:
+	cmp byte ptr [rcx+0x19],0x0
+	je short @L00000001
+	cmp rax,r8
+	je short @L00000004
+	cmp edx,dword ptr [rax+0x1C]
+	jae short @L00000005
+
+@L00000004:
+	mov rax,r8
+
+@L00000005:
+	cmp rax,r8
+	je short @L00000006
+	//mov eax,dword ptr [rax+0x20]
+	ret
+
+@L00000006:
+	xor eax,eax
+	ret
+
+align 10 CC
+
+pMoney:
+dq 0
+pFeltrite:
+dq 0
+pProjectPoints:
+dq 0
+pMutantBashTokens:
+dq 0
+
+/*
+ReadResources:
+jmp Hook
+db 90 90 90
+*/
+
+[DISABLE]
+
+/*
+ReadResources:
+readmem( ReadResources_o, 8 )
+*/
+
+unregistersymbol( FindPtr )
+
+unregistersymbol( pMutantBashTokens )
+unregistersymbol( pProjectPoints )
+unregistersymbol( pFeltrite )
+unregistersymbol( pMoney )
+dealloc( Hook )
+
+//unregistersymbol( GetBase )
+
+/*
+unregistersymbol( ReadResources_o )
+unregistersymbol( ReadResources )
+*/
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>50</ID>
+                  <Description>"Money"</Description>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>pMoney</Address>
+                  <Offsets>
+                    <Offset>20</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>53</ID>
+                  <Description>"Feltrite"</Description>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>pFeltrite</Address>
+                  <Offsets>
+                    <Offset>20</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>52</ID>
+                  <Description>"Project Points"</Description>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>pProjectPoints</Address>
+                  <Offsets>
+                    <Offset>20</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>51</ID>
+                  <Description>"Mutant Bash Tokens"</Description>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>pMutantBashTokens</Address>
+                  <Offsets>
+                    <Offset>20</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>92</ID>
+      <Description>"[ FRF Community Scripts ]"</Description>
+      <Options moHideChildren="1"/>
+      <LastState Value="" RealAddress="00000000"/>
+      <Color>8000FF</Color>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>93</ID>
+          <Description>"[ l0wb1t + Csimbi ]"</Description>
+          <Options moHideChildren="1"/>
+          <LastState Value="" RealAddress="00000000"/>
+          <Color>FF0000</Color>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>47</ID>
+              <Description>"--aobInvItemCalc"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>// Game   : RAGE2.exe
+// Version:
+// Date   :
+// Author : Cs
+[ENABLE]
+aobscanmodule(aobInvItemCalc,RAGE2.exe,41 8B F0 4C 8B E9 4C 8B 48 30 49 8B C1)
+
+alloc(newmemInvItemCalc,4096,aobInvItemCalc)
+
+label(aobInvItemCalc_r)
+label(aobInvItemCalc_i)
+registersymbol(aobInvItemCalc_r)
+registersymbol(aobInvItemCalc_i)
+
+label(lblInvItemCalc)
+label(lblInvItemCalcSkip)
+label(lblInvItemCalcRet)
+
+label(bEnableInfiniteItems)
+registersymbol(bEnableInfiniteItems)
+
+newmemInvItemCalc:
+bEnableInfiniteItems:
+dd 1
+
+lblInvItemCalc:
+cmp r8d,0
+jge short lblInvItemCalcSkip
+mov rsi,[g_Player]
+lea rsi,[rsi+00000CD8]
+cmp qword ptr [rsi],rcx
+jne short lblInvItemCalcSkip
+cmp dword ptr [bEnableInfiniteItems],1
+jne short lblInvItemCalcSkip
+xor r8,r8
+lblInvItemCalcSkip:
+//Alt: mov esi,r8d
+//Alt: mov r13,rcx
+//db 41 8B F0 4C 8B E9
+readmem(aobInvItemCalc,6)
+jmp lblInvItemCalcRet
+aobInvItemCalc_i:
+readmem(aobInvItemCalc,6)
+
+//"RAGE2.exe"+73F712:
+aobInvItemCalc:
+aobInvItemCalc_r:
+jmp lblInvItemCalc
+nop
+lblInvItemCalcRet:
+
+[DISABLE]
+//"RAGE2.exe"+73F712:
+//Alt: mov esi,r8d
+//Alt: mov r13,rcx
+//db 41 8B F0 4C 8B E9
+aobInvItemCalc_r:
+readmem(aobInvItemCalc_i,6)
+
+unregistersymbol(aobInvItemCalc_r)
+unregistersymbol(aobInvItemCalc_i)
+
+unregistersymbol(bEnableInfiniteItems)
+
+dealloc(newmemInvItemCalc)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "RAGE2.exe"+73F712
+
+"RAGE2.exe"+73F6F4: 48 83 C4 48                 -  add rsp,48
+"RAGE2.exe"+73F6F8: C3                          -  ret 
+"RAGE2.exe"+73F6F9: FF D2                       -  call rdx
+"RAGE2.exe"+73F6FB: 48 83 C4 48                 -  add rsp,48
+"RAGE2.exe"+73F6FF: C3                          -  ret 
+"RAGE2.exe"+73F700: 89 54 24 10                 -  mov [rsp+10],edx
+"RAGE2.exe"+73F704: 56                          -  push rsi
+"RAGE2.exe"+73F705: 41 55                       -  push r13
+"RAGE2.exe"+73F707: 48 83 EC 58                 -  sub rsp,58
+"RAGE2.exe"+73F70B: 48 8B 05 7E D3 92 02        -  mov rax,[RAGE2.exe+306CA90]
+// ---------- INJECTING HERE ----------
+"RAGE2.exe"+73F712: 41 8B F0                    -  mov esi,r8d
+"RAGE2.exe"+73F715: 4C 8B E9                    -  mov r13,rcx
+// ---------- DONE INJECTING  ----------
+"RAGE2.exe"+73F718: 4C 8B 48 30                 -  mov r9,[rax+30]
+"RAGE2.exe"+73F71C: 49 8B C1                    -  mov rax,r9
+"RAGE2.exe"+73F71F: 4D 8B 41 08                 -  mov r8,[r9+08]
+"RAGE2.exe"+73F723: 41 80 78 19 00              -  cmp byte ptr [r8+19],00
+"RAGE2.exe"+73F728: 75 29                       -  jne RAGE2.exe+73F753
+"RAGE2.exe"+73F72A: 66 0F 1F 44 00 00           -  nop [rax+rax+00]
+"RAGE2.exe"+73F730: 41 39 50 20                 -  cmp [r8+20],edx
+"RAGE2.exe"+73F734: 73 06                       -  jae RAGE2.exe+73F73C
+"RAGE2.exe"+73F736: 4D 8B 40 10                 -  mov r8,[r8+10]
+"RAGE2.exe"+73F73A: EB 06                       -  jmp RAGE2.exe+73F742
+}
+
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>48</ID>
+                  <Description>"bEnableInfiniteItems"</Description>
+                  <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">0:Disabled
+1:Enabled
+</DropDownList>
+                  <Color>008000</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>bEnableInfiniteItems</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>94</ID>
+              <Description>"--aobOverdriveTester"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>// Game   : RAGE2.exe
+// Version:
+// Date   :
+// Author : Cs
+[ENABLE]
+aobscanmodule(aobOverdriveTester,RAGE2.exe,0F 2F BF ?? ?? 00 00 77 ?? F3 0F)
+
+alloc(newmemOverdriveTester,4096,aobOverdriveTester)
+
+label(aobOverdriveTester_r)
+label(aobOverdriveTester_i)
+registersymbol(aobOverdriveTester_r)
+registersymbol(aobOverdriveTester_i)
+
+label(lblOverdriveTester)
+label(lblOverdriveTesterSkip)
+label(lblOverdriveTesterRet)
+
+label(bEnableMaxOverdrive)
+registersymbol(bEnableMaxOverdrive)
+
+newmemOverdriveTester:
+bEnableMaxOverdrive:
+dd 1
+
+lblOverdriveTester:
+cmp dword ptr [bEnableMaxOverdrive],1
+jne short lblOverdriveTesterSkip
+push rax
+movsxd rax,[aobOverdriveTester_i+03]
+movss [rax+rdi],xmm7
+pop rax
+lblOverdriveTesterSkip:
+//Alt: comiss xmm7,[rdi+00000D90]
+//db 0F 2F BF 90 0D 00 00
+readmem(aobOverdriveTester,7)
+jmp lblOverdriveTesterRet
+aobOverdriveTester_i:
+readmem(aobOverdriveTester,7)
+
+//"RAGE2.exe"+9B4B77:
+aobOverdriveTester:
+aobOverdriveTester_r:
+jmp lblOverdriveTester
+nop
+nop
+lblOverdriveTesterRet:
+
+[DISABLE]
+//"RAGE2.exe"+9B4B77:
+//Alt: comiss xmm7,[rdi+00000D90]
+//db 0F 2F BF 90 0D 00 00
+aobOverdriveTester_r:
+readmem(aobOverdriveTester_i,7)
+
+unregistersymbol(aobOverdriveTester_r)
+unregistersymbol(aobOverdriveTester_i)
+
+unregistersymbol(bEnableMaxOverdrive)
+
+dealloc(newmemOverdriveTester)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "RAGE2.exe"+9B4B77
+
+"RAGE2.exe"+9B4B50: 48 8B 01                 -  mov rax,[rcx]
+"RAGE2.exe"+9B4B53: 81 78 04 3C A3 B0 35     -  cmp [rax+04],35B0A33C
+"RAGE2.exe"+9B4B5A: 74 70                    -  je RAGE2.exe+9B4BCC
+"RAGE2.exe"+9B4B5C: 48 83 C1 30              -  add rcx,30
+"RAGE2.exe"+9B4B60: 48 3B CA                 -  cmp rcx,rdx
+"RAGE2.exe"+9B4B63: 75 EB                    -  jne RAGE2.exe+9B4B50
+"RAGE2.exe"+9B4B65: 44 38 A7 95 0D 00 00     -  cmp [rdi+00000D95],r12l
+"RAGE2.exe"+9B4B6C: 74 5E                    -  je RAGE2.exe+9B4BCC
+"RAGE2.exe"+9B4B6E: 44 38 A7 94 0D 00 00     -  cmp [rdi+00000D94],r12l
+"RAGE2.exe"+9B4B75: 74 55                    -  je RAGE2.exe+9B4BCC
+// ---------- INJECTING HERE ----------
+"RAGE2.exe"+9B4B77: 0F 2F BF 90 0D 00 00     -  comiss xmm7,[rdi+00000D90]
+// ---------- DONE INJECTING  ----------
+"RAGE2.exe"+9B4B7E: 77 4C                    -  ja RAGE2.exe+9B4BCC
+"RAGE2.exe"+9B4B80: F3 0F 58 76 64           -  addss xmm6,dword ptr [rsi+64]
+"RAGE2.exe"+9B4B85: F3 0F 11 76 64           -  movss [rsi+64],xmm6
+"RAGE2.exe"+9B4B8A: 0F 2F 35 5F D9 D7 01     -  comiss xmm6,[RAGE2.exe+27324F0]
+"RAGE2.exe"+9B4B91: 76 39                    -  jna RAGE2.exe+9B4BCC
+"RAGE2.exe"+9B4B93: 44 89 66 64              -  mov [rsi+64],r12d
+"RAGE2.exe"+9B4B97: 4C 39 25 A2 80 6B 02     -  cmp [RAGE2.exe+306CC40],r12
+"RAGE2.exe"+9B4B9E: 74 2C                    -  je RAGE2.exe+9B4BCC
+"RAGE2.exe"+9B4BA0: 48 8D 8F 30 2A 00 00     -  lea rcx,[rdi+00002A30]
+"RAGE2.exe"+9B4BA7: 0F 57 C0                 -  xorps xmm0,xmm0
+}
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>95</ID>
+                  <Description>"bEnableMaxOverdrive"</Description>
+                  <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">0:Disabled
+1:Enabled
+</DropDownList>
+                  <Color>008000</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>bEnableMaxOverdrive</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>76</ID>
+              <Description>"--aobRefireRateReader (l0wb1t)"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>// Game   : RAGE2.exe
+// Version:
+// Date   :
+// Author : Cs
+[ENABLE]
+aobscanmodule(aobRefireRateReader,RAGE2.exe,F3 0F 59 B3 ?? ?? 00 00 4D 85 C0 0F)
+aobscanmodule(aobWeaponPlayerOffset,RAGE2.exe,48 8B 81 ?? ?? 00 00 48 89 85 ?? ?? 00 00 4C 8B)
+
+alloc(newmemRefireRateReader,4096,aobRefireRateReader)
+
+label(aobRefireRateReader_r)
+label(aobRefireRateReader_i)
+registersymbol(aobRefireRateReader_r)
+registersymbol(aobRefireRateReader_i)
+
+label(lblRefireRateReader)
+label(lblRefireRateReaderSkip)
+label(lblRefireRateReaderRet)
+
+label(bEnableRefireRateMod)
+label(fRefireRateMod)
+registersymbol(bEnableRefireRateMod)
+registersymbol(fRefireRateMod)
+
+label(iWeaponPlayerOffset)
+registersymbol(iWeaponPlayerOffset)
+
+newmemRefireRateReader:
+bEnableRefireRateMod:
+dd 1
+fRefireRateMod:
+dd (float)0.1
+
+lblRefireRateReader:
+//Alt: mulss xmm6,[rbx+0000036C]
+//db F3 0F 59 B3 6C 03 00 00
+readmem(aobRefireRateReader,8)
+push rax
+push rcx
+mov rcx,[g_Player]
+test rcx,rcx
+jz short lblRefireRateReaderSkip
+movsxd rax,[iWeaponPlayerOffset]
+cmp qword ptr [rax+rbx],rcx
+jne short lblRefireRateReaderSkip
+cmp dword ptr [bEnableRefireRateMod],1
+jne short lblRefireRateReaderSkip
+mulss xmm6,[fRefireRateMod]
+lblRefireRateReaderSkip:
+pop rcx
+pop rax
+jmp lblRefireRateReaderRet
+aobRefireRateReader_i:
+readmem(aobRefireRateReader,8)
+iWeaponPlayerOffset:
+readmem(aobWeaponPlayerOffset+03,4)
+
+//"RAGE2.exe"+7E310F:
+aobRefireRateReader:
+aobRefireRateReader_r:
+jmp lblRefireRateReader
+nop
+nop
+nop
+lblRefireRateReaderRet:
+
+[DISABLE]
+//"RAGE2.exe"+7E310F:
+//Alt: mulss xmm6,[rbx+0000036C]
+//db F3 0F 59 B3 6C 03 00 00
+aobRefireRateReader_r:
+readmem(aobRefireRateReader_i,8)
+
+unregistersymbol(aobRefireRateReader_r)
+unregistersymbol(aobRefireRateReader_i)
+
+unregistersymbol(bEnableRefireRateMod)
+unregistersymbol(fRefireRateMod)
+
+unregistersymbol(iWeaponPlayerOffset)
+
+dealloc(newmemRefireRateReader)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "RAGE2.exe"+7E310F
+
+"RAGE2.exe"+7E30DE: 48 81 C2 88 00 00 00        -  add rdx,00000088
+"RAGE2.exe"+7E30E5: 49 3B D0                    -  cmp rdx,r8
+"RAGE2.exe"+7E30E8: 75 C6                       -  jne RAGE2.exe+7E30B0
+"RAGE2.exe"+7E30EA: 0F 28 C2                    -  movaps xmm0,xmm2
+"RAGE2.exe"+7E30ED: F3 0F 59 77 7C              -  mulss xmm6,[rdi+7C]
+"RAGE2.exe"+7E30F2: 4C 8B 83 80 05 00 00        -  mov r8,[rbx+00000580]
+"RAGE2.exe"+7E30F9: 48 C7 44 24 20 00 00 00 00  -  mov qword ptr [rsp+20],00000000
+"RAGE2.exe"+7E3102: 4C 89 44 24 28              -  mov [rsp+28],r8
+"RAGE2.exe"+7E3107: F3 0F 59 F4                 -  mulss xmm6,xmm4
+"RAGE2.exe"+7E310B: F3 0F 59 F0                 -  mulss xmm6,xmm0
+// ---------- INJECTING HERE ----------
+"RAGE2.exe"+7E310F: F3 0F 59 B3 6C 03 00 00     -  mulss xmm6,[rbx+0000036C]
+// ---------- DONE INJECTING  ----------
+"RAGE2.exe"+7E3117: 4D 85 C0                    -  test r8,r8
+"RAGE2.exe"+7E311A: 0F 84 10 01 00 00           -  je RAGE2.exe+7E3230
+"RAGE2.exe"+7E3120: 41 8B 50 08                 -  mov edx,[r8+08]
+"RAGE2.exe"+7E3124: 85 D2                       -  test edx,edx
+"RAGE2.exe"+7E3126: 74 1B                       -  je RAGE2.exe+7E3143
+"RAGE2.exe"+7E3128: 0F 1F 84 00 00 00 00 00     -  nop [rax+rax+00000000]
+"RAGE2.exe"+7E3130: 8D 4A 01                    -  lea ecx,[rdx+01]
+"RAGE2.exe"+7E3133: 8B C2                       -  mov eax,edx
+"RAGE2.exe"+7E3135: F0 41 0F B1 48 08           - lock  cmpxchg [r8+08],ecx
+"RAGE2.exe"+7E313B: 74 5A                       -  je RAGE2.exe+7E3197
+}
+
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>77</ID>
+                  <Description>"bEnableRefireRateMod"</Description>
+                  <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">0:Disabled
+1:Enabled
+</DropDownList>
+                  <Color>008000</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>bEnableRefireRateMod</Address>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>78</ID>
+                      <Description>"fRefireRateMod"</Description>
+                      <Color>FF0000</Color>
+                      <VariableType>Float</VariableType>
+                      <Address>fRefireRateMod</Address>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>83</ID>
+              <Description>"--aobSpreadCalc (l0wb1t)"</Description>
+              <Options moHideChildren="1"/>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>// Game   : RAGE2.exe
+// Version:
+// Date   :
+// Author : Cs
+[ENABLE]
+aobscanmodule(aobSpreadCalc,RAGE2.exe,F3 0F 11 8B 38 04 00 00)
+
+alloc(newmemSpreadCalc,4096,aobSpreadCalc)
+
+label(aobSpreadCalc_r)
+label(aobSpreadCalc_i)
+registersymbol(aobSpreadCalc_r)
+registersymbol(aobSpreadCalc_i)
+
+label(lblSpreadCalc)
+label(lblSpreadCalcSkip)
+label(lblSpreadCalcRet)
+
+label(bEnableNoSpread)
+registersymbol(bEnableNoSpread)
+
+newmemSpreadCalc:
+bEnableNoSpread:
+dd 1
+
+lblSpreadCalc:
+push rax
+push rcx
+mov rcx,[g_Player]
+test rcx,rcx
+jz short lblSpreadCalcSkip
+movsxd rax,[iWeaponPlayerOffset]
+cmp qword ptr [rax+rbx],rcx
+jne short lblSpreadCalcSkip
+cmp dword ptr [bEnableNoSpread],1
+jne short lblSpreadCalcSkip
+xorps xmm1,xmm1
+lblSpreadCalcSkip:
+pop rcx
+pop rax
+//Alt: movss [rbx+00000438],xmm1
+//db F3 0F 11 8B 38 04 00 00
+readmem(aobSpreadCalc,8)
+jmp lblSpreadCalcRet
+aobSpreadCalc_i:
+readmem(aobSpreadCalc,8)
+
+//"RAGE2.exe"+7D4F40:
+aobSpreadCalc:
+aobSpreadCalc_r:
+jmp lblSpreadCalc
+nop
+nop
+nop
+lblSpreadCalcRet:
+
+[DISABLE]
+//"RAGE2.exe"+7D4F40:
+//Alt: movss [rbx+00000438],xmm1
+//db F3 0F 11 8B 38 04 00 00
+aobSpreadCalc_r:
+readmem(aobSpreadCalc_i,8)
+
+unregistersymbol(aobSpreadCalc_r)
+unregistersymbol(aobSpreadCalc_i)
+
+unregistersymbol(bEnableNoSpread)
+
+dealloc(newmemSpreadCalc)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "RAGE2.exe"+7D4F40
+
+"RAGE2.exe"+7D4F11: F3 0F 59 DF              -  mulss xmm3,xmm7
+"RAGE2.exe"+7D4F15: F3 0F 10 93 38 04 00 00  -  movss xmm2,[rbx+00000438]
+"RAGE2.exe"+7D4F1D: 0F 28 C3                 -  movaps xmm0,xmm3
+"RAGE2.exe"+7D4F20: 0F 57 05 69 FC F5 01     -  xorps xmm0,[RAGE2.exe+2734B90]
+"RAGE2.exe"+7D4F27: F3 0F 10 48 08           -  movss xmm1,[rax+08]
+"RAGE2.exe"+7D4F2C: F3 0F 59 CC              -  mulss xmm1,xmm4
+"RAGE2.exe"+7D4F30: F3 0F 5C CA              -  subss xmm1,xmm2
+"RAGE2.exe"+7D4F34: F3 0F 5F C8              -  maxss xmm1,xmm0
+"RAGE2.exe"+7D4F38: F3 0F 5D CB              -  minss xmm1,xmm3
+"RAGE2.exe"+7D4F3C: F3 0F 58 CA              -  addss xmm1,xmm2
+// ---------- INJECTING HERE ----------
+"RAGE2.exe"+7D4F40: F3 0F 11 8B 38 04 00 00  -  movss [rbx+00000438],xmm1
+// ---------- DONE INJECTING  ----------
+"RAGE2.exe"+7D4F48: F3 0F 10 93 3C 04 00 00  -  movss xmm2,[rbx+0000043C]
+"RAGE2.exe"+7D4F50: 0F 57 F6                 -  xorps xmm6,xmm6
+"RAGE2.exe"+7D4F53: 0F 2E D6                 -  ucomiss xmm2,xmm6
+"RAGE2.exe"+7D4F56: 74 4F                    -  je RAGE2.exe+7D4FA7
+"RAGE2.exe"+7D4F58: F3 0F 10 87 84 00 00 00  -  movss xmm0,[rdi+00000084]
+"RAGE2.exe"+7D4F60: F3 0F 59 C4              -  mulss xmm0,xmm4
+"RAGE2.exe"+7D4F64: F3 0F 59 C7              -  mulss xmm0,xmm7
+"RAGE2.exe"+7D4F68: 0F 28 CA                 -  movaps xmm1,xmm2
+"RAGE2.exe"+7D4F6B: F3 0F 5D C8              -  minss xmm1,xmm0
+"RAGE2.exe"+7D4F6F: F3 0F 5C D1              -  subss xmm2,xmm1
+}
+
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>84</ID>
+                  <Description>"bEnableNoSpread"</Description>
+                  <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">0:Disabled
+1:Enabled
+</DropDownList>
+                  <Color>008000</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>bEnableNoSpread</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>71</ID>
+              <Description>"No Recoil (l0wb1t)"</Description>
+              <LastState/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+aobscanmodule(_NoRecoil,RAGE2.exe,F2 0F 11 43 24 89 43 2C F3 41) // should be unique
+alloc(newmem,$1000,"RAGE2.exe"+5EAD9B)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  mov [rbx+24],0
+    mov [rbx+28],0
+      mov [rbx+2C],0
+  jmp return
+
+_NoRecoil:
+  jmp newmem
+return:
+registersymbol(_NoRecoil)
+
+[DISABLE]
+
+_NoRecoil:
+  db F2 0F 11 43 24
+
+unregistersymbol(_NoRecoil)
+dealloc(newmem)
+</AssemblerScript>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>2</ID>
+      <Description>"[ Debug ]"</Description>
+      <Options moHideChildren="1"/>
+      <LastState Value="" RealAddress="00000000"/>
+      <Color>0080FF</Color>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>1</ID>
+          <Description>"g_Player"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <Color>C0C0C0</Color>
+          <VariableType>8 Bytes</VariableType>
+          <Address>g_Player</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>111</ID>
+          <Description>"Health"</Description>
+          <Color>C0C0C0</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>g_Player</Address>
+          <Offsets>
+            <Offset>2FE</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>28</ID>
+          <Description>"Max Health"</Description>
+          <Color>C0C0C0</Color>
+          <VariableType>2 Bytes</VariableType>
+          <Address>g_Player</Address>
+          <Offsets>
+            <Offset>2F0</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>27</ID>
+          <Description>"Overdrive"</Description>
+          <Color>C0C0C0</Color>
+          <VariableType>Float</VariableType>
+          <Address>g_Player</Address>
+          <Offsets>
+            <Offset>D90</Offset>
+          </Offsets>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>32</ID>
+              <Description>"bOverdriveDisabled"</Description>
+              <Color>C0C0C0</Color>
+              <VariableType>Byte</VariableType>
+              <Address>g_Player</Address>
+              <Offsets>
+                <Offset>D94</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>33</ID>
+              <Description>"bOverdriveAvailable"</Description>
+              <Color>C0C0C0</Color>
+              <VariableType>Byte</VariableType>
+              <Address>g_Player</Address>
+              <Offsets>
+                <Offset>D95</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>67</ID>
+          <Description>"bInfiniteAmmo (OR(0x2))"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <Color>C0C0C0</Color>
+          <VariableType>Byte</VariableType>
+          <Address>g_Player</Address>
+          <Offsets>
+            <Offset>2DC9</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>21</ID>
+          <Description>"Time Of Day (0-24)"</Description>
+          <Color>C0C0C0</Color>
+          <VariableType>Float</VariableType>
+          <Address>RAGE2.exe+3060968</Address>
+          <Offsets>
+            <Offset>80</Offset>
+          </Offsets>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>8</ID>
+          <Description>"Overdrive"</Description>
+          <ShowAsHex>1</ShowAsHex>
+          <Color>C0C0C0</Color>
+          <VariableType>8 Bytes</VariableType>
+          <Address>g_Player</Address>
+          <Offsets>
+            <Offset>34F8</Offset>
+          </Offsets>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>112</ID>
+              <Description>"Multiplier"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <Color>C0C0C0</Color>
+              <VariableType>8 Bytes</VariableType>
+              <Address>g_Player</Address>
+              <Offsets>
+                <Offset>98</Offset>
+                <Offset>34F8</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>114</ID>
+                  <Description>"Calculated Timer"</Description>
+                  <Color>C0C0C0</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>g_Player</Address>
+                  <Offsets>
+                    <Offset>3C</Offset>
+                    <Offset>98</Offset>
+                    <Offset>34F8</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>122</ID>
+                  <Description>"Timer Minuend"</Description>
+                  <Color>C0C0C0</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>g_Player</Address>
+                  <Offsets>
+                    <Offset>44</Offset>
+                    <Offset>98</Offset>
+                    <Offset>34F8</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>123</ID>
+                  <Description>"Timer Subtrahend"</Description>
+                  <Color>C0C0C0</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>g_Player</Address>
+                  <Offsets>
+                    <Offset>40</Offset>
+                    <Offset>98</Offset>
+                    <Offset>34F8</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>120</ID>
+                  <Description>"Multiplier"</Description>
+                  <Color>C0C0C0</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>g_Player</Address>
+                  <Offsets>
+                    <Offset>60</Offset>
+                    <Offset>98</Offset>
+                    <Offset>34F8</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>121</ID>
+                  <Description>"Level"</Description>
+                  <Color>C0C0C0</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>g_Player</Address>
+                  <Offsets>
+                    <Offset>58</Offset>
+                    <Offset>98</Offset>
+                    <Offset>34F8</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>9</ID>
+          <Description>"Toggle Cheat Menu"</Description>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+// show menu
+RAGE2.exe+D022169:
+db B0 01
+
+// patch dependencies
+RAGE2.exe+AFE927:
+db EB 05
+
+RAGE2.exe+AFE96B:
+db 74 4E
+
+RAGE2.exe+AFE9BB:
+db B0 01
+
+RAGE2.exe+AFEAAD:
+db 0F 84 13 00 00 00
+
+// ft_settings_cheat_on_fire_commentary
+RAGE2.exe+AFEAD0:
+db EB 07
+
+// ft_settings_cheat_diamond_geezer_commentary
+RAGE2.exe+AFEAF5:
+db EB 07
+
+// ft_settings_cheat_call_that_wingstick_commentary
+RAGE2.exe+AFEB1A:
+db EB 07
+
+RAGE2.exe+AFEB46:
+db 90 90
+
+// ft_settings_cheat_super_overdrive
+RAGE2.exe+AFEBF5:
+db 74 00
+
+// ft_settings_cheat_super_wingstick
+RAGE2.exe+AFEC51:
+db 74 00
+
+// ft_settings_cheat_electrified_player
+RAGE2.exe+AFECAD:
+db 74 00
+
+// ft_settings_cheat_vehicle_launching_eject
+RAGE2.exe+AFED09:
+db 74 00
+
+// ft_settings_cheat_git_gud_mode
+RAGE2.exe+AFED65:
+db 74 00
+
+ // ft_settings_cheat_super_phoenix_car
+RAGE2.exe+AFEDC1:
+db 74 00
+
+// ft_settings_cheat_bloody_mess_gibbing
+RAGE2.exe+AFEE1D:
+db 74 00
+
+// ft_settings_cheat_red_barrel_spawning
+RAGE2.exe+AFEE79:
+db 74 00
+
+// ft_settings_cheat_low_gravity_player
+RAGE2.exe+AFEED5:
+db 74 00
+
+// ft_settings_cheat_infinite_ammo
+RAGE2.exe+AFEF31:
+db 74 00
+
+// ft_settings_cheat_low_gravity_ragdolls
+RAGE2.exe+AFEF8D:
+db 74 00
+
+// ft_settings_cheat_rainbow_mode
+RAGE2.exe+AFEFE9:
+db 74 00
+
+// ft_settings_cheat_cube_gibbing
+RAGE2.exe+AFF045:
+db 74 00
+
+// ft_settings_cheat_force_daytime
+RAGE2.exe+AFF0A1:
+db 74 00
+
+// ft_settings_cheat_force_nighttime
+RAGE2.exe+AFF0FD:
+db 74 00
+
+// ft_settings_cheat_enemy_circle_spawning
+RAGE2.exe+AFF159:
+db 74 00
+
+// ft_settings_cheat_low_gravity_vehicles
+RAGE2.exe+AFF1B5:
+db 74 00
+
+[DISABLE]
+
+RAGE2.exe+D022169:
+db 30 C0
+
+RAGE2.exe+AFE927:
+db 72 05
+
+RAGE2.exe+AFE9BB:
+db 32 C0
+
+RAGE2.exe+AFEAAD:
+db 0F 84 E6 00 00 00
+
+RAGE2.exe+AFEAD0:
+db 8B 03
+
+RAGE2.exe+AFEAF5:
+db 8B 03
+
+RAGE2.exe+AFEB1A:
+db 8B 03
+
+RAGE2.exe+AFEB46:
+db 75 88
+
+RAGE2.exe+AFEBF5:
+db 74 47
+
+RAGE2.exe+AFEC51:
+db 74 47
+
+RAGE2.exe+AFECAD:
+db 74 47
+
+RAGE2.exe+AFED09:
+db 74 47
+
+RAGE2.exe+AFED65:
+db 74 47
+
+RAGE2.exe+AFEDC1:
+db 74 47
+
+RAGE2.exe+AFEE1D:
+db 74 47
+
+RAGE2.exe+AFEE79:
+db 74 47
+
+RAGE2.exe+AFEED5:
+db 74 47
+
+RAGE2.exe+AFEF31:
+db 74 47
+
+RAGE2.exe+AFEF8D:
+db 74 47
+
+RAGE2.exe+AFEFE9:
+db 74 47
+
+RAGE2.exe+AFF045:
+db 74 47
+
+RAGE2.exe+AFF0A1:
+db 74 47
+
+RAGE2.exe+AFF0FD:
+db 74 47
+
+RAGE2.exe+AFF159:
+db 74 47
+
+RAGE2.exe+AFF1B5:
+db 74 47
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

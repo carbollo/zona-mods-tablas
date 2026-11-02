@@ -1,0 +1,2148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="46">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>94</ID>
+      <Description>"Compact View"</Description>
+      <Color>00FFFF</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{$lua}
+if syntaxcheck then return end
+[ENABLE]
+function cycleFullCompact(sender,force); local state = not(compactmenuitem.Caption == 'Compact'); if force~=nil then state = not force end; compactmenuitem.Caption = state and 'Compact' or 'Full'; getMainForm().Splitter1.Visible = state; getMainForm().Panel4.Visible = state; getMainForm().Panel5.Visible = state; end; function addCompactMenu(); if compactmenualreadyexists then return end; local parent = getMainForm().Menu.Items; compactmenuitem = createMenuItem(parent); parent.add(compactmenuitem); compactmenuitem.Caption = 'Compact'; compactmenuitem.OnClick = cycleFullCompact; compactmenualreadyexists = 'yes'; end; addCompactMenu(); cycleFullCompact(nil,true)
+[DISABLE]
+cycleFullCompact(nil,false)
+</AssemblerScript>
+      <Hotkeys>
+        <Hotkey>
+          <Action>Toggle Activation</Action>
+          <Keys>
+            <Key>17</Key>
+            <Key>96</Key>
+          </Keys>
+          <ID>0</ID>
+          <ActivateSound TTS="EN">Compact View Activated</ActivateSound>
+          <DeactivateSound TTS="EN">Compact View Deactivated</DeactivateSound>
+        </Hotkey>
+      </Hotkeys>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>95</ID>
+      <Description>"Attach Process"</Description>
+      <Color>00FFFF</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{$lua}
+if syntaxcheck then return end
+[ENABLE]
+Proc="Cannibal Abduction.exe"
+Nam="Cannibal Abduction"
+if  openProcess(Proc) then
+        MessageDialog(Nam, "Attached to " .. Nam, 2,mbOK) end
+  if not getProcessIDFromProcessName(Proc) then
+       error(MessageDialog(Nam, Nam .." Isn't Running\rPlease Open " .. Nam .. " And Try Again",1,mbOK )) end
+return 'nop'
+[DISABLE]
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>0</ID>
+      <Description>"Enable"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <Color>008000</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{$lua}
+if syntaxcheck then return end
+
+[ENABLE]
+MainForm.caption = "Cannibal Abduction Table By Glowmoss"
+mono_initialize()
+LaunchMonoDataCollector()
+[DISABLE]
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>1</ID>
+          <Description>"Remove Chromatic ab"</Description>
+          <Color>008000</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{Game  : Cannibal Abduction.exe
+Author : Glowmoss
+}
+
+[ENABLE]
+
+aobscanregion(Chrome,FearCore.VFX.ChromaticAberrationPostProcessing:OnRenderImage,FearCore.VFX.ChromaticAberrationPostProcessing:OnRenderImage+AD,D9 ? ? DE)
+alloc(newmem,128,Chrome)
+
+registersymbol(Chrome Chrome_Orig CHR)
+label(return Chrome_Orig CHR)
+
+newmem:
+  fld dword ptr [CHR]
+  fmulp st(1),st(0)
+  jmp return
+
+Chrome_Orig:
+  readmem(Chrome,5)
+  //fld dword ptr [ebx+14]
+  //fmulp st(1),st(0)
+
+CHR:
+  dd 0
+
+Chrome:
+  jmp newmem
+return:
+
+[DISABLE]
+
+Chrome:
+  readmem(Chrome_Orig,5)
+
+unregistersymbol(*)
+dealloc(*)
+
+{
+// ORIGINAL CODE - INJECTION POINT: Tnots.ChromaticAberration:OnRenderImage+1a
+
+Tnots.SharpenPostProcessing:OnRenderImage+3b: D9 5C 24 08              - fstp dword ptr [esp+08]
+Tnots.SharpenPostProcessing:OnRenderImage+3f: C7 44 24 04 40 E4 10 26  - mov [esp+04],2610E440
+Tnots.SharpenPostProcessing:OnRenderImage+47: 89 04 24                 - mov [esp],eax
+Tnots.SharpenPostProcessing:OnRenderImage+4a: 39 00                    - cmp [eax],eax
+Tnots.SharpenPostProcessing:OnRenderImage+4c: 8D 6D 00                 - lea ebp,[ebp+00]
+Tnots.SharpenPostProcessing:OnRenderImage+4f: E8 D4 FC FF FF           - call UnityEngine.Material:SetFloat
+Tnots.SharpenPostProcessing:OnRenderImage+54: 89 1C 24                 - mov [esp],ebx
+Tnots.SharpenPostProcessing:OnRenderImage+57: E8 2C FB FF FF           - call Tnots.PostProcess:get_Material
+Tnots.SharpenPostProcessing:OnRenderImage+5c: 89 44 24 08              - mov [esp+08],eax
+Tnots.SharpenPostProcessing:OnRenderImage+60: 8B 45 10                 - mov eax,[ebp+10]
+Tnots.SharpenPostProcessing:OnRenderImage+63: 89 44 24 04              - mov [esp+04],eax
+Tnots.SharpenPostProcessing:OnRenderImage+67: 8B 45 0C                 - mov eax,[ebp+0C]
+Tnots.SharpenPostProcessing:OnRenderImage+6a: 89 04 24                 - mov [esp],eax
+Tnots.SharpenPostProcessing:OnRenderImage+6d: 8B C0                    - mov eax,eax
+Tnots.SharpenPostProcessing:OnRenderImage+6f: E8 AC FD FF FF           - call UnityEngine.Graphics:Blit
+Tnots.SharpenPostProcessing:OnRenderImage+74: 8D 65 FC                 - lea esp,[ebp-04]
+Tnots.SharpenPostProcessing:OnRenderImage+77: 8D 65 FC                 - lea esp,[ebp-04]
+Tnots.SharpenPostProcessing:OnRenderImage+7a: 5B                       - pop ebx
+Tnots.SharpenPostProcessing:OnRenderImage+7b: C9                       - leave 
+Tnots.SharpenPostProcessing:OnRenderImage+7c: C3                       - ret 
+265F7395: 00 00                    - add [eax],al
+265F7397: 00 55 8B                 - add [ebp-75],dl
+Tnots.ChromaticAberration:OnRenderImage+2: EC                       - in al,dx
+Tnots.ChromaticAberration:OnRenderImage+3: 53                       - push ebx
+Tnots.ChromaticAberration:OnRenderImage+4: 83 EC 24                 - sub esp,24
+Tnots.ChromaticAberration:OnRenderImage+7: 8B 5D 08                 - mov ebx,[ebp+08]
+Tnots.ChromaticAberration:OnRenderImage+a: 89 1C 24                 - mov [esp],ebx
+Tnots.ChromaticAberration:OnRenderImage+d: 8B C0                    - mov eax,eax
+Tnots.ChromaticAberration:OnRenderImage+f: E8 F4 FA FF FF           - call Tnots.PostProcess:get_Material
+Tnots.ChromaticAberration:OnRenderImage+14: D9 05 F8 39 52 1E        - fld dword ptr [1E5239F8]
+// ---------- INJECTING HERE ----------
+Tnots.ChromaticAberration:OnRenderImage+1a: D9 43 14                 - fld dword ptr [ebx+14]
+// ---------- DONE INJECTING  ----------
+Tnots.ChromaticAberration:OnRenderImage+1d: DE C9                    - fmulp st(1),st(0)
+Tnots.ChromaticAberration:OnRenderImage+1f: D9 5C 24 08              - fstp dword ptr [esp+08]
+Tnots.ChromaticAberration:OnRenderImage+23: C7 44 24 04 60 F4 0E 26  - mov [esp+04],260EF460
+Tnots.ChromaticAberration:OnRenderImage+2b: 89 04 24                 - mov [esp],eax
+Tnots.ChromaticAberration:OnRenderImage+2e: 39 00                    - cmp [eax],eax
+Tnots.ChromaticAberration:OnRenderImage+30: 8D 6D 00                 - lea ebp,[ebp+00]
+Tnots.ChromaticAberration:OnRenderImage+33: E8 70 FC FF FF           - call UnityEngine.Material:SetFloat
+Tnots.ChromaticAberration:OnRenderImage+38: 0F B6 43 18              - movzx eax,byte ptr [ebx+18]
+Tnots.ChromaticAberration:OnRenderImage+3c: 85 C0                    - test eax,eax
+Tnots.ChromaticAberration:OnRenderImage+3e: 74 26                    - je Tnots.ChromaticAberration:OnRenderImage+66
+Tnots.ChromaticAberration:OnRenderImage+40: 89 1C 24                 - mov [esp],ebx
+Tnots.ChromaticAberration:OnRenderImage+43: E8 C4 F9 FF FF           - call 265F6DA4
+Tnots.ChromaticAberration:OnRenderImage+48: D9 05 00 3A 52 1E        - fld dword ptr [1E523A00]
+Tnots.ChromaticAberration:OnRenderImage+4e: D9 5C 24 08              - fstp dword ptr [esp+08]
+Tnots.ChromaticAberration:OnRenderImage+52: C7 44 24 04 20 E4 10 26  - mov [esp+04],2610E420
+Tnots.ChromaticAberration:OnRenderImage+5a: 89 04 24                 - mov [esp],eax
+Tnots.ChromaticAberration:OnRenderImage+5d: 39 00                    - cmp [eax],eax
+Tnots.ChromaticAberration:OnRenderImage+5f: E8 B4 F9 FF FF           - call 265F6DB0
+Tnots.ChromaticAberration:OnRenderImage+64: EB 22                    - jmp Tnots.ChromaticAberration:OnRenderImage+88
+Tnots.ChromaticAberration:OnRenderImage+66: 89 1C 24                 - mov [esp],ebx
+Tnots.ChromaticAberration:OnRenderImage+69: 8B C0                    - mov eax,eax
+Tnots.ChromaticAberration:OnRenderImage+6b: E8 98 FA FF FF           - call Tnots.PostProcess:get_Material
+Tnots.ChromaticAberration:OnRenderImage+70: D9 EE                    - fldz 
+Tnots.ChromaticAberration:OnRenderImage+72: D9 5C 24 08              - fstp dword ptr [esp+08]
+Tnots.ChromaticAberration:OnRenderImage+76: C7 44 24 04 20 E4 10 26  - mov [esp+04],2610E420
+Tnots.ChromaticAberration:OnRenderImage+7e: 89 04 24                 - mov [esp],eax
+Tnots.ChromaticAberration:OnRenderImage+81: 39 00                    - cmp [eax],eax
+Tnots.ChromaticAberration:OnRenderImage+83: E8 20 FC FF FF           - call UnityEngine.Material:SetFloat
+Tnots.ChromaticAberration:OnRenderImage+88: 89 1C 24                 - mov [esp],ebx
+Tnots.ChromaticAberration:OnRenderImage+8b: E8 78 FA FF FF           - call Tnots.PostProcess:get_Material
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>2</ID>
+          <Description>"Remove Noise"</Description>
+          <Color>008000</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{Game  : Cannibal Abduction.exe
+Author : Glowmoss
+}
+
+[ENABLE]
+
+aobscanregion(Noise,FearCore.VFX.NoisePostProcessing:OnRenderImage,FearCore.VFX.NoisePostProcessing:OnRenderImage+A5,D9 ? ? D9 ? ? ? C7 ? ? ? ? ? ? ? 89 ? ? 39 ? 8D ? ? E8 ? ? ? ? 89 ? ? E8 ? ? ? ? 89 ? ? E8)
+alloc(newmem,128,Noise)
+
+registersymbol(Noise Noise_Orig NOI)
+label(return Noise_Orig NOI)
+
+newmem:
+  fld dword ptr [NOI]
+  fstp dword ptr [esp+08]
+  jmp return
+
+Noise_Orig:
+  readmem(Noise,7)
+  //fld dword ptr [ebx+18]
+  //fstp dword ptr [esp+08]
+
+NOI:
+  dd 0
+
+Noise:
+  jmp newmem
+  nop 2
+return:
+
+[DISABLE]
+
+Noise:
+  readmem(Noise_Orig,7)
+
+unregistersymbol(*)
+dealloc(*)
+
+{
+// ORIGINAL CODE - INJECTION POINT: Tnots.Noise:OnRenderImage+38
+
+Tnots.ChromaticAberration:OnRenderImage+9b: 8B 45 0C                 - mov eax,[ebp+0C]
+Tnots.ChromaticAberration:OnRenderImage+9e: 89 04 24                 - mov [esp],eax
+Tnots.ChromaticAberration:OnRenderImage+a1: 8B C0                    - mov eax,eax
+Tnots.ChromaticAberration:OnRenderImage+a3: E8 F8 FC FF FF           - call UnityEngine.Graphics:Blit
+Tnots.ChromaticAberration:OnRenderImage+a8: 8D 65 FC                 - lea esp,[ebp-04]
+Tnots.ChromaticAberration:OnRenderImage+ab: 8D 65 FC                 - lea esp,[ebp-04]
+Tnots.ChromaticAberration:OnRenderImage+ae: 5B                       - pop ebx
+Tnots.ChromaticAberration:OnRenderImage+af: C9                       - leave 
+Tnots.ChromaticAberration:OnRenderImage+b0: C3                       - ret 
+26A25869: 00 00                    - add [eax],al
+26A2586B: 00 00                    - add [eax],al
+26A2586D: 00 00                    - add [eax],al
+26A2586F: 00 55 8B                 - add [ebp-75],dl
+Tnots.Noise:OnRenderImage+2: EC                       - in al,dx
+Tnots.Noise:OnRenderImage+3: 53                       - push ebx
+Tnots.Noise:OnRenderImage+4: 83 EC 24                 - sub esp,24
+Tnots.Noise:OnRenderImage+7: 8B 5D 08                 - mov ebx,[ebp+08]
+Tnots.Noise:OnRenderImage+a: 89 1C 24                 - mov [esp],ebx
+Tnots.Noise:OnRenderImage+d: 8B C0                    - mov eax,eax
+Tnots.Noise:OnRenderImage+f: E8 3C FA FF FF           - call Tnots.PostProcess:get_Material
+Tnots.Noise:OnRenderImage+14: D9 43 14                 - fld dword ptr [ebx+14]
+Tnots.Noise:OnRenderImage+17: D9 5C 24 08              - fstp dword ptr [esp+08]
+Tnots.Noise:OnRenderImage+1b: C7 44 24 04 78 3F 4F 26  - mov [esp+04],264F3F78
+Tnots.Noise:OnRenderImage+23: 89 04 24                 - mov [esp],eax
+Tnots.Noise:OnRenderImage+26: 39 00                    - cmp [eax],eax
+Tnots.Noise:OnRenderImage+28: 8D 6D 00                 - lea ebp,[ebp+00]
+Tnots.Noise:OnRenderImage+2b: E8 C0 FB FF FF           - call UnityEngine.Material:SetFloat
+Tnots.Noise:OnRenderImage+30: 89 1C 24                 - mov [esp],ebx
+Tnots.Noise:OnRenderImage+33: E8 18 FA FF FF           - call Tnots.PostProcess:get_Material
+// ---------- INJECTING HERE ----------
+Tnots.Noise:OnRenderImage+38: D9 43 18                 - fld dword ptr [ebx+18]
+Tnots.Noise:OnRenderImage+3b: D9 5C 24 08              - fstp dword ptr [esp+08]
+// ---------- DONE INJECTING  ----------
+Tnots.Noise:OnRenderImage+3f: C7 44 24 04 50 3F 4F 26  - mov [esp+04],264F3F50
+Tnots.Noise:OnRenderImage+47: 89 04 24                 - mov [esp],eax
+Tnots.Noise:OnRenderImage+4a: 39 00                    - cmp [eax],eax
+Tnots.Noise:OnRenderImage+4c: 8D 6D 00                 - lea ebp,[ebp+00]
+Tnots.Noise:OnRenderImage+4f: E8 9C FB FF FF           - call UnityEngine.Material:SetFloat
+Tnots.Noise:OnRenderImage+54: 89 1C 24                 - mov [esp],ebx
+Tnots.Noise:OnRenderImage+57: E8 F4 F9 FF FF           - call Tnots.PostProcess:get_Material
+Tnots.Noise:OnRenderImage+5c: 89 44 24 08              - mov [esp+08],eax
+Tnots.Noise:OnRenderImage+60: 8B 45 10                 - mov eax,[ebp+10]
+Tnots.Noise:OnRenderImage+63: 89 44 24 04              - mov [esp+04],eax
+Tnots.Noise:OnRenderImage+67: 8B 45 0C                 - mov eax,[ebp+0C]
+Tnots.Noise:OnRenderImage+6a: 89 04 24                 - mov [esp],eax
+Tnots.Noise:OnRenderImage+6d: 8B C0                    - mov eax,eax
+Tnots.Noise:OnRenderImage+6f: E8 74 FC FF FF           - call UnityEngine.Graphics:Blit
+Tnots.Noise:OnRenderImage+74: 8D 65 FC                 - lea esp,[ebp-04]
+Tnots.Noise:OnRenderImage+77: 8D 65 FC                 - lea esp,[ebp-04]
+Tnots.Noise:OnRenderImage+7a: 5B                       - pop ebx
+Tnots.Noise:OnRenderImage+7b: C9                       - leave 
+Tnots.Noise:OnRenderImage+7c: C3                       - ret 
+26A258ED: 00 00                    - add [eax],al
+26A258EF: 00 55 8B                 - add [ebp-75],dl
+Tnots.VHSPostProcessEffect:OnRenderImage+2: EC                       - in al,dx
+Tnots.VHSPostProcessEffect:OnRenderImage+3: 53                       - push ebx
+Tnots.VHSPostProcessEffect:OnRenderImage+4: 83 EC 24                 - sub esp,24
+Tnots.VHSPostProcessEffect:OnRenderImage+7: 8B 5D 08                 - mov ebx,[ebp+08]
+Tnots.VHSPostProcessEffect:OnRenderImage+a: 89 1C 24                 - mov [esp],ebx
+Tnots.VHSPostProcessEffect:OnRenderImage+d: 8B C0                    - mov eax,eax
+Tnots.VHSPostProcessEffect:OnRenderImage+f: E8 BC F9 FF FF           - call Tnots.PostProcess:get_Material
+Tnots.VHSPostProcessEffect:OnRenderImage+14: 89 45 F4                 - mov [ebp-0C],eax
+Tnots.VHSPostProcessEffect:OnRenderImage+17: 8B 43 18                 - mov eax,[ebx+18]
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>3</ID>
+          <Description>"Remove VHS Effect"</Description>
+          <Color>008000</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{Game  : Cannibal Abduction.exe
+Author : Glowmoss
+}
+
+[ENABLE]
+
+aobscanregion(vhsremove,FearCore.VFX.VHSPostProcessing:OnRenderImage,FearCore.VFX.VHSPostProcessing:OnRenderImage+89,D9 ? ? D9 ? ? ? C7 ? ? ? ? ? ? ? 89)
+alloc(newmem,128,vhsremove)
+
+registersymbol(vhsremove vhsremove_Orig vhsstop)
+label(return vhsremove_Orig vhsstop)
+
+newmem:
+  fld dword ptr [vhsstop]
+  fstp dword ptr [esp+08]
+  jmp return
+vhsremove_Orig:
+  readmem(vhsremove,7)
+  //fld dword ptr [ebx+1C]
+  //fstp dword ptr [esp+08]
+
+vhsstop:
+  dd 0
+
+vhsremove:
+  jmp newmem
+  nop 2
+return:
+
+[DISABLE]
+
+vhsremove:
+  readmem(vhsremove_Orig,7)
+
+unregistersymbol(*)
+dealloc(*)
+
+{
+// ORIGINAL CODE - INJECTION POINT: Tnots.VHSPostProcessEffect:OnRenderImage+48
+
+Tnots.Noise:OnRenderImage+74: 8D 65 FC                 - lea esp,[ebp-04]
+Tnots.Noise:OnRenderImage+77: 8D 65 FC                 - lea esp,[ebp-04]
+Tnots.Noise:OnRenderImage+7a: 5B                       - pop ebx
+Tnots.Noise:OnRenderImage+7b: C9                       - leave 
+Tnots.Noise:OnRenderImage+7c: C3                       - ret 
+270C74CD: 00 00                    - add [eax],al
+270C74CF: 00 55 8B                 - add [ebp-75],dl
+Tnots.VHSPostProcessEffect:OnRenderImage+2: EC                       - in al,dx
+Tnots.VHSPostProcessEffect:OnRenderImage+3: 53                       - push ebx
+Tnots.VHSPostProcessEffect:OnRenderImage+4: 83 EC 24                 - sub esp,24
+Tnots.VHSPostProcessEffect:OnRenderImage+7: 8B 5D 08                 - mov ebx,[ebp+08]
+Tnots.VHSPostProcessEffect:OnRenderImage+a: 89 1C 24                 - mov [esp],ebx
+Tnots.VHSPostProcessEffect:OnRenderImage+d: 8B C0                    - mov eax,eax
+Tnots.VHSPostProcessEffect:OnRenderImage+f: E8 BC F9 FF FF           - call Tnots.PostProcess:get_Material
+Tnots.VHSPostProcessEffect:OnRenderImage+14: 89 45 F4                 - mov [ebp-0C],eax
+Tnots.VHSPostProcessEffect:OnRenderImage+17: 8B 43 18                 - mov eax,[ebx+18]
+Tnots.VHSPostProcessEffect:OnRenderImage+1a: 89 04 24                 - mov [esp],eax
+Tnots.VHSPostProcessEffect:OnRenderImage+1d: 39 00                    - cmp [eax],eax
+Tnots.VHSPostProcessEffect:OnRenderImage+1f: E8 84 00 00 00           - call UnityEngine.Video.VideoPlayer:get_texture
+Tnots.VHSPostProcessEffect:OnRenderImage+24: 8B C8                    - mov ecx,eax
+Tnots.VHSPostProcessEffect:OnRenderImage+26: 8B 45 F4                 - mov eax,[ebp-0C]
+Tnots.VHSPostProcessEffect:OnRenderImage+29: 89 4C 24 08              - mov [esp+08],ecx
+Tnots.VHSPostProcessEffect:OnRenderImage+2d: C7 44 24 04 60 E4 BB 26  - mov [esp+04],26BBE460
+Tnots.VHSPostProcessEffect:OnRenderImage+35: 89 04 24                 - mov [esp],eax
+Tnots.VHSPostProcessEffect:OnRenderImage+38: 39 00                    - cmp [eax],eax
+Tnots.VHSPostProcessEffect:OnRenderImage+3a: 90                       - nop 
+Tnots.VHSPostProcessEffect:OnRenderImage+3b: E8 18 01 00 00           - call UnityEngine.Material:SetTexture
+Tnots.VHSPostProcessEffect:OnRenderImage+40: 89 1C 24                 - mov [esp],ebx
+Tnots.VHSPostProcessEffect:OnRenderImage+43: E8 88 F9 FF FF           - call Tnots.PostProcess:get_Material
+Tnots.VHSPostProcessEffect:OnRenderImage+48: D9 43 1C                 - fld dword ptr [ebx+1C]
+// ---------- INJECTING HERE ----------
+Tnots.VHSPostProcessEffect:OnRenderImage+4b: D9 5C 24 08              - fstp dword ptr [esp+08]
+// ---------- DONE INJECTING  ----------
+Tnots.VHSPostProcessEffect:OnRenderImage+4f: C7 44 24 04 28 3F B9 26  - mov [esp+04],26B93F28
+Tnots.VHSPostProcessEffect:OnRenderImage+57: 89 04 24                 - mov [esp],eax
+Tnots.VHSPostProcessEffect:OnRenderImage+5a: 39 00                    - cmp [eax],eax
+Tnots.VHSPostProcessEffect:OnRenderImage+5c: 8D 6D 00                 - lea ebp,[ebp+00]
+Tnots.VHSPostProcessEffect:OnRenderImage+5f: E8 0C FB FF FF           - call UnityEngine.Material:SetFloat
+Tnots.VHSPostProcessEffect:OnRenderImage+64: 89 1C 24                 - mov [esp],ebx
+Tnots.VHSPostProcessEffect:OnRenderImage+67: E8 64 F9 FF FF           - call Tnots.PostProcess:get_Material
+Tnots.VHSPostProcessEffect:OnRenderImage+6c: 89 44 24 08              - mov [esp+08],eax
+Tnots.VHSPostProcessEffect:OnRenderImage+70: 8B 45 10                 - mov eax,[ebp+10]
+Tnots.VHSPostProcessEffect:OnRenderImage+73: 89 44 24 04              - mov [esp+04],eax
+Tnots.VHSPostProcessEffect:OnRenderImage+77: 8B 45 0C                 - mov eax,[ebp+0C]
+Tnots.VHSPostProcessEffect:OnRenderImage+7a: 89 04 24                 - mov [esp],eax
+Tnots.VHSPostProcessEffect:OnRenderImage+7d: 8B C0                    - mov eax,eax
+Tnots.VHSPostProcessEffect:OnRenderImage+7f: E8 E4 FB FF FF           - call UnityEngine.Graphics:Blit
+Tnots.VHSPostProcessEffect:OnRenderImage+84: 8D 65 FC                 - lea esp,[ebp-04]
+Tnots.VHSPostProcessEffect:OnRenderImage+87: 8D 65 FC                 - lea esp,[ebp-04]
+Tnots.VHSPostProcessEffect:OnRenderImage+8a: 5B                       - pop ebx
+Tnots.VHSPostProcessEffect:OnRenderImage+8b: C9                       - leave 
+Tnots.VHSPostProcessEffect:OnRenderImage+8c: C3                       - ret 
+270C755D: 00 00                    - add [eax],al
+270C755F: 00 68 30                 - add [eax+30],ch
+270C7562: ED                       - in eax,dx
+270C7563: 79 1F                    - jns UnityEngine.Video.VideoPlayer:get_texture+c
+270C7565: E9 96 8B 89 DD           - jmp 04960100
+270C756A: 00 00                    - add [eax],al
+270C756C: 68 88 89 78 1F           - push 1F788988
+270C7571: E9 8A 8B 89 DD           - jmp 04960100
+270C7576: 00 00                    - add [eax],al
+UnityEngine.Video.VideoPlayer:get_texture: 55                       - push ebp
+UnityEngine.Video.VideoPlayer:get_texture+1: 8B EC                    - mov ebp,esp
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>4</ID>
+          <Description>"Remove Glitch Effect"</Description>
+          <Color>008000</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{Game  : Cannibal Abduction.exe
+Author : Glowmoss
+}
+
+[ENABLE]
+
+define(NoGlitch,FearCore.VFX.GlitchPostProcessing:OnRenderImage)
+alloc(NoGlitch_Orig,8)
+
+registersymbol(NoGlitch NoGlitch_Orig)
+
+NoGlitch_Orig:
+  readmem(NoGlitch,1)
+
+NoGlitch:
+  db C3
+
+[DISABLE]
+
+NoGlitch:
+  readmem(NoGlitch_Orig,1)
+
+unregistersymbol(*)
+dealloc(*)
+
+{
+// ORIGINAL CODE - INJECTION POINT: Tnots.GlitchEffect:OnRenderImage
+
+TMPro.TextMeshProUGUI:InternalUpdate+d0: C3                       - ret 
+TMPro.TextMeshProUGUI:InternalUpdate+d1: 6A 6F                    - push 6F
+TMPro.TextMeshProUGUI:InternalUpdate+d3: 68 86 01 00 00           - push 00000186
+TMPro.TextMeshProUGUI:InternalUpdate+d8: E8 FB 50 4E D6           - call 01291100
+2ADAC005: 00 00                    - add [eax],al
+2ADAC007: 00 68 C8                 - add [eax-38],ch
+2ADAC00A: 6B 14 19 E9              - imul edx,[ecx+ebx],-17
+2ADAC00E: EE                       - out dx,al
+2ADAC00F: 40                       - inc eax
+2ADAC010: 4E                       - dec esi
+2ADAC011: D6                       - db D6
+2ADAC012: 00 00                    - add [eax],al
+2ADAC014: 00 00                    - add [eax],al
+2ADAC016: 00 00                    - add [eax],al
+TMPro.TMP_MaterialManager:OnPreRender: 55                       - push ebp
+TMPro.TMP_MaterialManager:OnPreRender+1: 8B EC                    - mov ebp,esp
+TMPro.TMP_MaterialManager:OnPreRender+3: 83 EC 08                 - sub esp,08
+TMPro.TMP_MaterialManager:OnPreRender+6: 0F B6 05 F8 7E 76 06     - movzx eax,byte ptr [06767EF8]
+TMPro.TMP_MaterialManager:OnPreRender+d: 85 C0                    - test eax,eax
+TMPro.TMP_MaterialManager:OnPreRender+f: 74 0F                    - je TMPro.TMP_MaterialManager:OnPreRender+20
+TMPro.TMP_MaterialManager:OnPreRender+11: 8B C0                    - mov eax,eax
+TMPro.TMP_MaterialManager:OnPreRender+13: E8 0C 00 00 00           - call 2ADAC03C
+TMPro.TMP_MaterialManager:OnPreRender+18: B8 F8 7E 76 06           - mov eax,06767EF8
+TMPro.TMP_MaterialManager:OnPreRender+1d: C6 00 00                 - mov byte ptr [eax],00
+TMPro.TMP_MaterialManager:OnPreRender+20: C9                       - leave 
+TMPro.TMP_MaterialManager:OnPreRender+21: C3                       - ret 
+2ADAC03A: 00 00                    - add [eax],al
+2ADAC03C: 68 78 BC DB 1E           - push 1EDBBC78
+2ADAC041: E9 BA 40 4E D6           - jmp 01290100
+2ADAC046: 00 00                    - add [eax],al
+// ---------- INJECTING HERE ----------
+Tnots.GlitchEffect:OnRenderImage: 55                       - push ebp
+// ---------- DONE INJECTING  ----------
+Tnots.GlitchEffect:OnRenderImage+1: 8B EC                    - mov ebp,esp
+Tnots.GlitchEffect:OnRenderImage+3: 53                       - push ebx
+Tnots.GlitchEffect:OnRenderImage+4: 81 EC C4 00 00 00        - sub esp,000000C4
+Tnots.GlitchEffect:OnRenderImage+a: 8B 5D 08                 - mov ebx,[ebp+08]
+Tnots.GlitchEffect:OnRenderImage+d: 89 1C 24                 - mov [esp],ebx
+Tnots.GlitchEffect:OnRenderImage+10: 8D 6D 00                 - lea ebp,[ebp+00]
+Tnots.GlitchEffect:OnRenderImage+13: E8 40 AE 84 FB           - call Tnots.PostProcess:get_Material
+Tnots.GlitchEffect:OnRenderImage+18: D9 43 18                 - fld dword ptr [ebx+18]
+Tnots.GlitchEffect:OnRenderImage+1b: D9 5C 24 08              - fstp dword ptr [esp+08]
+Tnots.GlitchEffect:OnRenderImage+1f: C7 44 24 04 28 3F 0E 26  - mov [esp+04],260E3F28
+Tnots.GlitchEffect:OnRenderImage+27: 89 04 24                 - mov [esp],eax
+Tnots.GlitchEffect:OnRenderImage+2a: 39 00                    - cmp [eax],eax
+Tnots.GlitchEffect:OnRenderImage+2c: 8D 6D 00                 - lea ebp,[ebp+00]
+Tnots.GlitchEffect:OnRenderImage+2f: E8 C4 AF 84 FB           - call UnityEngine.Material:SetFloat
+Tnots.GlitchEffect:OnRenderImage+34: 89 1C 24                 - mov [esp],ebx
+Tnots.GlitchEffect:OnRenderImage+37: E8 1C AE 84 FB           - call Tnots.PostProcess:get_Material
+Tnots.GlitchEffect:OnRenderImage+3c: D9 43 20                 - fld dword ptr [ebx+20]
+Tnots.GlitchEffect:OnRenderImage+3f: D9 5C 24 08              - fstp dword ptr [esp+08]
+Tnots.GlitchEffect:OnRenderImage+43: C7 44 24 04 20 1A 16 26  - mov [esp+04],26161A20
+Tnots.GlitchEffect:OnRenderImage+4b: 89 04 24                 - mov [esp],eax
+Tnots.GlitchEffect:OnRenderImage+4e: 39 00                    - cmp [eax],eax
+Tnots.GlitchEffect:OnRenderImage+50: 8D 6D 00                 - lea ebp,[ebp+00]
+Tnots.GlitchEffect:OnRenderImage+53: E8 A0 AF 84 FB           - call UnityEngine.Material:SetFloat
+Tnots.GlitchEffect:OnRenderImage+58: 89 1C 24                 - mov [esp],ebx
+Tnots.GlitchEffect:OnRenderImage+5b: E8 F8 AD 84 FB           - call Tnots.PostProcess:get_Material
+Tnots.GlitchEffect:OnRenderImage+60: 8B 4B 14                 - mov ecx,[ebx+14]
+Tnots.GlitchEffect:OnRenderImage+63: 89 4C 24 08              - mov [esp+08],ecx
+Tnots.GlitchEffect:OnRenderImage+67: C7 44 24 04 C0 28 16 26  - mov [esp+04],261628C0
+Tnots.GlitchEffect:OnRenderImage+6f: 89 04 24                 - mov [esp],eax
+Tnots.GlitchEffect:OnRenderImage+72: 39 00                    - cmp [eax],eax
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>5</ID>
+          <Description>"Remove Distortion (usually in chases)"</Description>
+          <Color>008000</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{Game  : Cannibal Abduction.exe
+Author : Glowmoss
+}
+
+[ENABLE]
+
+aobscanregion(distortion,FearCore.VFX.Distortion:OnRenderImage,FearCore.VFX.Distortion:OnRenderImage+C1,D9 ? ? D9 ? ? ? C7 ? ? ? ? ? ? ? 89 ? ? 39 ? 8D ? ? E8)
+alloc(newmem,128,distortion)
+
+registersymbol(distortion distortion_Orig Dist)
+label(return distortion_Orig Dist)
+
+newmem:
+  fld dword ptr [Dist]
+  fstp dword ptr [esp+08]
+  jmp return
+distortion_Orig:
+  readmem(distortion,7)
+  //fld dword ptr [ebx+20]
+  //fstp dword ptr [esp+08]
+
+
+Dist:
+  dd 0
+
+distortion:
+  jmp newmem
+  nop 2
+return:
+
+[DISABLE]
+
+distortion:
+  readmem(distortion_Orig,7)
+
+unregistersymbol(*)
+dealloc(*)
+
+{
+// ORIGINAL CODE - INJECTION POINT: Tnots.Distortion:OnRenderImage+14
+
+Tnots.ThirdPersonCameraControllerBase:LateUpdate+186: 89 4D DC                 - mov [ebp-24],ecx
+Tnots.ThirdPersonCameraControllerBase:LateUpdate+189: 8B 4D B0                 - mov ecx,[ebp-50]
+Tnots.ThirdPersonCameraControllerBase:LateUpdate+18c: 89 4D E0                 - mov [ebp-20],ecx
+Tnots.ThirdPersonCameraControllerBase:LateUpdate+18f: 8B 4D D8                 - mov ecx,[ebp-28]
+Tnots.ThirdPersonCameraControllerBase:LateUpdate+192: 89 4C 24 04              - mov [esp+04],ecx
+Tnots.ThirdPersonCameraControllerBase:LateUpdate+196: 8B 4D DC                 - mov ecx,[ebp-24]
+Tnots.ThirdPersonCameraControllerBase:LateUpdate+199: 89 4C 24 08              - mov [esp+08],ecx
+Tnots.ThirdPersonCameraControllerBase:LateUpdate+19d: 8B 4D E0                 - mov ecx,[ebp-20]
+Tnots.ThirdPersonCameraControllerBase:LateUpdate+1a0: 89 4C 24 0C              - mov [esp+0C],ecx
+Tnots.ThirdPersonCameraControllerBase:LateUpdate+1a4: 89 04 24                 - mov [esp],eax
+Tnots.ThirdPersonCameraControllerBase:LateUpdate+1a7: 39 00                    - cmp [eax],eax
+Tnots.ThirdPersonCameraControllerBase:LateUpdate+1a9: 8B C0                    - mov eax,eax
+Tnots.ThirdPersonCameraControllerBase:LateUpdate+1ab: E8 60 20 48 FE           - call UnityEngine.Transform:set_position
+Tnots.ThirdPersonCameraControllerBase:LateUpdate+1b0: 8D 65 FC                 - lea esp,[ebp-04]
+Tnots.ThirdPersonCameraControllerBase:LateUpdate+1b3: 8D 65 FC                 - lea esp,[ebp-04]
+Tnots.ThirdPersonCameraControllerBase:LateUpdate+1b6: 5F                       - pop edi
+Tnots.ThirdPersonCameraControllerBase:LateUpdate+1b7: C9                       - leave 
+Tnots.ThirdPersonCameraControllerBase:LateUpdate+1b8: C3                       - ret 
+2C0D0699: 00 00                    - add [eax],al
+2C0D069B: 00 00                    - add [eax],al
+2C0D069D: 00 00                    - add [eax],al
+2C0D069F: 00 55 8B                 - add [ebp-75],dl
+Tnots.Distortion:OnRenderImage+2: EC                       - in al,dx
+Tnots.Distortion:OnRenderImage+3: 53                       - push ebx
+Tnots.Distortion:OnRenderImage+4: 83 EC 24                 - sub esp,24
+Tnots.Distortion:OnRenderImage+7: 8B 5D 08                 - mov ebx,[ebp+08]
+Tnots.Distortion:OnRenderImage+a: 89 1C 24                 - mov [esp],ebx
+Tnots.Distortion:OnRenderImage+d: 8B C0                    - mov eax,eax
+Tnots.Distortion:OnRenderImage+f: E8 EC 67 CF FA           - call Tnots.PostProcess:get_Material
+Tnots.Distortion:OnRenderImage+14: D9 43 20                 - fld dword ptr [ebx+20]
+// ---------- INJECTING HERE ----------
+Tnots.Distortion:OnRenderImage+17: D9 5C 24 08              - fstp dword ptr [esp+08]
+// ---------- DONE INJECTING  ----------
+Tnots.Distortion:OnRenderImage+1b: C7 44 24 04 A8 40 7C 26  - mov [esp+04],267C40A8
+Tnots.Distortion:OnRenderImage+23: 89 04 24                 - mov [esp],eax
+Tnots.Distortion:OnRenderImage+26: 39 00                    - cmp [eax],eax
+Tnots.Distortion:OnRenderImage+28: 8D 6D 00                 - lea ebp,[ebp+00]
+Tnots.Distortion:OnRenderImage+2b: E8 70 69 CF FA           - call UnityEngine.Material:SetFloat
+Tnots.Distortion:OnRenderImage+30: 89 1C 24                 - mov [esp],ebx
+Tnots.Distortion:OnRenderImage+33: E8 C8 67 CF FA           - call Tnots.PostProcess:get_Material
+Tnots.Distortion:OnRenderImage+38: D9 43 18                 - fld dword ptr [ebx+18]
+Tnots.Distortion:OnRenderImage+3b: D9 5C 24 08              - fstp dword ptr [esp+08]
+Tnots.Distortion:OnRenderImage+3f: C7 44 24 04 70 40 7C 26  - mov [esp+04],267C4070
+Tnots.Distortion:OnRenderImage+47: 89 04 24                 - mov [esp],eax
+Tnots.Distortion:OnRenderImage+4a: 39 00                    - cmp [eax],eax
+Tnots.Distortion:OnRenderImage+4c: 8D 6D 00                 - lea ebp,[ebp+00]
+Tnots.Distortion:OnRenderImage+4f: E8 4C 69 CF FA           - call UnityEngine.Material:SetFloat
+Tnots.Distortion:OnRenderImage+54: 89 1C 24                 - mov [esp],ebx
+Tnots.Distortion:OnRenderImage+57: E8 A4 67 CF FA           - call Tnots.PostProcess:get_Material
+Tnots.Distortion:OnRenderImage+5c: D9 43 1C                 - fld dword ptr [ebx+1C]
+Tnots.Distortion:OnRenderImage+5f: D9 5C 24 08              - fstp dword ptr [esp+08]
+Tnots.Distortion:OnRenderImage+63: C7 44 24 04 28 0A 01 2C  - mov [esp+04],2C010A28
+Tnots.Distortion:OnRenderImage+6b: 89 04 24                 - mov [esp],eax
+Tnots.Distortion:OnRenderImage+6e: 39 00                    - cmp [eax],eax
+Tnots.Distortion:OnRenderImage+70: 8D 6D 00                 - lea ebp,[ebp+00]
+Tnots.Distortion:OnRenderImage+73: E8 28 69 CF FA           - call UnityEngine.Material:SetFloat
+Tnots.Distortion:OnRenderImage+78: 89 1C 24                 - mov [esp],ebx
+Tnots.Distortion:OnRenderImage+7b: E8 80 67 CF FA           - call Tnots.PostProcess:get_Material
+Tnots.Distortion:OnRenderImage+80: 8B 4B 14                 - mov ecx,[ebx+14]
+Tnots.Distortion:OnRenderImage+83: 89 4C 24 08              - mov [esp+08],ecx
+Tnots.Distortion:OnRenderImage+87: C7 44 24 04 00 0A 01 2C  - mov [esp+04],2C010A00
+Tnots.Distortion:OnRenderImage+8f: 89 04 24                 - mov [esp],eax
+Tnots.Distortion:OnRenderImage+92: 39 00                    - cmp [eax],eax
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>6</ID>
+          <Description>"Sharpness"</Description>
+          <Options moHideChildren="1"/>
+          <Color>008000</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{Game  : Cannibal Abduction.exe
+Author : Glowmoss
+}
+
+[ENABLE]
+
+aobscanregion(Sharp,FearCore.VFX.SharpenPostProcessing:OnRenderImage,FearCore.VFX.SharpenPostProcessing:OnRenderImage+79,D9 ? ? D9 ? ? ? C7 ? ? ? ? ? ? ? 89 ? ? 39 ? 8D ? ? E8 ? ? ? ? 89 ? ? E8 ? ? ? ? 89)
+alloc(newmem,128,Sharp)
+
+registersymbol(Sharp Sharp_Orig SHP)
+label(return Sharp_Orig SHP)
+
+newmem:
+  fld dword ptr [SHP]
+  fstp dword ptr [esp+08]
+  jmp return
+Sharp_Orig:
+  readmem(Sharp,7)
+  //fld dword ptr [ebx+18]
+  //fstp dword ptr [esp+08]
+
+SHP:
+  dd (float)1
+
+Sharp:
+  jmp newmem
+  nop 2
+return:
+
+[DISABLE]
+
+Sharp:
+  readmem(Sharp_Orig,7)
+
+unregistersymbol(*)
+dealloc(*)
+
+{
+// ORIGINAL CODE - INJECTION POINT: Tnots.SharpenPostProcessing:OnRenderImage+38
+
+UnityEngine.Graphics:Internal_BlitMaterial5+8f: C3                       - ret 
+UnityEngine.Graphics:Internal_BlitMaterial5+90: 83 EC 0C                 - sub esp,0C
+UnityEngine.Graphics:Internal_BlitMaterial5+93: 56                       - push esi
+UnityEngine.Graphics:Internal_BlitMaterial5+94: 8D 6D 00                 - lea ebp,[ebp+00]
+UnityEngine.Graphics:Internal_BlitMaterial5+97: E8 1C B4 63 DD           - call 04060B40
+UnityEngine.Graphics:Internal_BlitMaterial5+9c: 8D 6D 00                 - lea ebp,[ebp+00]
+UnityEngine.Graphics:Internal_BlitMaterial5+9f: E8 04 B9 6A E0           - call 070D1030
+UnityEngine.Graphics:Internal_BlitMaterial5+a4: 8B F0                    - mov esi,eax
+UnityEngine.Graphics:Internal_BlitMaterial5+a6: 85 C0                    - test eax,eax
+UnityEngine.Graphics:Internal_BlitMaterial5+a8: 75 E6                    - jne UnityEngine.Graphics:Internal_BlitMaterial5+90
+UnityEngine.Graphics:Internal_BlitMaterial5+aa: EB C0                    - jmp UnityEngine.Graphics:Internal_BlitMaterial5+6c
+26A25734: 00 00                    - add [eax],al
+26A25736: 00 00                    - add [eax],al
+Tnots.SharpenPostProcessing:OnRenderImage: 55                       - push ebp
+Tnots.SharpenPostProcessing:OnRenderImage+1: 8B EC                    - mov ebp,esp
+Tnots.SharpenPostProcessing:OnRenderImage+3: 53                       - push ebx
+Tnots.SharpenPostProcessing:OnRenderImage+4: 83 EC 24                 - sub esp,24
+Tnots.SharpenPostProcessing:OnRenderImage+7: 8B 5D 08                 - mov ebx,[ebp+08]
+Tnots.SharpenPostProcessing:OnRenderImage+a: 89 1C 24                 - mov [esp],ebx
+Tnots.SharpenPostProcessing:OnRenderImage+d: 8B C0                    - mov eax,eax
+Tnots.SharpenPostProcessing:OnRenderImage+f: E8 74 FB FF FF           - call Tnots.PostProcess:get_Material
+Tnots.SharpenPostProcessing:OnRenderImage+14: D9 43 14                 - fld dword ptr [ebx+14]
+Tnots.SharpenPostProcessing:OnRenderImage+17: D9 5C 24 08              - fstp dword ptr [esp+08]
+Tnots.SharpenPostProcessing:OnRenderImage+1b: C7 44 24 04 E0 E4 51 26  - mov [esp+04],2651E4E0
+Tnots.SharpenPostProcessing:OnRenderImage+23: 89 04 24                 - mov [esp],eax
+Tnots.SharpenPostProcessing:OnRenderImage+26: 39 00                    - cmp [eax],eax
+Tnots.SharpenPostProcessing:OnRenderImage+28: 8D 6D 00                 - lea ebp,[ebp+00]
+Tnots.SharpenPostProcessing:OnRenderImage+2b: E8 F8 FC FF FF           - call UnityEngine.Material:SetFloat
+Tnots.SharpenPostProcessing:OnRenderImage+30: 89 1C 24                 - mov [esp],ebx
+Tnots.SharpenPostProcessing:OnRenderImage+33: E8 50 FB FF FF           - call Tnots.PostProcess:get_Material
+// ---------- INJECTING HERE ----------
+Tnots.SharpenPostProcessing:OnRenderImage+38: D9 43 18                 - fld dword ptr [ebx+18]
+// ---------- DONE INJECTING  ----------
+Tnots.SharpenPostProcessing:OnRenderImage+3b: D9 5C 24 08              - fstp dword ptr [esp+08]
+Tnots.SharpenPostProcessing:OnRenderImage+3f: C7 44 24 04 C0 E4 51 26  - mov [esp+04],2651E4C0
+Tnots.SharpenPostProcessing:OnRenderImage+47: 89 04 24                 - mov [esp],eax
+Tnots.SharpenPostProcessing:OnRenderImage+4a: 39 00                    - cmp [eax],eax
+Tnots.SharpenPostProcessing:OnRenderImage+4c: 8D 6D 00                 - lea ebp,[ebp+00]
+Tnots.SharpenPostProcessing:OnRenderImage+4f: E8 D4 FC FF FF           - call UnityEngine.Material:SetFloat
+Tnots.SharpenPostProcessing:OnRenderImage+54: 89 1C 24                 - mov [esp],ebx
+Tnots.SharpenPostProcessing:OnRenderImage+57: E8 2C FB FF FF           - call Tnots.PostProcess:get_Material
+Tnots.SharpenPostProcessing:OnRenderImage+5c: 89 44 24 08              - mov [esp+08],eax
+Tnots.SharpenPostProcessing:OnRenderImage+60: 8B 45 10                 - mov eax,[ebp+10]
+Tnots.SharpenPostProcessing:OnRenderImage+63: 89 44 24 04              - mov [esp+04],eax
+Tnots.SharpenPostProcessing:OnRenderImage+67: 8B 45 0C                 - mov eax,[ebp+0C]
+Tnots.SharpenPostProcessing:OnRenderImage+6a: 89 04 24                 - mov [esp],eax
+Tnots.SharpenPostProcessing:OnRenderImage+6d: 8B C0                    - mov eax,eax
+Tnots.SharpenPostProcessing:OnRenderImage+6f: E8 AC FD FF FF           - call UnityEngine.Graphics:Blit
+Tnots.SharpenPostProcessing:OnRenderImage+74: 8D 65 FC                 - lea esp,[ebp-04]
+Tnots.SharpenPostProcessing:OnRenderImage+77: 8D 65 FC                 - lea esp,[ebp-04]
+Tnots.SharpenPostProcessing:OnRenderImage+7a: 5B                       - pop ebx
+Tnots.SharpenPostProcessing:OnRenderImage+7b: C9                       - leave 
+Tnots.SharpenPostProcessing:OnRenderImage+7c: C3                       - ret 
+26A257B5: 00 00                    - add [eax],al
+26A257B7: 00 55 8B                 - add [ebp-75],dl
+Tnots.ChromaticAberration:OnRenderImage+2: EC                       - in al,dx
+Tnots.ChromaticAberration:OnRenderImage+3: 53                       - push ebx
+Tnots.ChromaticAberration:OnRenderImage+4: 83 EC 24                 - sub esp,24
+Tnots.ChromaticAberration:OnRenderImage+7: 8B 5D 08                 - mov ebx,[ebp+08]
+Tnots.ChromaticAberration:OnRenderImage+a: 89 1C 24                 - mov [esp],ebx
+Tnots.ChromaticAberration:OnRenderImage+d: 8B C0                    - mov eax,eax
+Tnots.ChromaticAberration:OnRenderImage+f: E8 F4 FA FF FF           - call Tnots.PostProcess:get_Material
+Tnots.ChromaticAberration:OnRenderImage+14: D9 05 70 F1 0E 1F        - fld dword ptr [1F0EF170]
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>7</ID>
+              <Description>"Value (default = 1)"</Description>
+              <Color>FFFF00</Color>
+              <VariableType>Float</VariableType>
+              <Address>SHP</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>8</ID>
+          <Description>"No DMG (This will help unlock the no dmg achievement)"</Description>
+          <Color>008000</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{Game  : Cannibal Abduction.exe
+Author : Glowmoss
+}
+
+[ENABLE]
+
+define(dmg,FearCore.Gameplay.PlayerController:TakeDamage)
+alloc(dmg_Orig,8)
+
+registersymbol(dmg dmg_Orig)
+
+dmg_Orig:
+  readmem(dmg,1)
+
+dmg:
+  db C3
+
+[DISABLE]
+
+dmg:
+  readmem(dmg_Orig,1)
+
+unregistersymbol(*)
+dealloc(*)
+
+{
+// ORIGINAL CODE - INJECTION POINT: Tnots.PlayerController:TakeDamage
+
+Tnots.EnemyController:HandleStabPerform+5c: 8D 6D 00                 - lea ebp,[ebp+00]
+Tnots.EnemyController:HandleStabPerform+5f: E8 54 00 00 00           - call Tnots.PlayerController:TakeDamage
+Tnots.EnemyController:HandleStabPerform+64: 8B 47 24                 - mov eax,[edi+24]
+Tnots.EnemyController:HandleStabPerform+67: 89 04 24                 - mov [esp],eax
+Tnots.EnemyController:HandleStabPerform+6a: 39 00                    - cmp [eax],eax
+Tnots.EnemyController:HandleStabPerform+6c: 8D 6D 00                 - lea ebp,[ebp+00]
+Tnots.EnemyController:HandleStabPerform+6f: E8 6C 02 00 00           - call Tnots.EnemyAestheticController:PlayStabSFX
+Tnots.EnemyController:HandleStabPerform+74: 8D 6D 00                 - lea ebp,[ebp+00]
+Tnots.EnemyController:HandleStabPerform+77: E8 E4 FC 00 FB           - call UnityEngine.Time:get_time
+Tnots.EnemyController:HandleStabPerform+7c: D9 47 48                 - fld dword ptr [edi+48]
+Tnots.EnemyController:HandleStabPerform+7f: DE C1                    - faddp 
+Tnots.EnemyController:HandleStabPerform+81: D9 5F 58                 - fstp dword ptr [edi+58]
+Tnots.EnemyController:HandleStabPerform+84: D9 47 44                 - fld dword ptr [edi+44]
+Tnots.EnemyController:HandleStabPerform+87: D9 5C 24 08              - fstp dword ptr [esp+08]
+Tnots.EnemyController:HandleStabPerform+8b: C7 44 24 04 48 08 01 2C  - mov [esp+04],2C010848
+Tnots.EnemyController:HandleStabPerform+93: 89 3C 24                 - mov [esp],edi
+Tnots.EnemyController:HandleStabPerform+96: 90                       - nop 
+Tnots.EnemyController:HandleStabPerform+97: E8 DC E3 9F F8           - call UnityEngine.MonoBehaviour:Invoke
+Tnots.EnemyController:HandleStabPerform+9c: 8D 65 F8                 - lea esp,[ebp-08]
+Tnots.EnemyController:HandleStabPerform+9f: 8D 65 F8                 - lea esp,[ebp-08]
+Tnots.EnemyController:HandleStabPerform+a2: 5E                       - pop esi
+Tnots.EnemyController:HandleStabPerform+a3: 5F                       - pop edi
+Tnots.EnemyController:HandleStabPerform+a4: C9                       - leave 
+Tnots.EnemyController:HandleStabPerform+a5: C3                       - ret 
+2BA9DA6E: 00 00                    - add [eax],al
+2BA9DA70: 68 70 E2 42 19           - push 1942E270
+2BA9DA75: E9 86 26 4C D7           - jmp 02F60100
+2BA9DA7A: 00 00                    - add [eax],al
+2BA9DA7C: 00 00                    - add [eax],al
+2BA9DA7E: 00 00                    - add [eax],al
+// ---------- INJECTING HERE ----------
+Tnots.PlayerController:TakeDamage: 55                       - push ebp
+// ---------- DONE INJECTING  ----------
+Tnots.PlayerController:TakeDamage+1: 8B EC                    - mov ebp,esp
+Tnots.PlayerController:TakeDamage+3: 56                       - push esi
+Tnots.PlayerController:TakeDamage+4: 83 EC 24                 - sub esp,24
+Tnots.PlayerController:TakeDamage+7: 8B 45 08                 - mov eax,[ebp+08]
+Tnots.PlayerController:TakeDamage+a: 8B 40 10                 - mov eax,[eax+10]
+Tnots.PlayerController:TakeDamage+d: 89 04 24                 - mov [esp],eax
+Tnots.PlayerController:TakeDamage+10: 39 00                    - cmp [eax],eax
+Tnots.PlayerController:TakeDamage+12: 90                       - nop 
+Tnots.PlayerController:TakeDamage+13: E8 48 00 00 00           - call Tnots.PlayerAestheticController:PlayTakeDamage
+Tnots.PlayerController:TakeDamage+18: 8B 45 08                 - mov eax,[ebp+08]
+Tnots.PlayerController:TakeDamage+1b: 8B 40 2C                 - mov eax,[eax+2C]
+Tnots.PlayerController:TakeDamage+1e: 8B F0                    - mov esi,eax
+Tnots.PlayerController:TakeDamage+20: 85 C0                    - test eax,eax
+Tnots.PlayerController:TakeDamage+22: 75 02                    - jne Tnots.PlayerController:TakeDamage+26
+Tnots.PlayerController:TakeDamage+24: EB 06                    - jmp Tnots.PlayerController:TakeDamage+2c
+Tnots.PlayerController:TakeDamage+26: 89 34 24                 - mov [esp],esi
+Tnots.PlayerController:TakeDamage+29: FF 56 0C                 - call dword ptr [esi+0C]
+Tnots.PlayerController:TakeDamage+2c: 8B 45 0C                 - mov eax,[ebp+0C]
+Tnots.PlayerController:TakeDamage+2f: 3D 01 00 00 00           - cmp eax,00000001
+Tnots.PlayerController:TakeDamage+34: 75 14                    - jne Tnots.PlayerController:TakeDamage+4a
+Tnots.PlayerController:TakeDamage+36: 8B 45 08                 - mov eax,[ebp+08]
+Tnots.PlayerController:TakeDamage+39: 8B 40 30                 - mov eax,[eax+30]
+Tnots.PlayerController:TakeDamage+3c: 8B F0                    - mov esi,eax
+Tnots.PlayerController:TakeDamage+3e: 85 C0                    - test eax,eax
+Tnots.PlayerController:TakeDamage+40: 75 02                    - jne Tnots.PlayerController:TakeDamage+44
+Tnots.PlayerController:TakeDamage+42: EB 06                    - jmp Tnots.PlayerController:TakeDamage+4a
+Tnots.PlayerController:TakeDamage+44: 89 34 24                 - mov [esp],esi
+Tnots.PlayerController:TakeDamage+47: FF 56 0C                 - call dword ptr [esi+0C]
+Tnots.PlayerController:TakeDamage+4a: 8D 65 FC                 - lea esp,[ebp-04]
+Tnots.PlayerController:TakeDamage+4d: 8D 65 FC                 - lea esp,[ebp-04]
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>9</ID>
+          <Description>"Inf Stamina"</Description>
+          <Color>008000</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{Game  : Cannibal Abduction.exe
+Author : Glowmoss
+}
+
+[ENABLE]
+
+define(InfStam,FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints)
+alloc(InfStam_Orig,8)
+
+registersymbol(InfStam InfStam_Orig)
+
+InfStam_Orig:
+  readmem(InfStam,1)
+
+InfStam:
+  db C3
+
+[DISABLE]
+
+InfStam:
+  readmem(InfStam_Orig,1)
+
+unregistersymbol(*)
+dealloc(*)
+
+{
+// ORIGINAL CODE - INJECTION POINT: FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints
+
+FearCore.Gameplay.PlayerHealth:Update+2c: DE C9           - fmulp st(1),st(0)
+FearCore.Gameplay.PlayerHealth:Update+2e: DE E9           - fsubp st(1),st(0)
+FearCore.Gameplay.PlayerHealth:Update+30: D9 5C 24 04     - fstp dword ptr [esp+04]
+FearCore.Gameplay.PlayerHealth:Update+34: 89 3C 24        - mov [esp],edi
+FearCore.Gameplay.PlayerHealth:Update+37: E8 44 00 00 00  - call FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints
+FearCore.Gameplay.PlayerHealth:Update+3c: EB 2A           - jmp FearCore.Gameplay.PlayerHealth:Update+68
+FearCore.Gameplay.PlayerHealth:Update+3e: D9 47 48        - fld dword ptr [edi+48]
+FearCore.Gameplay.PlayerHealth:Update+41: DD 5D F0        - fstp qword ptr [ebp-10]
+FearCore.Gameplay.PlayerHealth:Update+44: 8D 6D 00        - lea ebp,[ebp+00]
+FearCore.Gameplay.PlayerHealth:Update+47: E8 54 8A BC F0  - call UnityEngine.Time:get_deltaTime
+FearCore.Gameplay.PlayerHealth:Update+4c: DD 45 F0        - fld qword ptr [ebp-10]
+FearCore.Gameplay.PlayerHealth:Update+4f: D9 47 40        - fld dword ptr [edi+40]
+FearCore.Gameplay.PlayerHealth:Update+52: D9 CA           - fxch st(2)
+FearCore.Gameplay.PlayerHealth:Update+54: D9 C9           - fxch st(1)
+FearCore.Gameplay.PlayerHealth:Update+56: D9 CA           - fxch st(2)
+FearCore.Gameplay.PlayerHealth:Update+58: DE C9           - fmulp st(1),st(0)
+FearCore.Gameplay.PlayerHealth:Update+5a: DE C1           - faddp 
+FearCore.Gameplay.PlayerHealth:Update+5c: D9 5C 24 04     - fstp dword ptr [esp+04]
+FearCore.Gameplay.PlayerHealth:Update+60: 89 3C 24        - mov [esp],edi
+FearCore.Gameplay.PlayerHealth:Update+63: E8 18 00 00 00  - call FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints
+FearCore.Gameplay.PlayerHealth:Update+68: 8D 65 FC        - lea esp,[ebp-04]
+FearCore.Gameplay.PlayerHealth:Update+6b: 5F              - pop edi
+FearCore.Gameplay.PlayerHealth:Update+6c: C9              - leave 
+FearCore.Gameplay.PlayerHealth:Update+6d: C3              - ret 
+39762E06: 00 00           - add [eax],al
+39762E08: 68 38 09 CD 1E  - push 1ECD0938
+39762E0D: E9 EE D2 F8 CF  - jmp 096F0100
+39762E12: 00 00           - add [eax],al
+39762E14: 00 00           - add [eax],al
+39762E16: 00 00           - add [eax],al
+// ---------- INJECTING HERE ----------
+FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints: 55              - push ebp
+// ---------- DONE INJECTING  ----------
+FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints+1: 8B EC           - mov ebp,esp
+FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints+3: 57              - push edi
+FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints+4: 56              - push esi
+FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints+5: 83 EC 20        - sub esp,20
+FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints+8: 8B 7D 08        - mov edi,[ebp+08]
+FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints+b: D9 45 0C        - fld dword ptr [ebp+0C]
+FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints+e: D9 EE           - fldz 
+FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints+10: D9 E8           - fld1 
+FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints+12: D9 5C 24 08     - fstp dword ptr [esp+08]
+FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints+16: D9 5C 24 04     - fstp dword ptr [esp+04]
+FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints+1a: D9 1C 24        - fstp dword ptr [esp]
+FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints+1d: 8B C0           - mov eax,eax
+FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints+1f: E8 74 CD 54 D0  - call UnityEngine.Mathf:Clamp
+FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints+24: D9 5D 0C        - fstp dword ptr [ebp+0C]
+FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints+27: D9 45 0C        - fld dword ptr [ebp+0C]
+FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints+2a: D9 EE           - fldz 
+FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints+2c: DF F1           - fcomip st(0),st(1)
+FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints+2e: DD D8           - fstp st(0)
+FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints+30: 75 23           - jne FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints+55
+FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints+32: 7A 21           - jp FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints+55
+FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints+34: 72 1F           - jb FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints+55
+FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints+36: C6 47 4F 01     - mov byte ptr [edi+4F],01
+FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints+3a: 8B 47 14        - mov eax,[edi+14]
+FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints+3d: 8B C8           - mov ecx,eax
+FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints+3f: 8B F1           - mov esi,ecx
+FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints+41: 85 C0           - test eax,eax
+FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints+43: 75 05           - jne FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints+4a
+FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints+45: E9 6A 00 00 00  - jmp FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints+b4
+FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints+4a: 89 34 24        - mov [esp],esi
+FearCore.Gameplay.PlayerHealth:UpdateCurrentStaminaPoints+4d: FF 56 0C        - call dword ptr [esi+0C]
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>10</ID>
+          <Description>"Freeze Killer"</Description>
+          <Color>008000</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{Game  : Cannibal Abduction.exe
+Author : Glowmoss
+}
+
+[ENABLE]
+
+define(freezeEn,FearCore.Gameplay.EnemyController:HandleChasingPlayerState)
+alloc(freezeEn_Orig,8)
+
+registersymbol(freezeEn freezeEn_Orig)
+
+freezeEn_Orig:
+  readmem(freezeEn,1)
+
+freezeEn:
+  db C3
+
+[DISABLE]
+
+freezeEn:
+  readmem(freezeEn_Orig,1)
+
+unregistersymbol(*)
+dealloc(*)
+
+{
+// ORIGINAL CODE - INJECTION POINT: Tnots.EnemyController:HandleChasingState
+
+2BA9CECC: 00 00              - add [eax],al
+2BA9CECE: 00 00              - add [eax],al
+Tnots.EnemyController:set_CurrentChaseTime: 55                 - push ebp
+Tnots.EnemyController:set_CurrentChaseTime+1: 8B EC              - mov ebp,esp
+Tnots.EnemyController:set_CurrentChaseTime+3: 83 EC 18           - sub esp,18
+Tnots.EnemyController:set_CurrentChaseTime+6: D9 45 0C           - fld dword ptr [ebp+0C]
+Tnots.EnemyController:set_CurrentChaseTime+9: D9 EE              - fldz 
+Tnots.EnemyController:set_CurrentChaseTime+b: 8B 45 08           - mov eax,[ebp+08]
+Tnots.EnemyController:set_CurrentChaseTime+e: D9 40 50           - fld dword ptr [eax+50]
+Tnots.EnemyController:set_CurrentChaseTime+11: D9 5C 24 08        - fstp dword ptr [esp+08]
+Tnots.EnemyController:set_CurrentChaseTime+15: D9 5C 24 04        - fstp dword ptr [esp+04]
+Tnots.EnemyController:set_CurrentChaseTime+19: D9 1C 24           - fstp dword ptr [esp]
+Tnots.EnemyController:set_CurrentChaseTime+1c: 8D 6D 00           - lea ebp,[ebp+00]
+Tnots.EnemyController:set_CurrentChaseTime+1f: E8 BC 3A 30 F6     - call UnityEngine.Mathf:Clamp
+Tnots.EnemyController:set_CurrentChaseTime+24: 8B 45 08           - mov eax,[ebp+08]
+Tnots.EnemyController:set_CurrentChaseTime+27: D9 58 4C           - fstp dword ptr [eax+4C]
+Tnots.EnemyController:set_CurrentChaseTime+2a: C9                 - leave 
+Tnots.EnemyController:set_CurrentChaseTime+2b: C3                 - ret 
+2BA9CEFC: 00 00              - add [eax],al
+2BA9CEFE: 00 00              - add [eax],al
+Tnots.FearManager:OnKillerChaseState: 55                 - push ebp
+Tnots.FearManager:OnKillerChaseState+1: 8B EC              - mov ebp,esp
+Tnots.FearManager:OnKillerChaseState+3: 83 EC 08           - sub esp,08
+Tnots.FearManager:OnKillerChaseState+6: 8B 45 08           - mov eax,[ebp+08]
+Tnots.FearManager:OnKillerChaseState+9: C6 40 4F 01        - mov byte ptr [eax+4F],01
+Tnots.FearManager:OnKillerChaseState+d: C6 40 50 00        - mov byte ptr [eax+50],00
+Tnots.FearManager:OnKillerChaseState+11: C6 40 4C 01        - mov byte ptr [eax+4C],01
+Tnots.FearManager:OnKillerChaseState+15: C9                 - leave 
+Tnots.FearManager:OnKillerChaseState+16: C3                 - ret 
+2BA9CF17: 00                 - db 00 
+// ---------- INJECTING HERE ----------
+Tnots.EnemyController:HandleChasingState: C3                 - ret 
+// ---------- DONE INJECTING  ----------
+Tnots.EnemyController:HandleChasingState+1: 8B EC              - mov ebp,esp
+Tnots.EnemyController:HandleChasingState+3: 57                 - push edi
+Tnots.EnemyController:HandleChasingState+4: 81 EC B4 00 00 00  - sub esp,000000B4
+Tnots.EnemyController:HandleChasingState+a: 8B 7D 08           - mov edi,[ebp+08]
+Tnots.EnemyController:HandleChasingState+d: 8B 47 1C           - mov eax,[edi+1C]
+Tnots.EnemyController:HandleChasingState+10: 8B 4F 18           - mov ecx,[edi+18]
+Tnots.EnemyController:HandleChasingState+13: 89 4C 24 04        - mov [esp+04],ecx
+Tnots.EnemyController:HandleChasingState+17: 89 04 24           - mov [esp],eax
+Tnots.EnemyController:HandleChasingState+1a: 39 00              - cmp [eax],eax
+Tnots.EnemyController:HandleChasingState+1c: 8D 6D 00           - lea ebp,[ebp+00]
+Tnots.EnemyController:HandleChasingState+1f: E8 74 03 00 00     - call Tnots.EnemyAwarenessController:IsInAttackArea
+Tnots.EnemyController:HandleChasingState+24: 85 C0              - test eax,eax
+Tnots.EnemyController:HandleChasingState+26: 0F 84 05 01 00 00  - je Tnots.EnemyController:HandleChasingState+131
+Tnots.EnemyController:HandleChasingState+2c: 8B 47 24           - mov eax,[edi+24]
+Tnots.EnemyController:HandleChasingState+2f: 89 85 6C FF FF FF  - mov [ebp-00000094],eax
+Tnots.EnemyController:HandleChasingState+35: 8B 47 18           - mov eax,[edi+18]
+Tnots.EnemyController:HandleChasingState+38: 8D 4D A0           - lea ecx,[ebp-60]
+Tnots.EnemyController:HandleChasingState+3b: 89 4C 24 04        - mov [esp+04],ecx
+Tnots.EnemyController:HandleChasingState+3f: 89 04 24           - mov [esp],eax
+Tnots.EnemyController:HandleChasingState+42: 39 00              - cmp [eax],eax
+Tnots.EnemyController:HandleChasingState+44: 8D 6D 00           - lea ebp,[ebp+00]
+Tnots.EnemyController:HandleChasingState+47: E8 B4 F0 FF FF     - call Tnots.PlayerController:get_WorldPosition
+Tnots.EnemyController:HandleChasingState+4c: 83 EC 04           - sub esp,04
+Tnots.EnemyController:HandleChasingState+4f: 89 3C 24           - mov [esp],edi
+Tnots.EnemyController:HandleChasingState+52: 90                 - nop 
+Tnots.EnemyController:HandleChasingState+53: E8 D0 AD 9F F8     - call UnityEngine.Component:get_transform
+Tnots.EnemyController:HandleChasingState+58: 8D 4D AC           - lea ecx,[ebp-54]
+Tnots.EnemyController:HandleChasingState+5b: 89 4C 24 04        - mov [esp+04],ecx
+Tnots.EnemyController:HandleChasingState+5f: 89 04 24           - mov [esp],eax
+Tnots.EnemyController:HandleChasingState+62: 39 00              - cmp [eax],eax
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>81</ID>
+          <Description>"Unlock Numeric Padlock"</Description>
+          <Color>008000</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{Game  : Cannibal Abduction.exe
+Author : Glowmoss
+}
+
+[ENABLE]
+
+define(Unlock,FearCore.Gameplay.NumericPadlockController:UnlockFail)
+alloc(Unlock_Orig,8)
+
+registersymbol(Unlock Unlock_Orig)
+
+Unlock_Orig:
+  readmem(Unlock,8)
+
+Unlock:
+  jmp FearCore.Gameplay.NumericPadlockController:UnlockSuccess
+
+[DISABLE]
+
+Unlock:
+  readmem(Unlock_Orig,8)
+
+unregistersymbol(*)
+dealloc(*)
+
+{
+// ORIGINAL CODE - INJECTION POINT: FearCore.Gameplay.NumericPadlockController:UnlockSuccess
+
+TMPro.TextMeshProUGUI:OnDestroy+35: 8B C0                    - mov eax,eax
+TMPro.TextMeshProUGUI:OnDestroy+37: E8 3C 9A 52 22           - call UnityEngine.Object:op_Inequality
+TMPro.TextMeshProUGUI:OnDestroy+3c: 85 C0                    - test eax,eax
+TMPro.TextMeshProUGUI:OnDestroy+3e: 74 10                    - je TMPro.TextMeshProUGUI:OnDestroy+50
+TMPro.TextMeshProUGUI:OnDestroy+40: 8B 87 0C 01 00 00        - mov eax,[edi+0000010C]
+TMPro.TextMeshProUGUI:OnDestroy+46: 89 04 24                 - mov [esp],eax
+TMPro.TextMeshProUGUI:OnDestroy+49: 8B C0                    - mov eax,eax
+TMPro.TextMeshProUGUI:OnDestroy+4b: E8 F8 7A FE FF           - call UnityEngine.Object:DestroyImmediate
+TMPro.TextMeshProUGUI:OnDestroy+50: 8B 47 5C                 - mov eax,[edi+5C]
+TMPro.TextMeshProUGUI:OnDestroy+53: C7 44 24 04 00 00 00 00  - mov [esp+04],00000000
+TMPro.TextMeshProUGUI:OnDestroy+5b: 89 04 24                 - mov [esp],eax
+TMPro.TextMeshProUGUI:OnDestroy+5e: 90                       - nop 
+TMPro.TextMeshProUGUI:OnDestroy+5f: E8 14 9A 52 22           - call UnityEngine.Object:op_Inequality
+TMPro.TextMeshProUGUI:OnDestroy+64: 85 C0                    - test eax,eax
+TMPro.TextMeshProUGUI:OnDestroy+66: 74 13                    - je TMPro.TextMeshProUGUI:OnDestroy+7b
+TMPro.TextMeshProUGUI:OnDestroy+68: 8B 47 5C                 - mov eax,[edi+5C]
+TMPro.TextMeshProUGUI:OnDestroy+6b: 89 04 24                 - mov [esp],eax
+TMPro.TextMeshProUGUI:OnDestroy+6e: 90                       - nop 
+TMPro.TextMeshProUGUI:OnDestroy+6f: E8 14 00 00 00           - call 01815F98
+TMPro.TextMeshProUGUI:OnDestroy+74: C7 47 5C 00 00 00 00     - mov [edi+5C],00000000
+TMPro.TextMeshProUGUI:OnDestroy+7b: C6 87 B8 05 00 00 00     - mov byte ptr [edi+000005B8],00
+TMPro.TextMeshProUGUI:OnDestroy+82: 8D 65 FC                 - lea esp,[ebp-04]
+TMPro.TextMeshProUGUI:OnDestroy+85: 5F                       - pop edi
+TMPro.TextMeshProUGUI:OnDestroy+86: C9                       - leave 
+TMPro.TextMeshProUGUI:OnDestroy+87: C3                       - ret 
+01815F98: 68 18 D6 63 41           - push 4163D618
+01815F9D: E9 5E A1 CD 07           - jmp 094F0100
+01815FA2: 00 00                    - add [eax],al
+01815FA4: 00 00                    - add [eax],al
+01815FA6: 00 00                    - add [eax],al
+// ---------- INJECTING HERE ----------
+FearCore.Gameplay.NumericPadlockController:UnlockSuccess: 55                       - push ebp
+// ---------- DONE INJECTING  ----------
+FearCore.Gameplay.NumericPadlockController:UnlockSuccess+1: 8B EC                    - mov ebp,esp
+FearCore.Gameplay.NumericPadlockController:UnlockSuccess+3: 57                       - push edi
+FearCore.Gameplay.NumericPadlockController:UnlockSuccess+4: 83 EC 24                 - sub esp,24
+FearCore.Gameplay.NumericPadlockController:UnlockSuccess+7: 8B 7D 08                 - mov edi,[ebp+08]
+FearCore.Gameplay.NumericPadlockController:UnlockSuccess+a: C7 47 34 01 00 00 00     - mov [edi+34],00000001
+FearCore.Gameplay.NumericPadlockController:UnlockSuccess+11: 8B 47 1C                 - mov eax,[edi+1C]
+FearCore.Gameplay.NumericPadlockController:UnlockSuccess+14: 89 04 24                 - mov [esp],eax
+FearCore.Gameplay.NumericPadlockController:UnlockSuccess+17: 39 00                    - cmp [eax],eax
+FearCore.Gameplay.NumericPadlockController:UnlockSuccess+19: 8B C0                    - mov eax,eax
+FearCore.Gameplay.NumericPadlockController:UnlockSuccess+1b: E8 94 AA FE FF           - call 01800A5C
+FearCore.Gameplay.NumericPadlockController:UnlockSuccess+20: 8D 65 FC                 - lea esp,[ebp-04]
+FearCore.Gameplay.NumericPadlockController:UnlockSuccess+23: 5F                       - pop edi
+FearCore.Gameplay.NumericPadlockController:UnlockSuccess+24: C9                       - leave 
+FearCore.Gameplay.NumericPadlockController:UnlockSuccess+25: C3                       - ret 
+01815FCE: 00 00                    - add [eax],al
+01815FD0: 00 00                    - add [eax],al
+01815FD2: 00 00                    - add [eax],al
+01815FD4: 00 00                    - add [eax],al
+01815FD6: 00 00                    - add [eax],al
+01815FD8: 00 00                    - add [eax],al
+01815FDA: 00 00                    - add [eax],al
+01815FDC: 00 00                    - add [eax],al
+01815FDE: 00 00                    - add [eax],al
+01815FE0: 00 00                    - add [eax],al
+01815FE2: 00 00                    - add [eax],al
+01815FE4: 00 00                    - add [eax],al
+01815FE6: 00 00                    - add [eax],al
+01815FE8: 00 00                    - add [eax],al
+01815FEA: 00 00                    - add [eax],al
+01815FEC: 00 00                    - add [eax],al
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>82</ID>
+          <Description>"Save Without Tape"</Description>
+          <Color>008000</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{Game  : Cannibal Abduction.exe
+Author : Glowmoss
+}
+
+[ENABLE]
+
+define(Saver,FearCore.Gameplay.VHSPlayerController:HandleSaveGameMissingItem)
+alloc(Saver_Orig,8)
+
+registersymbol(Saver Saver_Orig)
+
+Saver_Orig:
+  readmem(Saver,8)
+
+Saver:
+  jmp FearCore.Gameplay.VHSPlayerController:HandleSaveGame
+
+[DISABLE]
+
+Saver:
+  readmem(Saver_Orig,8)
+
+unregistersymbol(*)
+dealloc(*)
+
+{
+// ORIGINAL CODE - INJECTION POINT: FearCore.Gameplay.VHSPlayerController:HandleSaveGameMissingItem
+
+FearCore.Gameplay.GameplaySceneManager:HandleHideRadioDial+f8: 68 62 01 00 00        - push 00000162
+FearCore.Gameplay.GameplaySceneManager:HandleHideRadioDial+fd: E8 46 8F DB 07        - call 096F10C0
+FearCore.Gameplay.GameplaySceneManager:HandleHideRadioDial+102: 68 DD 00 00 00        - push 000000DD
+FearCore.Gameplay.GameplaySceneManager:HandleHideRadioDial+107: 68 F3 00 00 00        - push 000000F3
+FearCore.Gameplay.GameplaySceneManager:HandleHideRadioDial+10c: E8 37 8F DB 07        - call 096F10C0
+01938189: 00 00                 - add [eax],al
+0193818B: 00 00                 - add [eax],al
+0193818D: 00 00                 - add [eax],al
+0193818F: 00 55 8B              - add [ebp-75],dl
+FearCore.Audio.PlayRandomClip:StopUpdating+2: EC                    - in al,dx
+FearCore.Audio.PlayRandomClip:StopUpdating+3: 83 EC 08              - sub esp,08
+FearCore.Audio.PlayRandomClip:StopUpdating+6: 8B 45 08              - mov eax,[ebp+08]
+FearCore.Audio.PlayRandomClip:StopUpdating+9: C6 40 38 00           - mov byte ptr [eax+38],00
+FearCore.Audio.PlayRandomClip:StopUpdating+d: C9                    - leave 
+FearCore.Audio.PlayRandomClip:StopUpdating+e: C3                    - ret 
+0193819F: 00 55 8B              - add [ebp-75],dl
+FearCore.Gameplay.DoorController:UnlockImmediately+2: EC                    - in al,dx
+FearCore.Gameplay.DoorController:UnlockImmediately+3: 83 EC 18              - sub esp,18
+FearCore.Gameplay.DoorController:UnlockImmediately+6: 8B 45 08              - mov eax,[ebp+08]
+FearCore.Gameplay.DoorController:UnlockImmediately+9: C7 40 5C 00 00 00 00  - mov [eax+5C],00000000
+FearCore.Gameplay.DoorController:UnlockImmediately+10: 89 04 24              - mov [esp],eax
+FearCore.Gameplay.DoorController:UnlockImmediately+13: E8 50 8B FF FF        - call FearCore.Gameplay.DoorController:UnlockFinish
+FearCore.Gameplay.DoorController:UnlockImmediately+18: C9                    - leave 
+FearCore.Gameplay.DoorController:UnlockImmediately+19: C3                    - ret 
+019381BA: 00 00                 - add [eax],al
+019381BC: 68 B8 B7 CB 1E        - push 1ECBB7B8
+019381C1: E9 3A 7F DB 07        - jmp 096F0100
+019381C6: 00 00                 - add [eax],al
+// ---------- INJECTING HERE ----------
+FearCore.Gameplay.VHSPlayerController:HandleSaveGameMissingItem: 55                    - push ebp
+FearCore.Gameplay.VHSPlayerController:HandleSaveGameMissingItem+1: 8B EC                 - mov ebp,esp
+FearCore.Gameplay.VHSPlayerController:HandleSaveGameMissingItem+3: 57                    - push edi
+FearCore.Gameplay.VHSPlayerController:HandleSaveGameMissingItem+4: 83 EC 34              - sub esp,34
+// ---------- DONE INJECTING  ----------
+FearCore.Gameplay.VHSPlayerController:HandleSaveGameMissingItem+7: 8B 7D 08              - mov edi,[ebp+08]
+FearCore.Gameplay.VHSPlayerController:HandleSaveGameMissingItem+a: 8B 47 28              - mov eax,[edi+28]
+FearCore.Gameplay.VHSPlayerController:HandleSaveGameMissingItem+d: 89 04 24              - mov [esp],eax
+FearCore.Gameplay.VHSPlayerController:HandleSaveGameMissingItem+10: 39 00                 - cmp [eax],eax
+FearCore.Gameplay.VHSPlayerController:HandleSaveGameMissingItem+12: 90                    - nop 
+FearCore.Gameplay.VHSPlayerController:HandleSaveGameMissingItem+13: E8 00 65 E3 37        - call 3976E6E0
+FearCore.Gameplay.VHSPlayerController:HandleSaveGameMissingItem+18: 8B 05 58 36 7C 09     - mov eax,[097C3658]
+FearCore.Gameplay.VHSPlayerController:HandleSaveGameMissingItem+1e: 89 45 F8              - mov [ebp-08],eax
+FearCore.Gameplay.VHSPlayerController:HandleSaveGameMissingItem+21: 8B 47 14              - mov eax,[edi+14]
+FearCore.Gameplay.VHSPlayerController:HandleSaveGameMissingItem+24: 89 45 F0              - mov [ebp-10],eax
+FearCore.Gameplay.VHSPlayerController:HandleSaveGameMissingItem+27: 8B 47 28              - mov eax,[edi+28]
+FearCore.Gameplay.VHSPlayerController:HandleSaveGameMissingItem+2a: 89 45 E8              - mov [ebp-18],eax
+FearCore.Gameplay.VHSPlayerController:HandleSaveGameMissingItem+2d: 85 C0                 - test eax,eax
+FearCore.Gameplay.VHSPlayerController:HandleSaveGameMissingItem+2f: 0F 84 89 00 00 00     - je FearCore.Gameplay.VHSPlayerController:HandleSaveGameMissingItem+be
+FearCore.Gameplay.VHSPlayerController:HandleSaveGameMissingItem+35: C7 04 24 68 A8 44 1F  - mov [esp],1F44A868
+FearCore.Gameplay.VHSPlayerController:HandleSaveGameMissingItem+3c: 8D 6D 00              - lea ebp,[ebp+00]
+FearCore.Gameplay.VHSPlayerController:HandleSaveGameMissingItem+3f: E8 B4 8E 36 08        - call System.Object:__icall_wrapper_ves_icall_object_new_specific
+FearCore.Gameplay.VHSPlayerController:HandleSaveGameMissingItem+44: 8B 4D E8              - mov ecx,[ebp-18]
+FearCore.Gameplay.VHSPlayerController:HandleSaveGameMissingItem+47: 85 C9                 - test ecx,ecx
+FearCore.Gameplay.VHSPlayerController:HandleSaveGameMissingItem+49: 0F 84 63 00 00 00     - je FearCore.Gameplay.VHSPlayerController:HandleSaveGameMissingItem+b2
+FearCore.Gameplay.VHSPlayerController:HandleSaveGameMissingItem+4f: 89 4D F4              - mov [ebp-0C],ecx
+FearCore.Gameplay.VHSPlayerController:HandleSaveGameMissingItem+52: 89 48 10              - mov [eax+10],ecx
+FearCore.Gameplay.VHSPlayerController:HandleSaveGameMissingItem+55: 89 45 EC              - mov [ebp-14],eax
+FearCore.Gameplay.VHSPlayerController:HandleSaveGameMissingItem+58: 05 10 00 00 00        - add eax,00000010
+FearCore.Gameplay.VHSPlayerController:HandleSaveGameMissingItem+5d: 89 04 24              - mov [esp],eax
+FearCore.Gameplay.VHSPlayerController:HandleSaveGameMissingItem+60: 8D 6D 00              - lea ebp,[ebp+00]
+FearCore.Gameplay.VHSPlayerController:HandleSaveGameMissingItem+63: E8 F4 8C 36 08        - call 09CA0F24
+FearCore.Gameplay.VHSPlayerController:HandleSaveGameMissingItem+68: 8B 45 F4              - mov eax,[ebp-0C]
+FearCore.Gameplay.VHSPlayerController:HandleSaveGameMissingItem+6b: 8B 4D F0              - mov ecx,[ebp-10]
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>11</ID>
+          <Description>"Fear Controller pointers"</Description>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+          <Color>008000</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{Game  : Cannibal Abduction.exe
+Author : Glowmoss
+}
+
+[ENABLE]
+
+define(FearCont,FearCore.Gameplay.FearController:Update)
+alloc(newmem,128,FearCont)
+
+registersymbol(FearCont FearCont_Orig Fbas)
+label(return FearCont_Orig Fbas)
+
+newmem:
+  mov [Fbas],rcx
+FearCont_Orig:
+  readmem(FearCont,5)
+  //push ebp
+  //mov ebp,esp
+  //push edi
+  //push esi
+  jmp return
+
+Fbas:
+  dq 0
+
+FearCont:
+  jmp newmem
+return:
+
+[DISABLE]
+
+FearCont:
+  readmem(FearCont_Orig,5)
+
+unregistersymbol(*)
+dealloc(*)
+
+{
+// ORIGINAL CODE - INJECTION POINT: FearCore.Gameplay.FearController:Update
+
+2A3381A5: E9 56 7F 3B DF        - jmp 096F0100
+2A3381AA: 00 00                 - add [eax],al
+2A3381AC: 68 E0 ED C9 1E        - push 1EC9EDE0
+2A3381B1: E9 4A 7F 3B DF        - jmp 096F0100
+2A3381B6: 00 00                 - add [eax],al
+FearCore.Gameplay.EnemyController:TryToAttack: 55                    - push ebp
+FearCore.Gameplay.EnemyController:TryToAttack+1: 8B EC                 - mov ebp,esp
+FearCore.Gameplay.EnemyController:TryToAttack+3: 57                    - push edi
+FearCore.Gameplay.EnemyController:TryToAttack+4: 83 EC 24              - sub esp,24
+FearCore.Gameplay.EnemyController:TryToAttack+7: 8B 7D 08              - mov edi,[ebp+08]
+FearCore.Gameplay.EnemyController:TryToAttack+a: 0F B6 47 7C           - movzx eax,byte ptr [edi+7C]
+FearCore.Gameplay.EnemyController:TryToAttack+e: 85 C0                 - test eax,eax
+FearCore.Gameplay.EnemyController:TryToAttack+10: 74 22                 - je FearCore.Gameplay.EnemyController:TryToAttack+34
+FearCore.Gameplay.EnemyController:TryToAttack+12: 0F B6 87 98 00 00 00  - movzx eax,byte ptr [edi+00000098]
+FearCore.Gameplay.EnemyController:TryToAttack+19: 85 C0                 - test eax,eax
+FearCore.Gameplay.EnemyController:TryToAttack+1b: 74 17                 - je FearCore.Gameplay.EnemyController:TryToAttack+34
+FearCore.Gameplay.EnemyController:TryToAttack+1d: C6 87 98 00 00 00 00  - mov byte ptr [edi+00000098],00
+FearCore.Gameplay.EnemyController:TryToAttack+24: 8B 47 44              - mov eax,[edi+44]
+FearCore.Gameplay.EnemyController:TryToAttack+27: 89 04 24              - mov [esp],eax
+FearCore.Gameplay.EnemyController:TryToAttack+2a: 39 00                 - cmp [eax],eax
+FearCore.Gameplay.EnemyController:TryToAttack+2c: 8D 6D 00              - lea ebp,[ebp+00]
+FearCore.Gameplay.EnemyController:TryToAttack+2f: E8 08 00 00 00        - call 2A3381F4
+FearCore.Gameplay.EnemyController:TryToAttack+34: 8D 65 FC              - lea esp,[ebp-04]
+FearCore.Gameplay.EnemyController:TryToAttack+37: 5F                    - pop edi
+FearCore.Gameplay.EnemyController:TryToAttack+38: C9                    - leave 
+FearCore.Gameplay.EnemyController:TryToAttack+39: C3                    - ret 
+2A3381F2: 00 00                 - add [eax],al
+2A3381F4: 68 38 F0 D3 1E        - push 1ED3F038
+2A3381F9: E9 02 7F 3B DF        - jmp 096F0100
+2A3381FE: 00 00                 - add [eax],al
+// ---------- INJECTING HERE ----------
+FearCore.Gameplay.FearController:Update: 55                    - push ebp
+// ---------- DONE INJECTING  ----------
+FearCore.Gameplay.FearController:Update+1: 8B EC                 - mov ebp,esp
+FearCore.Gameplay.FearController:Update+3: 57                    - push edi
+FearCore.Gameplay.FearController:Update+4: 56                    - push esi
+FearCore.Gameplay.FearController:Update+5: 83 EC 70              - sub esp,70
+FearCore.Gameplay.FearController:Update+8: 8B 7D 08              - mov edi,[ebp+08]
+FearCore.Gameplay.FearController:Update+b: BA 20 40 41 1F        - mov edx,1F414020
+FearCore.Gameplay.FearController:Update+10: 8D 6D 00              - lea ebp,[ebp+00]
+FearCore.Gameplay.FearController:Update+13: E8 B0 93 D6 FF        - call FearCore.Utils.SingletonMonobehaviour`1[T_REF]:get_Instance
+FearCore.Gameplay.FearController:Update+18: 89 45 CC              - mov [ebp-34],eax
+FearCore.Gameplay.FearController:Update+1b: E8 60 5D 49 FF        - call UnityEngine.Time:get_time
+FearCore.Gameplay.FearController:Update+20: 8B 45 CC              - mov eax,[ebp-34]
+FearCore.Gameplay.FearController:Update+23: D9 47 4C              - fld dword ptr [edi+4C]
+FearCore.Gameplay.FearController:Update+26: 33 C9                 - xor ecx,ecx
+FearCore.Gameplay.FearController:Update+28: DF F1                 - fcomip st(0),st(1)
+FearCore.Gameplay.FearController:Update+2a: DD D8                 - fstp st(0)
+FearCore.Gameplay.FearController:Update+2c: 0F 97 C1              - seta cl
+FearCore.Gameplay.FearController:Update+2f: 89 4C 24 04           - mov [esp+04],ecx
+FearCore.Gameplay.FearController:Update+33: 89 04 24              - mov [esp],eax
+FearCore.Gameplay.FearController:Update+36: 39 00                 - cmp [eax],eax
+FearCore.Gameplay.FearController:Update+38: 8D 6D 00              - lea ebp,[ebp+00]
+FearCore.Gameplay.FearController:Update+3b: E8 98 F8 FF FF        - call 2A337AD8
+FearCore.Gameplay.FearController:Update+40: 8B 47 28              - mov eax,[edi+28]
+FearCore.Gameplay.FearController:Update+43: 8B C8                 - mov ecx,eax
+FearCore.Gameplay.FearController:Update+45: 39 09                 - cmp [ecx],ecx
+FearCore.Gameplay.FearController:Update+47: 8B 70 18              - mov esi,[eax+18]
+FearCore.Gameplay.FearController:Update+4a: D9 EE                 - fldz 
+FearCore.Gameplay.FearController:Update+4c: DD 5D D0              - fstp qword ptr [ebp-30]
+FearCore.Gameplay.FearController:Update+4f: 8B 47 28              - mov eax,[edi+28]
+FearCore.Gameplay.FearController:Update+52: 8B C8                 - mov ecx,eax
+FearCore.Gameplay.FearController:Update+54: 39 09                 - cmp [ecx],ecx
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>12</ID>
+              <Description>"Player"</Description>
+              <Options moHideChildren="1"/>
+              <Color>008000</Color>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>13</ID>
+                  <Description>"_maxHealthPoints"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[Fbas]+1C</Address>
+                  <Offsets>
+                    <Offset>30</Offset>
+                    <Offset>24</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>14</ID>
+                  <Description>"_staminaDrainRate"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>[Fbas]+1C</Address>
+                  <Offsets>
+                    <Offset>34</Offset>
+                    <Offset>24</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>15</ID>
+                  <Description>"_restFulfillTreshold"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>[Fbas]+1C</Address>
+                  <Offsets>
+                    <Offset>38</Offset>
+                    <Offset>24</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>16</ID>
+                  <Description>"_healthPointsToRestore"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[Fbas]+1C</Address>
+                  <Offsets>
+                    <Offset>3C</Offset>
+                    <Offset>24</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>17</ID>
+                  <Description>"_staminaRestoreRate"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>[Fbas]+1C</Address>
+                  <Offsets>
+                    <Offset>40</Offset>
+                    <Offset>24</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>18</ID>
+                  <Description>"_currentHealthPoints"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[Fbas]+1C</Address>
+                  <Offsets>
+                    <Offset>44</Offset>
+                    <Offset>24</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>19</ID>
+                  <Description>"_currentStaminaPoints"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>[Fbas]+1C</Address>
+                  <Offsets>
+                    <Offset>48</Offset>
+                    <Offset>24</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>20</ID>
+                  <Description>"_isDead"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Byte</VariableType>
+                  <Address>[Fbas]+1C</Address>
+                  <Offsets>
+                    <Offset>4C</Offset>
+                    <Offset>24</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>21</ID>
+                  <Description>"_drainStamina"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Byte</VariableType>
+                  <Address>[Fbas]+1C</Address>
+                  <Offsets>
+                    <Offset>4D</Offset>
+                    <Offset>24</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>22</ID>
+                  <Description>"&lt;HasHealed&gt;k__BackingField"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Byte</VariableType>
+                  <Address>[Fbas]+1C</Address>
+                  <Offsets>
+                    <Offset>4E</Offset>
+                    <Offset>24</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>23</ID>
+                  <Description>"&lt;NeedsToRest&gt;k__BackingField"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Byte</VariableType>
+                  <Address>[Fbas]+1C</Address>
+                  <Offsets>
+                    <Offset>4F</Offset>
+                    <Offset>24</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>24</ID>
+                  <Description>"_walkSpeed"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>[Fbas]+1C</Address>
+                  <Offsets>
+                    <Offset>10</Offset>
+                    <Offset>1C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>25</ID>
+                  <Description>"_walkRotationSpeed"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>[Fbas]+1C</Address>
+                  <Offsets>
+                    <Offset>14</Offset>
+                    <Offset>1C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>26</ID>
+                  <Description>"_runSpeed"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>[Fbas]+1C</Address>
+                  <Offsets>
+                    <Offset>18</Offset>
+                    <Offset>1C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>27</ID>
+                  <Description>"_runRotationSpeed"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>[Fbas]+1C</Address>
+                  <Offsets>
+                    <Offset>1C</Offset>
+                    <Offset>1C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>28</ID>
+                  <Description>"_acceleration"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>[Fbas]+1C</Address>
+                  <Offsets>
+                    <Offset>20</Offset>
+                    <Offset>1C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>29</ID>
+                  <Description>"_currentSpeed"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>[Fbas]+1C</Address>
+                  <Offsets>
+                    <Offset>40</Offset>
+                    <Offset>1C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>30</ID>
+                  <Description>"_currentRotationSpeed"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>[Fbas]+1C</Address>
+                  <Offsets>
+                    <Offset>44</Offset>
+                    <Offset>1C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>31</ID>
+                  <Description>"_shouldRun"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Byte</VariableType>
+                  <Address>[Fbas]+1C</Address>
+                  <Offsets>
+                    <Offset>30</Offset>
+                    <Offset>1C</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>32</ID>
+              <Description>"Inventory"</Description>
+              <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+              <Color>008000</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript Async="1">[ENABLE]
+aobscan(INVIT,49 74 ? 6D 5F 42 61 6E 64 ? 67 ? ? ? 00 ? 00 ? 00 ? 01)
+registersymbol(INVIT)
+[DISABLE]
+unregistersymbol(*)
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>33</ID>
+                  <Description>"Get Item List"</Description>
+                  <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+                  <Color>008000</Color>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>{$lua}
+if syntaxcheck then return end
+[ENABLE]
+ local basePtr = 'INVIT'
+ INVList={}
+ for array=1,18 do
+  INVList[(array-1)*2]=readString('INVIT+'..string.format('%X',(array-1)*0xD0))
+  INVList[(array-1)*2+1]=readInteger(('INVIT+'..string.format('%X',(array-1)*0xD0) ..'-10'))
+ end
+
+[DISABLE]
+
+
+</AssemblerScript>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>34</ID>
+                      <Description>"Edit Inventory"</Description>
+                      <Color>008000</Color>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>{$lua}
+if syntaxcheck then return end
+[ENABLE]
+ local basePtr = 'Fbas'
+ local SOffsets = {0,0x20,0x2C,0x1C}
+ local SOffsets1 = {0x1C,0,0x20,0x2C,0x1C}
+
+ local al=getAddressList()
+ local mainMR = al.getMemoryRecordByID(34)
+ while mainMR.Count&gt;0 do mainMR[0].destroy() end
+
+ local ECount = readInteger('[[[[Fbas]+1C]+2C]+20]+C')
+ Lists = '0:None\r'..INVList[1]..':'..INVList[0]..'\r'
+ for a=1, 17 do
+ if a==12 then
+ Lists = Lists .. INVList[(a)*2+1]..':Item_SimpleKey\r'
+ else
+ Lists = Lists .. INVList[(a)*2+1]..':'..INVList[(a)*2]..'\r'
+ end end
+
+ for array=1,ECount do
+   local NameMR = al.createMemoryRecord()
+   NameMR.Type = vtDword
+   NameMR.Description = 'Slot '..array
+   SOffsets[1] = (array-1)*4+0x10
+   NameMR.setAddress (basePtr, SOffsets)
+   NameMR.DisplayAsDropDownListItem=true
+   NameMR.DropDownList.Text=Lists
+   NameMR.DropDownReadOnly=true
+   NameMR.DropDownDescriptionOnly=true
+   NameMR.Color = 0xFFFF00
+   NameMR.appendToEntry(mainMR)
+
+      local NMR = al.createMemoryRecord()
+   NMR.Type = vtDword
+   NMR.Description = 'Single Use?'
+   SOffsets1[2] = (array-1)*4+0x10
+   NMR.setAddress (basePtr, SOffsets1)
+   NMR.DisplayAsDropDownListItem=true
+   NMR.DropDownList.Text='1:Yes\r0:No'
+   NMR.DropDownReadOnly=true
+   NMR.DropDownDescriptionOnly=true
+   NMR.Color = 0xFFFF00
+   NMR.appendToEntry(NameMR)
+ end
+
+[DISABLE]
+ local mainMR = getAddressList().getMemoryRecordByID(34)
+ while mainMR.Count&gt;0 do mainMR[0].destroy() end
+
+</AssemblerScript>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>35</ID>
+                  <Description>"Item List"</Description>
+                  <Color>008000</Color>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>{$lua}
+if syntaxcheck then return end
+[ENABLE]
+ local basePtr = 'INVIT'
+
+ local al=getAddressList()
+ local mainMR = al.getMemoryRecordByID(35)
+ while mainMR.Count&gt;0 do mainMR[0].destroy() end
+ INVList={}
+ local ECount = 18
+
+ for array=1,ECount do
+  INVList[(array-1)*2]=readString('INVIT+'..string.format('%X',(array-1)*0xD0))
+  INVList[(array-1)*2+1]=readInteger(('INVIT+'..string.format('%X',(array-1)*0xD0) ..'-10'))
+   local NameMR = al.createMemoryRecord()
+   NameMR.Type = vtDword
+   NameMR.Description = readString('INVIT+'..string.format('%X',(array-1)*0xD0))
+   NameMR.setAddress ('INVIT+'..string.format('%X',(array-1)*0xD0) ..'-10')
+
+   NameMR.ShowAsHex=true
+   NameMR.Color = 0xFFFF00
+   NameMR.appendToEntry(mainMR)
+ end
+
+[DISABLE]
+ local mainMR = getAddressList().getMemoryRecordByID(35)
+ while mainMR.Count&gt;0 do mainMR[0].destroy() end
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>36</ID>
+                  <Description>"Normal Difficulty Slots (Visual)"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[Fbas]+1C</Address>
+                  <Offsets>
+                    <Offset>8</Offset>
+                    <Offset>1C</Offset>
+                    <Offset>2C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>37</ID>
+                  <Description>"Hard Difficulty Slots (Visual)"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[Fbas]+1C</Address>
+                  <Offsets>
+                    <Offset>C</Offset>
+                    <Offset>1C</Offset>
+                    <Offset>2C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>38</ID>
+                  <Description>"Inventory slot count"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[Fbas]+20</Address>
+                  <Offsets>
+                    <Offset>C</Offset>
+                    <Offset>20</Offset>
+                    <Offset>2C</Offset>
+                    <Offset>34</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>39</ID>
+                  <Description>"Saving and quitting seems to show the new slot count"</Description>
+                  <Color>0000FF</Color>
+                  <GroupHeader>1</GroupHeader>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>40</ID>
+              <Description>"Enemy"</Description>
+              <Options moHideChildren="1"/>
+              <Color>008000</Color>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>41</ID>
+                  <Description>"_minPatrolTime"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>[Fbas]+20</Address>
+                  <Offsets>
+                    <Offset>5C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>42</ID>
+                  <Description>"_maxPatrolTime"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>[Fbas]+20</Address>
+                  <Offsets>
+                    <Offset>60</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>43</ID>
+                  <Description>"_minIdleTimeDuringPatrol"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>[Fbas]+20</Address>
+                  <Offsets>
+                    <Offset>64</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>44</ID>
+                  <Description>"_maxIdleTimeDuringPatrol"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>[Fbas]+20</Address>
+                  <Offsets>
+                    <Offset>68</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>45</ID>
+                  <Description>"_minChaseTime"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>[Fbas]+20</Address>
+                  <Offsets>
+                    <Offset>6C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>46</ID>
+                  <Description>"_maxChaseTime"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>[Fbas]+20</Address>
+                  <Offsets>
+                    <Offset>70</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>47</ID>
+                  <Description>"_seekRadius"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>[Fbas]+20</Address>
+                  <Offsets>
+                    <Offset>74</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>48</ID>
+                  <Description>"_waitTimeBeforeStartChasing"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>[Fbas]+20</Address>
+                  <Offsets>
+                    <Offset>78</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>49</ID>
+                  <Description>"AllowAttack"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Byte</VariableType>
+                  <Address>[Fbas]+20</Address>
+                  <Offsets>
+                    <Offset>7C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>50</ID>
+                  <Description>"_attackRate"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>[Fbas]+20</Address>
+                  <Offsets>
+                    <Offset>80</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>51</ID>
+                  <Description>"_attackDamage"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[Fbas]+20</Address>
+                  <Offsets>
+                    <Offset>84</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>52</ID>
+                  <Description>"_distanceToStopDuringChasingState"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>[Fbas]+20</Address>
+                  <Offsets>
+                    <Offset>88</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>53</ID>
+                  <Description>"_timeToStopPatrolling"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>[Fbas]+20</Address>
+                  <Offsets>
+                    <Offset>8C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>54</ID>
+                  <Description>"_currentIdleDuration"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>[Fbas]+20</Address>
+                  <Offsets>
+                    <Offset>90</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>55</ID>
+                  <Description>"_remainingChaseTime"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>[Fbas]+20</Address>
+                  <Offsets>
+                    <Offset>94</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>56</ID>
+                  <Description>"_canAttack"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Byte</VariableType>
+                  <Address>[Fbas]+20</Address>
+                  <Offsets>
+                    <Offset>98</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>57</ID>
+                  <Description>"_playerSeen"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Byte</VariableType>
+                  <Address>[Fbas]+20</Address>
+                  <Offsets>
+                    <Offset>99</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>58</ID>
+                  <Description>"_firstChaseAfterSpawn"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Byte</VariableType>
+                  <Address>[Fbas]+20</Address>
+                  <Offsets>
+                    <Offset>9A</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>59</ID>
+                  <Description>"_currentWaitTimeBeforeStartChasing"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>[Fbas]+20</Address>
+                  <Offsets>
+                    <Offset>9C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>60</ID>
+                  <Description>"_spawnTrapChance"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>[Fbas]+20</Address>
+                  <Offsets>
+                    <Offset>A0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>61</ID>
+                  <Description>"_remainingTrapsToSpawn"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[Fbas]+20</Address>
+                  <Offsets>
+                    <Offset>A4</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>62</ID>
+                  <Description>"_maxTrapCount"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[Fbas]+20</Address>
+                  <Offsets>
+                    <Offset>A8</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>63</ID>
+                  <Description>"_canPlaceTrap"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Byte</VariableType>
+                  <Address>[Fbas]+20</Address>
+                  <Offsets>
+                    <Offset>AC</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>64</ID>
+                  <Description>"&lt;CurrentAIState&gt;k__BackingField"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[Fbas]+20</Address>
+                  <Offsets>
+                    <Offset>B0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>65</ID>
+                  <Description>"Can make him blind by making bottom 3 0"</Description>
+                  <Color>0000FF</Color>
+                  <GroupHeader>1</GroupHeader>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>66</ID>
+                  <Description>"_closeDetectionRadius"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>[Fbas]+20</Address>
+                  <Offsets>
+                    <Offset>2C</Offset>
+                    <Offset>3C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>67</ID>
+                  <Description>"_farDetectionRadius"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>[Fbas]+20</Address>
+                  <Offsets>
+                    <Offset>28</Offset>
+                    <Offset>3C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>68</ID>
+                  <Description>"_fieldOfViewAngle"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>[Fbas]+20</Address>
+                  <Offsets>
+                    <Offset>24</Offset>
+                    <Offset>3C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>69</ID>
+                  <Description>"Run speed values"</Description>
+                  <Options moHideChildren="1"/>
+                  <Color>008000</Color>
+                  <GroupHeader>1</GroupHeader>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>70</ID>
+                      <Description>"_hardValue"</Description>
+                      <Color>FFFF00</Color>
+                      <VariableType>Float</VariableType>
+                      <Address>[Fbas]+20</Address>
+                      <Offsets>
+                        <Offset>C</Offset>
+                        <Offset>24</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>71</ID>
+                      <Description>"_defaultValue"</Description>
+                      <Color>FFFF00</Color>
+                      <VariableType>Float</VariableType>
+                      <Address>[Fbas]+20</Address>
+                      <Offsets>
+                        <Offset>8</Offset>
+                        <Offset>24</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>72</ID>
+                  <Description>"Run speed no stamina values"</Description>
+                  <Options moHideChildren="1"/>
+                  <Color>008000</Color>
+                  <GroupHeader>1</GroupHeader>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>73</ID>
+                      <Description>"_defaultValue"</Description>
+                      <Color>FFFF00</Color>
+                      <VariableType>Float</VariableType>
+                      <Address>[Fbas]+20</Address>
+                      <Offsets>
+                        <Offset>8</Offset>
+                        <Offset>28</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>74</ID>
+                      <Description>"_hardValue"</Description>
+                      <Color>FFFF00</Color>
+                      <VariableType>Float</VariableType>
+                      <Address>[Fbas]+20</Address>
+                      <Offsets>
+                        <Offset>C</Offset>
+                        <Offset>28</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>75</ID>
+              <Description>"Flashlight"</Description>
+              <Options moHideChildren="1"/>
+              <Color>008000</Color>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>76</ID>
+                  <Description>"_startSpotLightRange"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>[Fbas]+1C</Address>
+                  <Offsets>
+                    <Offset>34</Offset>
+                    <Offset>34</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>77</ID>
+                  <Description>"_maxPointLightDistance"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>[Fbas]+1C</Address>
+                  <Offsets>
+                    <Offset>30</Offset>
+                    <Offset>34</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>78</ID>
+                  <Description>"&lt;IsOn&gt;k__BackingField"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Byte</VariableType>
+                  <Address>[Fbas]+1C</Address>
+                  <Offsets>
+                    <Offset>38</Offset>
+                    <Offset>34</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>79</ID>
+                  <Description>"&lt;IsEquipped&gt;k__BackingField"</Description>
+                  <Color>FFFF00</Color>
+                  <VariableType>Byte</VariableType>
+                  <Address>[Fbas]+1C</Address>
+                  <Offsets>
+                    <Offset>39</Offset>
+                    <Offset>34</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>80</ID>
+              <Description>"_requiredNoteCountToUnlockNotesAchievement"</Description>
+              <Color>FFFF00</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>[Fbas]+1C</Address>
+              <Offsets>
+                <Offset>A0</Offset>
+                <Offset>10</Offset>
+                <Offset>10</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

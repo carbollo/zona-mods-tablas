@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="28">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>14</ID>
+      <Description>"Steam - Denuvo"</Description>
+      <Options moHideChildren="1"/>
+      <LastState Value="" Activated="1" RealAddress="00000000"/>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>24</ID>
+          <Description>"Play as..."</Description>
+          <Options moHideChildren="1"/>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : DevilMayCry5.exe
+  Version:
+  Date   : 2019-03-20
+  Author : OleMagne
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(charId,DevilMayCry5.exe,F0 89 87 B0 00 00 00) // should be unique
+alloc(newmem,$1000,"DevilMayCry5.exe"+1210FBE1)
+
+label(charSelector)
+label(code)
+label(return)
+
+registersymbol(charSelector)
+
+newmem:
+  mov eax,[charSelector]
+  jmp code
+
+code:
+  mov [rdi+000000B0],eax
+  jmp return
+
+charSelector:
+  dd 0
+
+charId+01:
+  jmp newmem
+  nop
+return:
+registersymbol(charId)
+
+[DISABLE]
+
+charId+01:
+  db 89 87 B0 00 00 00
+
+unregistersymbol(charId)
+dealloc(newmem)
+unregistersymbol(charSelector)
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>3</ID>
+              <Description>"Character (Vergil is buggy)"</Description>
+              <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">0:Nero
+1:Dante
+2:V
+3:Vergil
+3:SunBeam
+</DropDownList>
+              <VariableType>4 Bytes</VariableType>
+              <Address>charSelector</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>13</ID>
+          <Description>"Costume"</Description>
+          <Options moHideChildren="1"/>
+          <LastState/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : DevilMayCry5.exe
+  Version: 
+  Date   : 2019-03-12
+  Author : OleMagne
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(costumeSelector,DevilMayCry5.exe,89 6A 18 48 8B 5C 24 30) // should be unique
+alloc(newmem,$1000,"DevilMayCry5.exe"+14184BB5)
+
+label(costumeSelectorValue)
+label(code)
+label(return)
+
+registersymbol(costumeSelectorValue)
+
+newmem:
+  mov ebp,[costumeSelectorValue]
+  mov [rdx+18],ebp
+  mov rbx,[rsp+30]
+  jmp return
+
+code:
+  mov [rdx+18],ebp
+  mov rbx,[rsp+30]
+  jmp return
+
+costumeSelectorValue:
+  dd 0
+
+costumeSelector:
+  jmp newmem
+  nop
+  nop
+  nop
+return:
+registersymbol(costumeSelector)
+
+[DISABLE]
+
+costumeSelector:
+  db 89 6A 18 48 8B 5C 24 30
+
+unregistersymbol(costumeSelector)
+dealloc(newmem)
+unregistersymbol(costumeSelectorValue)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "DevilMayCry5.exe"+14192C70
+
+"DevilMayCry5.exe"+14192C4D: 45 31 C0                    -  xor r8d,r8d
+"DevilMayCry5.exe"+14192C50: 41 8D 51 38                 -  lea edx,[r9+38]
+"DevilMayCry5.exe"+14192C54: E8 F7 A8 24 EE              -  call DevilMayCry5.exe+23DD550
+"DevilMayCry5.exe"+14192C59: 31 C0                       -  xor eax,eax
+"DevilMayCry5.exe"+14192C5B: 48 8B 5C 24 38              -  mov rbx,[rsp+38]
+"DevilMayCry5.exe"+14192C60: 48 8B 6C 24 40              -  mov rbp,[rsp+40]
+"DevilMayCry5.exe"+14192C65: 48 83 C4 20                 -  add rsp,20
+"DevilMayCry5.exe"+14192C69: 5F                          -  pop rdi
+"DevilMayCry5.exe"+14192C6A: C3                          -  ret 
+"DevilMayCry5.exe"+14192C6B: 48 89 74 24 30              -  mov [rsp+30],rsi
+// ---------- INJECTING HERE ----------
+"DevilMayCry5.exe"+14192C70: 41 8B 71 18                 -  mov esi,[r9+18]
+"DevilMayCry5.exe"+14192C74: 40 F6 C6 01                 -  test sil,01
+// ---------- DONE INJECTING  ----------
+"DevilMayCry5.exe"+14192C78: 0F 84 0D 01 00 00           -  je DevilMayCry5.exe+14192D8B
+"DevilMayCry5.exe"+14192C7E: 31 D2                       -  xor edx,edx
+"DevilMayCry5.exe"+14192C80: 83 FD 02                    -  cmp ebp,02
+"DevilMayCry5.exe"+14192C83: 0F 9D D2                    -  setge dl
+"DevilMayCry5.exe"+14192C86: 83 C2 0A                    -  add edx,0A
+"DevilMayCry5.exe"+14192C89: 41 8B 49 1C                 -  mov ecx,[r9+1C]
+"DevilMayCry5.exe"+14192C8D: 48 8B 43 50                 -  mov rax,[rbx+50]
+"DevilMayCry5.exe"+14192C91: 4C 8B 40 18                 -  mov r8,[rax+18]
+"DevilMayCry5.exe"+14192C95: 4D 85 C0                    -  test r8,r8
+"DevilMayCry5.exe"+14192C98: 74 04                       -  je DevilMayCry5.exe+14192C9E
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>12</ID>
+              <Description>"Dress up as..."</Description>
+              <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">0:Normal
+1:EX Color
+2:Super
+3:Super EX Color
+</DropDownList>
+              <VariableType>4 Bytes</VariableType>
+              <Address>costumeSelectorValue</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+  <Comments>CAVEATS: 
+"Continue Game" will load the previous character no matter what.
+Continuing to the next mission after finishing a mission will load the correct character. You must go back to the main menu and mission select to load the character again.
+Vergil stuff:
+He can only turn around if you slow down and wiggle your stick to get it working. Otherwise he moves forwards.
+Limited Devil Trigger. Use the table in the first post for infinite devil trigger.
+L2 or Left Trigger will soft lock him in place, needing a retry of the mission.
+Getting hit can randomly, but very rarely, put him in a T-pose.
+</Comments>
+</CheatTable>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="52">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>1</ID>
+      <Description>"Inf. Clip"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(clip,CryGameSDK.dll,89 58 08 B0 01 48 83 C4 30 5B C3)
+alloc(newmem,$1000,clip)
+registersymbol(clip)
+label(code)
+label(return)
+newmem:
+  cmp ebx,[rax+08]
+  jl code
+  mov [rax+08],ebx
+
+code:
+  mov al,01
+  jmp return
+
+clip:
+  jmp newmem
+return:
+
+[DISABLE]
+unregistersymbol(clip)
+dealloc(newmem)
+clip:
+  db 89 58 08 B0 01
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>2</ID>
+      <Description>"Inf. Breath"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(breath,CryGameSDK.dll,F3 0F 11 43 0C 73 ** 48 8B 0D ** ** ** ** 48 8B 01 FF 90 48 02 00 00)
+alloc(newmem,$1000,breath)
+registersymbol(breath)
+label(code)
+label(return)
+newmem:
+  movss xmm0,xmm12
+
+code:
+  movss [rbx+0C],xmm0
+  jmp return
+
+breath:
+  jmp newmem
+return:
+
+[DISABLE]
+unregistersymbol(breath)
+dealloc(newmem)
+breath:
+  db F3 0F 11 43 0C
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>3</ID>
+      <Description>"Inf. Battery"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+aobscanmodule(battery,CryGameSDK.dll,F3 0F 5C C8 41 0F 2F CA F3 0F 11 8F)
+registersymbol(battery)
+battery:
+  db 90 90 90 90
+
+[DISABLE]
+unregistersymbol(battery)
+battery:
+  db F3 0F 5C C8
+</AssemblerScript>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>
