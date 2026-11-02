@@ -1,12 +1,12 @@
 # Zona Mods · Tablas de Cheat Engine
 
-Recopilación de **7198 tablas de Cheat Engine (`.CT`) para juegos single-player en Windows**, preparada como fuente automática del servidor de trainers de Zona Mods.
+Recopilación de **7202 tablas de Cheat Engine (`.CT`) para juegos single-player en Windows**, preparada como fuente automática del servidor de trainers de Zona Mods.
 
 Solo están las tablas que el importador de Zona Mods convierte en al menos un cheat que la app puede ejecutar. Cada archivo es una **copia sin modificar** del original.
 
 ## Cómo usarlo en Zona Mods
 
-El servidor coge como mucho 200 archivos por fuente, así que las tablas van repartidas en 36 lotes. En el panel (**Fuentes automáticas**) añade una fuente por lote:
+El servidor coge como mucho 200 archivos por fuente, así que las tablas van repartidas en 37 lotes. En el panel (**Fuentes automáticas**) añade una fuente por lote:
 
 ```
 https://github.com/carbollo/zona-mods-tablas/tree/main/lote-01
@@ -45,6 +45,7 @@ https://github.com/carbollo/zona-mods-tablas/tree/main/lote-33
 https://github.com/carbollo/zona-mods-tablas/tree/main/lote-34
 https://github.com/carbollo/zona-mods-tablas/tree/main/lote-35
 https://github.com/carbollo/zona-mods-tablas/tree/main/lote-36
+https://github.com/carbollo/zona-mods-tablas/tree/main/lote-37
 ```
 
 Conviene añadirlas con **Publicar** desactivado y revisar lo importado antes de publicarlo. Las tablas nunca cambian de lote: las nuevas se añaden al último o abren otro.
@@ -74,9 +75,9 @@ Todo el mérito es de sus autores. Este repositorio solo reúne y filtra su trab
 
 | Origen | Licencia | Tablas |
 |---|---|---|
-| [Hexorg/CheatEngineTables](https://github.com/Hexorg/CheatEngineTables) | sin licencia | 3575 |
+| [Hexorg/CheatEngineTables](https://github.com/Hexorg/CheatEngineTables) | sin licencia | 3577 |
 | [framedsc/framedsc.github.io](https://github.com/framedsc/framedsc.github.io) | sin licencia | 341 |
-| [themaoci/Sintrix-Dump-Ct](https://github.com/themaoci/Sintrix-Dump-Ct) | sin licencia | 316 |
+| [themaoci/Sintrix-Dump-Ct](https://github.com/themaoci/Sintrix-Dump-Ct) | sin licencia | 317 |
 | [David-Honisch/CheatsAndTricks](https://github.com/David-Honisch/CheatsAndTricks) | sin licencia | 241 |
 | [xXKronosLeeXx/CE-Cheat-Tables](https://github.com/xXKronosLeeXx/CE-Cheat-Tables) | sin licencia | 215 |
 | [bbfox0703/Mydev-Cheat-Engine-Tables](https://github.com/bbfox0703/Mydev-Cheat-Engine-Tables) | GPL-3.0 | 149 |
@@ -146,6 +147,7 @@ Todo el mérito es de sus autores. Este repositorio solo reúne y filtra su trab
 | [Kemui52/CTLibrary](https://github.com/Kemui52/CTLibrary) | sin licencia | 6 |
 | [DeathHound6/CheatTables](https://github.com/DeathHound6/CheatTables) | sin licencia | 6 |
 | [Naitrate/EnigmaFix](https://github.com/Naitrate/EnigmaFix) | MIT | 6 |
+| [asd9176506911298/Cheat-Engine-CT](https://github.com/asd9176506911298/Cheat-Engine-CT) | sin licencia | 6 |
 | [dogbbc/-](https://github.com/dogbbc/-) | sin licencia | 6 |
 | [fusigi0930/game_script](https://github.com/fusigi0930/game_script) | sin licencia | 6 |
 | [YYLMZXC/nklua](https://github.com/YYLMZXC/nklua) | sin licencia | 6 |
@@ -160,7 +162,6 @@ Todo el mérito es de sus autores. Este repositorio solo reúne y filtra su trab
 | [TCRoid/My-CheatEngine-Table](https://github.com/TCRoid/My-CheatEngine-Table) | sin licencia | 5 |
 | [Thermospore/Scene-Files](https://github.com/Thermospore/Scene-Files) | sin licencia | 5 |
 | [aldo-arch/Cheats-Cheat-Engine-](https://github.com/aldo-arch/Cheats-Cheat-Engine-) | sin licencia | 5 |
-| [asd9176506911298/Cheat-Engine-CT](https://github.com/asd9176506911298/Cheat-Engine-CT) | sin licencia | 5 |
 | [nttlong/cheat-engine](https://github.com/nttlong/cheat-engine) | sin licencia | 5 |
 | [erfg12/CSharp-Game-Trainers](https://github.com/erfg12/CSharp-Game-Trainers) | sin licencia | 5 |
 | [AadityaKandel/BB-RACING-CHEAT-ENGINE-SCRIPT](https://github.com/AadityaKandel/BB-RACING-CHEAT-ENGINE-SCRIPT) | MIT | 4 |

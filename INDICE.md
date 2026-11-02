@@ -7176,10 +7176,11 @@ Cada tabla, con los cheats que el importador de Zona Mods puede ejecutar sobre e
 | SpaceMarine | SpaceMarine.exe | 1/1 | `zupremacy__z-nation/SpaceMarine.CT` | [zupremacy/z-nation](https://github.com/zupremacy/z-nation/blob/main/SpaceMarine.CT) |
 | WOL2-Win64-Shipping | WOL2-Win64-Shipping.exe | 18/27 | `zupremacy__z-nation/WOL2-Win64-Shipping v1.2.CT` | [zupremacy/z-nation](https://github.com/zupremacy/z-nation/blob/main/WOL2-Win64-Shipping%20v1.2.CT) |
 
-## lote-36 (199 tablas)
+## lote-36 (200 tablas)
 
 | Juego | Proceso | Cheats utilizables | Archivo | Origen |
 |---|---|---|---|---|
+| Gamble With Your Friends | — | 1/2 | `asd9176506911298__Cheat-Engine-CT/Gamble With Your Friends.CT` | [asd9176506911298/Cheat-Engine-CT](https://github.com/asd9176506911298/Cheat-Engine-CT/blob/main/Gamble%20With%20Your%20Friends.CT) |
 | TheGreatCircle | TheGreatCircle.exe | 11/16 | `themaoci__Sintrix-Dump-Ct/indiana-jones-and-the-great-circle-xbox-app - TheGreatCircle.CT` | [themaoci/Sintrix-Dump-Ct](https://github.com/themaoci/Sintrix-Dump-Ct/blob/main/indiana-jones-and-the-great-circle-xbox-app/TheGreatCircle.CT) |
 | Island Clicker | — | 4/9 | `themaoci__Sintrix-Dump-Ct/island-clicker - Island Clicker.CT` | [themaoci/Sintrix-Dump-Ct](https://github.com/themaoci/Sintrix-Dump-Ct/blob/main/island-clicker/Island%20Clicker.CT) |
 | Jotunnslayer | — | 3/29 | `themaoci__Sintrix-Dump-Ct/jotunnslayer-hordes-of-hel - Jotunnslayer.CT` | [themaoci/Sintrix-Dump-Ct](https://github.com/themaoci/Sintrix-Dump-Ct/blob/main/jotunnslayer-hordes-of-hel/Jotunnslayer.CT) |
@@ -7379,3 +7380,11 @@ Cada tabla, con los cheats que el importador de Zona Mods puede ejecutar sobre e
 | XAngel | — | 2/8 | `themaoci__Sintrix-Dump-Ct/x-angels - XAngel.CT` | [themaoci/Sintrix-Dump-Ct](https://github.com/themaoci/Sintrix-Dump-Ct/blob/main/x-angels/XAngel.CT) |
 | ZenoClash2 | ZC2.exe | 3/4 | `themaoci__Sintrix-Dump-Ct/zeno-clash-2 - ZenoClash2.CT` | [themaoci/Sintrix-Dump-Ct](https://github.com/themaoci/Sintrix-Dump-Ct/blob/main/zeno-clash-2/ZenoClash2.CT) |
 | Zombieville Sintrix | Exodus-Win64-Shipping.exe | 6/9 | `themaoci__Sintrix-Dump-Ct/zombieville-usa-3d - Zombieville_Sintrix.CT` | [themaoci/Sintrix-Dump-Ct](https://github.com/themaoci/Sintrix-Dump-Ct/blob/main/zombieville-usa-3d/Zombieville_Sintrix.CT) |
+
+## lote-37 (3 tablas)
+
+| Juego | Proceso | Cheats utilizables | Archivo | Origen |
+|---|---|---|---|---|
+| basicprotection 576 | DarkSoulsIII.exe | 1/4 | `Hexorg__CheatEngineTables/tables - basicprotection_576.ct` | [Hexorg/CheatEngineTables](https://github.com/Hexorg/CheatEngineTables/blob/master/tables/basicprotection_576.ct) |
+| basicprotection 956 | DarkSoulsIII.exe | 1/5 | `Hexorg__CheatEngineTables/tables - basicprotection_956.ct` | [Hexorg/CheatEngineTables](https://github.com/Hexorg/CheatEngineTables/blob/master/tables/basicprotection_956.ct) |
+| revolution-idle-v2.1 indev | — | 1/115 | `themaoci__Sintrix-Dump-Ct/revolution-idle - revolution-idle-v2.1 indev.CT` | [themaoci/Sintrix-Dump-Ct](https://github.com/themaoci/Sintrix-Dump-Ct/blob/main/revolution-idle/revolution-idle-v2.1%20indev.CT) |
