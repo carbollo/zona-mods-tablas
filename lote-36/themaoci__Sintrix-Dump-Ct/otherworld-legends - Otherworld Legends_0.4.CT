@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>104</ID>
+      <Description>"Enable (Auto-Attach Game Process)"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$Lua}
+if syntaxcheck then return end
+
+local process = 'Otherworld Legends.exe'
+OpenProcess(process);
+if process ~= process or (readInteger(process) == nil) then
+   error(ShowMessage("Failed To Attach To Process"))
+end
+
+
+--Set Window Title
+local title = "Otherworld Legends 0.4";
+if not((MainForm.Caption):match("Otherworld Legends")) then
+MainForm.Caption = title..' ~ '..MainForm.Caption
+end
+
+
+[DISABLE]
+
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>769</ID>
+          <Description>"Initialize Mono"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+{$lua}
+mono_initialize()
+LaunchMonoDataCollector()
+{$asm}
+
+
+[DISABLE]
+
+
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>3</ID>
+              <Description>"Disable Enemy AI"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>//Send@FearlessRevolution|Sintrix
+[ENABLE]
+AI.Update:
+db C3
+
+[DISABLE]
+AI.Update:
+db 40 53
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>796</ID>
+              <Description>"No Skill Cooldown"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>//Send@FearlessRevolution/Sintrix
+define(address,"GameAssembly.dll"+199AEB4) //Skill.update
+define(bytes,F3 0F 10 05 04 3D 2A 02)
+
+define(address2,"GameAssembly.dll"+199D3F9) //Skill.get_additionalSkillCooldown
+define(bytes2,F3 0F 58 05 BF 17 2A 02)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,"GameAssembly.dll"+199AEB4)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  movss xmm0,[GameAssembly.dll+3C3EBC0]
+  xorps xmm0,xmm0
+  jmp return
+
+address:
+  jmp newmem
+  nop 3
+return:
+
+assert(address2,bytes2)
+alloc(newmem2,$1000,"GameAssembly.dll"+199D3F9)
+
+label(code2)
+label(return2)
+
+newmem2:
+
+code2:
+  addss xmm0,[GameAssembly.dll+3C3EBC0]
+  xorps xmm0,xmm0
+  jmp return2
+
+address2:
+  jmp newmem2
+  nop 3
+return2:
+
+[DISABLE]
+
+address:
+  db bytes
+
+address2:
+  db bytes2
+
+
+dealloc(*)
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>798</ID>
+              <Description>"Coin Drop Modifier"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>//Send@FearlessRevolution|Sintrix
+////CoinInScene.Update
+define(address,"GameAssembly.dll"+1ABBEBD)
+define(bytes,48 8B D9 E8 0B 82 8E FE)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,"GameAssembly.dll"+1ABBEBD)
+registersymbol(scis)
+label(code return scis)
+
+newmem:
+push r13
+mov r13,[scis]
+mov [rcx+30],r13
+
+code:
+  pop r13
+  mov rbx,rcx
+  call CoopServerSteam.AdvertiseServer
+  jmp return
+
+scis:
+dd #1000
+
+address:
+  jmp newmem
+  nop 3
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+unregistersymbol(*)
+dealloc(*)
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>770</ID>
+                  <Description>"Set Coin Amount"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>scis</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>786</ID>
+      <Description>"--------------------------------"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>787</ID>
+      <Description>"💥 Author: Send @ Sintrix"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>788</ID>
+      <Description>"🞂 Process: Otherworld Legends.exe"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>789</ID>
+      <Description>"🞂 Build: 16914526"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>457</ID>
+      <Description>"✔ Verify Game Build"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+{$lua}
+shellExecute("https://steamdb.info/app/1761380/patchnotes/")
+
+{$asm}
+[DISABLE]
+
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>460</ID>
+      <Description>"⚡ Discord "</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+{$lua}
+shellExecute("https://discord.gg/NTFcdAUWxb")
+
+{$asm}
+[DISABLE]
+
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>790</ID>
+      <Description>"--------------------------------"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+  </CheatEntries>
+  <CheatCodes>
+    <CodeEntry>
+      <Description>Change of movss xmm8,[rbx+0000008C]</Description>
+      <AddressString>GameAssembly.dll+199C03E</AddressString>
+      <Before>
+        <Byte>0F</Byte>
+        <Byte>A3</Byte>
+        <Byte>C8</Byte>
+        <Byte>73</Byte>
+        <Byte>09</Byte>
+      </Before>
+      <Actual>
+        <Byte>F3</Byte>
+        <Byte>44</Byte>
+        <Byte>0F</Byte>
+        <Byte>10</Byte>
+        <Byte>83</Byte>
+        <Byte>8C</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>13</Byte>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+      </After>
+    </CodeEntry>
+  </CheatCodes>
+  <UserdefinedSymbols>
+    <SymbolEntry>
+      <Name>mbboardptr2</Name>
+      <Address>2553CC8CD80</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>nspawnptr</Name>
+      <Address>25557846B00</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>gdataptr</Name>
+      <Address>2017040D7E0</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>mbboardptr</Name>
+      <Address>20137D9ED80</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>npcmanptr</Name>
+      <Address>19F58F3B000</Address>
+    </SymbolEntry>
+  </UserdefinedSymbols>
+
+</CheatTable>

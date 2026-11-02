@@ -1,0 +1,642 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>1337208720</ID>
+      <Description>"==== Character ===="</Description>
+      <Color>FFFF00</Color>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>1337208759</ID>
+          <Description>"Infinite Health"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(playerHealth,$process,4C 8B 08 4C 8D 85 F8 00 00 00)
+alloc(newmem,$1000,playerHealth)
+label(code return)
+//Send@Sintrix|FearlessRevolution
+newmem:
+push r11
+mov r11,[rax+2D8] //Pawn
+test r11,r11
+je @f
+mov r11,[r11+908] //CharacterHealth
+mov [r11+F4],1 //Unlimited
+mov [r11+D8],(float)99999 //Current/Resource
+mov [r11+DC],(float)99999 //Max/MaxResource
+mov [r11+178],(float)-1
+mov [r11+1AC],(float)-1
+mov [r11+1E0],(float)-1
+mov [r11+214],(float)-1
+mov [r11+248],(float)-1
+mov [r11+168],(float)99999 //RigtLegCurrent
+mov [r11+16C],(float)99999 //RightLegMax
+mov [r11+170],(float)99999 //RightLegMaxLimit
+mov [r11+19C],(float)99999 //LeftLegCurrent
+mov [r11+1A0],(float)99999 //LeftLegMax
+mov [r11+1A4],(float)99999 //LeftLegMaxLimit
+mov [r11+1D0],(float)99999 //RightArmCurrent
+mov [r11+1D4],(float)99999 //RightArmMax
+mov [r11+1D8],(float)99999 //RightArmMaxLimit
+mov [r11+204],(float)99999 //LeftArmCurrent
+mov [r11+208],(float)99999 //LeftArmMax
+mov [r11+20C],(float)99999 //LeftArmMaxLimit
+mov [r11+238],(float)99999 //HeadCurrent
+mov [r11+23C],(float)99999 //HeadMax
+mov [r11+240],(float)99999 //HeadMaxLimit
+mov [r11+258],(float)99999 //OriginalHeadMax
+mov [r11+224],(float)99999 //OriginalLeftArmMax
+mov [r11+1F0],(float)99999 //OriignalRightArmMax
+mov [r11+1BC],(float)99999 //OriginalLeftLegMax
+mov [r11+188],(float)99999 //OriginalRightLegMax
+mov [r11+159],0 //EnableIncapacitation
+//Send@Sintrix|FearlessRevolution
+@@:
+pop r11
+
+code:
+  mov r9,[rax]
+  lea r8,[rbp+000000F8]
+  jmp return
+//Send@Sintrix|FearlessRevolution
+playerHealth:
+  jmp newmem
+  nop 5
+return:
+registersymbol(playerHealth)
+//Send@Sintrix|FearlessRevolution
+[DISABLE]
+
+playerHealth:
+  db 4C 8B 08 4C 8D 85 F8 00 00 00
+//Send@Sintrix|FearlessRevolution
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>1337208767</ID>
+          <Description>"One Hit Kill"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(WeaponDamage,$process,0F 29 BC 24 30 01 00 00 44 0F 29 84 24 20 01 00 00 F3 0F)
+alloc(newmem,$1000,WeaponDamage)
+label(code return)
+//Send@Sintrix|FearlessRevolution
+
+newmem:
+mov [rbx+DC8],(float)999999 //Head
+mov [rbx+DCC],(float)999999 //UpperBody
+mov [rbx+DD0],(float)999999 //LowerBody
+mov [rbx+DD4],(float)999999 //Arm
+mov [rbx+DD8],(float)999999 //Hand
+mov [rbx+DDC],(float)999999 //Leg
+mov [rbx+DE0],(float)999999 //Foot
+mov [rbx+D94],(float)999999 //Dismemberment
+mov [rbx+D8C],(float)999999 //SpallingDamage
+mov [rbx+D98],(float)999999 //ArteryHitChance
+
+code:
+  movaps [rsp+00000130],xmm7
+  jmp return
+//Send@Sintrix|FearlessRevolution
+
+WeaponDamage:
+  jmp newmem
+  nop 3
+return:
+registersymbol(WeaponDamage)
+//Send@Sintrix|FearlessRevolution
+
+[DISABLE]
+
+WeaponDamage:
+  db 0F 29 BC 24 30 01 00 00
+//Send@Sintrix|FearlessRevolution
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>26473</ID>
+          <Description>"→ Movement Speed Modifier"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+//Send@Sintrix|FearlessRevolution
+aobscanmodule(speed,$process,F3 0F 11 88 48 02 00 00 45)
+alloc(newmem,$1000,speed)
+registersymbol(setspeed)
+label(code return setspeed)
+
+newmem:
+//Send@Sintrix|FearlessRevolution
+code:
+  movss xmm1,[setspeed]
+  movss [rax+00000248],xmm1
+  jmp return
+
+setspeed:
+dd (float)306.23
+//Send@Sintrix|FearlessRevolution
+speed:
+  jmp newmem
+  nop 3
+return:
+registersymbol(speed)
+
+[DISABLE]
+//Send@Sintrix|FearlessRevolution
+speed:
+  db F3 0F 11 88 48 02 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>26474</ID>
+              <Description>"Set Movement Speed"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>setspeed</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>26546</ID>
+          <Description>"No Fear"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+//Send@Sintrix|FearlessRevolution
+aobscanmodule(PlayerFear,$process,F3 41 0F 10 B6 38 2B 00 00)
+alloc(newmem,$1000,PlayerFear)
+label(code return)
+
+newmem:
+//Send@Sintrix|FearlessRevolution
+code:
+  movss xmm6,[r14+00002B38]
+  xorps xmm6,xmm6
+  jmp return
+
+PlayerFear:
+  jmp newmem
+  nop 4
+return:
+registersymbol(PlayerFear)
+//Send@Sintrix|FearlessRevolution
+[DISABLE]
+
+PlayerFear:
+  db F3 41 0F 10 B6 38 2B 00 00
+//Send@Sintrix|FearlessRevolution
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>26548</ID>
+          <Description>"No Exhaustion"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(PlayerExhaustion,$process,F3 45 0F 10 86 28 2B 00 00)
+alloc(newmem,$1000,PlayerExhaustion)
+label(code return)
+//Send@Sintrix|FearlessRevolution
+
+newmem:
+
+code:
+  movss xmm8,[r14+00002B28]
+  xorps xmm8,xmm8
+  jmp return
+//Send@Sintrix|FearlessRevolution
+
+PlayerExhaustion:
+  jmp newmem
+  nop 4
+return:
+registersymbol(PlayerExhaustion)
+
+[DISABLE]
+//Send@Sintrix|FearlessRevolution
+
+PlayerExhaustion:
+  db F3 45 0F 10 86 28 2B 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>1337208763</ID>
+          <Description>"→ Field Of View Editor"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(FieldOfView_FirstPersonCamera,$process,F3 0F 11 89 A0 02 00 00 C3)
+alloc(newmem,$1000,FieldOfView_FirstPersonCamera)
+registersymbol(SetFoV)
+label(code return SetFoV)
+
+newmem:
+//Send@Sintrix|FearlessRevolution
+code:
+  movss xmm1,[SetFoV]
+  movss [rcx+000002A0],xmm1
+  jmp return
+
+SetFoV:
+dd (float)120
+//Send@Sintrix|FearlessRevolution
+FieldOfView_FirstPersonCamera:
+  jmp newmem
+  nop 3
+return:
+registersymbol(FieldOfView_FirstPersonCamera)
+//Send@Sintrix|FearlessRevolution
+[DISABLE]
+
+FieldOfView_FirstPersonCamera:
+  db F3 0F 11 89 A0 02 00 00
+//Send@Sintrix|FearlessRevolution
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>1337208764</ID>
+              <Description>"Set Field of View"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>SetFoV</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>1337208721</ID>
+      <Description>"==== Weapon ===="</Description>
+      <Color>FFFF00</Color>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>1337208729</ID>
+          <Description>"No Reload"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+//Send@Sintrix|FearlessRevolution
+aobscanmodule(AmmoDecrease,$process,66 89 04 91 48 63 83 30 16 00 00)
+
+AmmoDecrease:
+  db 90 90 90 90
+
+registersymbol(AmmoDecrease)
+//Send@Sintrix|FearlessRevolution
+[DISABLE]
+
+AmmoDecrease:
+  db 66 89 04 91 48 63 83 30 16 00 00
+//Send@Sintrix|FearlessRevolution
+unregistersymbol(AmmoDecrease)
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>1337208733</ID>
+          <Description>"No Recoil"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(WeaponRecoil,$process,F3 44 0F 10 AD 78 11 00 00)
+alloc(newmem,$1000,WeaponRecoil)
+label(code return)
+//Send@Sintrix|FearlessRevolution
+newmem:
+
+code:
+  movss xmm13,[rbp+00001178]
+  xorps xmm13,xmm13
+  jmp return
+//Send@Sintrix|FearlessRevolution
+WeaponRecoil:
+  jmp newmem
+  nop 4
+return:
+registersymbol(WeaponRecoil)
+
+[DISABLE]
+//Send@Sintrix|FearlessRevolution
+WeaponRecoil:
+  db F3 44 0F 10 AD 78 11 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>1337208738</ID>
+          <Description>"No Spread"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(IgnoreAmmoSpread,$process,44 38 B7 18 11 00 00)
+alloc(newmem,$1000,IgnoreAmmoSpread)
+label(code return)
+
+newmem:
+
+code:
+  mov [rdi+00001118],1
+  jmp return
+
+IgnoreAmmoSpread:
+  jmp newmem
+  nop 2
+return:
+registersymbol(IgnoreAmmoSpread)
+
+[DISABLE]
+
+IgnoreAmmoSpread:
+  db 44 38 B7 18 11 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>1337208740</ID>
+          <Description>"Suppress Weapon"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(bSupressWeapon,$process,41 88 BE 84 0E 00 00)
+alloc(newmem,$1000,bSupressWeapon)
+label(code return)
+//Send@Sintrix|FearlessRevolution
+newmem:
+
+code:
+  mov [r14+00000E84],1
+  jmp return
+
+bSupressWeapon:
+  jmp newmem
+  nop 2
+return:
+registersymbol(bSupressWeapon)
+//Send@Sintrix|FearlessRevolution
+[DISABLE]
+
+bSupressWeapon:
+  db 41 88 BE 84 0E 00 00
+//Send@Sintrix|FearlessRevolution
+unregistersymbol(*)
+dealloc(*)
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>1337208742</ID>
+          <Description>"→ Weapon Stats"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(WeaponFireRate,$process,F3 0F 10 80 F4 03 00 00)
+alloc(newmem,$1000,WeaponFireRate)
+registersymbol(getWeapon)
+label(code return getWeapon)
+
+newmem:
+
+code:
+  movss xmm0,[rax+000003F4]
+  mov [getWeapon],rax
+  jmp return
+
+getWeapon:
+dq 0
+
+WeaponFireRate:
+  jmp newmem
+  nop 3
+return:
+registersymbol(WeaponFireRate)
+
+[DISABLE]
+
+WeaponFireRate:
+  db F3 0F 10 80 F4 03 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>1337208758</ID>
+              <Description>"Set Projectile Count"</Description>
+              <VariableType>4 Bytes</VariableType>
+              <Address>[getWeapon]+1174</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>1337208743</ID>
+              <Description>"Set Fire Rate"</Description>
+              <VariableType>Float</VariableType>
+              <Address>[getWeapon]+FD0</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>1337208751</ID>
+              <Description>"Infinite Ammo"</Description>
+              <DropDownListLink>Armor Piercing Ammunition</DropDownListLink>
+              <VariableType>Byte</VariableType>
+              <Address>[getWeapon]+162C</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>1337208749</ID>
+              <Description>"Armor Piercing Ammunition"</Description>
+              <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">0:Disabled
+1:Enabled
+</DropDownList>
+              <VariableType>Byte</VariableType>
+              <Address>[getWeapon]+FDC</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>1337208766</ID>
+              <Description>"Ignore Armour"</Description>
+              <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">0:Disabled
+1:Enabled
+</DropDownList>
+              <VariableType>Byte</VariableType>
+              <Address>[getWeapon]+D78</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>1337208755</ID>
+          <Description>"No Weapon Heat"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(HeatPerShot,$process,F3 0F 10 83 40 18 00 00)
+alloc(newmem,$1000,HeatPerShot)
+label(code return)
+//Send@Sintrix|FearlessRevolution
+newmem:
+
+code:
+  movss xmm0,[rbx+00001840]
+  xorps xmm0,xmm0
+  jmp return
+//Send@Sintrix|FearlessRevolution
+HeatPerShot:
+  jmp newmem
+  nop 3
+return:
+registersymbol(HeatPerShot)
+
+[DISABLE]
+//Send@Sintrix|FearlessRevolution
+HeatPerShot:
+  db F3 0F 10 83 40 18 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>1337208753</ID>
+          <Description>"Weightless Magazines"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(MagazineWeight,$process,48 8B 81 08 16 00 00 48 63 D2)
+alloc(newmem,$1000,MagazineWeight)
+//Send@Sintrix|FearlessRevolution
+label(code)
+label(return)
+
+newmem:
+mov [rcx+1860],(float)0
+//Send@Sintrix|FearlessRevolution
+code:
+  mov rax,[rcx+00001608]
+  jmp return
+
+MagazineWeight:
+  jmp newmem
+  nop 2
+return:
+registersymbol(MagazineWeight)
+//Send@Sintrix|FearlessRevolution
+[DISABLE]
+
+MagazineWeight:
+  db 48 8B 81 08 16 00 00
+//Send@Sintrix|FearlessRevolution
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>1337208757</ID>
+          <Description>"Remove Heavy Rifle Flag"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(HeavyRifleFlag,$process,0F B7 0C 90 66 0F 6E C1)
+alloc(newmem,$1000,HeavyRifleFlag)
+label(code return)
+//Send@Sintrix|FearlessRevolution
+
+newmem:
+mov [rcx+1891],0
+
+code:
+  movzx ecx,word ptr [rax+rdx*4]
+  movd xmm0,ecx
+  jmp return
+//Send@Sintrix|FearlessRevolution
+HeavyRifleFlag:
+  jmp newmem
+  nop 3
+return:
+registersymbol(HeavyRifleFlag)
+
+[DISABLE]
+
+HeavyRifleFlag:
+  db 0F B7 0C 90 66 0F 6E C1
+//Send@Sintrix|FearlessRevolution
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>459</ID>
+      <Description>"--------------------------------"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>461</ID>
+      <Description>"💥 Author:  Send - CamoHax"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>454</ID>
+      <Description>"🞂 Process: ReadyOrNotSteam-Win64-Shipping.exe"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>772</ID>
+      <Description>"✔ Table Version: 1.3"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>773</ID>
+      <Description>"✔ Game Build: 19378689 (https://steamdb.info/app/1144200/patchnotes/)"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>460</ID>
+      <Description>"⚡ Discord "</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+{$lua}
+shellExecute("https://discord.gg/NTFcdAUWxb")
+
+{$asm}
+[DISABLE]
+
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>458</ID>
+      <Description>"--------------------------------"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

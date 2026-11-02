@@ -1,0 +1,609 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>104</ID>
+      <Description>"Enable (Auto-Attach Game Process)"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$Lua}
+if syntaxcheck then return end
+
+local process = 'Metria.exe'
+OpenProcess(process);
+if process ~= process or (readInteger(process) == nil) then
+   error(ShowMessage("Failed To Attach To Process"))
+end
+
+
+--Set Window Title
+local title = "Metria 1.0.0.1 by Sintrix";
+if not((MainForm.Caption):match("metria")) then
+MainForm.Caption = title..' ~ '..MainForm.Caption
+end
+
+
+[DISABLE]
+
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>1337094691</ID>
+          <Description>"Ignore Damage"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>//Send@Sintrix|FearlessRevolution
+//EnemyScript.AttackProcess
+[ENABLE]
+GameAssembly.dll+9CA0B0:
+db C3
+GameAssembly.dll+9CA440: //EnemyScript.BeginAttackProcess
+db C3
+[DISABLE]
+GameAssembly.dll+9CA0B0: //EnemyScript.AttackProcess
+db 48 8B C4
+GameAssembly.dll+9CA440:
+db 40 53
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>1337094686</ID>
+          <Description>"Max Attack Range"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>define(address,"GameAssembly.dll"+E1DF00)
+define(bytes,F2 0F 10 44 88 20)
+
+define(address2,"GameAssembly.dll"+E1DF06)
+define(bytes2,8B 44 88 28 EB 32)
+
+[ENABLE]
+
+//Send@Sintrix (Credits to LittleLight for finding the instruction.)
+//CharaAttack.GetCharaAttackParams
+
+assert(address,bytes)
+alloc(newmem,$1000,"GameAssembly.dll"+E1DF00)
+
+label(code)
+label(return)
+
+newmem:
+  mov [rax+rcx*4+20],(float)5000
+code:
+
+  movsd xmm0,[rax+rcx*4+20]
+  jmp return
+
+address:
+  jmp newmem
+  nop
+return:
+
+assert(address2,bytes2)
+alloc(newmem2,$1000,"GameAssembly.dll"+E1DF06)
+
+label(code2)
+label(return2)
+
+newmem2:
+  mov [rax+rcx*4+20],(float)5000
+code2:
+
+  mov eax,[rax+rcx*4+28]
+  jmp GameAssembly.dll+E1DF3E
+  jmp return2
+
+address2:
+  jmp newmem2
+  nop
+return2:
+
+[DISABLE]
+
+address:
+  db bytes
+address2:
+  db bytes2
+
+dealloc(*)
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>1337094720</ID>
+          <Description>"Fast Dodge/Roll"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>//Send@Sintrix
+[ENABLE]
+//PlayerScript.DodgeDistance
+aobscanmodule(dodgedistance,GameAssembly.dll,F3 41 0F 10 96 04 01 00 00)
+alloc(newmem,$1000,dodgedistance)
+
+label(code)
+label(return)
+
+newmem:
+mov [r14+104],(float)18
+code:
+  movss xmm2,[r14+00000104]
+  jmp return
+
+dodgedistance:
+  jmp newmem
+  nop 4
+return:
+registersymbol(dodgedistance)
+
+[DISABLE]
+
+dodgedistance:
+  db F3 41 0F 10 96 04 01 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>1337094692</ID>
+          <Description>"Rapid Attack &amp; Always Critical Hit"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>//Send@FearlessRevolution|Sintrix
+[ENABLE]
+//PlayerScript.GetExSkillGaugeRate
+aobscanmodule(rapidattk,GameAssembly.dll,F3 48 0F 2A 40 10)
+alloc(newmem,$1000,rapidattk)
+label(code return)
+
+newmem:
+push rbx
+mov rbx,[rbx+250]
+mov [rbx+1D0],(float)9999
+mov [rbx+E8],#999999
+mov [rbx+178],(float)10000000
+mov [rbx+180],#10000000
+mov [rbx+188],(float)10000000
+code:
+  pop rbx
+  cvtsi2ss xmm0,[rax+10]
+  jmp return
+
+rapidattk:
+  jmp newmem
+  nop
+return:
+registersymbol(rapidattk)
+
+[DISABLE]
+
+rapidattk:
+  db F3 48 0F 2A 40 10
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>1337094693</ID>
+          <Description>"Infinite Stamina"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>//Send@Sintrix|FearlessRevoltuon
+[ENABLE]
+
+
+aobscanmodule(stam,GameAssembly.dll,F3 48 0F 2A 41 18 0F)
+alloc(newmem,$1000,stam)
+label(code return)
+
+newmem:
+
+code:
+  mov [rcx+18],#100
+  cvtsi2ss xmm0,[rcx+18]
+  jmp return
+
+stam:
+  jmp newmem
+  nop
+return:
+registersymbol(stam)
+
+[DISABLE]
+
+stam:
+  db F3 48 0F 2A 41 18
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>1337094642</ID>
+          <Description>"Instant EX Skill"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>//Send@FearlessRevolution|Sintrix
+[ENABLE]
+
+aobscanmodule(exskill,GameAssembly.dll,F3 48 0F 2A 49 10 F3 0F 5E C8)
+alloc(newmem,$1000,exskill)
+label(code return)
+
+newmem:
+
+code:
+  mov [rcx+10],(float)99999
+  cvtsi2ss xmm1,[rcx+10]
+  jmp return
+
+exskill:
+  jmp newmem
+  nop
+return:
+registersymbol(exskill)
+
+[DISABLE]
+
+exskill:
+  db F3 48 0F 2A 49 10
+
+unregistersymbol(*)
+dealloc(*)
+//PlayerScript.GetExSkillGaugeRate
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>1337094646</ID>
+          <Description>"Combo Doesn't Decrease"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>//Send@Sintrix|FearlessRevoltuon
+[ENABLE]
+
+aobscanmodule(combotime,GameAssembly.dll,F3 0F 10 41 20 F3 0F 5E)
+alloc(newmem,$1000,combotime)
+label(code return)
+
+newmem:
+
+code:
+  mov [rcx+20],(float)9999
+  movss xmm0,[rcx+20]
+  jmp return
+
+combotime:
+  jmp newmem
+return:
+registersymbol(combotime)
+
+[DISABLE]
+
+combotime:
+  db F3 0F 10 41 20
+
+unregistersymbol(*)
+dealloc(*)
+//Metria.PlayerComboManager.AddCombo
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>1337094702</ID>
+          <Description>"No Drop Item Wait (Items Drop A Bit Faster)"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>//Send@Sintrix
+//&lt;DropEventAsync&gt;d__42.MoveNext
+define(address,"GameAssembly.dll"+928869)
+define(bytes,F3 0F 10 40 68)
+
+define(address2,"GameAssembly.dll"+9288BD)
+define(bytes2,F3 0F 10 40 68)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,"GameAssembly.dll"+928869)
+label(code return)
+newmem:
+
+code:
+  mov [rax+68],(float)-1
+  movss xmm0,[rax+68]
+  jmp return
+
+address:
+  jmp newmem
+return:
+
+assert(address2,bytes2)
+alloc(newmem2,$1000,"GameAssembly.dll"+9288BD)
+label(code2 return2)
+
+newmem2:
+
+code2:
+  mov [rax+68],(float)-1
+  movss xmm0,[rax+68]
+  jmp return2
+
+address2:
+  jmp newmem2
+return2:
+
+[DISABLE]
+
+address:
+  db bytes
+
+address2:
+  db bytes2
+
+dealloc(*)
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>1337094736</ID>
+          <Description>"No Loot Pickup Delay"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>//Send@Sintrix
+define(address,"GameAssembly.dll"+9825AB)
+define(bytes,0F 2F 40 18 40 0F 97 C7)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,"GameAssembly.dll"+9825AB)
+label(code return)
+
+newmem:
+
+code:
+  mov [rax+18],(float)0
+  comiss xmm0,[rax+18]
+  seta dil
+  jmp return
+
+address:
+  jmp newmem
+  nop 3
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+dealloc(*)
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>1337094735</ID>
+          <Description>"No Cooldowns"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>//Send@Sintrix
+[ENABLE]
+
+aobscanmodule(cd,GameAssembly.dll,F3 0F 10 41 18 48 83 C4 28 C3 E8 81)
+alloc(newmem,$1000,cd)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  mov [rcx+18],(float)0
+  movss xmm0,[rcx+18]
+  jmp return
+
+cd:
+  jmp newmem
+return:
+registersymbol(cd)
+
+[DISABLE]
+
+cd:
+  db F3 0F 10 41 18
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>1337094673</ID>
+          <Description>"Instant Break Enemy"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>//Send@Sintrix
+//CharacterScript.GetNowBreakRatio
+
+define(address,"GameAssembly.dll"+8ADAB1)
+define(bytes,F3 48 0F 2A 83 80 02 00 00)
+
+[ENABLE]
+
+
+assert(address,bytes)
+alloc(newmem,$1000,"GameAssembly.dll"+8ADAB1)
+label(code return)
+newmem:
+
+code:
+  mov [rbx+280],(float)0
+  cvtsi2ss xmm0,[rbx+00000280]
+  jmp return
+
+address:
+  jmp newmem
+  nop 4
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+dealloc(*)
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>1337094733</ID>
+          <Description>"Movespeed Modifier"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>define(address,"GameAssembly.dll"+8B2C75)
+define(bytes,F3 0F 10 7E 1C)
+
+[ENABLE]
+
+//Send@Sintrix
+//CharacterScript.UpdateAnimationSpeed
+
+assert(address,bytes)
+alloc(newmem,$1000,"GameAssembly.dll"+8B2C75)
+registersymbol(smove)
+label(code return smove)
+
+newmem:
+
+code:
+  movss xmm7,[smove]
+  jmp return
+
+smove:
+dd (float)5
+
+address:
+  jmp newmem
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>1337094734</ID>
+              <Description>"Set Move Speed"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>smove</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>1337094724</ID>
+          <Description>"Camera Zoom Scale"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>//Send@Sintrix
+[ENABLE]
+
+aobscanmodule(camz,GameAssembly.dll,F3 0F 5F 83 C8 00 00 00 0F 28 D6 41 0F 57 C9 F3 0F 5E D0 F3 0F 59 D1 0F)
+alloc(newmem,$1000,camz)
+registersymbol(szoom)
+label(code return szoom)
+
+newmem:
+mov [szoom],rbx
+
+code:
+  maxss xmm0,[rbx+000000C8]
+  jmp return
+
+szoom:
+dq 0
+
+camz:
+  jmp newmem
+  nop 3
+return:
+registersymbol(camz)
+
+[DISABLE]
+
+camz:
+  db F3 0F 5F 83 C8 00 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>1337094725</ID>
+              <Description>"Set Zoom Scale"</Description>
+              <VariableType>Float</VariableType>
+              <Address>[szoom]+C8</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>459</ID>
+      <Description>"--------------------------------"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>461</ID>
+      <Description>"💥 Author: Send"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>454</ID>
+      <Description>"🞂 Process: Metria.exe"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>455</ID>
+      <Description>"🞂 Build: 16442187"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>457</ID>
+      <Description>"✔ Verify Game Build"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+{$lua}
+shellExecute("https://steamdb.info/app/3017110/patchnotes/")
+
+{$asm}
+[DISABLE]
+
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>460</ID>
+      <Description>"⚡ Sintrix Discord"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+{$lua}
+shellExecute("https://discord.gg/NTFcdAUWxb")
+
+{$asm}
+[DISABLE]
+
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>458</ID>
+      <Description>"--------------------------------"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

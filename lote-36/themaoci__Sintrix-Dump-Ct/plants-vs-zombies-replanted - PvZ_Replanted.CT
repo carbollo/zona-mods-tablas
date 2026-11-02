@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>774</ID>
+      <Description>"Activate Trainer"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$Lua}
+if syntaxcheck then return end
+
+local process = 'Replanted.exe'
+OpenProcess(process);
+if process ~= process or (readInteger(process) == nil) then
+   error(ShowMessage("Failed To Attach To Process"))
+end
+
+{$asm}
+[DISABLE]
+
+
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>769</ID>
+          <Description>"→ Initialize Mono"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+{$lua}
+mono_initialize()
+LaunchMonoDataCollector()
+{$asm}
+
+
+[DISABLE]
+
+
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>777</ID>
+              <Description>"Unlimited Plant Health"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>define(address,Reloaded.Gameplay.Plant.Update)
+define(bytes,40 53 48 83 EC 20)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,Reloaded.Gameplay.Plant.Update)
+
+label(code)
+label(return)
+
+newmem:
+mov [rcx+8C],#99999999
+
+code:
+  push rbx
+  sub rsp,20
+  jmp return
+
+address:
+  jmp newmem
+  nop
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+dealloc(newmem)
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>778</ID>
+              <Description>"Weak Zombies"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>define(address,Reloaded.Gameplay.Zombie.Update)
+define(bytes,40 53 48 83 EC 20)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,Reloaded.Gameplay.Zombie.Update)
+
+label(code)
+label(return)
+
+newmem:
+mov [rcx+120],#1
+mov [rcx+124],#1
+mov [rcx+128],#0
+mov [rcx+12C],#0
+mov [rcx+134],#0
+mov [rcx+138],#0
+mov [rcx+13C],#1
+mov [rcx+140],#1
+jmp code
+
+code:
+  push rbx
+  sub rsp,20
+  jmp return
+
+address:
+  jmp newmem
+  nop
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+dealloc(newmem)
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>780</ID>
+              <Description>"Free Plant Purchases"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+aobscanmodule(PlantCost,GameAssembly.dll,66 0F 6E 43 48)
+alloc(newmem,$1000,PlantCost)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  movd xmm0,[rbx+48]
+  xorpd xmm0,xmm0
+  jmp return
+
+PlantCost:
+  jmp newmem
+return:
+registersymbol(PlantCost)
+
+[DISABLE]
+
+PlantCost:
+  db 66 0F 6E 43 48
+
+unregistersymbol(PlantCost)
+dealloc(newmem)
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>781</ID>
+              <Description>"Zero Plant Purchase Refresh"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+aobscanmodule(PlantBuyRefreshTime,GameAssembly.dll,66 0F 6E 47 50)
+alloc(newmem,$1000,PlantBuyRefreshTime)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  movd xmm0,[rdi+50]
+  xorpd xmm0,xmm0
+  jmp return
+
+PlantBuyRefreshTime:
+  jmp newmem
+return:
+registersymbol(PlantBuyRefreshTime)
+
+[DISABLE]
+
+PlantBuyRefreshTime:
+  db 66 0F 6E 47 50
+
+unregistersymbol(PlantBuyRefreshTime)
+dealloc(newmem)
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>782</ID>
+              <Description>"Edit Sun Stash"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+aobscanmodule(SunCount,GameAssembly.dll,8B 50 10 48 85 F6 0F 84 38)
+alloc(newmem,$1000,SunCount)
+alloc(EditSun,8,SunCount)
+label(code return)
+
+newmem:
+push r12
+lea r12,[rax+10]
+mov [EditSun],r12
+pop r12
+
+code:
+  mov edx,[rax+10]
+  test rsi,rsi
+  jmp return
+
+SunCount:
+  jmp newmem
+  nop
+return:
+registersymbol(SunCount EditSun)
+
+[DISABLE]
+
+SunCount:
+  db 8B 50 10 48 85 F6
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>783</ID>
+                  <Description>"Set Amount"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[EditSun]</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>459</ID>
+      <Description>"--------------------------------"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>454</ID>
+      <Description>"🞂 Process: Replanted.exe "</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>458</ID>
+      <Description>"--------------------------------"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

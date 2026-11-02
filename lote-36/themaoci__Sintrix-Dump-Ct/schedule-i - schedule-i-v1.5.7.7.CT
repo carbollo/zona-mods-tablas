@@ -1,0 +1,2887 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>845</ID>
+      <Description>"→ Enable (Auto-Attach Game Process)"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$lua}
+if syntaxcheck then return end
+-- Load Scripts from lua file
+local s = findTableFile('SintrixLua.lua').Stream
+load(readStringLocal(s.Memory,s.Size))()
+-- set background picture
+setAddressListPicture('sintrix.jpg', 210, 0x0000FF)
+-- start table script : (process , title, footer)
+startTable('Schedule I.exe','Schedule I v1.5.7.7', 'Schedule I x SINTRIX')
+checkUpdate('schedule-i')
+{$asm}
+[DISABLE]
+
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>1430</ID>
+          <Description>"→ Initialize Mono"</Description>
+          <Options moHideChildren="1"/>
+          <Color>FFFF00</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+{$lua}
+mono_initialize()
+LaunchMonoDataCollector()
+{$asm}
+
+
+[DISABLE]
+
+
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>1431</ID>
+              <Description>"→ Player"</Description>
+              <Options moHideChildren="1"/>
+              <Color>0080FF</Color>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>1432</ID>
+                  <Description>"God Mode"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+ScheduleOne.PlayerScripts.Health.PlayerHealth.get_CanTakeDamage:
+db B0 00 C3
+ScheduleOne.PlayerScripts.Health.PlayerHealth.RpcWriter___Observers_TakeDamage_3505310624:
+db C3
+//Send@Sintrix|FearlessRevolution
+[DISABLE]
+ScheduleOne.PlayerScripts.Health.PlayerHealth.get_CanTakeDamage:
+db 48 83 EC 08
+ScheduleOne.PlayerScripts.Health.PlayerHealth.RpcWriter___Observers_TakeDamage_3505310624:
+db 48 89 5C 24 10
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1433</ID>
+                  <Description>"Infinite Stamina"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+ScheduleOne.PlayerScripts.PlayerMovement.SetStamina:
+db C3
+//Send@Sintrix|FearlessRevolution
+[DISABLE]
+ScheduleOne.PlayerScripts.PlayerMovement.SetStamina:
+db 48 89 5C 24 08
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1434</ID>
+                  <Description>"Stealth Mode"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+//Send@Sintrix|FearlessRevolution
+aobscanmodule(stealth,GameAssembly.dll,F3 0F 11 83 18 01 00 00 48 83)
+alloc(newmem,$1000,stealth)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  xorps xmm0,xmm0
+  movss [rbx+00000118],xmm0
+  jmp return
+
+stealth:
+  jmp newmem
+  nop 3
+return:
+registersymbol(stealth)
+//Send@Sintrix|FearlessRevolution
+[DISABLE]
+
+stealth:
+  db F3 0F 11 83 18 01 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1435</ID>
+                  <Description>"Never Paranoid/Disoriented"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>define(address,ScheduleOne.PlayerScripts.Player.Update)
+define(bytes,48 89 5C 24 10)
+
+[ENABLE]
+//Send@Sintrix|FearlessRevolution
+assert(address,bytes)
+alloc(newmem,$1000,ScheduleOne.PlayerScripts.Player.Update)
+
+label(code)
+label(return)
+
+newmem:
+mov [rcx+368],0
+mov [rcx+369],0
+code:
+  mov [rsp+10],rbx
+  jmp return
+//Send@Sintrix|FearlessRevolution
+address:
+  jmp newmem
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+
+dealloc(*)
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1436</ID>
+                  <Description>"→  Player Movement Modifiers"</Description>
+                  <Options moHideChildren="1"/>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>//Send@Sintrix|FearlessRevolution
+
+
+define(address,ScheduleOne.PlayerScripts.PlayerMovement.Update)
+define(bytes,40 53 48 83 EC 60)
+
+[ENABLE]
+assert(address,bytes)
+alloc(newmem,$1000,ScheduleOne.PlayerScripts.PlayerMovement.Update)
+registersymbol(mptr)
+label(code return mptr)
+
+newmem:
+mov [mptr],rcx
+//Send@Sintrix|FearlessRevolution
+code:
+  push rbx
+  sub rsp,60
+  jmp return
+
+mptr:
+dq 0
+
+
+//Send@Sintrix|FearlessRevolution
+address:
+  jmp newmem
+  nop
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>1437</ID>
+                      <Description>"Set Move Speed Multiplier"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Float</VariableType>
+                      <Address>[mptr]+3C</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>1438</ID>
+                      <Description>"Set Jump Height"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Float</VariableType>
+                      <Address>[mptr]+44</Address>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1439</ID>
+                  <Description>"Edit Clicked Item"</Description>
+                  <Options moHideChildren="1"/>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+//Send@Sintrix|FearlessRevolution
+aobscanmodule(clickeditemamount,GameAssembly.dll,48 8B 53 20 48 85 D2 74 24 4C)
+alloc(newmem,$1000,clickeditemamount)
+registersymbol(clicked)
+label(code return clicked)
+
+newmem:
+mov [clicked],rbx
+
+code:
+  mov rdx,[rbx+20]
+  test rdx,rdx
+  jmp return
+
+clicked:
+dw
+//Send@Sintrix|FearlessRevolution
+clickeditemamount:
+  jmp newmem
+  nop 2
+return:
+registersymbol(clickeditemamount)
+
+[DISABLE]
+ //ScheduleOne.UI.Items.ItemUI.UpdateUI
+clickeditemamount:
+  db 48 8B 53 20 48 85 D2
+//Send@Sintrix|FearlessRevolution
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>1440</ID>
+                      <Description>"Quantity"</Description>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>[clicked]+20</Address>
+                      <Offsets>
+                        <Offset>20</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>1441</ID>
+                      <Description>"Quality"</Description>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>[clicked]+20</Address>
+                      <Offsets>
+                        <Offset>38</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1442</ID>
+                  <Description>"9999x Stack Limit"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>//Target:  Schedule I.exe
+//Author:  Salis
+//Credit to METHOS for custom Template LUA
+
+[ENABLE]
+
+////////////////////////  setstacklim  \\\\\\\\\\\\\\\\\\\\\\\\
+
+define(address, ScheduleOne.ItemFramework.ItemInstance.get_StackLimit+10)
+
+alloc(newmem,1024,GameAssembly.dll)
+alloc(obytes_setstacklim, 10)
+label(return code)
+
+registersymbol(obytes_setstacklim)
+
+obytes_setstacklim:
+readmem(address, 10)
+
+newmem:
+mov [rax+5C],#9999
+code:
+ mov eax,[rax+5C]
+ add rsp,28
+ jmp return
+
+address:
+ jmp newmem
+ nop 2
+return:
+
+
+[DISABLE]
+
+address:
+readmem(obytes_setstacklim, 10)
+
+dealloc(*)
+unregistersymbol(*)
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1443</ID>
+                  <Description>"→ Enable Easy Pickpocket"</Description>
+                  <Options moHideChildren="1"/>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+
+aobscanmodule(PICKPOCKET,GameAssembly.dll,F3 44 0F 10 47 2C 44 0F)
+alloc(newmem,$1000,PICKPOCKET)
+registersymboL(epp)
+label(code return epp)
+
+newmem:
+cmp [epp],1
+jne @F
+mov [rdi+2C],(float)950
+mov [rdi+30],(float)950
+
+@@:
+cmp [epp],0
+jne code
+mov [rdi+2C],(float)45
+mov [rdi+30],(float)7
+
+code:
+  movss xmm8,[rdi+2C]
+  jmp return
+
+epp:
+dd 0
+
+PICKPOCKET:
+  jmp newmem
+  nop
+return:
+registersymbol(PICKPOCKET)
+
+[DISABLE]
+
+PICKPOCKET:
+  db F3 44 0F 10 47 2C
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>1444</ID>
+                      <Description>"Toggle Easy Pickpocket On/Off"</Description>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>[ENABLE]
+epp:
+dd 1
+
+[DISABLE]
+epp:
+dd 0
+</AssemblerScript>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1445</ID>
+                  <Description>"Infinite Watering Can"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+
+aobscanmodule(watercan,GameAssembly.dll,38 F3 0F 10 48 38)
+alloc(newmem,$1000,watercan)
+
+//Send@Sintrix|FearlessRevolutionel(code)
+label(code return)
+//Send@Sintrix|FearlessRevolution
+newmem:
+mov [rdx+38],(float)35
+code:
+  movss xmm1,[rax+38]
+  jmp return
+
+watercan+01:
+  jmp newmem
+return:
+registersymbol(watercan)
+//Send@Sintrix|FearlessRevolution
+[DISABLE]
+
+watercan+01:
+  db F3 0F 10 48 38
+//Send@Sintrix|FearlessRevolution
+unregistersymbol(*)
+dealloc(*))
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1446</ID>
+                  <Description>"Infinite Ammo"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>//Shaggy@Sintrix
+[ENABLE]
+
+
+aobscanmodule(address,GameAssembly.dll,F3??????????????33??E8????????F3??????33??488B??F3??????????????E8????????80)
+alloc(newmem,1024,GameAssembly.dll)
+alloc(obytes_infammo2, 10)
+label(return originalcode)
+
+registersymbol(obytes_infammo2)
+
+obytes_infammo2:
+readmem(address, 10)
+
+newmem:
+
+originalcode:
+ movss xmm6,[rbx+00000088]
+ push rdx
+ mov rdx, [rbx+00000168]
+ mov [rdx+00000038],#99
+ pop rdx
+ jmp return
+
+address:
+ jmp newmem
+ nop 3
+return:
+
+
+[DISABLE]
+
+address:
+readmem(obytes_infammo2, 10)
+
+dealloc(*)
+unregistersymbol(*)
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1447</ID>
+                  <Description>"Guns: Always Cocked"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>//Target:  Schedule I.exe
+//Author:  Salis
+//Credit to METHOS for custom Template LUA
+
+[ENABLE]
+
+////////////////////////  alwayscock  \\\\\\\\\\\\\\\\\\\\\\\\
+
+aobscanmodule(address,GameAssembly.dll,88 86 9D 00 00 00 88)
+alloc(newmem,1024,GameAssembly.dll)
+alloc(obytes_alwayscock, 10)
+label(return originalcode)
+
+registersymbol(obytes_alwayscock)
+
+obytes_alwayscock:
+readmem(address, 10)
+
+newmem:
+
+originalcode:
+ mov [rsi+0000009D],01
+ jmp return
+
+address:
+ jmp newmem
+ nop
+return:
+
+
+[DISABLE]
+
+address:
+readmem(obytes_alwayscock, 10)
+
+dealloc(*)
+unregistersymbol(*)
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1448</ID>
+                  <Description>"Guns: Rapid Fire"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>//Target:  Schedule I.exe
+//Author:  Salis
+//Credit to METHOS for custom Template LUA
+
+[ENABLE]
+
+////////////////////////  quickfirerev  \\\\\\\\\\\\\\\\\\\\\\\\
+
+aobscanmodule(address,GameAssembly.dll,0F 2F 87 C0 00 00 00)
+alloc(newmem,1024,GameAssembly.dll)
+alloc(obytes_quickfirerev, 10)
+label(return originalcode)
+
+registersymbol(obytes_quickfirerev)
+
+obytes_quickfirerev:
+readmem(address, 10)
+
+newmem:
+
+originalcode:
+ mov [rdi+000000C0],(float)0.01
+ comiss xmm0,[rdi+000000C0]
+ jmp return
+
+address:
+ jmp newmem
+ nop 2
+return:
+
+
+[DISABLE]
+
+address:
+readmem(obytes_quickfirerev, 10)
+
+dealloc(*)
+unregistersymbol(*)
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1449</ID>
+                  <Description>"Guns: Super Damage / Max Range / No Spread"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>//Target:  Schedule I.exe
+//Author:  Salis
+//Credit to METHOS for custom Template LUA
+
+[ENABLE]
+
+////////////////////////  powerrevolver  \\\\\\\\\\\\\\\\\\\\\\\\
+
+aobscanmodule(address,GameAssembly.dll,F3 0F 10 BE DC 00 00 00 77)
+alloc(newmem,1024,GameAssembly.dll)
+alloc(obytes_powerrevolver, 10)
+label(return originalcode)
+
+registersymbol(obytes_powerrevolver)
+
+obytes_powerrevolver:
+readmem(address, 10)
+
+newmem:
+
+originalcode:
+ mov [rsi+000000D4], (float)900
+ mov [rsi+000000DC], #0
+ mov [rsi+000000E0], #0
+ mov [rsi+000000E4], (float)900
+ mov [rsi+000000E8], (float)900
+ movss xmm7,[rsi+000000DC]
+ jmp return
+
+address:
+ jmp newmem
+ nop 3
+return:
+
+
+[DISABLE]
+
+address:
+readmem(obytes_powerrevolver, 10)
+
+dealloc(*)
+unregistersymbol(*)
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1450</ID>
+                  <Description>"→ Enable Super Punch"</Description>
+                  <Options moHideChildren="1"/>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>//Originally by Shaggy@Sintrix
+//Modified by Send @Sintrix
+[ENABLE]
+
+
+aobscanmodule(superpunch,GameAssembly.dll,F3 0F 10 5B 38 F3 0F 5C C2)
+alloc(newmem,$1000,superpunch)
+registersymbol(tsp)
+label(code return tsp)
+
+newmem:
+cmp [tsp],1
+jne @f
+mov [rbx+38],(float)9000
+mov [rbx+3c],(float)18000
+
+
+@@:
+cmp [tsp],1
+je code
+mov [rbx+38],(float)60
+mov [rbx+3C],(float)160
+
+code:
+  movss xmm3,[rbx+38]
+  jmp return
+
+tsp:
+dd 0
+
+superpunch:
+  jmp newmem
+return:
+registersymbol(superpunch)
+
+[DISABLE]
+
+superpunch:
+  db F3 0F 10 5B 38
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>1451</ID>
+                      <Description>"Toggle Super Punc On/Off"</Description>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>[ENABLE]
+tsp:
+dd 1
+
+[DISABLE]
+tsp:
+dd 0
+</AssemblerScript>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1452</ID>
+                  <Description>"→ Enable Super Punch Damage"</Description>
+                  <Options moHideChildren="1"/>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>define(address,ScheduleOne.Combat.PunchController.Update)
+define(bytes,40 53 48 83 EC 40)
+//Send@Sintrix|FearlessRevolution
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,ScheduleOne.Combat.PunchController.Update)
+registersymbol(opm)
+label(code return opm)
+
+newmem:
+cmp [opm],1
+jne @f
+mov [rcx+30],(float)99999
+mov [rcx+34],(float)99999
+
+@@:
+cmp [opm],1
+je code
+mov [rcx+30],(float)20
+mov [rcx+34],(float)35
+
+code:
+  push rbx
+  sub rsp,40
+  jmp return
+
+opm:
+dd 0
+
+address:
+  jmp newmem
+  nop
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>1453</ID>
+                      <Description>"Toggle On/Off"</Description>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>[ENABLE]
+opm:
+dd 1
+
+[DISABLE]
+opm:
+dd 0
+</AssemblerScript>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1454</ID>
+                  <Description>"Infinite Jumps"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+//Send@Sintrix|FearlessRevolution
+aobscanmodule(flymode,GameAssembly.dll,88 83 BC 00 00 00 48)
+alloc(newmem,$1000,flymode)
+
+label(code)
+label(return)
+
+newmem:
+mov al,1
+
+code:
+  mov [rbx+000000BC],al
+  jmp return
+
+flymode:
+  jmp newmem
+  nop
+return:
+registersymbol(flymode)
+//Send@Sintrix|FearlessRevolution
+[DISABLE]
+
+flymode:
+  db 88 83 BC 00 00 00 //ScheduleOne.PlayerScripts.PlayerMovement.FixedUpdate
+
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1455</ID>
+                  <Description>"Vehicle: No Top Speed"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>define(address,ScheduleOne.Vehicles.LandVehicle.Update)
+define(bytes,40 57 48 83 EC 50)
+
+[ENABLE]
+//Send@Sintrix|FearlessRevolution
+assert(address,bytes)
+alloc(newmem,$1000,ScheduleOne.Vehicles.LandVehicle.Update)
+
+label(code)
+label(return)
+//Send@Sintrix|FearlessRevolution
+newmem:
+mov [rcx+208],(float)10000
+code:
+  push rdi
+  sub rsp,50
+  jmp return
+
+address:
+  jmp newmem
+  nop
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+
+dealloc(*)
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1456</ID>
+                  <Description>"Trash Can: No Capacity Limit"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+
+aobscanmodule(trashcanCapacity,GameAssembly.dll,66 0F 6E 8B 20 01 00 00 0F 5B C9)
+alloc(newmem,$1000,trashcanCapacity)
+//Send@Sintrix|FearlessRevolution
+label(code)
+label(return)
+
+newmem:
+//Send@Sintrix|FearlessRevolution
+code:
+  mov [rbx+120],(float)35000
+  movd xmm1,[rbx+00000120]
+  jmp return
+
+trashcanCapacity:
+  jmp newmem
+  nop 3
+return:
+registersymbol(trashcanCapacity)
+//Send@Sintrix|FearlessRevolution
+[DISABLE]
+
+trashcanCapacity:
+  db 66 0F 6E 8B 20 01 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>1457</ID>
+              <Description>"→ Money"</Description>
+              <Options moHideChildren="1"/>
+              <Color>00FF00</Color>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>1458</ID>
+                  <Description>"→ Grab Cash Balance Method 1 (Hold Cash)"</Description>
+                  <Options moHideChildren="1"/>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+
+aobscanmodule(cashonhandptr,GameAssembly.dll,F3 0F 58 70 38 33)
+alloc(newmem,$1000,cashonhandptr)
+registersymbol(cash_held)
+label(code return cash_held)
+//Send@Sintrix|FearlessRevolution
+newmem:
+mov [cash_held],rax
+
+code:
+  addss xmm6,[rax+38]
+  jmp return
+
+cash_held:
+dw
+
+cashonhandptr:
+  jmp newmem
+return:
+registersymbol(cashonhandptr)
+//Send@Sintrix|FearlessRevolution
+[DISABLE]
+
+cashonhandptr:
+  db F3 0F 58 70 38
+//Send@Sintrix|FearlessRevolution
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>1459</ID>
+                      <Description>"Set Cash Balance"</Description>
+                      <VariableType>Float</VariableType>
+                      <Address>[cash_held]+38</Address>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1460</ID>
+                  <Description>"→ Grab Cash Balance Method 2 (Open ATM)"</Description>
+                  <Options moHideChildren="1"/>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>//Shaggy@Sintrix
+[ENABLE]
+
+
+define(address, ScheduleOne.Money.MoneyManager.get_cashBalance+10)
+
+alloc(newmem,1024,GameAssembly.dll)
+alloc(obytes_getcash, 10)
+label(return code)
+
+registersymbol(obytes_getcash cashx)
+
+obytes_getcash:
+readmem(address, 10)
+
+newmem:
+
+code:
+ mov [cashx], rax
+ movss xmm0,[rax+38]
+ jmp return
+
+cashx:
+dd #0
+
+address:
+ jmp newmem
+ return:
+
+
+[DISABLE]
+
+address:
+readmem(obytes_getcash, 10)
+
+dealloc(*)
+unregistersymbol(*)
+
+</AssemblerScript>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>1461</ID>
+                      <Description>"Set Cash Balance"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Float</VariableType>
+                      <Address>[cashx]+38</Address>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1462</ID>
+                  <Description>"Reset Weekly Deposit Limit (Open ATM)"</Description>
+                  <Options moHideChildren="1"/>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+//Send@Sintrix|FearlessRevolution
+aobscanmodule(atmliit,GameAssembly.dll,33 D2 F3 0F 10 00 E8 B9)
+alloc(newmem,$1000,atmliit)
+registersymbol(deposit)
+label(code return deposit)
+//Send@Sintrix|FearlessRevolution
+newmem:
+mov [deposit],rax
+
+code:
+  xor edx,edx
+  movss xmm0,[rax]
+  jmp return
+
+deposit:
+dw
+
+//Send@Sintrix|FearlessRevolution
+atmliit:
+  jmp newmem
+  nop
+return:
+registersymbol(atmliit)
+//Send@Sintrix|FearlessRevolution
+[DISABLE]
+
+atmliit:
+  db 33 D2 F3 0F 10 00
+//Send@Sintrix|FearlessRevolution
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>1463</ID>
+                      <Description>"Reset Weekly Deposit:  Shift+G"</Description>
+                      <GroupHeader>1</GroupHeader>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>1464</ID>
+                      <Description>"Set Amount Deposited"</Description>
+                      <VariableType>Float</VariableType>
+                      <Address>[deposit]</Address>
+                      <Hotkeys>
+                        <Hotkey>
+                          <Action>Set Value</Action>
+                          <Keys>
+                            <Key>16</Key>
+                            <Key>71</Key>
+                          </Keys>
+                          <Value>0</Value>
+                          <Description>Clear Limit</Description>
+                          <ID>0</ID>
+                        </Hotkey>
+                      </Hotkeys>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1465</ID>
+                  <Description>"ATM Deposits Don't Increase Weekly Limit"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+
+aobscanmodule(depositlimit,GameAssembly.dll,F3 0F 11 00 F3 0F 10 47 2C)
+alloc(newmem,$1000,depositlimit)
+
+label(code)
+label(return)
+//Send@Sintrix|FearlessRevolution
+newmem:
+
+code:
+  xorps xmm0,xmm0
+  movss [rax],xmm0
+  movss xmm0,[rdi+2C]
+  jmp return
+//Send@Sintrix|FearlessRevolution
+depositlimit:
+  jmp newmem
+  nop 4
+return:
+registersymbol(depositlimit)
+
+[DISABLE]
+
+depositlimit:
+  db F3 0F 11 00 F3 0F 10 47 2C
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1466</ID>
+                  <Description>"All Businesses Are Free"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+
+aobscanmodule(businessprice,GameAssembly.dll,E0 CC CC CC CC CC CC CC 48 89 5C 24 10 48 89 7C)
+alloc(newmem,$1000,businessprice)
+//Send@Sintrix|FearlessRevolution
+label(code)
+label(return)
+
+newmem:
+mov [rcx+158],(float)0
+
+code:
+  mov [rsp+10],rbx
+  jmp return
+
+businessprice+08:
+  jmp newmem
+return:
+registersymbol(businessprice)
+//Send@Sintrix|FearlessRevolution
+[DISABLE]
+
+businessprice+08:
+  db 48 89 5C 24 10
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1467</ID>
+                  <Description>"All Properties Are Free"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>define(address,ScheduleOne.Property.Property.UpdateCulling)
+define(bytes,40 53 48 81 EC 80 00 00 00)
+//Send@Sintrix|FearlessRevolution
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,ScheduleOne.Property.Property.UpdateCulling)
+//Send@Sintrix|FearlessRevolution
+label(code)
+label(return)
+
+newmem:
+mov [rcx+158],(float)0
+//Send@Sintrix|FearlessRevolution
+code:
+  push rbx
+  sub rsp,00000080
+  jmp return
+
+address:
+  jmp newmem
+  nop 4
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+//Send@Sintrix|FearlessRevolution
+dealloc(*)
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1468</ID>
+                  <Description>"All Vehicles Are Free"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+
+aobscanmodule(vehicleprice,GameAssembly.dll,F3 0F 10 80 30 01 00 00)
+alloc(newmem,$1000,vehicleprice)
+//Send@Sintrix|FearlessRevolution
+label(code)
+label(return)
+
+newmem:
+//Send@Sintrix|FearlessRevolution
+code:
+  movss xmm0,[rax+00000130]
+  xorps xmm0,xmm0
+  jmp return
+
+vehicleprice:
+  jmp newmem
+  nop 3
+return:
+registersymbol(vehicleprice)
+
+[DISABLE]
+//Send@Sintrix|FearlessRevolution
+vehicleprice:
+  db F3 0F 10 80 30 01 00 00
+//DealershipListing.get_price
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1469</ID>
+                  <Description>"Instant Money Laundering"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+//ScheduleOne.UI.LaunderingInterface.UpdateTimeline
+
+aobscanmodule(laundering,GameAssembly.dll,44 8B 7F 1C 44 8B 67 20)
+alloc(newmem,$1000,laundering)
+label(code return)
+//Send@Sintrix|FearlessRevolution
+newmem:
+mov [rdi+1C],#999999
+code:
+  mov r15d,[rdi+1C]
+  mov r12d,[rdi+20]
+  jmp return
+
+laundering:
+  jmp newmem
+  nop 3
+return:
+registersymbol(laundering)
+//Send@Sintrix|FearlessRevolution
+[DISABLE]
+
+laundering:
+  db 44 8B 7F 1C 44 8B 67 20
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1470</ID>
+                  <Description>"No Laundering Capacity @ Businesses"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+
+aobscanmodule(LaunderingCap,GameAssembly.dll,00 44 8B F2 48 8B F9 75 1F)
+alloc(newmem,$1000,LaunderingCap)
+//Send@Sintrix|FearlessRevolution
+label(code)
+label(return)
+//Send@Sintrix|FearlessRevolution
+newmem:
+mov [rcx+240],(float)99999999
+
+code:
+  mov rdi,rcx
+  jne GameAssembly.dll+80CAFE
+  jmp return
+
+LaunderingCap+04:
+  jmp newmem
+return:
+registersymbol(LaunderingCap)
+
+[DISABLE]
+
+LaunderingCap+04:
+  db 48 8B F9 75 1F
+//Send@Sintrix|FearlessRevolution
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1471</ID>
+                  <Description>"Store: Free Purchases"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+
+
+aobscanmodule(shopprice,GameAssembly.dll,488B??488B??E8????????4C????????????8B??488B??8B)
+alloc(newmem,$1000,shopprice)
+
+label(code)
+label(return)
+//Send@Sintrix/FearlessRevolution
+newmem:
+mov [rax+20],1
+mov [rax+21],(float)0.1
+code:
+  mov rdx,rax
+  mov rcx,rsi
+  jmp return
+
+shopprice:
+  jmp newmem
+  nop
+return:
+registersymbol(shopprice)
+
+[DISABLE]
+
+shopprice:
+  db 48 8B D0 48 8B CE
+//Send@Sintrix/FearlessRevolution
+unregistersymbol(*)
+dealloc(*)
+
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1472</ID>
+                  <Description>"Phone: Free Purchases"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+
+aobscanmodule(itemprice,GameAssembly.dll,80 79 20 00 74 0A)
+alloc(newmem,$1000,itemprice)
+
+label(code)
+label(return)
+//Send@Sintrix/FearlessRevolution
+newmem:
+mov [rcx+20],1
+mov [rcx+21],(float)0.1
+code:
+  cmp byte ptr [rcx+20],00
+  je GameAssembly.dll+8D6DB4
+  jmp return
+
+itemprice:
+  jmp newmem
+  nop
+return:
+registersymbol(itemprice)
+
+[DISABLE]
+//Send@Sintrix/FearlessRevolution
+itemprice:
+  db 80 79 20 00 74 0A
+
+
+unregistersymbol(itemprice)
+dealloc(newmem)
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1473</ID>
+                  <Description>"→ Edit Cash For Trash Payment (Recycler)"</Description>
+                  <Options moHideChildren="1"/>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>//Send@Sintrix|FearlessRevolution
+define(address,ScheduleOne.ObjectScripts.Recycler.GetTrash)
+define(bytes,48 89 5C 24 20)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,ScheduleOne.ObjectScripts.Recycler.GetTrash)
+registersymbol(recycle)
+label(code return recycle)
+
+newmem:
+xorps xmm15,xmm15
+movss xmm15,[recycle]
+movss [rcx+1D0],xmm15
+//Send@Sintrix|FearlessRevolution
+
+code:
+  mov [rsp+20],rbx
+  jmp return
+
+recycle:
+dd (float)100
+
+address:
+  jmp newmem
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+
+unregistersymbol(*)
+dealloc(*)
+//Send@Sintrix|FearlessRevolution
+
+</AssemblerScript>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>1474</ID>
+                      <Description>"Set Cash Value"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Float</VariableType>
+                      <Address>recycle</Address>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1475</ID>
+                  <Description>"Casino: Always Win Slot Machine"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+
+aobscanmodule(slotwintrigger,GameAssembly.dll,7D 28 41 3B C9)
+//Send@Sintrix/FearlessRevolution
+
+slotwintrigger:
+db EB
+
+registersymbol(slotwintrigger)
+
+[DISABLE]
+//Send@Sintrix/FearlessRevolution
+slotwintrigger:
+  db 7D 28 41 3B C9
+
+unregistersymbol(*)
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1476</ID>
+                  <Description>"→ Casino: Custom 'Ride The Bus' Bet"</Description>
+                  <Options moHideChildren="1"/>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>//Send@Sintrix|FearlessRevolution
+[ENABLE]
+
+aobscanmodule(ridethebus_bet,GameAssembly.dll,0F 2F 80 BC 01 00 00)
+alloc(newmem,$1000,ridethebus_bet)
+registersymbol(rtb_bet)
+label(code return rtb_bet)
+newmem:
+mov [rtb_bet],rax
+code:
+  comiss xmm0,[rax+000001BC]
+  jmp return
+
+rtb_bet:
+dw
+
+ridethebus_bet:
+  jmp newmem
+  nop 2
+return:
+registersymbol(ridethebus_bet)
+
+[DISABLE]
+
+ridethebus_bet:
+  db 0F 2F 80 BC 01 00 00 //ScheduleOne.Casino.UI.RTBInterface.RefreshReadyButton
+
+unregistersymbol(*)
+dealloc(*)
+
+
+</AssemblerScript>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>1477</ID>
+                      <Description>"Set Amount &amp; Click Ready"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Float</VariableType>
+                      <Address>[rtb_bet]+1BC</Address>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1478</ID>
+                  <Description>"→ Casino: Custom 'Blackjack' Bet"</Description>
+                  <Options moHideChildren="1"/>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+
+aobscanmodule(bjbet,GameAssembly.dll,0F 2F 80 58 01 00 00 73)
+alloc(newmem,$1000,bjbet)
+//Send@Sintrix|FearlessRevolution
+registersymbol(blkjck_bet)
+label(code return blkjck_bet)
+
+newmem:
+mov [blkjck_bet],rax
+code:
+  comiss xmm0,[rax+00000158]
+  jmp return
+//Send@Sintrix|FearlessRevolution
+
+blkjck_bet:
+dw
+
+bjbet:
+  jmp newmem
+  nop 2
+return:
+registersymbol(bjbet)
+
+[DISABLE]
+//ScheduleOne.Casino.UI.BlackjackInterface.RefreshReadyButton
+bjbet:
+  db 0F 2F 80 58 01 00 00
+unregistersymbol(*)
+dealloc(*)
+//Send@Sintrix|FearlessRevolution
+</AssemblerScript>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>1479</ID>
+                      <Description>"Set Amount &amp; Click Ready"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Float</VariableType>
+                      <Address>[blkjck_bet]+158</Address>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1480</ID>
+                  <Description>"Casino: Always Win Blackjack"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>define(address,ScheduleOne.Casino.BlackjackGameController.FixedUpdate)
+define(bytes,40 53 48 83 EC 60)
+
+[ENABLE]
+//Send@Sintrix|FearlessRevolution
+assert(address,bytes)
+alloc(newmem,$1000,ScheduleOne.Casino.BlackjackGameController.FixedUpdate)
+
+label(code)
+label(return)
+
+newmem:
+mov [rcx+15C],#0
+mov [rcx+160],#21
+
+code:
+  push rbx
+  sub rsp,60
+  jmp return
+//Send@Sintrix|FearlessRevolution
+address:
+  jmp newmem
+  nop
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+//Send@Sintrix|FearlessRevolution
+
+dealloc(*)
+
+</AssemblerScript>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>1481</ID>
+              <Description>"→ Customers/Employees/NPCs"</Description>
+              <Options moHideChildren="1"/>
+              <Color>0080FF</Color>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>1482</ID>
+                  <Description>"→ Edit Customer Data"</Description>
+                  <Options moHideChildren="1"/>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>define(address,ScheduleOne.Economy.Customer.CheckContractGeneration)
+define(bytes,40 53 57 48 81 EC E8 00 00 00)
+
+[ENABLE]
+//Send@Sintrix|FearlessRevolution
+assert(address,bytes)
+alloc(newmem,$1000,ScheduleOne.Economy.Customer.CheckContractGeneration)
+registersymbol(allowance orders)
+label(code return allowance orders)
+newmem:
+push rcx
+mov rcx,[rcx+178]
+xorps xmm15,xmm15
+movss xmm15,[allowance]
+movss [rcx+28],xmm15
+movss [rcx+2C],xmm15
+xorps xmm14,xmm14
+movd xmm14,[orders]
+movd [rcx+30],xmm14
+movd [rcx+34],xmm14
+pop rcx
+//Send@Sintrix|FearlessRevolution
+code:
+  push rbx
+  push rdi
+  sub rsp,000000E8
+  jmp return
+
+allowance:
+dd (float)800
+//Send@Sintrix|FearlessRevolution
+orders:
+dd #5
+
+
+address:
+  jmp newmem
+  nop 5
+return:
+//Send@Sintrix|FearlessRevolution
+[DISABLE]
+
+address:
+  db bytes
+unregistersymbol(*)
+dealloc(*)
+</AssemblerScript>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>1483</ID>
+                      <Description>"Set Weekly Spending Limit"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Float</VariableType>
+                      <Address>allowance</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>1484</ID>
+                      <Description>"Set Weekly Order Limit"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>orders</Address>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1485</ID>
+                  <Description>"Max Customer Addiction Level"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>define(address,ScheduleOne.Economy.Customer.MinPass)
+define(bytes,40 53 48 83 EC 50)
+
+[ENABLE]
+//Send@Sintrix|FearlessRevolution
+assert(address,bytes)
+alloc(newmem,$1000,ScheduleOne.Economy.Customer.MinPass)
+
+label(code)
+label(return)
+
+newmem:
+mov [rcx+11C],(float)100
+
+code:
+  push rbx
+  sub rsp,50
+  jmp return
+
+address:
+  jmp newmem
+  nop
+return:
+//Send@Sintrix|FearlessRevolution
+[DISABLE]
+
+address:
+  db bytes
+
+dealloc(*)
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1486</ID>
+                  <Description>"Max Relationship Level"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>define(address,ScheduleOne.NPCs.Relation.NPCRelationData.SetRelationship)
+define(bytes,F3 0F 10 59 10)
+
+define(address2,ScheduleOne.NPCs.NPC.MinPass)
+define(bytes2,48 89 5C 24 18)
+
+[ENABLE]
+newmem2:
+//Send@Sintrix|FearlessRevolution
+
+assert(address,bytes)
+alloc(newmem,$1000,ScheduleOne.NPCs.Relation.NPCRelationData.SetRelationship)
+
+label(code)
+label(return)
+//Send@Sintrix|FearlessRevolution
+newmem:
+
+code:
+  mov [rcx+10],(float)100
+  movss xmm3,[rcx+10]
+  jmp return
+
+address:
+  jmp newmem
+return:
+
+assert(address2,bytes2)
+alloc(newmem2,$1000,ScheduleOne.NPCs.NPC.MinPass)
+
+label(code2)
+label(return2)
+
+newmem2:
+push rcx
+mov rcx,[rcx+1F0]
+mov [rcx+10],(float)100
+pop rcx
+//Send@Sintrix|FearlessRevolution
+code2:
+  mov [rsp+18],rbx
+  jmp return2
+
+address2:
+  jmp newmem2
+return2:
+
+[DISABLE]
+//Send@Sintrix|FearlessRevolution
+address:
+  db bytes
+address2:
+  db bytes2
+
+dealloc(*)
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1487</ID>
+                  <Description>"NPC: Never Panic"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+ScheduleOne.NPCs.NPC.get_IsPanicked:
+db C3
+//Send@Sintrix|FearlessRevolution
+[DISABLE]
+ScheduleOne.NPCs.NPC.RpcWriter___Server_SetPanicked_2166136261:
+db F3 0F 10 05 C8 EE 69 02
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1488</ID>
+                  <Description>"No Employee Wage"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>define(address,ScheduleOne.Employees.Employee.MinPass)
+define(bytes,40 53 48 83 EC 20)
+
+[ENABLE]
+//Send@Sintrix|FearlessRevolution
+assert(address,bytes)
+alloc(newmem,$1000,ScheduleOne.Employees.Employee.MinPass)
+
+label(code)
+label(return)
+//Send@Sintrix|FearlessRevolution
+newmem:
+
+mov [rcx+2F4],(float)0
+
+code:
+  push rbx
+  sub rsp,20
+  jmp return
+//Send@Sintrix|FearlessRevolution
+address:
+  jmp newmem
+  nop
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+dealloc(*)
+
+</AssemblerScript>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>1489</ID>
+              <Description>"→ Cops"</Description>
+              <Options moHideChildren="1"/>
+              <Color>FFFF00</Color>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>1490</ID>
+                  <Description>"No Curfew Violation"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>define(address,ScheduleOne.Law.CurfewManager.get_IsCurrentlyActiveWithTolerance)
+define(bytes,40 53 48 83 EC 20)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,ScheduleOne.Law.CurfewManager.get_IsCurrentlyActiveWithTolerance)
+//Send@Sintrix|FearlessRevolution
+label(code)
+label(return)
+
+newmem:
+mov [rcx+120],0
+mov [rcx+121],0
+code:
+  push rbx
+  sub rsp,20
+  jmp return
+//Send@Sintrix|FearlessRevolution
+address:
+  jmp newmem
+  nop
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+dealloc(*)
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1491</ID>
+                  <Description>"Never Suspicious"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+
+aobscanmodule(stealth,GameAssembly.dll,F3 0F 11 83 18 01 00 00 F3)
+alloc(newmem,$1000,stealth)
+
+label(code)
+label(return)
+
+newmem:
+//Send@Sintrix|FearlessRevolution
+code:
+  xorps xmm0,xmm0
+  movss [rbx+00000118],xmm0
+  jmp return
+
+stealth:
+  jmp newmem
+  nop 3
+return:
+registersymbol(stealth)
+//Send@Sintrix|FearlessRevolution
+[DISABLE]
+
+stealth:
+  db F3 0F 11 83 18 01 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1492</ID>
+                  <Description>"Disable Body Search By Cops"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+ScheduleOne.NPCs.Behaviour.BodySearchBehaviour.UpdateSearch:
+db C3
+ScheduleOne.NPCs.Behaviour.BodySearchBehaviour.AssignTarget:
+db C3
+ScheduleOne.NPCs.Behaviour.BodySearchBehaviour.DoesPlayerContainItemsOfInterest:
+db C3
+ScheduleOne.Police.PoliceOfficer.BeginBodySearch:
+db C3
+ScheduleOne.Police.PoliceOfficer.BeginBodySearch_LocalPlayer:
+db C3
+ScheduleOne.Police.PoliceOfficer.BeginBodySearch_Networked:
+db C3
+//Send@Sintrix|FearlessRevolution
+[DISABLE]
+//Send@Sintrix|FearlessRevolution
+ScheduleOne.NPCs.Behaviour.BodySearchBehaviour.UpdateSearch:
+db 48 89 5C 24 10
+ScheduleOne.NPCs.Behaviour.BodySearchBehaviour.AssignTarget:
+db 48 89 5C 24 08
+ScheduleOne.NPCs.Behaviour.BodySearchBehaviour.DoesPlayerContainItemsOfInterest:
+db 48 89 5C 24 08
+ScheduleOne.Police.PoliceOfficer.BeginBodySearch:
+db 48 89 5C 24 10
+ScheduleOne.Police.PoliceOfficer.BeginBodySearch_LocalPlayer:
+db 40 53
+ScheduleOne.Police.PoliceOfficer.BeginBodySearch_Networked:
+db 40 53
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1493</ID>
+                  <Description>"Chill Cops"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>define(address,ScheduleOne.Police.PoliceOfficer.FixedUpdate)
+define(bytes,48 89 6C 24 18)
+
+[ENABLE]
+//Send@Sintrix|FearlessRevolution
+assert(address,bytes)
+alloc(newmem,$1000,ScheduleOne.Police.PoliceOfficer.FixedUpdate)
+
+label(code)
+label(return)
+//Send@Sintrix|FearlessRevolution
+newmem:
+mov [rcx+34C],(float)0
+mov [rcx+350],(float)100
+mov [rcx+354],(float)0
+mov [rcx+358],(float)0
+
+code:
+  mov [rsp+18],rbp
+  jmp return
+//Send@Sintrix|FearlessRevolution
+address:
+  jmp newmem
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+//Send@Sintrix|FearlessRevolution
+
+dealloc(newmem)
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1494</ID>
+                  <Description>"Disable Police Foot/Car Chase"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+ScheduleOne.Police.PoliceOfficer.BeginFootPursuit_Networked:
+db C3
+ScheduleOne.Police.PoliceOfficer.BeginVehiclePursuit_Networked:
+db C3
+ScheduleOne.Police.PoliceOfficer.CanInvestigate:
+db B0 00 C3
+//Send@Sintrix|FearlessRevolution
+[DISABLE]
+ScheduleOne.Police.PoliceOfficer.BeginFootPursuit_Networked:
+db 48 89 5C 24 10
+ScheduleOne.Police.PoliceOfficer.BeginVehiclePursuit_Networked:
+db 48 89 5C 24 10
+ScheduleOne.Police.PoliceOfficer.CanInvestigate:
+db B0 00 C3
+//Send@Sintrix|FearlessRevolution
+</AssemblerScript>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>1495</ID>
+              <Description>"→ Plants"</Description>
+              <Options moHideChildren="1"/>
+              <Color>00FF00</Color>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>1496</ID>
+                  <Description>"Drying Rack: Insta-Complete"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>//Send@Sintrix|FearlessRevolution
+[ENABLE]
+
+aobscanmodule(dryingracktime,GameAssembly.dll,66 0F 6E 70 20)//ScheduleOne.UI.Stations.Drying_rack.DryingOperationUI.UpdatePosition
+
+alloc(newmem,$1000,dryingracktime)
+
+label(code)
+label(return)
+//Send@Sintrix|FearlessRevolution
+newmem:
+mov [rax+20],#999999
+
+code:
+  movd xmm6,[rax+20]
+  jmp return
+
+dryingracktime:
+  jmp newmem
+return:
+registersymbol(dryingracktime)
+
+[DISABLE]
+//Send@Sintrix|FearlessRevolution
+dryingracktime:
+  db 66 0F 6E 70 20
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1497</ID>
+                  <Description>"Drying Rack: 9999x Capacity"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>define(address,ScheduleOne.ObjectScripts.DryingRack.CanStartOperation)
+define(bytes,40 53 48 83 EC 20)
+
+[ENABLE]
+//Send@Sintrix|FearlessRevolution
+assert(address,bytes)
+alloc(newmem,$1000,ScheduleOne.ObjectScripts.DryingRack.CanStartOperation)
+
+label(code)
+label(return)
+
+newmem:
+mov [rcx+210],#9999
+//Send@Sintrix|FearlessRevolution
+code:
+  push rbx
+  sub rsp,20
+  jmp return
+
+address:
+  jmp newmem
+  nop
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+dealloc(*)
+//Send@Sintrix|FearlessRevolution
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1498</ID>
+                  <Description>"Instant Plant Growth"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>//Send@Sintrix|FearlessRevolution
+define(address,ScheduleOne.ObjectScripts.Pot.LateUpdate)
+define(bytes,48 89 5C 24 18)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,ScheduleOne.ObjectScripts.Pot.LateUpdate)
+registersymbol(yieldmult)
+label(code return yieldmult)
+
+newmem://Send@Sintrix|FearlessRevolution
+mov [rcx+340],(float)999
+
+code:
+  mov [rsp+18],rbx
+  jmp return
+
+yieldmult:
+dd (float)2
+
+address:
+  jmp newmem
+return:
+//Send@Sintrix|FearlessRevolution
+[DISABLE]
+
+address:
+  db bytes
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1499</ID>
+                  <Description>"Max Plant Yield"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+
+aobscanmodule(yield,GameAssembly.dll,48 8B D9 75 43 48 8D 0D * * * * E8 DB 5D)
+alloc(newmem,$1000,yield)
+//Send@Sintrix|FearlessRevolution
+label(code)
+label(return)
+
+newmem:
+mov [rbx+33C],(float)999999
+code:
+  mov rbx,rcx
+  jne GameAssembly.dll+98ED6C
+  jmp return
+//Send@Sintrix|FearlessRevolution
+yield:
+  jmp newmem
+return:
+registersymbol(yield)
+
+[DISABLE]
+//Send@Sintrix|FearlessRevolution
+yield:
+  db 48 8B D9 75 43
+//Send@Sintrix|FearlessRevolution
+unregistersymbol(yield)
+dealloc(newmem)
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1500</ID>
+                  <Description>"Max Harvest Quality"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>define(address,ScheduleOne.Growing.Plant.MinPass)
+define(bytes,40 53 48 83 EC 50)
+//Send@Sintrix|FearlessRevolution
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,ScheduleOne.Growing.Plant.MinPass)
+
+label(code)
+label(return)
+//Send@Sintrix|FearlessRevolution
+newmem:
+mov [rcx+94],(float)999
+mov [rcx+70],(float)999
+code:
+  push rbx
+  sub rsp,50
+  jmp return
+
+address:
+  jmp newmem
+  nop
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+
+dealloc(*)
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1501</ID>
+                  <Description>"All Pots Have Soil &amp; Water (Just Add Seed)"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>define(address,ScheduleOne.ObjectScripts.Pot.UpdateCanvas)
+define(bytes,48 89 5C 24 10)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,ScheduleOne.ObjectScripts.Pot.UpdateCanvas)
+
+label(code)
+label(return)
+//Send@Sintrix|FearlessRevolution
+newmem:
+mov [rcx+34C],(float)20 //SoilCap
+mov [rcx+380],(float)20 //SoilLevel
+mov [rcx+350],(float)5 //WaterCap
+mov [rcx+394],(float)4.9 //WaterLevel
+code:
+  mov [rsp+10],rbx
+  jmp return
+
+address:
+  jmp newmem
+return:
+//Send@Sintrix|FearlessRevolution
+[DISABLE]
+
+address:
+  db bytes
+
+
+dealloc(*)
+
+</AssemblerScript>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>1502</ID>
+              <Description>"→ Supplier"</Description>
+              <Options moHideChildren="1"/>
+              <Color>0080FF</Color>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>1503</ID>
+                  <Description>"Instant Dead Drop Delivery"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>define(address,ScheduleOne.Economy.Supplier.MinPass)
+define(bytes,40 53 48 83 EC 20)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,ScheduleOne.Economy.Supplier.MinPass)
+
+label(code)
+label(return)
+//Send@Sintrix|FearlessRevolution
+newmem:
+mov [rcx+340],(float)0
+
+code:
+  push rbx
+  sub rsp,20
+  jmp return
+//Send@Sintrix|FearlessRevolution
+address:
+  jmp newmem
+  nop
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+
+dealloc(*)
+
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1504</ID>
+                  <Description>"Zero Debt"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+
+aobscanmodule(supplierdebt,GameAssembly.dll,48 8B D9 E8 30 C3 E9 FF)
+alloc(newmem,$1000,supplierdebt)
+//Send@Sintrix|FearlessRevolution
+label(code)
+label(return)
+//Send@Sintrix|FearlessRevolution
+newmem:
+mov [rcx+338],(float)0
+code:
+  mov rbx,rcx
+  call ScheduleOne.NPCs.NPC.MinPass
+  jmp return
+
+supplierdebt:
+  jmp newmem
+  nop 3
+return:
+registersymbol(supplierdebt)
+//Send@Sintrix|FearlessRevolution
+[DISABLE]
+
+supplierdebt:
+  db 48 8B D9 E8 30 C3 E9 FF
+//Send@Sintrix|FearlessRevolution
+unregistersymbol(supplierdebt)
+dealloc(newmem)
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1505</ID>
+                  <Description>"Free Purchases"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+//Send@Sintrix|FearlessRevolution
+aobscanmodule(supplierfree,GameAssembly.dll,F3 0F 59 41 18 F3 0F 58 F0)
+alloc(newmem,$1000,supplierfree)
+//Send@Sintrix|FearlessRevolution
+label(code)
+label(return)
+
+newmem:
+mov [rcx+18],(float)0.01 // Cart Total
+code:
+  mulss xmm0,[rcx+18]
+  jmp return
+
+supplierfree:
+  jmp newmem
+return:
+registersymbol(supplierfree)
+//Send@Sintrix|FearlessRevolution
+[DISABLE]
+//Send@Sintrix|FearlessRevolution
+supplierfree:
+  db F3 0F 59 41 18
+//Send@Sintrix|FearlessRevolution
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>1506</ID>
+              <Description>"→ Chemistry"</Description>
+              <Options moHideChildren="1"/>
+              <Color>FFFF00</Color>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>1507</ID>
+                  <Description>"Mixing Station: Insta-Complete"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>//Send@Sintrix/FearlessRevolution
+define(address,ScheduleOne.ObjectScripts.MixingStation.get_IsMixingDone)
+define(bytes,48 83 B9 20 02 00 00 00)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,ScheduleOne.ObjectScripts.MixingStation.get_IsMixingDone)
+
+label(code)
+label(return)
+
+newmem:
+mov [rcx+290],#0
+
+code:
+  cmp qword ptr [rcx+00000220],00
+  jmp return
+
+address:
+  jmp newmem
+  nop 3
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+//Send@Sintrix/FearlessRevolution
+
+dealloc(*)
+//Send@Sintrix/FearlessRevolution
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1508</ID>
+                  <Description>"→ Mixing Station: Edit Output Quantity &amp; Quality"</Description>
+                  <Options moHideChildren="1"/>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>define(address,ScheduleOne.UI.Stations.MixingStationCanvas.Update)
+define(bytes,40 53 48 83 EC 20)
+//Send@Sintrix|FearlessRevolution
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,ScheduleOne.UI.Stations.MixingStationCanvas.Update)
+registersymbol(mixingOutput)
+label(code return mixingOutput)
+
+newmem:
+mov [mixingOutput],rcx
+
+code:
+  push rbx
+  sub rsp,20
+  jmp return
+
+mixingOutput:
+dw
+
+address:
+  jmp newmem
+  nop
+return:
+
+[DISABLE]
+//Send@Sintrix|FearlessRevolution
+address:
+  db bytes
+
+dealloc(*)
+
+</AssemblerScript>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>1509</ID>
+                      <Description>"Current Quality In Output Slot"</Description>
+                      <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">1:Poor
+2:Standard
+3:Premium
+4:Heavenly
+*:Output Slot Empty
+</DropDownList>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>[mixingOutput]+98</Address>
+                      <Offsets>
+                        <Offset>38</Offset>
+                        <Offset>50</Offset>
+                        <Offset>58</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>1510</ID>
+                      <Description>"Curent Quantity In Output Slot"</Description>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>[mixingOutput]+98</Address>
+                      <Offsets>
+                        <Offset>20</Offset>
+                        <Offset>50</Offset>
+                        <Offset>58</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1511</ID>
+                  <Description>"Chemistry Station: Max Product Quality"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+//Send@Sintrix|FearlessRevolution
+aobscanmodule(maxchemproduct,GameAssembly.dll,8B 52 20 45 33 C0 48 8B C8 E8 A3)
+alloc(newmem,$1000,maxchemproduct)
+//Send@Sintrix|FearlessRevolution
+label(code)
+label(return)
+
+newmem:
+
+code:
+  mov edx,#4 //[rcx+20]
+  xor r8d,r8d
+  jmp return
+
+maxchemproduct:
+  jmp newmem
+  nop
+return:
+registersymbol(maxchemproduct)
+
+[DISABLE]
+//ScheduleOne.ObjectScripts.ChemistryStation.RpcLogic___FinalizeOperation_2166136261
+maxchemproduct:
+  db 8B 52 20 45 33 C0
+//Send@Sintrix|FearlessRevolution
+unregistersymbol(maxchemproduct)
+dealloc(newmem)
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1512</ID>
+                  <Description>"Chemistry Station: Insta-Complete Cooking"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>//Send@Sintrix|FearlessRevolution
+define(address,ScheduleOne.ObjectScripts.ChemistryCookOperation.get_Recipe)
+define(bytes,48 89 5C 24 10)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,ScheduleOne.ObjectScripts.ChemistryCookOperation.get_Recipe)
+
+label(code)
+label(return)
+
+newmem:
+mov [rcx+38],#9999
+//Send@Sintrix|FearlessRevolution
+code:
+  mov [rsp+10],rbx
+  jmp return
+
+address:
+  jmp newmem
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+//Send@Sintrix|FearlessRevolution
+dealloc(newmem)
+//Send@Sintrix|FearlessRevolution
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1513</ID>
+                  <Description>"Chemistry Station: Perfect Temperature"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>define(address,"GameAssembly.dll"+83FA9D)
+define(bytes,F3 0F 10 78 28)
+
+[ENABLE]
+//Send@Sintrix|FearlessRevolution
+assert(address,bytes)
+alloc(newmem,$1000,"GameAssembly.dll"+83FA9D)
+
+label(code)
+label(return)
+
+newmem:
+mov [rax+28],(float)0.55
+code:
+  movss xmm7,[rax+28]
+  jmp return
+
+address:
+  jmp newmem
+return:
+//Send@Sintrix|FearlessRevolution
+[DISABLE]
+
+address:
+  db bytes
+//Send@Sintrix|FearlessRevolution
+
+dealloc(newmem)
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1514</ID>
+                  <Description>"→  Chemistry Station: Edit Output Quantity &amp; Quality"</Description>
+                  <Options moHideChildren="1"/>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>define(address,ScheduleOne.UI.Stations.ChemistryStationCanvas.Update)
+define(bytes,40 57 48 83 EC 20)
+
+[ENABLE]
+//Send@Sintrix/FearlessRevolution
+assert(address,bytes)
+alloc(newmem,$1000,ScheduleOne.UI.Stations.ChemistryStationCanvas.Update)
+registersymbol(chemoutput)
+label(code return chemoutput)
+
+newmem:
+mov [chemoutput],rcx
+//Send@Sintrix/FearlessRevolution
+code:
+  push rdi
+  sub rsp,20
+  jmp return
+
+chemoutput:
+dw
+
+address:
+  jmp newmem
+  nop
+return:
+
+[DISABLE]
+//Send@Sintrix/FearlessRevolution
+address:
+  db bytes
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>1515</ID>
+                      <Description>"Current Quality In Output Slot"</Description>
+                      <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">1:Poor
+2:Standard
+3:Premium
+4:Heavenly
+*:Output Slot Empty
+</DropDownList>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>[chemoutput]+68</Address>
+                      <Offsets>
+                        <Offset>38</Offset>
+                        <Offset>50</Offset>
+                        <Offset>58</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>1516</ID>
+                      <Description>"Current Quantity In Output Slot"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>[chemoutput]+68</Address>
+                      <Offsets>
+                        <Offset>20</Offset>
+                        <Offset>50</Offset>
+                        <Offset>58</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1517</ID>
+                  <Description>"Lab Oven: Insta-Complete Baking"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>define(address,ScheduleOne.ObjectScripts.OvenCookOperation.GetCookDuration)
+define(bytes,40 53 48 83 EC 20)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,ScheduleOne.ObjectScripts.OvenCookOperation.GetCookDuration)
+
+label(code)
+label(return)
+//Send@Sintrix|FearlessRevolution
+newmem:
+mov [rcx+40],#9999
+code:
+  push rbx
+  sub rsp,20
+  jmp return
+
+address:
+  jmp newmem
+  nop
+return:
+//Send@Sintrix|FearlessRevolution
+[DISABLE]
+
+address:
+  db bytes
+
+dealloc(*)
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1518</ID>
+                  <Description>"→ Lab Oven: Edit Output Quantity &amp; Quality"</Description>
+                  <Options moHideChildren="1"/>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>define(address,ScheduleOne.UI.Stations.LabOvenCanvas.Update)
+define(bytes,40 57 48 83 EC 30)
+
+[ENABLE]
+//Send@Sintrix|FearlessRevolution
+assert(address,bytes)
+alloc(newmem,$1000,ScheduleOne.UI.Stations.LabOvenCanvas.Update)
+registersymbol(ovenoutput)
+label(code return ovenoutput)
+
+newmem:
+mov [ovenoutput],rcx
+
+code:
+  push rdi
+  sub rsp,30
+  jmp return
+
+ovenoutput:
+dw 0
+//Send@Sintrix|FearlessRevolution
+address:
+  jmp newmem
+  nop
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+dealloc(*)
+
+</AssemblerScript>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>1519</ID>
+                      <Description>"Current Quality In Output Slot"</Description>
+                      <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">1:Poor
+2:Standard
+3:Premium
+4:Heavenly
+*:Output Slot Empty
+</DropDownList>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>[ovenoutput]+50</Address>
+                      <Offsets>
+                        <Offset>38</Offset>
+                        <Offset>50</Offset>
+                        <Offset>58</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>1520</ID>
+                      <Description>"Current Quantity In Output Slot"</Description>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>[ovenoutput]+50</Address>
+                      <Offsets>
+                        <Offset>20</Offset>
+                        <Offset>50</Offset>
+                        <Offset>58</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1521</ID>
+                  <Description>"Cauldron: Instant Cook / Max Quality"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>define(address,ScheduleOne.ObjectScripts.Cauldron.MinPass)
+define(bytes,40 53 48 83 EC 50)
+
+[ENABLE]
+//Send@Sintrix|FearlessRevolution
+assert(address,bytes)
+alloc(newmem,$1000,ScheduleOne.ObjectScripts.Cauldron.MinPass)
+label(code return)
+
+newmem:
+mov [rcx+338],#1
+mov [rcx+33C],#4
+jmp code
+
+code:
+  push rbx
+  sub rsp,50
+  jmp return
+
+address:
+  jmp newmem
+  nop
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+
+dealloc(*)
+
+</AssemblerScript>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>1522</ID>
+              <Description>"→ World"</Description>
+              <Options moHideChildren="1"/>
+              <Color>FFFF00</Color>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>1523</ID>
+                  <Description>"Grab Time Data"</Description>
+                  <Options moHideChildren="1"/>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>define(address,ScheduleOne.GameTime.TimeManager.FixedUpdate)
+define(bytes,48 83 B9 78 01 00 00 00)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,ScheduleOne.GameTime.TimeManager.FixedUpdate)
+registersymbol(timeptr)
+label(code return timeptr)
+
+newmem:
+mov [timeptr],rcx
+
+code:
+  cmp qword ptr [rcx+00000178],00
+  jmp return
+
+timeptr:
+dq 0
+
+address:
+  jmp newmem
+  nop 3
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+unregistersymbol(*)
+dealloc(*)
+</AssemblerScript>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>1524</ID>
+                      <Description>"Elapsed Days"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>[timeptr]+124</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>1525</ID>
+                      <Description>"Set Current Time"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>[timeptr]+128</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>1526</ID>
+                      <Description>"Time Progression Multiplier"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Float</VariableType>
+                      <Address>[timeptr]+138</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>1527</ID>
+                      <Description>"Playtime"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Float</VariableType>
+                      <Address>[timeptr]+140</Address>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1528</ID>
+                  <Description>"Delivery App Timer"</Description>
+                  <Options moHideChildren="1"/>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+
+aobscanmodule(deliverytime,GameAssembly.dll,8B 4B 3C 33 C0)
+alloc(newmem,$1000,deliverytime)
+registersymbol(arrivaltime)
+label(code return arrivaltime)
+//Send@Sintrix|FearlessRevolution
+newmem:
+mov [arrivaltime],rbx
+
+code:
+  mov ecx,[rbx+3C]
+  xor eax,eax
+  jmp return
+
+arrivaltime:
+dw
+
+deliverytime:
+  jmp newmem
+return:
+registersymbol(deliverytime)
+//Send@Sintrix|FearlessRevolution
+[DISABLE]
+
+deliverytime:
+  db 8B 4B 3C 33 C0
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>1529</ID>
+                      <Description>"Instant Delivery: Left Alt + Numpad 1"</Description>
+                      <GroupHeader>1</GroupHeader>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>1530</ID>
+                      <Description>"Time Until Arrival"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>[arrivaltime]+3C</Address>
+                      <Hotkeys>
+                        <Hotkey>
+                          <Action>Set Value</Action>
+                          <Keys>
+                            <Key>18</Key>
+                            <Key>97</Key>
+                          </Keys>
+                          <Value>0</Value>
+                          <Description>Set Arrival Time To 0</Description>
+                          <ID>0</ID>
+                        </Hotkey>
+                      </Hotkeys>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>459</ID>
+      <Description>"--------------------------------"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>461</ID>
+      <Description>"💥 Author:  Send | Shaggy | CamoHax @ Sintrix"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>454</ID>
+      <Description>"🞂 Process: Schedule I.exe"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>772</ID>
+      <Description>"Table Version: 1.5.7.7"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>970</ID>
+      <Description>"✔ Game Version: 0.3.6f3"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>460</ID>
+      <Description>"⚡ Discord "</Description>
+      <Color>8080FF</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+{$lua}
+shellExecute("https://discord.gg/NTFcdAUWxb")
+
+{$asm}
+[DISABLE]
+
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>458</ID>
+      <Description>"--------------------------------"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

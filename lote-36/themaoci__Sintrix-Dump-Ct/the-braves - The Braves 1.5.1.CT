@@ -1,0 +1,557 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>105</ID>
+      <Description>"Enable"</Description>
+      <Options moHideChildren="1"/>
+      <Color>00FF00</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$Lua}
+if syntaxcheck then return end
+
+local function startTable(process, title, footer)
+  OpenProcess(process);
+  if process ~= process or (readInteger(process) == nil) then
+     error(ShowMessage("Failed To Attach To Process"))
+  end
+  --Set Window Title
+  if not((MainForm.Caption):match(title)) then
+  MainForm.Caption = title..' ~ '..MainForm.Caption
+  end
+
+  --Credits
+  if MainForm.lblSigned.Caption:match(footer) == nil then
+    local Main = MainForm.lblSigned
+    local MadeBy = createPanel(Main.Parent)
+
+
+    MadeBy.AutoSize = true
+    MadeBy.Anchors = '[akTop,akRight,akLeft]'
+    MadeBy.AnchorSideTop.Control = MadeBy.Parent
+    MadeBy.AnchorSideTop.Side = asrCenter
+    MadeBy.AnchorSideRight.Control = MainForm.CommentButton
+    MadeBy.AnchorSideRight.Side = asrLeft
+    MadeBy.AnchorSideLeft.Control = MainForm.advancedbutton
+    MadeBy.AnchorSideLeft.Side = asrRight
+
+    Main.Parent = MadeBy
+    Main.Visible = true
+    Main.Caption = footer
+    Main.Font.Size = 12
+    Main.Font.Style = '[fsBold]'
+    Main.Font.Quality = 'fqCleartypeNatural'
+    Main.AnchorSideTop.Control = MadeBy
+    Main.AnchorSideTop.Side = asrCenter
+    Main.AnchorSideLeft.Control = MadeBy
+    Main.AnchorSideLeft.Side = asrCenter
+  end
+end
+registerLuaFunctionHighlight("startTable")
+startTable('The Braves.exe','The Braves v1.5.1','By Sintrix.net / Build 16578384')
+
+function cycleFullCompact(sender,force)     local state = not(compactmenuitem.Caption == 'Compact View Mode'); if force~=nil then state = not force end; compactmenuitem.Caption = state and 'Compact View Mode' or 'Full View Mode'; getMainForm().Splitter1.Visible = state; getMainForm().Panel4.Visible    = state; getMainForm().Panel5.Visible    = state; end; function addCompactMenu() if compactmenualreadyexists then return end; local parent = getMainForm().Menu.Items; compactmenuitem = createMenuItem(parent); parent.add(compactmenuitem); compactmenuitem.Caption = 'Compact View Mode'; compactmenuitem.OnClick = cycleFullCompact; compactmenualreadyexists = 'yes'; end; addCompactMenu(); cycleFullCompact(nil,true);
+
+getMainForm().Panel4.Visible = true;
+{$asm}
+[DISABLE]
+{$Lua}
+cycleFullCompact(nil,false);
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>918</ID>
+          <Description>"Initialize Mono"</Description>
+          <Options moHideChildren="1"/>
+          <Color>FFFF00</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+{$Lua}
+if syntaxcheck then return end
+if not monopipe then if LaunchMonoDataCollector() == 0 then
+
+if process == nil then ShowMessage('Process is not selected.')
+elseif readInteger(process) == 0 then ShowMessage('Process cannot be opened. Gone?')
+else
+  if (monopipe~=nil) and (monopipe.ProcessID~=getOpenedProcessID()) then
+    monopipe.destroy()
+    monopipe=nil
+  end
+  if (monopipe==nil) then
+    LaunchMonoDataCollector()
+    -- monoSymbolList is only available if the target is il2cpp and not normal mono
+    --while (monoSymbolList==nil) or (not monoSymbolList.FullyLoaded) do checkSynchronize(50) end -- checkSynchronize requires that memRec is ASynch.
+  end
+end
+end end
+
+{$asm}
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>1102</ID>
+              <Description>"Anti-Cheat Bypass Scripts"</Description>
+              <Options moHideChildren="1"/>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>1100</ID>
+                  <Description>"(Anti-Cheat) Destroy ObscuredCheatingDetector"</Description>
+                  <Color>00FF00</Color>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+aobscanregion(obscuredcheatingdetector,CodeStage.AntiCheat.Detectors.ObscuredCheatingDetector.get_ExistsAndIsRunning,CodeStage.AntiCheat.Detectors.ObscuredCheatingDetector.get_ExistsAndIsRunning+af,8a 40 2a)
+
+alloc(newmem,$1000)
+alloc(obscheatdet,4)
+alloc(obytes_obcd,10)
+registersymbol(obscheatdet obytes_obcd)
+label(code return)
+
+obytes_obcd:
+readmem(obscuredcheatingdetector,10)
+
+newmem:
+
+code:
+  mov [obscheatdet],eax
+  mov al, [eax+2a]
+  mov [eax+10],00
+  mov [eax+14],00
+  mov [eax+18],00
+  mov [eax+19],00
+  mov [eax+20],00
+  mov [eax+2a],00
+  mov [eax+29],00
+  ret
+
+obscuredcheatingdetector:
+  dq 0
+
+obscuredcheatingdetector:
+  jmp newmem
+  nop 5
+return:
+
+
+[DISABLE]
+
+obscuredcheatingdetector:
+readmem(obytes_obcd,10)
+
+dealloc(*)
+unregistersymbol(*)
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>917</ID>
+                  <Description>"(Anti-Cheat) Destroy SpeedHackDetector"</Description>
+                  <Color>00FF00</Color>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>//Shaggalicious &amp; Send @  https://fearlessrevolution.com
+
+[ENABLE]
+aobscanregion(speedhackdetect,CodeStage.AntiCheat.Detectors.SpeedHackDetector.Update,CodeStage.AntiCheat.Detectors.SpeedHackDetector.Update+50,8B 7D 08 80 7F 2A 00)
+
+alloc(newmem,$1000)
+alloc(speedhackdet,4)
+alloc(obytes_shd,10)
+registersymbol(speedhackdet obytes_shd)
+label(code return)
+
+obytes_shd:
+readmem(speedhackdetect,10)
+
+newmem:
+
+code:
+  mov edi,[ebp+08]
+  cmp byte ptr [edi+2A],00
+  mov [speedhackdet], edi
+  mov byte ptr [edi+20],00
+  mov byte ptr [edi+10],00
+  mov byte ptr [edi+14],00
+  mov byte ptr [edi+18],00
+  mov byte ptr [edi+19],00
+  mov byte ptr [edi+20],00
+  mov byte ptr [edi+2a],00
+  mov byte ptr [edi+29],00
+  jmp return
+
+speedhackdetect:
+  jmp newmem
+  nop 2
+return:
+registersymbol(speedhackdetect)
+[DISABLE]
+
+speedhackdetect:
+readmem(obytes_shd,10)
+
+dealloc(*)
+unregistersymbol(*)
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>161</ID>
+                  <Description>"(Anti-Cheat) Keep Me Connected"</Description>
+                  <Color>00FF00</Color>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>{ Game   : The Braves.exe
+  Version: 
+  Date   : 2024-08-03
+  Author : User
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(keepconnect,GameAssembly.dll,55 8b ec 80 3d ? ? ? ? ? 75 ? 68 ? ? ? ? e8 ? ? ? ? 83 c4 ? c6 05 ? ? ? ? ? 6a ? ff 75 ? ff 35 ? ? ? ? e8 ? ? ? ? 83 c4 ? 5d c3 cc cc cc cc cc cc cc cc cc cc cc 55 8b ec c7 45) // should be unique
+
+registersymbol(keepconnect)
+keepconnect:
+  db C3
+[DISABLE]
+
+keepconnect:
+  db 55
+
+unregistersymbol(keepconnect)
+
+
+{
+// ORIGINAL CODE - INJECTION POINT: S.NetErrorWindow.Show
+
+GameAssembly.dll+BE69A6: CC                    - int 3 
+GameAssembly.dll+BE69A7: CC                    - int 3 
+GameAssembly.dll+BE69A8: CC                    - int 3 
+GameAssembly.dll+BE69A9: CC                    - int 3 
+GameAssembly.dll+BE69AA: CC                    - int 3 
+GameAssembly.dll+BE69AB: CC                    - int 3 
+GameAssembly.dll+BE69AC: CC                    - int 3 
+GameAssembly.dll+BE69AD: CC                    - int 3 
+GameAssembly.dll+BE69AE: CC                    - int 3 
+GameAssembly.dll+BE69AF: CC                    - int 3 
+// ---------- INJECTING HERE ----------
+S.NetErrorWindow.Show: 55                    - push ebp
+// ---------- DONE INJECTING  ----------
+S.NetErrorWindow.Show+1: 8B EC                 - mov ebp,esp
+GameAssembly.dll+BE69B3: 80 3D 5E AF AF 62 00  - cmp byte ptr [GameAssembly.dll+2F5AF5E],00
+GameAssembly.dll+BE69BA: 75 14                 - jne GameAssembly.dll+BE69D0
+GameAssembly.dll+BE69BC: 68 98 AD A2 62        - push GameAssembly.dll+2E8AD98
+GameAssembly.dll+BE69C1: E8 2A 89 6C FF        - call GameAssembly.dll+2AF2F0
+GameAssembly.dll+BE69C6: 83 C4 04              - add esp,04
+GameAssembly.dll+BE69C9: C6 05 5E AF AF 62 01  - mov byte ptr [GameAssembly.dll+2F5AF5E],01
+GameAssembly.dll+BE69D0: 6A 00                 - push 00
+GameAssembly.dll+BE69D2: FF 75 08              - push [ebp+08]
+GameAssembly.dll+BE69D5: FF 35 98 AD A2 62     - push [GameAssembly.dll+2E8AD98]
+}
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1101</ID>
+                  <Description>"[ Cheats ]"</Description>
+                  <Options moHideChildren="1"/>
+                  <GroupHeader>1</GroupHeader>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>1090</ID>
+                      <Description>"Don't Show Skill Wheel"</Description>
+                      <Color>00FF00</Color>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+S.GachaWindow.Show:
+ db c3
+ 
+ 
+[DISABLE]
+S.GachaWindow.Show:
+ db 55
+</AssemblerScript>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>1093</ID>
+                      <Description>"Don't Show New Skill Window"</Description>
+                      <Color>00FF00</Color>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+S.NewSkillWindow.Show:
+ db c3
+
+ 
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+S.NewSkillWindow.Show:
+ db 55
+</AssemblerScript>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>1122</ID>
+                      <Description>"God Mode"</Description>
+                      <Color>00FF00</Color>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>//Target:  The Braves.exe
+//Author:  Salis
+//Credit to METHOS for custom Template LUA
+
+[ENABLE]
+
+////////////////////////  godmode  \\\\\\\\\\\\\\\\\\\\\\\\
+{83 7C 88 10 00 0F 8F ? ? ? ? FF ? ? ? ? ? 5? E8 ? ? ? ? 83 C4 08 85 C0 0F 84 ? ? ? ? 8B 4E 10 8B 40 20 83 7C 88 10 00 0f 8f}
+
+
+define(address,GameAssembly.dll+98166F)
+alloc(newmem,1024,GameAssembly.dll)
+alloc(obytes_godmode, 10)
+label(return originalcode)
+
+registersymbol(obytes_godmode)
+
+obytes_godmode:
+readmem(address, 10)
+
+newmem:
+
+originalcode:
+ mov [eax+ecx*4+10],01
+ cmp dword ptr [eax+ecx*4+10],00
+ jmp return
+
+address:
+ jmp newmem
+ return:
+
+
+[DISABLE]
+
+address:
+readmem(obytes_godmode, 10)
+
+dealloc(*)
+unregistersymbol(*)
+</AssemblerScript>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>1104</ID>
+                      <Description>"Infinite Re-Roll"</Description>
+                      <Color>00FF00</Color>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>//Target:  The Braves.exe
+//Author:  Salis
+//Credit to METHOS for custom Template LUA
+
+[ENABLE]
+
+////////////////////////  infreroll  \\\\\\\\\\\\\\\\\\\\\\\\
+
+aobscanmodule(address,GameAssembly.dll,E8 ?? ?? ?? ?? 8B 4F 68 83 C4 1C 0F 10 00 8B 40 10 0F 11 47 40 89 47 50 85 C9)
+alloc(newmem,1024,GameAssembly.dll)
+alloc(obytes_infreroll, 10)
+label(return originalcode)
+
+registersymbol(obytes_infreroll)
+
+obytes_infreroll:
+readmem(address, 10)
+
+newmem:
+
+originalcode:
+ call CodeStage.AntiCheat.ObscuredTypes.ObscuredInt.op_Increment
+ jmp return
+
+address:
+ jmp newmem
+ return:
+
+
+[DISABLE]
+
+address:
+readmem(obytes_infreroll, 10)
+
+dealloc(*)
+unregistersymbol(*)
+</AssemblerScript>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>1103</ID>
+                      <Description>"Infinite Skill Ban"</Description>
+                      <Color>00FF00</Color>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>//Target:  The Braves.exe
+//Author:  Sintrix.net
+//Credit to METHOS for custom Template LUA
+
+[ENABLE]
+
+////////////////////////  infban  \\\\\\\\\\\\\\\\\\\\\\\\
+
+aobscanmodule(address,GameAssembly.dll,E8 ?? ?? ?? ?? 8B 4D 0C 83 C4 1C 0F 10 00 8B 40 10 0F 11 46 2C 89 46 3C)
+alloc(newmem,1024,GameAssembly.dll)
+alloc(obytes_infban, 10)
+label(return originalcode)
+
+registersymbol(obytes_infban)
+
+obytes_infban:
+readmem(address, 10)
+
+newmem:
+
+originalcode:
+ call CodeStage.AntiCheat.ObscuredTypes.ObscuredInt.op_Increment
+ jmp return
+
+address:
+ jmp newmem
+ return:
+
+
+[DISABLE]
+
+address:
+readmem(obytes_infban, 10)
+
+dealloc(*)
+unregistersymbol(*)
+</AssemblerScript>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>1106</ID>
+                      <Description>"Infinite New Skill"</Description>
+                      <Color>00FF00</Color>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>//Target:  The Braves.exe
+//Author:  Sintrix.net
+//Credit to METHOS for custom Template LUA
+
+[ENABLE]
+
+////////////////////////  infnewskill  \\\\\\\\\\\\\\\\\\\\\\\\
+
+aobscanmodule(address,GameAssembly.dll,83 3F 00 F3 0F 10 4D EC 7E 3E 0F 2F 4F 08 72 38 83 3F 00)
+alloc(newmem,1024,GameAssembly.dll)
+alloc(obytes_infnewskill, 10)
+label(return originalcode)
+
+registersymbol(obytes_infnewskill)
+
+obytes_infnewskill:
+readmem(address, 10)
+
+newmem:
+
+originalcode:
+ mov [edi],#1
+ cmp dword ptr [edi],00
+ movss xmm1,[ebp-14]
+ jmp return
+
+address:
+ jmp newmem
+ nop 3
+return:
+
+
+[DISABLE]
+
+address:
+readmem(obytes_infnewskill, 10)
+
+dealloc(*)
+unregistersymbol(*)
+</AssemblerScript>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>1105</ID>
+                      <Description>"Infinite Resurrect"</Description>
+                      <Color>00FF00</Color>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>//Target:  The Braves.exe
+//Author:  Salis
+//Credit to METHOS for custom Template LUA
+
+[ENABLE]
+
+////////////////////////  infres  \\\\\\\\\\\\\\\\\\\\\\\\
+
+aobscanmodule(address,GameAssembly.dll,E8 ?? ?? ?? ?? 83 C4 1C 0F 10 00 8B 40 10 0F 11 87 84 00 00 00 89 87 94 00 00 00)
+alloc(newmem,1024,GameAssembly.dll)
+alloc(obytes_infres, 10)
+label(return originalcode)
+
+registersymbol(obytes_infres)
+
+obytes_infres:
+readmem(address, 10)
+
+newmem:
+
+originalcode:
+ call CodeStage.AntiCheat.ObscuredTypes.ObscuredInt.op_Decrement
+ jmp return
+
+address:
+ jmp newmem
+ return:
+
+
+[DISABLE]
+
+address:
+readmem(obytes_infres, 10)
+
+dealloc(*)
+unregistersymbol(*)
+</AssemblerScript>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>435</ID>
+      <Description>"-&gt; Extra"</Description>
+      <Options moHideChildren="1"/>
+      <Color>4080FF</Color>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>436</ID>
+          <Description>"Extra Credits For Contributing: Send"</Description>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>447</ID>
+          <Description>"Join Discord"</Description>
+          <Color>8000FF</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+{$lua}
+shellExecute("https://discord.gg/n7QPrYn7p5")
+ 
+{$asm}
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

@@ -1,0 +1,469 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>104</ID>
+      <Description>"-&gt; Start Table &lt;-"</Description>
+      <Options moHideChildren="1"/>
+      <Color>00FF00</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$Lua}
+if syntaxcheck then return end
+
+
+function mono_name_getStaticFieldValue(domain, classname, staticfield)
+  local cid = mono_findClass(domain,classname)
+  local fields = mono_class_enumFields(cid, true)
+  for i in pairs(fields) do
+      if fields[i].isStatic and fields[i].name == staticfield then
+         local result = mono_class_getStaticFieldValue(cid, fields[i].field)
+         return result
+      end
+  end
+end
+registerLuaFunctionHighlight("mono_name_getStaticFieldValue")
+
+
+local function startTable(process, title, footer)
+  OpenProcess(process);
+  if process ~= process or (readInteger(process) == nil) then
+     error(ShowMessage("Failed To Attach To Process"))
+  end
+  --Set Window Title
+  if not((MainForm.Caption):match(title)) then
+  MainForm.Caption = title..' ~ '..MainForm.Caption
+  end
+
+  --Credits
+  if MainForm.lblSigned.Caption:match(footer) == nil then
+    local Main = MainForm.lblSigned
+    local MadeBy = createPanel(Main.Parent)
+
+
+    MadeBy.AutoSize = true
+    MadeBy.Anchors = '[akTop,akRight,akLeft]'
+    MadeBy.AnchorSideTop.Control = MadeBy.Parent
+    MadeBy.AnchorSideTop.Side = asrCenter
+    MadeBy.AnchorSideRight.Control = MainForm.CommentButton
+    MadeBy.AnchorSideRight.Side = asrLeft
+    MadeBy.AnchorSideLeft.Control = MainForm.advancedbutton
+    MadeBy.AnchorSideLeft.Side = asrRight
+
+    Main.Parent = MadeBy
+    Main.Visible = true
+    Main.Caption = footer
+    Main.Font.Size = 12
+    Main.Font.Style = '[fsBold]'
+    Main.Font.Quality = 'fqCleartypeNatural'
+    Main.AnchorSideTop.Control = MadeBy
+    Main.AnchorSideTop.Side = asrCenter
+    Main.AnchorSideLeft.Control = MadeBy
+    Main.AnchorSideLeft.Side = asrCenter
+  end
+end
+registerLuaFunctionHighlight("startTable")
+startTable('Booty Farm.exe','Booty Farm v1.0','By Sintrix.net / Build 16316750')
+
+
+
+function cycleFullCompact(sender,force)     local state = not(compactmenuitem.Caption == 'Compact View Mode'); if force~=nil then state = not force end; compactmenuitem.Caption = state and 'Compact View Mode' or 'Full View Mode'; getMainForm().Splitter1.Visible = state; getMainForm().Panel4.Visible    = state; getMainForm().Panel5.Visible    = state; end; function addCompactMenu() if compactmenualreadyexists then return end; local parent = getMainForm().Menu.Items; compactmenuitem = createMenuItem(parent); parent.add(compactmenuitem); compactmenuitem.Caption = 'Compact View Mode'; compactmenuitem.OnClick = cycleFullCompact; compactmenualreadyexists = 'yes'; end; addCompactMenu(); cycleFullCompact(nil,true);
+
+getMainForm().Panel4.Visible = true;
+{$asm}
+[DISABLE]
+{$Lua}
+cycleFullCompact(nil,false);
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>434</ID>
+          <Description>"-&gt; Initialize "</Description>
+          <Options moHideChildren="1"/>
+          <Color>FFFF00</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+{$Lua}
+--dont run on syntaxcheck
+if syntaxcheck then return end
+
+-- setup monopipe
+if not monopipe then
+   if LaunchMonoDataCollector() == 0 then
+      ShowMessage('Failed To Launch Mono Data Collector')
+   end
+end
+
+
+{$asm}
+[DISABLE]
+{$lua}
+
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>3</ID>
+              <Description>"-&gt; Get Current Selected Girl"</Description>
+              <Options moHideChildren="1"/>
+              <Color>00FF00</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>//Target:  Booty Farm.exe
+//Author:  Salis
+//Credit to METHOS for custom Template LUA
+
+[ENABLE]
+
+////////////////////////  getselgirl  \\\\\\\\\\\\\\\\\\\\\\\\
+
+aobscanmodule(address,GameAssembly.dll,8B 47 10 89 45 0C 8B 47 14)
+alloc(newmem,1024,GameAssembly.dll)
+alloc(obytes_getselgirl, 10)
+label(return originalcode)
+
+registersymbol(obytes_getselgirl girlholder)
+
+obytes_getselgirl:
+readmem(address, 10)
+
+newmem:
+
+originalcode:
+ mov [girlholder], edi
+ mov eax,[edi+10]
+ mov [ebp+0C],eax
+ jmp return
+
+girlholder:
+dd #0
+
+address:
+ jmp newmem
+ nop
+return:
+
+
+[DISABLE]
+
+address:
+readmem(obytes_getselgirl, 10)
+
+dealloc(*)
+unregistersymbol(*)
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>4</ID>
+                  <Description>"GirlHolder"</Description>
+                  <Options moManualExpandCollapse="1"/>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>girlholder</Address>
+                  <Offsets>
+                    <Offset>0</Offset>
+                  </Offsets>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>5</ID>
+                      <Description>"id"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>+8</Address>
+                      <Offsets>
+                        <Offset>0</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>6</ID>
+                      <Description>"level"</Description>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>+C</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>7</ID>
+                      <Description>"affinityPoints"</Description>
+                      <VariableType>8 Bytes</VariableType>
+                      <Address>+10</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>8</ID>
+                      <Description>"questionsAnswered"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>+18</Address>
+                      <Offsets>
+                        <Offset>0</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>9</ID>
+                      <Description>"personalQuestionsUnlocked"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>+1C</Address>
+                      <Offsets>
+                        <Offset>0</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>10</ID>
+                      <Description>"clickThruConversationIndex"</Description>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>+20</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>11</ID>
+                      <Description>"facts"</Description>
+                      <ShowAsHex>1</ShowAsHex>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>+24</Address>
+                      <Offsets>
+                        <Offset>0</Offset>
+                      </Offsets>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>12</ID>
+                      <Description>"allFactsRewardCollected"</Description>
+                      <VariableType>Byte</VariableType>
+                      <Address>+28</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>13</ID>
+                      <Description>"unlockedChaptersCount"</Description>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>+2C</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>14</ID>
+                      <Description>"girlPaid"</Description>
+                      <VariableType>Byte</VariableType>
+                      <Address>+30</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>15</ID>
+                      <Description>"girl"</Description>
+                      <Options moManualExpandCollapse="1"/>
+                      <ShowAsHex>1</ShowAsHex>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>+34</Address>
+                      <Offsets>
+                        <Offset>0</Offset>
+                      </Offsets>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>16</ID>
+                          <Description>"id"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>4 Bytes</VariableType>
+                          <Address>+8</Address>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>17</ID>
+                          <Description>"name"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>4 Bytes</VariableType>
+                          <Address>+C</Address>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>18</ID>
+                          <Description>"unlockLevel"</Description>
+                          <VariableType>4 Bytes</VariableType>
+                          <Address>+10</Address>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>19</ID>
+                          <Description>"unlockCrystals"</Description>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>+18</Address>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>20</ID>
+                          <Description>"hidden"</Description>
+                          <VariableType>Byte</VariableType>
+                          <Address>+20</Address>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>21</ID>
+                          <Description>"autoCompleteFacts"</Description>
+                          <VariableType>Byte</VariableType>
+                          <Address>+21</Address>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>22</ID>
+                          <Description>"levelUpSteps"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>4 Bytes</VariableType>
+                          <Address>+24</Address>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>23</ID>
+                          <Description>"factsId"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>4 Bytes</VariableType>
+                          <Address>+28</Address>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>24</ID>
+                          <Description>"questionsId"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>4 Bytes</VariableType>
+                          <Address>+2C</Address>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>25</ID>
+                          <Description>"personalQuestionIntrosId"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>4 Bytes</VariableType>
+                          <Address>+30</Address>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>26</ID>
+                          <Description>"personalQuestionsId"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>4 Bytes</VariableType>
+                          <Address>+34</Address>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>27</ID>
+                          <Description>"chapters"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>4 Bytes</VariableType>
+                          <Address>+38</Address>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>28</ID>
+                          <Description>"photosId"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>4 Bytes</VariableType>
+                          <Address>+3C</Address>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>29</ID>
+                          <Description>"bacgroundsId"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>4 Bytes</VariableType>
+                          <Address>+40</Address>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>30</ID>
+                          <Description>"premiumOfferId"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>4 Bytes</VariableType>
+                          <Address>+44</Address>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>31</ID>
+                          <Description>"girlsGroup"</Description>
+                          <ShowAsHex>1</ShowAsHex>
+                          <VariableType>4 Bytes</VariableType>
+                          <Address>+48</Address>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>34</ID>
+              <Description>"Toggle Debug Window"</Description>
+              <Color>00FF00</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+{$lua}
+if syntaxcheck then return end
+
+local address = string.format('0x%x',mono_name_getStaticFieldValue('','DebugController','instance'))
+local method = mono_findMethod('','DebugController','ToggleDebugMenu')
+
+mono_invoke_method('',method,address,{})
+
+if not syntaxcheck then
+ synchronize(createTimer,60,memrec.setActive,false)
+end
+{$asm}
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+</AssemblerScript>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>111</ID>
+          <Description>"&lt; Don't Touch&gt;"</Description>
+          <Options moHideChildren="1"/>
+          <Color>0000FF</Color>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>1017</ID>
+      <Description>"-&gt; Extra"</Description>
+      <Options moHideChildren="1"/>
+      <Color>4080FF</Color>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>447</ID>
+          <Description>"Join Discord"</Description>
+          <Color>8000FF</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+{$lua}
+shellExecute("https://discord.gg/n7QPrYn7p5")
+ 
+{$asm}
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+  <Structures StructVersion="2">
+    <Structure Name="GirlHolder" AutoFill="0" AutoCreate="1" DefaultHex="0" AutoDestroy="0" DoNotSaveLocal="0" RLECompression="1" AutoCreateStructsize="4096">
+      <Elements>
+        <Element Offset="8" Vartype="Pointer" Bytesize="4" OffsetHex="00000008" Description="id" DisplayMethod="unsigned integer"/>
+        <Element Offset="12" Vartype="4 Bytes" Bytesize="4" OffsetHex="0000000C" Description="level" DisplayMethod="unsigned integer"/>
+        <Element Offset="16" Vartype="8 Bytes" Bytesize="8" OffsetHex="00000010" Description="affinityPoints" DisplayMethod="unsigned integer"/>
+        <Element Offset="24" Vartype="Pointer" Bytesize="4" OffsetHex="00000018" Description="questionsAnswered" DisplayMethod="unsigned integer"/>
+        <Element Offset="28" Vartype="Pointer" Bytesize="4" OffsetHex="0000001C" Description="personalQuestionsUnlocked" DisplayMethod="unsigned integer"/>
+        <Element Offset="32" Vartype="4 Bytes" Bytesize="4" OffsetHex="00000020" Description="clickThruConversationIndex" DisplayMethod="unsigned integer"/>
+        <Element Offset="36" Vartype="Pointer" Bytesize="4" OffsetHex="00000024" Description="facts" DisplayMethod="unsigned integer"/>
+        <Element Offset="40" Vartype="Byte" Bytesize="1" OffsetHex="00000028" Description="allFactsRewardCollected" DisplayMethod="unsigned integer"/>
+        <Element Offset="44" Vartype="4 Bytes" Bytesize="4" OffsetHex="0000002C" Description="unlockedChaptersCount" DisplayMethod="unsigned integer"/>
+        <Element Offset="48" Vartype="Byte" Bytesize="1" OffsetHex="00000030" Description="girlPaid" DisplayMethod="unsigned integer"/>
+        <Element Offset="52" Vartype="Pointer" Bytesize="4" OffsetHex="00000034" Description="girl" DisplayMethod="unsigned integer"/>
+      </Elements>
+    </Structure>
+    <Structure Name="Girl" AutoFill="0" AutoCreate="1" DefaultHex="0" AutoDestroy="0" DoNotSaveLocal="0" RLECompression="1" AutoCreateStructsize="4096">
+      <Elements>
+        <Element Offset="8" Vartype="Pointer" Bytesize="4" OffsetHex="00000008" Description="id" DisplayMethod="unsigned integer"/>
+        <Element Offset="12" Vartype="Pointer" Bytesize="4" OffsetHex="0000000C" Description="name" DisplayMethod="unsigned integer"/>
+        <Element Offset="16" Vartype="4 Bytes" Bytesize="4" OffsetHex="00000010" Description="unlockLevel" DisplayMethod="unsigned integer"/>
+        <Element Offset="24" Vartype="8 Bytes" Bytesize="8" OffsetHex="00000018" Description="unlockCrystals" DisplayMethod="unsigned integer"/>
+        <Element Offset="32" Vartype="Byte" Bytesize="1" OffsetHex="00000020" Description="hidden" DisplayMethod="unsigned integer"/>
+        <Element Offset="33" Vartype="Byte" Bytesize="1" OffsetHex="00000021" Description="autoCompleteFacts" DisplayMethod="unsigned integer"/>
+        <Element Offset="36" Vartype="Pointer" Bytesize="4" OffsetHex="00000024" Description="levelUpSteps" DisplayMethod="unsigned integer"/>
+        <Element Offset="40" Vartype="Pointer" Bytesize="4" OffsetHex="00000028" Description="factsId" DisplayMethod="unsigned integer"/>
+        <Element Offset="44" Vartype="Pointer" Bytesize="4" OffsetHex="0000002C" Description="questionsId" DisplayMethod="unsigned integer"/>
+        <Element Offset="48" Vartype="Pointer" Bytesize="4" OffsetHex="00000030" Description="personalQuestionIntrosId" DisplayMethod="unsigned integer"/>
+        <Element Offset="52" Vartype="Pointer" Bytesize="4" OffsetHex="00000034" Description="personalQuestionsId" DisplayMethod="unsigned integer"/>
+        <Element Offset="56" Vartype="Pointer" Bytesize="4" OffsetHex="00000038" Description="chapters" DisplayMethod="unsigned integer"/>
+        <Element Offset="60" Vartype="Pointer" Bytesize="4" OffsetHex="0000003C" Description="photosId" DisplayMethod="unsigned integer"/>
+        <Element Offset="64" Vartype="Pointer" Bytesize="4" OffsetHex="00000040" Description="bacgroundsId" DisplayMethod="unsigned integer"/>
+        <Element Offset="68" Vartype="Pointer" Bytesize="4" OffsetHex="00000044" Description="premiumOfferId" DisplayMethod="unsigned integer"/>
+        <Element Offset="72" Vartype="Pointer" Bytesize="4" OffsetHex="00000048" Description="girlsGroup" DisplayMethod="unsigned integer"/>
+      </Elements>
+    </Structure>
+  </Structures>
+</CheatTable>

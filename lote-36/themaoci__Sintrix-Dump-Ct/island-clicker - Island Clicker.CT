@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>452</ID>
+      <Description>"Enable (Auto-Attach Game Process)"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$Lua}
+if syntaxcheck then return end
+
+local process = 'Island Clicker.exe'
+OpenProcess(process);
+if process ~= process or (readInteger(process) == nil) then
+   error(ShowMessage("Failed To Attach To Process"))
+end
+
+--Set Window Title
+local title = "Island Clicker 0.1";
+if not((MainForm.Caption):match("Island Clicker")) then
+MainForm.Caption = title..' ~ '..MainForm.Caption
+end
+
+--Credits
+if MainForm.lblSigned.Caption:match('Sintrix / Build 16747747') == nil then
+  local Main = MainForm.lblSigned
+  local MadeBy = createPanel(Main.Parent)
+
+
+  MadeBy.AutoSize = true
+  MadeBy.Anchors = '[akTop,akRight,akLeft]'
+  MadeBy.AnchorSideTop.Control = MadeBy.Parent
+  MadeBy.AnchorSideTop.Side = asrCenter
+  MadeBy.AnchorSideRight.Control = MainForm.CommentButton
+  MadeBy.AnchorSideRight.Side = asrLeft
+  MadeBy.AnchorSideLeft.Control = MainForm.advancedbutton
+  MadeBy.AnchorSideLeft.Side = asrRight
+
+  Main.Parent = MadeBy
+  Main.Visible = true
+  Main.Caption = 'Sintrix / Build 16747747'
+  Main.Font.Size = 12
+  Main.Font.Style = '[fsBold]'
+  Main.Font.Quality = 'fqCleartypeNatural'
+  Main.AnchorSideTop.Control = MadeBy
+  Main.AnchorSideTop.Side = asrCenter
+  Main.AnchorSideLeft.Control = MadeBy
+  Main.AnchorSideLeft.Side = asrCenter
+end
+
+[DISABLE]
+
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>769</ID>
+          <Description>"Initialize Mono"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+{$lua}
+mono_initialize()
+LaunchMonoDataCollector()
+{$asm}
+
+
+[DISABLE]
+
+
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>105403</ID>
+              <Description>"Massive Resource Gain"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>//Send@FearlessRevolution|Sintrix
+[ENABLE]
+
+aobscanmodule(resources,GameAssembly.dll,48 8B D9 0F 28 F1 45)
+alloc(newmem,$1000,resources)
+
+label(code)
+label(return)
+
+newmem:
+push rsi
+mov rsi,(double)9999999999999
+mov [rcx+10],rsi
+
+code:
+  pop rsi
+  mov rbx,rcx
+  movaps xmm6,xmm1
+  jmp return
+
+resources:
+  jmp newmem
+  nop
+return:
+registersymbol(resources)
+
+[DISABLE]
+
+resources:
+  db 48 8B D9 0F 28 F1
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>105416</ID>
+              <Description>"Infinite Resources"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>//Send@FearlessRevolution|Sintrix
+[ENABLE]
+PlayerResources.SpendResource:
+db C3
+
+[DISABLE]
+PlayerResources.SpendResource:
+db 48 53
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>105408</ID>
+              <Description>"Instant Boss Kill"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>//Send@FearlessRevolution|Sintrix
+//ArenaBoss
+
+define(address,GameAssembly.dll+3028BD)
+define(bytes,F2 0F 10 B3 A8 00 00 00)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,GameAssembly.dll+3028BD)
+
+label(code)
+label(return)
+
+newmem:
+push r9
+mov r9,(double)0
+mov [rbx+a8],r9
+jmp code
+
+code:
+  pop r9
+  movsd xmm6,[rbx+000000A8]
+  jmp return
+
+address:
+  jmp newmem
+  nop 3
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+dealloc(*)
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>105410</ID>
+              <Description>"Free Tool Upgrades"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>//Send@FearlessRevolution|Sintrix
+[ENABLE]
+GetCraftCosts.GetCraftToolCost:
+db C3
+BuyCraftUpgrade.GetToolCost:
+db C3
+[DISABLE]
+GetCraftCosts.GetCraftToolCost:
+db 48 8B C4
+BuyCraftUpgrade.GetToolCost:
+db 48 53
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>105413</ID>
+              <Description>"Instant Cooking"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>//Send@FearlessRevolution|Sintrix
+//CookingMenu
+define(address,"GameAssembly.dll"+33DEB7)
+define(bytes,F3 0F 11 4B 44)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,"GameAssembly.dll"+33DEB7)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  xorps xmm1,xmm1
+  movss [rbx+44],xmm1
+  jmp return
+
+address:
+  jmp newmem
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+dealloc(*)
+
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>105418</ID>
+              <Description>"Rapid Auto Clickers"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>//Send@FearlessRevolution|Sintrix
+//AutoClickers
+define(address,"GameAssembly.dll"+35B82C)
+define(bytes,F3 0F 10 73 50)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,"GameAssembly.dll"+35B82C)
+label(code return)
+
+newmem:
+
+code:
+  mov [rbx+50],(float)-10
+  movss xmm6,[rbx+50]
+  jmp return
+
+address:
+  jmp newmem
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+dealloc(*)
+
+
+</AssemblerScript>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>105395</ID>
+      <Description>"--------------------------------"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>105396</ID>
+      <Description>"💥 Author: Send"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>105397</ID>
+      <Description>"Game Process: Island Clicker.exe"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>105393</ID>
+      <Description>"Game Build: 16747747 (14 December 2024)"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>105401</ID>
+      <Description>"https://steamdb.info/app/3133180/patchnotes/"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>105399</ID>
+      <Description>"⚡Discord"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+{$lua}
+shellExecute("https://discord.gg/NTFcdAUWxb")
+
+{$asm}
+[DISABLE]
+
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>105400</ID>
+      <Description>"--------------------------------"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

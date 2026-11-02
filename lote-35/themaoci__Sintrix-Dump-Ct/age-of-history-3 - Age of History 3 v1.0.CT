@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <Files/>
+  <CheatEntries>
+    <CheatEntry>
+      <ID>112</ID>
+      <Description>"-&gt; Start Table &lt;-"</Description>
+      <Color>00FF00</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$Lua}
+if syntaxcheck then return end
+
+local process = 'javaw.exe'
+OpenProcess(process);
+if process ~= process or (readInteger(process) == nil) then
+   error(ShowMessage("Failed To Attach To Process"))
+end
+ShowMessage("Attached to javaw process, if this doesn't work please manually attach to the game through the windows section")
+
+--Set Window Title
+local title = "Age of History v1.0";
+if not((MainForm.Caption):match("Age of History")) then
+MainForm.Caption = title..' ~ '..MainForm.Caption
+end
+
+--Credits
+if MainForm.lblSigned.Caption:match('By Sintrix / Build 16184556') == nil then
+  local Main = MainForm.lblSigned
+  local MadeBy = createPanel(Main.Parent)
+
+
+  MadeBy.AutoSize = true
+  MadeBy.Anchors = '[akTop,akRight,akLeft]'
+  MadeBy.AnchorSideTop.Control = MadeBy.Parent
+  MadeBy.AnchorSideTop.Side = asrCenter
+  MadeBy.AnchorSideRight.Control = MainForm.CommentButton
+  MadeBy.AnchorSideRight.Side = asrLeft
+  MadeBy.AnchorSideLeft.Control = MainForm.advancedbutton
+  MadeBy.AnchorSideLeft.Side = asrRight
+
+  Main.Parent = MadeBy
+  Main.Visible = true
+  Main.Caption = 'By Sintrix / Build 16184556'
+  Main.Font.Size = 12
+  Main.Font.Style = '[fsBold]'
+  Main.Font.Quality = 'fqCleartypeNatural'
+  Main.AnchorSideTop.Control = MadeBy
+  Main.AnchorSideTop.Side = asrCenter
+  Main.AnchorSideLeft.Control = MadeBy
+  Main.AnchorSideLeft.Side = asrCenter
+end
+
+function cycleFullCompact(sender,force)     local state = not(compactmenuitem.Caption == 'Compact View Mode'); if force~=nil then state = not force end; compactmenuitem.Caption = state and 'Compact View Mode' or 'Full View Mode'; getMainForm().Splitter1.Visible = state; getMainForm().Panel4.Visible    = state; getMainForm().Panel5.Visible    = state; end; function addCompactMenu() if compactmenualreadyexists then return end; local parent = getMainForm().Menu.Items; compactmenuitem = createMenuItem(parent); parent.add(compactmenuitem); compactmenuitem.Caption = 'Compact View Mode'; compactmenuitem.OnClick = cycleFullCompact; compactmenualreadyexists = 'yes'; end; addCompactMenu(); cycleFullCompact(nil,true);
+
+getMainForm().Panel4.Visible = true;
+
+[DISABLE]
+{$Lua}
+cycleFullCompact(nil,false);
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>2</ID>
+          <Description>"-&gt; Grab Playerstats (click on it to update)"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : Age of History 3
+  Version: 
+  Date   : 2024-10-28
+  Author : User
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscan(goldting,C5 FA 10 48 34 C5 F8 2E C1 41 B8 FF FF FF FF 0F ?? ?? ?? ?? ?? 0f ?? ?? ?? ?? ?? 41 b8 00 00 00 00 0f ?? ?? ?? ?? ?? 49 ff c0 41 83 f8 00 49 b8 ?? ?? ?? ?? ?? ?? ?? ?? 48 ba ?? ?? ?? ?? ?? ?? ?? ?? 0f 84 ?? ?? ?? ?? 48 ba ?? ?? ?? ?? ?? ?? ?? ?? 49 8b 34 10 48 8D 76 01 49 89 34 10 48 8B 54 24 68 ) // should be unique
+alloc(newmem,$1000,goldting)
+
+label(code)
+label(return)
+registersymbol(pstats)
+
+
+newmem:
+
+code:
+  mov [pstats],rax
+  vmovss xmm1,[rax+34]
+  jmp return
+
+pstats:
+dd #0
+
+goldting:
+  jmp newmem
+return:
+registersymbol(goldting)
+
+[DISABLE]
+
+goldting:
+  db C5 FA 10 48 34
+
+unregistersymbol(*)
+dealloc(*)
+
+{
+// ORIGINAL CODE - INJECTION POINT: 04043A32
+
+040439F2: 48 C7 86 B8 01 00 00 01 00 00 00  - mov qword ptr [rsi+000001B8],00000001
+040439FD: E9 21 00 00 00                    - jmp 04043A23
+04043A02: E9 1C 00 00 00                    - jmp 04043A23
+04043A07: 48 BE 40 EC A0 6D 00 00 00 00     - mov rsi,000000006DA0EC40
+04043A11: 48 83 AE 98 01 00 00 01           - sub qword ptr [rsi+00000198],01
+04043A19: E9 7C 19 00 00                    - jmp 0404539A
+04043A1E: E9 00 00 00 00                    - jmp 04043A23
+04043A23: 4C 8B C0                          - mov r8,rax
+04043A26: 49 8B C0                          - mov rax,r8
+04043A29: C5 FA 10 84 24 A0 00 00 00        - vmovss xmm0,[rsp+000000A0]
+// ---------- INJECTING HERE ----------
+04043A32: C5 FA 10 48 34                    - vmovss xmm1,[rax+34]
+// ---------- DONE INJECTING  ----------
+04043A37: C5 F8 2E C1                       - vucomiss xmm0,xmm1
+04043A3B: 41 B8 FF FF FF FF                 - mov r8d,FFFFFFFF
+04043A41: 0F 8A 15 00 00 00                 - jp 04043A5C
+04043A47: 0F 82 0F 00 00 00                 - jb 04043A5C
+04043A4D: 41 B8 00 00 00 00                 - mov r8d,00000000
+04043A53: 0F 84 03 00 00 00                 - je 04043A5C
+04043A59: 49 FF C0                          - inc r8
+04043A5C: 41 83 F8 00                       - cmp r8d,00
+04043A60: 49 B8 28 7D A2 3D 00 00 00 00     - mov r8,000000003DA27D28
+04043A6A: 48 BA 18 01 00 00 00 00 00 00     - mov rdx,0000000000000118
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>3</ID>
+              <Description>"pstats"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>pstats</Address>
+              <Offsets>
+                <Offset>0</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>10</ID>
+                  <Description>"Manpower"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>+14</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>7</ID>
+                  <Description>"Money"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>+34</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>8</ID>
+                  <Description>"Legacy"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>+38</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>9</ID>
+                  <Description>"Diplomacy"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>+3C</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>12</ID>
+                  <Description>"Advantage Points"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>+29c</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>435</ID>
+      <Description>"-&gt; Extra"</Description>
+      <Options moHideChildren="1"/>
+      <Color>4080FF</Color>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>447</ID>
+          <Description>"Join Discord"</Description>
+          <Color>8000FF</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+{$lua}
+shellExecute("https://discord.gg/n7QPrYn7p5")
+ 
+{$asm}
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>774</ID>
+      <Description>"Attach Game Process"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$Lua}
+if syntaxcheck then return end
+
+local process = 'RGame-Win64-Shipping.exe'
+OpenProcess(process);
+if process ~= process or (readInteger(process) == nil) then
+   error(ShowMessage("Failed To Attach To Process"))
+end
+
+{$asm}
+[DISABLE]
+
+
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>809</ID>
+          <Description>"Get Player"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(playerController,RGame-Win64-Shipping.exe,49 8B 06 48 8D 95 40 01 00 00)
+alloc(newmem,$1000,playerController)
+registersymbol(getPlayer)
+label(code return getPlayer)
+//Send@FearlessRevolution|Sintrix
+newmem:
+mov [getPlayer],r14
+
+code:
+  mov rax,[r14]
+  lea rdx,[rbp+00000140]
+  jmp return
+
+getPlayer:
+dq
+//Send@FearlessRevolution|Sintrix
+playerController:
+  jmp newmem
+  nop 5
+return:
+registersymbol(playerController)
+
+[DISABLE]
+
+playerController:
+  db 49 8B 06 48 8D 95 40 01 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>811</ID>
+              <Description>"No Damage To Player"</Description>
+              <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">1:Enabled
+0:Disabled
+</DropDownList>
+              <VariableType>4 Bytes</VariableType>
+              <Address>[getPlayer]+2E8</Address>
+              <Offsets>
+                <Offset>B8</Offset>
+                <Offset>340</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>822</ID>
+              <Description>"Edit Movement Speed"</Description>
+              <VariableType>Float</VariableType>
+              <Address>[getPlayer]+2E8</Address>
+              <Offsets>
+                <Offset>4EC</Offset>
+                <Offset>4788</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>810</ID>
+              <Description>"Edit Player Speed"</Description>
+              <VariableType>Float</VariableType>
+              <Address>[getPlayer]+2E8</Address>
+              <Offsets>
+                <Offset>68</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>824</ID>
+              <Description>"Edit Dash Speed"</Description>
+              <VariableType>Float</VariableType>
+              <Address>[getPlayer]+2E8</Address>
+              <Offsets>
+                <Offset>780</Offset>
+                <Offset>4788</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>823</ID>
+              <Description>"Edit Jump Height"</Description>
+              <VariableType>Float</VariableType>
+              <Address>[getPlayer]+2E8</Address>
+              <Offsets>
+                <Offset>644</Offset>
+                <Offset>4788</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>775</ID>
+          <Description>"Infinite Ammo"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(Ammo,RGame-Win64-Shipping.exe,89 8F E0 00 00 00 48 8D 4F)
+alloc(newmem,$1000,Ammo)
+//Send@FearlessRevolution|Sintrix
+label(code)
+label(return)
+
+newmem:
+
+code:
+  mov [rdi+000000E0],#99
+  jmp return
+
+Ammo:
+  jmp newmem
+  nop
+return:
+registersymbol(Ammo)
+//Send@FearlessRevolution|Sintrix
+[DISABLE]
+
+Ammo:
+  db 89 8F E0 00 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>781</ID>
+          <Description>"No Recoil | No Spread"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(SpreadRecoil,RGame-Win64-Shipping.exe,48 8B 81 08 01 00 00 48 85 C0 74 4F)
+alloc(newmem,$1000,SpreadRecoil)
+//Send@FearlessRevolution|Sintrix
+label(code)
+label(return)
+//Send@FearlessRevolution|Sintrix
+newmem:
+push rcx
+mov rcx,[rcx+108]
+mov [rcx+98],(float)0
+mov [rcx+A0],(float)0
+mov [rcx+C8],(float)0
+mov [rcx+D0],(float)0
+jmp code
+
+code:
+  pop rcx
+  mov rax,[rcx+00000108]
+  jmp return
+//Send@FearlessRevolution|Sintrix
+SpreadRecoil:
+  jmp newmem
+  nop 2
+return:
+registersymbol(SpreadRecoil)
+
+[DISABLE]
+
+SpreadRecoil:
+  db 48 8B 81 08 01 00 00
+//Send@FearlessRevolution|Sintrix
+unregistersymbol(SpreadRecoil)
+dealloc(newmem)
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>805</ID>
+          <Description>"No Weapon Overheat"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>//Send@FearlessRevolution|Sintrix
+[ENABLE]
+
+aobscanmodule(Overheat,RGame-Win64-Shipping.exe,A0 01 00 00 48 8B 86 08 01 00 00)
+alloc(newmem,$1000,Overheat)
+
+label(code)
+label(return)
+
+newmem:
+push r8
+mov r8,rsi
+movsd xmm15,[NewHeat]
+movsd [r8+4E8],xmm15
+jmp code
+//Send@FearlessRevolution|Sintrix
+code:
+  pop r8
+  mov rax,[rsi+00000108]
+  jmp return
+
+NewHeat:
+dq (double)0
+//Send@FearlessRevolution|Sintrix
+Overheat+04:
+  jmp newmem
+  nop 2
+return:
+registersymbol(Overheat)
+
+[DISABLE]
+
+Overheat+04:
+  db 48 8B 86 08 01 00 00
+
+unregistersymbol(Overheat)
+dealloc(newmem)
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>807</ID>
+          <Description>"Super Weapon Damage"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(WeaponDamage,RGame-Win64-Shipping.exe,48 8B 01 48 8D 15 D3 90 D1 02)
+alloc(newmem,$1000,WeaponDamage)
+
+label(code)
+label(return)
+//Send@FearlessRevolution|Sintrix
+newmem:
+push r15
+mov r15,[rcx+108]
+movsd xmm15,[NewDamage]
+movsd [r15+38],xmm15
+movsd [r15+40],xmm15
+jmp code
+
+code:
+  pop r15
+  mov rax,[rcx]
+  lea rdx,[RGame-Win64-Shipping.exe+7C1C390]
+  jmp return
+//Send@FearlessRevolution|Sintrix
+NewDamage:
+dq (double)999999
+
+WeaponDamage:
+  jmp newmem
+  nop 5
+return:
+registersymbol(WeaponDamage)
+
+[DISABLE]
+//Send@FearlessRevolution|Sintrix
+WeaponDamage:
+  db 48 8B 01 48 8D 15 D3 90 D1 02
+
+unregistersymbol(WeaponDamage)
+dealloc(newmem)
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>788</ID>
+          <Description>"Weapon Editor"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(WeaponEditor,RGame-Win64-Shipping.exe,48 8B 81 08 01 00 00 C3 33)
+alloc(newmem,$1000,WeaponEditor)
+registersymbol(getGun)
+label(code return getGun)
+//Send@Sintrix|FearlessRevolution
+newmem:
+mov [getGun],rcx
+
+code:
+  mov rax,[rcx+00000108]
+  jmp return
+
+getGun:
+dq
+
+WeaponEditor:
+  jmp newmem
+  nop 2
+return:
+registersymbol(WeaponEditor)
+
+[DISABLE]
+
+WeaponEditor:
+  db 48 8B 81 08 01 00 00
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>798</ID>
+              <Description>"Edit Rate Of Fire"</Description>
+              <VariableType>Float</VariableType>
+              <Address>[getGun]+108</Address>
+              <Offsets>
+                <Offset>60</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>799</ID>
+              <Description>"Edit Primary Weapon Damage"</Description>
+              <VariableType>Double</VariableType>
+              <Address>[getGun]+108</Address>
+              <Offsets>
+                <Offset>38</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>800</ID>
+              <Description>"Edit Secondary Weapon Damage"</Description>
+              <VariableType>Double</VariableType>
+              <Address>[getGun]+108</Address>
+              <Offsets>
+                <Offset>40</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>459</ID>
+      <Description>"--------------------------------"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>461</ID>
+      <Description>"💥 Author:  Send"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>454</ID>
+      <Description>"🞂 Process:  RGame-Win64-Shipping.exe"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>458</ID>
+      <Description>"--------------------------------"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

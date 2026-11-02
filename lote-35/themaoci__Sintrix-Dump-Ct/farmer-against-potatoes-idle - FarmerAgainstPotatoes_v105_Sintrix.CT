@@ -1,0 +1,1198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>44</ID>
+      <Description>"→ Enable (Auto-Attach Game Process)"</Description>
+      <Options moHideChildren="1"/>
+      <Color>00FF00</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$Lua}
+if syntaxcheck then return end
+
+function mono_name_getStaticFieldValue(domain, classname, staticfield)
+  local cid = mono_findClass(domain,classname)
+  local fields = mono_class_enumFields(cid, true)
+  for i in pairs(fields) do
+      if fields[i].isStatic and fields[i].name == staticfield then
+         local result = mono_class_getStaticFieldValue(cid, fields[i].field)
+         return result
+      end
+  end
+end
+registerLuaFunctionHighlight("mono_name_getStaticFieldValue")
+
+local function startTable(process, title, footer)
+  OpenProcess(process);
+  if process ~= process or (readInteger(process) == nil) then
+     error(ShowMessage("Failed To Attach To Process"))
+  end
+  --Set Window Title
+  if not((MainForm.Caption):match(title)) then
+  MainForm.Caption = title..' ~ '..MainForm.Caption
+  end
+
+  --Credits
+  if MainForm.lblSigned.Caption:match(footer) == nil then
+    local Main = MainForm.lblSigned
+    local MadeBy = createPanel(Main.Parent)
+
+
+    MadeBy.AutoSize = true
+    MadeBy.Anchors = '[akTop,akRight,akLeft]'
+    MadeBy.AnchorSideTop.Control = MadeBy.Parent
+    MadeBy.AnchorSideTop.Side = asrCenter
+    MadeBy.AnchorSideRight.Control = MainForm.CommentButton
+    MadeBy.AnchorSideRight.Side = asrLeft
+    MadeBy.AnchorSideLeft.Control = MainForm.advancedbutton
+    MadeBy.AnchorSideLeft.Side = asrRight
+
+    Main.Parent = MadeBy
+    Main.Visible = true
+    Main.Caption = footer
+    Main.Font.Size = 12
+    Main.Font.Style = '[fsBold]'
+    Main.Font.Quality = 'fqCleartypeNatural'
+    Main.AnchorSideTop.Control = MadeBy
+    Main.AnchorSideTop.Side = asrCenter
+    Main.AnchorSideLeft.Control = MadeBy
+    Main.AnchorSideLeft.Side = asrCenter
+  end
+end
+registerLuaFunctionHighlight("startTable")
+startTable('Farmer Against Potatoes Idle.exe','Farmer Against Potatoes Idle v1.0.5','By Sintrix / Build 16581813')
+
+
+getMainForm().Panel4.Visible = true;
+{$asm}
+[DISABLE]
+{$Lua}
+
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>448</ID>
+          <Description>"→ Scripts"</Description>
+          <Options moHideChildren="1"/>
+          <Color>0080FF</Color>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>46</ID>
+              <Description>"→ Enable Mono"</Description>
+              <Color>FFFF00</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+{$Lua}
+if syntaxcheck then return end
+if not monopipe then if LaunchMonoDataCollector() == 0 then
+
+if process == nil then ShowMessage('Process is not selected.')
+elseif readInteger(process) == 0 then ShowMessage('Process cannot be opened. Gone?')
+else
+  if (monopipe~=nil) and (monopipe.ProcessID~=getOpenedProcessID()) then
+    monopipe.destroy()
+    monopipe=nil
+  end
+  if (monopipe==nil) then
+    LaunchMonoDataCollector()
+    -- monoSymbolList is only available if the target is il2cpp and not normal mono
+    --while (monoSymbolList==nil) or (not monoSymbolList.FullyLoaded) do checkSynchronize(50) end -- checkSynchronize requires that memRec is ASynch.
+  end
+end
+end end
+ 
+{$asm}
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>0</ID>
+                  <Description>"→ Grab Game Manger &amp; Fast Stages"</Description>
+                  <Color>00FF00</Color>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+{$Lua}
+if syntaxcheck then return end
+local method = mono_findMethod('', 'GameManager', 'get_i')
+
+
+gmPointer = mono_invoke_method('', method, 0x0,{})
+playerdata = readPointer(gmPointer+0x40)
+
+
+registerSymbol("gmptr", gmPointer );
+gmptrstring = string.format("0x%X",gmPointer )
+
+
+
+{$asm}
+[DISABLE]
+
+</AssemblerScript>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>1</ID>
+                      <Description>"→ GameManager"</Description>
+                      <Options moHideChildren="1"/>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <Color>FFFF00</Color>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>gmptr</Address>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>2</ID>
+                          <Description>"-&gt; PlayerData"</Description>
+                          <Options moHideChildren="1"/>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <Color>FFFF00</Color>
+                          <VariableType>4 Bytes</VariableType>
+                          <Address>+40</Address>
+                          <Offsets>
+                            <Offset>0</Offset>
+                          </Offsets>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>507</ID>
+                              <Description>"TimePlayed"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+448</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>508</ID>
+                              <Description>"TimePlayedGameOpen"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+450</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>509</ID>
+                              <Description>"PotatoCurrent"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+4F0</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>510</ID>
+                              <Description>"PotatoCurrentBD.mantissa"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+4F8</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>511</ID>
+                              <Description>"PotatoCurrentBD.exponent"</Description>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+500</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>512</ID>
+                              <Description>"CurrentDifficulty"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+508</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>513</ID>
+                              <Description>"CurrentStage"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+50C</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>514</ID>
+                              <Description>"CurrentArea"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+510</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>515</ID>
+                              <Description>"CurrentWorld"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+514</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>516</ID>
+                              <Description>"DifficultySelected"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+518</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>517</ID>
+                              <Description>"DifficultyPreSelected"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+51C</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>518</ID>
+                              <Description>"AreaSelected"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+524</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>519</ID>
+                              <Description>"StageSelected"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+520</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>520</ID>
+                              <Description>"AreaPreSelected"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+528</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>521</ID>
+                              <Description>"WorldSelected"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+52C</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>522</ID>
+                              <Description>"WorldPreSelected"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+530</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>523</ID>
+                              <Description>"BestProgress"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+534</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>524</ID>
+                              <Description>"DeathCounter"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+538</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>525</ID>
+                              <Description>"CurrentReincarnationTimer"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+540</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>526</ID>
+                              <Description>"CurrentAscensionTimer"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+548</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>527</ID>
+                              <Description>"DayPassed"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+550</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>528</ID>
+                              <Description>"AreaAuto"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+554</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>529</ID>
+                              <Description>"StageKillRequired"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+55C</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>530</ID>
+                              <Description>"PerkZoneModifier"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+560</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>531</ID>
+                              <Description>"MaxMobCount"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+568</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>532</ID>
+                              <Description>"AreaStageRequired"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+56C</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>533</ID>
+                              <Description>"StageKillMinimum"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+570</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>534</ID>
+                              <Description>"AreaDropModifier"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+578</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>535</ID>
+                              <Description>"AreaDropLimit"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+580</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>536</ID>
+                              <Description>"AreaBonusesLimit"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+588</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>537</ID>
+                              <Description>"AreaCritModifier"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+590</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>538</ID>
+                              <Description>"AreaCritLimit"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+598</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>539</ID>
+                              <Description>"AreaEvadeModifier"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+5A0</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>540</ID>
+                              <Description>"AreaEvadeLimit"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+5A8</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>541</ID>
+                              <Description>"AreaAttackSpdModifier"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+5B0</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>542</ID>
+                              <Description>"AreaAttackSpdLimit"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+5B8</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>543</ID>
+                              <Description>"AreaMobSpawnCountModifier"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+5BC</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>544</ID>
+                              <Description>"AreaMobSpawnCountLimit"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+5C0</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>545</ID>
+                              <Description>"AreaSpawnSpeedModifier"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+5C8</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>546</ID>
+                              <Description>"AreaSpawnSpeedLimit"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+5D0</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>547</ID>
+                              <Description>"BestArea"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+5D8</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>548</ID>
+                              <Description>"AscensionBestArea"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+5DC</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>549</ID>
+                              <Description>"HardUnlocked"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+5E4</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>550</ID>
+                              <Description>"MediumUnlocked"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+5E0</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>551</ID>
+                              <Description>"EternalUnlocked"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+5E8</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>552</ID>
+                              <Description>"CurrentExpBD.mantissa"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+5F0</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>553</ID>
+                              <Description>"CurrentExpBD.exponent"</Description>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+5F8</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>554</ID>
+                              <Description>"ExpToLevelBD.mantissa"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+600</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>555</ID>
+                              <Description>"ExpToLevelBD.exponent"</Description>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+608</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>611</ID>
+                              <Description>"PlayerHPBD.mantissa"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+610</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>612</ID>
+                              <Description>"PlayerHPBD.exponent"</Description>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+618</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>613</ID>
+                              <Description>"PlayerMaxHPBD.mantissa"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+620</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>614</ID>
+                              <Description>"PlayerMaxHPBD.exponent"</Description>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+628</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>556</ID>
+                              <Description>"PlayerDropChanceBD.mantissa"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+6A0</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>557</ID>
+                              <Description>"PlayerDropChanceBD.exponent"</Description>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+6A8</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>628</ID>
+                              <Description>"CurrentWormBD.mantissa"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+1178</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>629</ID>
+                              <Description>"CurrentWormBD.exponent"</Description>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+1180</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>630</ID>
+                              <Description>"TotalWormBD.mantissa"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+1188</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>631</ID>
+                              <Description>"TotalWormBD.exponent"</Description>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+1190</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>632</ID>
+                              <Description>"CurrentWormPoopBD.exponent"</Description>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+11A0</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>633</ID>
+                              <Description>"CurrentWormPoopBD.mantissa"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+1198</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>634</ID>
+                              <Description>"TotalWormPoopBD.exponent"</Description>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+11B0</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>635</ID>
+                              <Description>"TotalWormPoopBD.mantissa"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+11A8</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>636</ID>
+                              <Description>"CurrentWormLarvaBD.mantissa"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+11B8</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>637</ID>
+                              <Description>"CurrentWormLarvaBD.exponent"</Description>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+11C0</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>638</ID>
+                              <Description>"TotalWormLarvaBD.mantissa"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+11C8</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>639</ID>
+                              <Description>"TotalWormLarvaBD.exponent"</Description>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+11D0</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>558</ID>
+                              <Description>"FarmerExpBonus"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+778</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>559</ID>
+                              <Description>"SmasherExpBonus"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+780</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>560</ID>
+                              <Description>"HoerExpBonus"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+788</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>561</ID>
+                              <Description>"HarvesterExpBonus"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+790</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>562</ID>
+                              <Description>"RancherExpBonus"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+798</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>563</ID>
+                              <Description>"FreeloaderExpBonus"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+7A0</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>564</ID>
+                              <Description>"ClassCatchUpExpBonus"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+7A8</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>565</ID>
+                              <Description>"PreviousLifeClassLevel"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+7B0</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>566</ID>
+                              <Description>"TotalLevel"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+7B8</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>567</ID>
+                              <Description>"CurrentLevel"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+7BC</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>568</ID>
+                              <Description>"CurrentClass"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+7C0</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>569</ID>
+                              <Description>"TotalTalentPoints"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+9C8</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>570</ID>
+                              <Description>"PermaTalentPoints"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+9CC</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>571</ID>
+                              <Description>"NormalTalentPoints"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+9D0</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>572</ID>
+                              <Description>"RewardTalentPoints"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+9D4</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>573</ID>
+                              <Description>"CurrentTalentPoints"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+9D8</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>574</ID>
+                              <Description>"TalentPointsInvested"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+9DC</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>575</ID>
+                              <Description>"CurrentPointsRequired"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+9E0</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>576</ID>
+                              <Description>"equippedWeapon"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+1034</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>577</ID>
+                              <Description>"equippedHat"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+1038</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>578</ID>
+                              <Description>"BossRewardClaimed"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+102C</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>579</ID>
+                              <Description>"SeasonRewardClaimed"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+1030</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>580</ID>
+                              <Description>"equippedShield"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+103C</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>581</ID>
+                              <Description>"equippedGloves"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+1040</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>582</ID>
+                              <Description>"equippedChest"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+1044</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>583</ID>
+                              <Description>"equippedShoes"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+1048</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>584</ID>
+                              <Description>"MaxInventory"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+104C</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>585</ID>
+                              <Description>"BreedingTime"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+1278</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>586</ID>
+                              <Description>"CurrentWorm"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+1280</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>587</ID>
+                              <Description>"TotalWorm"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+1288</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>588</ID>
+                              <Description>"CurrentWormPoop"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+1290</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>589</ID>
+                              <Description>"TotalWormPoop"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+1298</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>590</ID>
+                              <Description>"CurrentWormSilk"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+12A0</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>591</ID>
+                              <Description>"CurrentWormLarva"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+12A8</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>592</ID>
+                              <Description>"TotalWormLarva"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+12B0</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>593</ID>
+                              <Description>"LarvaChance"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+12B8</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>594</ID>
+                              <Description>"WormClaimed"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+12C8</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>595</ID>
+                              <Description>"SilkChance"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+12C0</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>640</ID>
+                              <Description>"CurrentMilkBD.mantissa"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+19A0</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>641</ID>
+                              <Description>"CurrentMilkBD.exponent"</Description>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+19A8</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>642</ID>
+                              <Description>"TotalMilkBD.mantissa"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+19B0</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>643</ID>
+                              <Description>"TotalMilkBD.exponent"</Description>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+19B8</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>644</ID>
+                              <Description>"CurrentResidueBD.mantissa"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+19C0</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>645</ID>
+                              <Description>"CurrentResidueBD.exponent"</Description>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+19C8</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>646</ID>
+                              <Description>"TotalResidueBD.mantissa"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+19D0</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>647</ID>
+                              <Description>"TotalResidueBD.exponent"</Description>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+19D8</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>600</ID>
+                              <Description>"CurrentMilkTimer"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+1A38</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>601</ID>
+                              <Description>"MilkTimer"</Description>
+                              <VariableType>Double</VariableType>
+                              <Address>+1A40</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>602</ID>
+                              <Description>"GoldPotatoChance"</Description>
+                              <VariableType>Float</VariableType>
+                              <Address>+2C80</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>603</ID>
+                              <Description>"GreenPotatoChance"</Description>
+                              <VariableType>Float</VariableType>
+                              <Address>+2C84</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>604</ID>
+                              <Description>"AscensionPoint"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+2E6C</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>605</ID>
+                              <Description>"AscensionPointSpent"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+2E70</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>606</ID>
+                              <Description>"FreeSoul"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+2F28</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>607</ID>
+                              <Description>"PremiumSoul"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+2F2C</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>608</ID>
+                              <Description>"SpentSoul"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+2F38</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>609</ID>
+                              <Description>"TotalSoul"</Description>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+2F3C</Address>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>610</ID>
+                      <Description>"Fast Stages"</Description>
+                      <Color>00FF00</Color>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+{$lua}
+if syntaxcheck then return end
+writeInteger((playerdata+0x55c), 1)
+writeInteger((playerdata+0x570), 1)
+
+{$asm}
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+</AssemblerScript>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>648</ID>
+                  <Description>"Disable Enemy Attacks"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>//Send@Sintrix
+[ENABLE]
+EnemyStats:Attack:
+db C3
+
+[DISABLE]
+EnemyStats:Attack:
+db 55
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>650</ID>
+                  <Description>"Rapid Attack Speed"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>//Send@Sintrix
+[ENABLE]
+
+aobscanregion(atkspeed,BattleMain:Update+5e,BattleMain:Update+106,F3 0F 10 90 C8 00 00 00)
+alloc(newmem,$1000,atkspeed)
+
+label(code)
+label(return)
+
+newmem:
+mov [rax+C8],(float)100
+code:
+  movss xmm2,[rax+000000C8]
+  jmp return
+
+atkspeed:
+  jmp newmem
+  nop 3
+return:
+registersymbol(atkspeed)
+
+[DISABLE]
+
+atkspeed:
+  db F3 0F 10 90 C8 00 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>652</ID>
+                  <Description>"Infinite Talent Points"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>//Send@sintrix
+[ENABLE]
+
+aobscanregion(talentpts,BattleTalents:Update+5a,BattleTalents:Update+105,48 63 80 C8 09 00 00 F2 0F 2A C0)
+alloc(newmem,$1000,talentpts)
+label(code return)
+
+newmem:
+mov [rax+9D8],#200
+mov [rax+9C8],#200
+
+code:
+  movsxd  rax,dword ptr [rax+000009C8]
+  jmp return
+
+talentpts:
+  jmp newmem
+  nop 2
+return:
+registersymbol(talentpts)
+
+[DISABLE]
+
+talentpts:
+  db 48 63 80 C8 09 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>658</ID>
+                  <Description>"Remove Event Ban Flag"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>//Send@Sintrix
+[ENABLE]
+//4088??????????4863????89??????????4863????89??????????4863??????????440F????????????488B??488D??????49BB????????????????41FF??4863??????????89??????????488B??488B??49BB????????????????41FF??488B??488B??488D??????49BB????????????????41FF??488B??488B??488D??????49BB????????????????41FF??F2??????????????488B??F2??????488D????49BB????????????????41FF??488B??488B??488D??????49BB????????????????41FF??488B??????????4889????4885??0F84????????488D??????????49BB????????????????41FF??488B??48BA????????????????488D??????9049BB????????????????41FF??488B??488B????488B??488B??FF??????????4863??????????85??0F84????????4863??????????488B??488D??????????49BB????????????????41FF??488B??488B
+aobscanregion(ebf,EventDisplay:displayData+28c,EventDisplay:displayData+2f6,40 88 87 70 07 00 00)
+alloc(newmem,$1000,ebf)
+label(code return)
+
+newmem:
+mov al,0
+
+code:
+  mov [rdi+00000770],al
+  jmp return
+
+ebf:
+  jmp newmem
+  nop 2
+return:
+registersymbol(ebf)
+
+[DISABLE]
+
+ebf:
+  db 40 88 87 70 07 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>657</ID>
+                  <Description>"No Whack-A-Potato Cooldown"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>//Send@Sintrix
+[ENABLE]
+//PlayerData.NextPlay
+aobscanregion(wap_cd,WreckAPotatoMain:WreckTimer,WreckAPotatoMain:WreckTimer+e2,F3??????????????F3??????F3??????????????F3??????F3??????????F3??????F2??????F2??????4885??0F84????????F2)
+alloc(newmem,$1000,wap_cd)
+label(code return)
+
+newmem:
+
+code:
+  movss xmm0,[rax+00002C5C]
+  xorps xmm0,xmm0
+  jmp return
+
+wap_cd:
+  jmp newmem
+  nop 3
+return:
+registersymbol(wap_cd)
+
+[DISABLE]
+
+wap_cd:
+  db F3 0F 10 80 5C 2C 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>654</ID>
+                  <Description>"Whack-A-Potato Score Multiplier"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>//Send@Sintrix
+[ENABLE]
+
+aobscanregion(wap_mult,WreckAPotatoMain:WreckTimer,WreckAPotatoMain:WreckTimer+8b,48 8B F1 F3 0F 11 4C 24 08 48)
+alloc(newmem,$1000,wap_mult)
+label(code return)
+
+newmem:
+mov [rcx+1E4],#999
+
+code:
+  mov rsi,rcx
+  movss [rsp+08],xmm1
+  jmp return
+
+wap_mult:
+  jmp newmem
+  nop 4
+return:
+registersymbol(wap_mult)
+
+[DISABLE]
+
+wap_mult:
+  db 48 8B F1 F3 0F 11 4C 24 08
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>435</ID>
+      <Description>"→ Extra"</Description>
+      <Options moHideChildren="1"/>
+      <Color>4080FF</Color>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>505</ID>
+          <Description>"Credits: Shaggalicious &amp; Send"</Description>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>447</ID>
+          <Description>"Join Discord"</Description>
+          <Color>8000FF</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+{$lua}
+shellExecute("https://discord.gg/n7QPrYn7p5")
+ 
+{$asm}
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <CheatCodes>
+    <CodeEntry>
+      <Description>Change of comisd xmm1,xmm0</Description>
+      <AddressString>1687ADF104D</AddressString>
+      <Before>
+        <Byte>0D</Byte>
+        <Byte>23</Byte>
+        <Byte>15</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>66</Byte>
+        <Byte>0F</Byte>
+        <Byte>2F</Byte>
+        <Byte>C8</Byte>
+      </Actual>
+      <After>
+        <Byte>0F</Byte>
+        <Byte>8A</Byte>
+        <Byte>34</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Change of comisd xmm1,xmm0</Description>
+      <AddressString>1687ADF1098</AddressString>
+      <Before>
+        <Byte>0D</Byte>
+        <Byte>C8</Byte>
+        <Byte>14</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>66</Byte>
+        <Byte>0F</Byte>
+        <Byte>2F</Byte>
+        <Byte>C8</Byte>
+      </Actual>
+      <After>
+        <Byte>0F</Byte>
+        <Byte>8A</Byte>
+        <Byte>F9</Byte>
+        <Byte>03</Byte>
+        <Byte>00</Byte>
+      </After>
+    </CodeEntry>
+  </CheatCodes>
+  <UserdefinedSymbols>
+    <SymbolEntry>
+      <Name>gmptr</Name>
+      <Address>1F5DF90F540</Address>
+    </SymbolEntry>
+  </UserdefinedSymbols>
+</CheatTable>

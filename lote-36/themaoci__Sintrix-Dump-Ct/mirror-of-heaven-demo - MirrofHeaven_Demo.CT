@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>769</ID>
+      <Description>"→ Initialize Mono"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+{$lua}
+mono_initialize()
+LaunchMonoDataCollector()
+{$asm}
+
+
+[DISABLE]
+
+
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>798</ID>
+          <Description>"Unlimited Health"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+//Send@Sintrix|FearlessRevolution
+aobscanregion(PlayerHealthAOB,ThingAttribute:get_HP,ThingAttribute:get_HP+5e,F3 0F 10 40 48 F3 0F 5A C0 F2 0F 5A E8 F3 0F 11 6D FC)
+alloc(newmem,$1000,PlayerHealthAOB)
+
+label(code)
+label(return)
+
+newmem:
+push rcx
+mov rcx,[rcx+18]
+mov rcx,[rcx+10]
+cmp [rcx+70],1
+jne code
+mov [rax+48],(float)999999
+pop rcx
+
+code:
+  movss xmm0,[rax+48]
+  jmp return
+
+PlayerHealthAOB:
+  jmp newmem
+return:
+registersymbol(PlayerHealthAOB)
+
+[DISABLE]
+
+PlayerHealthAOB:
+  db F3 0F 10 40 48
+//Send@Sintrix|FearlessRevolution
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>795</ID>
+          <Description>"One Hit Kill"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanregion(PlayerDamage,FightBody:DamageCountPro+169e,FightBody:DamageCountPro+1712,F3 0F 10 40 70)
+alloc(newmem,$1000,PlayerDamage)
+//Send@Sintrix|FearlessRevolution
+label(code)
+label(return)
+
+newmem:
+
+code:
+  movss xmm0,[SetATK]
+  jmp return
+
+SetATK:
+dd (float)999999
+
+PlayerDamage:
+  jmp newmem
+return:
+registersymbol(PlayerDamage)
+//Send@Sintrix|FearlessRevolution
+[DISABLE]
+
+PlayerDamage:
+  db F3 0F 10 40 70
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>775</ID>
+          <Description>"Unlimited MP"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>//Send@Sintrix|FearlessRevolution
+[ENABLE]
+
+aobscanregion(Mana,ThingAttribute:get_MP,ThingAttribute:get_MP+5e,F3 0F 10 40 48)
+alloc(newmem,$1000,Mana)
+
+label(code)
+label(return)
+
+newmem:
+push rcx
+mov rcx,[rcx+18]
+mov rcx,[rcx+10]
+cmp [rcx+70],1
+jne code
+mov [rax+48],(float)99999
+pop rcx
+//Send@Sintrix|FearlessRevolution
+code:
+  movss xmm0,[rax+48]
+  jmp return
+
+Mana:
+  jmp newmem
+return:
+registersymbol(Mana)
+
+[DISABLE]
+
+Mana:
+  db F3 0F 10 40 48
+//Send@Sintrix|FearlessRevolution
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>779</ID>
+          <Description>"→ Player"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>define(address,ThingAttribute:get_MP)
+define(bytes,55 48 8B EC 48 83 EC 30)
+
+[ENABLE]
+//Send@Sintrix|FearlessRevolution
+assert(address,bytes)
+alloc(newmem,$1000,ThingAttribute:get_MP)
+registersymbol(playerPtr)
+label(code return playerPtr)
+
+newmem:
+push rdi
+mov rdi,[rdi+10]
+cmp [rdi+70],1
+jne code
+mov [playerPtr],rcx
+pop rdi
+
+code:
+  push rbp
+  mov rbp,rsp
+  sub rsp,30
+  jmp return
+
+playerPtr:
+dw
+
+address:
+  jmp newmem
+  nop 3
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+//Send@Sintrix|FearlessRevolution
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>781</ID>
+              <Description>"Player Level"</Description>
+              <VariableType>4 Bytes</VariableType>
+              <Address>[playerPtr]+10</Address>
+              <Offsets>
+                <Offset>90</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>796</ID>
+              <Description>"Max Health"</Description>
+              <VariableType>Float</VariableType>
+              <Address>1D192398540+18</Address>
+              <Offsets>
+                <Offset>70</Offset>
+                <Offset>30</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>787</ID>
+              <Description>"Defense"</Description>
+              <VariableType>Float</VariableType>
+              <Address>[playerPtr]+18</Address>
+              <Offsets>
+                <Offset>70</Offset>
+                <Offset>50</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>788</ID>
+              <Description>"Energy Transfer"</Description>
+              <VariableType>Float</VariableType>
+              <Address>[playerPtr]+18</Address>
+              <Offsets>
+                <Offset>70</Offset>
+                <Offset>48</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>789</ID>
+              <Description>"Attack Power"</Description>
+              <VariableType>Float</VariableType>
+              <Address>[playerPtr]+18</Address>
+              <Offsets>
+                <Offset>70</Offset>
+                <Offset>28</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>791</ID>
+              <Description>"[Debug]"</Description>
+              <Options moHideChildren="1"/>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>790</ID>
+                  <Description>"[Debug] Player Team"</Description>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[playerPtr]+1B0</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>780</ID>
+                  <Description>"[Debug] Player ID"</Description>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[playerPtr]+10</Address>
+                  <Offsets>
+                    <Offset>70</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>459</ID>
+      <Description>"--------------------------------"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>461</ID>
+      <Description>"💥 Author:  Send"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>799</ID>
+      <Description>"✔ Game: Mirror of Heaven"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>773</ID>
+      <Description>"✔ Game Build: DEMO"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>460</ID>
+      <Description>"⚡ Discord "</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+{$lua}
+shellExecute("https://discord.gg/NTFcdAUWxb")
+
+{$asm}
+[DISABLE]
+
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>458</ID>
+      <Description>"--------------------------------"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

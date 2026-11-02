@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>43</ID>
+      <Description>"Enable"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{
+  /$$$$$$  /$$$$$$$$ /$$   /$$ /$$$$$$$
+ /$$__  $$| $$_____/| $$$ | $$| $$__  $$
+| $$  \__/| $$      | $$$$| $$| $$  \ $$
+|  $$$$$$ | $$$$$   | $$ $$ $$| $$  | $$
+ \____  $$| $$__/   | $$  $$$$| $$  | $$
+ /$$  \ $$| $$      | $$\  $$$| $$  | $$
+|  $$$$$$/| $$$$$$$$| $$ \  $$| $$$$$$$/
+ \______/ |________/|__/  \__/|_______/
+Game Version: November 1 2024 | Build ID: 16266339
+  HTTPS://FEARLESSREVOLUTION.COM
+}
+
+ [ENABLE]
+{$lua}
+  if syntaxcheck then return end
+
+
+  if syntaxcheck then return end
+ local al = getAddressList()
+  local pl = getProcessList()
+ local mpbase = getAddressSafe("")
+
+  local gameName = 'Overlewd'
+  local gameProc = 'SteamWindows.exe'
+
+  if pl[getProcessIDFromProcessName(gameProc)] ~= nil then
+
+    if (readInteger(process) == nil) or (readInteger(process) ~= readInteger(gameProc)) then
+      openProcess(gameProc)
+    end
+
+    if mpbase ~= nil or mpbase ~= 0 then
+                LaunchMonoDataCollector()
+    end
+
+    local msg = [[
+          Game: Overlewd
+          Patch: November 1 2024
+          Build ID: 16266339 (https://steamdb.info/app/2308870/patchnotes/)
+
+          Table by Send @ FearlessRevolution | Sintrix
+          https://fearlessrevolution.com/viewtopic.php?p=362402
+
+                ]]
+    mShowMessage('', msg, true, 0)
+
+
+  else beep()
+    error(showMessage(("%s (%s) is not running.\nLaunch the game before activating."):format(gameName,gameProc)))
+  end
+
+{$asm}
+aobscanmodule(charcontroller,GameAssembly.dll,F3??????????????E8????????F3??????F3??????????????488B)
+alloc(newmem,$1000,charcontroller)
+registersymbol(charcontroller overlord InstantKill)
+label(code return onehit overlord InstantKill)
+newmem:
+cmp byte ptr [rdi+002A],1
+jne onehit
+mov [overlord],rdi
+jmp return
+
+onehit:
+cmp [InstantKill],1
+jne code
+cmp byte ptr [rdi+0028],1
+jne code
+xorps xmm0,xmm0
+
+code:
+  movss [rdi+00000124],xmm0
+  jmp return
+
+overlord:
+dq 0
+
+InstantKill:
+dd 0
+
+charcontroller:
+  jmp newmem
+  nop 3
+return:
+
+
+[DISABLE]
+
+charcontroller:
+  db F3 0F 11 87 24 01 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>36</ID>
+          <Description>"Instant Kill"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>//Send
+[ENABLE]
+InstantKill:
+dd 1
+
+[DISABLE]
+InstantKill:
+dd 0
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>11</ID>
+          <Description>"Health"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>[overlord]+124</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>12</ID>
+          <Description>"Max Health"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>[overlord]+128</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>13</ID>
+          <Description>"Mana"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>[overlord]+12C</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>14</ID>
+          <Description>"Max Mana"</Description>
+          <ShowAsSigned>0</ShowAsSigned>
+          <VariableType>Float</VariableType>
+          <Address>[overlord]+130</Address>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>44</ID>
+          <Description>"Note: Take damage to populate pointers."</Description>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>9</ID>
+      <Description>"Join the Sintrix discord server for support, updates, and more tables!"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+{$lua}
+shellExecute("https://discord.gg/NTFcdAUWxb")
+
+{$asm}
+[DISABLE]
+
+
+</AssemblerScript>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+  <LuaScript>local t = translate
+
+CompactModeEnabled = false
+
+function disableHeaderSorting()
+   local addressListHeader = component_getComponent(AddressList, 1)
+   setMethodProperty(addressListHeader, 'OnSectionClick', nil)
+end
+
+function disableCompactMode()
+   control_setVisible(wincontrol_getControl(MainForm, 0), true)
+   control_setVisible(wincontrol_getControl(MainForm, 3), true)
+   CompactModeEnabled = false
+end
+
+function enableCompactMode()
+   control_setVisible(wincontrol_getControl(MainForm, 0), false)
+   control_setVisible(wincontrol_getControl(MainForm, 3), false)
+   CompactModeEnabled = true
+end
+
+function toggleCompactMode()
+   if CompactModeEnabled then
+      disableCompactMode()
+   else
+      enableCompactMode()
+   end
+end
+
+function addCompactModeMenu()
+   local name = 'miCTCompactMode'
+   local miCompactMode = nil
+   for i = 1, MainForm.Menu.Items.Count - 1 do
+      if MainForm.Menu.Items[i].Name == name then
+         miCompactMode = MainForm.Menu.Items[i]
+         break
+      end
+   end
+   if miCompactMode == nil then
+      miCompactMode = createMenuItem(MainForm.Menu.Items)
+      miCompactMode.Name = name
+      miCompactMode.Caption = t('Toggle Compact Mode')
+      miCompactMode.OnClick = toggleCompactMode
+      MainForm.Menu.Items.add(miCompactMode)
+   end
+end
+
+addCompactModeMenu()
+--CompactMode End
+
+--Custom Popup Message Start
+function openLink(link)
+  if type(link) == "string" and link ~= nil then
+     return shellExecute(link)
+  else
+     return nil
+  end
+end
+
+function mShowMessage(title, texttoshow, withbutton, link)
+  local myform = createForm(false)
+ myform.Caption = title
+ myform.autosize = true
+ myform.BorderStyle = 'bsDialog'
+ myform.Position = 'poScreenCenter'
+ myform.Color = 0x4a4845
+
+ local font = createFont(myform)
+ font.Name = 'Arial'
+ font.Height = -12
+ font.Size = 12
+ font.CharSet = 'ANSI_CHARSET'
+ font.pitch = 'fpFixed'
+ font.Quality = 'fqDraft'
+ font.Color = 0xFFFFFF
+
+ local mylabel = createLabel(myform)
+ mylabel.Caption = texttoshow
+ mylabel.OptimalFill = true
+ mylabel.font = font
+ mylabel.Align = 'alClient'
+ mylabel.left = (myform.width - mylabel.width) / 2
+ mylabel.BorderSpacing.Around = 25
+
+
+ if withbutton then
+   local mybtn = createButton(myform)
+   mybtn.height = 30
+   mybtn.left = (myform.width - mybtn.width) / 2
+   mybtn.top = myform.height - mybtn.height
+   mybtn.Align = 'alBottom'
+   mybtn.BorderSpacing.Around = 25
+   mybtn.Caption = 'Okay' --Button Name
+   mybtn.OnClick = function()
+                     if link == nil or link == '' then
+                        myform.hide()
+                        return
+                     else
+                        openLink(link)
+                        myform.hide()
+                     end
+                   end
+ end
+ myform.show()
+end
+--Custom Popup Message End
+
+--Script Colors Start
+--Credits for this part go to aSwedishMagyar and EpicBirdi
+--https://fearlessrevolution.com/viewtopic.php?p=205520#p205520
+function createRecordColorTimer(mainRec,interval)
+    local t = 0;
+	local timer = createTimer()
+	timer.Interval = interval
+	timer.OnTimer = function()
+	    t = t + 0.001
+	    red = math.floor(math.sin(freq*t+redPhase)*mag)+bias
+	    green = math.floor(math.sin(freq*t+greenPhase)*mag)+bias
+	    blue = math.floor(math.sin(freq*t+bluePhase)*mag)+bias
+        local color = (red)+(green&lt;&lt;0x8)+(blue&lt;&lt;0x10)
+        mainRec.Color = color
+    end
+	return timer
+end
+function createBackgroundColorTimer(interval)
+    local t = 0;
+	local timer = createTimer()
+	timer.Interval = interval
+	timer.OnTimer = function()
+	    t = t + 0.001
+	    red = math.floor(math.sin(freq*t+redPhase)*mag)+bias
+	    green = math.floor(math.sin(freq*t+greenPhase)*mag)+bias
+	    blue = math.floor(math.sin(freq*t+bluePhase)*mag)+bias
+        local color = (red)+(green&lt;&lt;0x8)+(blue&lt;&lt;0x10)
+        local addList = GetAddressList()
+		addList.Control[0].BackgroundColor = color
+    end
+	return timer
+end
+function defineConstants()
+    redPhase = math.pi/4
+    greenPhase = 3*math.pi/4
+    bluePhase = 5*math.pi/4
+    freq = 20
+    mag = 0x6F
+    bias = 0x80
+    --t = 0
+end
+if syntaxcheck then return end
+defineConstants()
+--Script Colors End
+</LuaScript>
+
+</CheatTable>

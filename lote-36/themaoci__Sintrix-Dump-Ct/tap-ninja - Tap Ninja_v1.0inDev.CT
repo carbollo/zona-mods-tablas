@@ -1,0 +1,654 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>44</ID>
+      <Description>"Enable"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$Lua}
+if syntaxcheck then return end
+
+local process = 'Tap Ninja.exe'
+OpenProcess(process);
+if process ~= process or (readInteger(process) == nil) then
+   error(ShowMessage("Failed To Attach To Process"))
+end
+
+
+--Set Window Title
+local title = "Tap Ninja v1.0";
+if not((MainForm.Caption):match("Tap Ninja")) then
+MainForm.Caption = title..' ~ '..MainForm.Caption
+end
+
+--Credits //Credits to Cfemen, Dr NHA &amp; Akira
+if MainForm.lblSigned.Caption:match('Sintrix / Build 15695393') == nil then
+  local Main = MainForm.lblSigned
+  local MadeBy = createPanel(Main.Parent)
+
+
+  MadeBy.AutoSize = true
+  MadeBy.Anchors = '[akTop,akRight,akLeft]'
+  MadeBy.AnchorSideTop.Control = MadeBy.Parent
+  MadeBy.AnchorSideTop.Side = asrCenter
+  MadeBy.AnchorSideRight.Control = MainForm.CommentButton
+  MadeBy.AnchorSideRight.Side = asrLeft
+  MadeBy.AnchorSideLeft.Control = MainForm.advancedbutton
+  MadeBy.AnchorSideLeft.Side = asrRight
+
+  Main.Parent = MadeBy
+  Main.Visible = true
+  Main.Caption = 'Sintrix / Build 15695393'
+  Main.Font.Size = 12
+  Main.Font.Style = '[fsBold]'
+  Main.Font.Quality = 'fqCleartypeNatural'
+  Main.AnchorSideTop.Control = MadeBy
+  Main.AnchorSideTop.Side = asrCenter
+  Main.AnchorSideLeft.Control = MadeBy
+  Main.AnchorSideLeft.Side = asrCenter
+end
+
+function cycleFullCompact(sender,force)     local state = not(compactmenuitem.Caption == 'Compact View Mode'); if force~=nil then state = not force end; compactmenuitem.Caption = state and 'Compact View Mode' or 'Full View Mode'; getMainForm().Splitter1.Visible = state; getMainForm().Panel4.Visible    = state; getMainForm().Panel5.Visible    = state; end; function addCompactMenu() if compactmenualreadyexists then return end; local parent = getMainForm().Menu.Items; compactmenuitem = createMenuItem(parent); parent.add(compactmenuitem); compactmenuitem.Caption = 'Compact View Mode'; compactmenuitem.OnClick = cycleFullCompact; compactmenualreadyexists = 'yes'; end; addCompactMenu(); cycleFullCompact(nil,true);
+
+getMainForm().Panel4.Visible = true;
+{$asm}
+[DISABLE]
+{$Lua}
+function cycleFullCompact(sender,force)     local state = not(compactmenuitem.Caption == 'Compact View Mode'); if force~=nil then state = not force end; compactmenuitem.Caption = state and 'Compact View Mode' or 'Full View Mode'; getMainForm().Splitter1.Visible = state; getMainForm().Panel4.Visible    = state; getMainForm().Panel5.Visible    = state; end; function addCompactMenu() if compactmenualreadyexists then return end; local parent = getMainForm().Menu.Items; compactmenuitem = createMenuItem(parent); parent.add(compactmenuitem); compactmenuitem.Caption = 'Compact View Mode'; compactmenuitem.OnClick = cycleFullCompact; compactmenualreadyexists = 'yes'; end; addCompactMenu(); cycleFullCompact(nil,false);
+
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>66</ID>
+          <Description>"Intialize Mono"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+{$lua}
+mono_initialize()
+LaunchMonoDataCollector()
+{$asm}
+
+
+[DISABLE]
+
+
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>41</ID>
+              <Description>"Disable Anti-Cheat"</Description>
+              <Options moHideChildren="1"/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>//Send@Sintrix
+[ENABLE]
+AntiCheat.Update:
+db C3
+
+[DISABLE]
+AntiCheat.Update:
+db 40 53
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>34</ID>
+                  <Description>"Set Current Gold"</Description>
+                  <Options moHideChildren="1"/>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>//Send@Sintrix
+[ENABLE]
+
+aobscanmodule(setmoney,GameAssembly.dll,F2 0F 10 40 10 48 83 C4 28 C3 E8 7B)
+alloc(newmem,$1000,setmoney)
+registersymbol(setg)
+label(code return setg)
+
+newmem:
+
+code:
+  movsd xmm0,[setg]
+  jmp return
+
+setg:
+dq (double)10000
+
+setmoney:
+  jmp newmem
+return:
+registersymbol(setmoney)
+
+[DISABLE]
+
+setmoney:
+  db F2 0F 10 40 10
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>35</ID>
+                      <Description>"Set Amount"</Description>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>Double</VariableType>
+                      <Address>setg</Address>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>47</ID>
+                  <Description>"Grab Player Data"</Description>
+                  <Options moHideChildren="1"/>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>//Send@Sintrix
+[ENABLE]
+
+aobscanmodule(playerdata,GameAssembly.dll,EB 02 00 00 0F 28 C6 F2 0F 58 40 10 F2 0F 11 40 10)
+alloc(newmem,$1000,playerdata)
+registersymbol(pdptr)
+label(code return pdptr)
+
+newmem:
+
+code:
+  movsd [rax+10],xmm0
+  mov [pdptr],rax
+  jmp return
+
+pdptr:
+dq 0
+
+playerdata+0C:
+  jmp newmem
+return:
+registersymbol(playerdata)
+
+[DISABLE]
+
+playerdata+0C:
+  db F2 0F 11 40 10
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>57</ID>
+                      <Description>"Set Elixir"</Description>
+                      <VariableType>Double</VariableType>
+                      <Address>[pdptr]+18</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>58</ID>
+                      <Description>"Set Amber"</Description>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>[pdptr]+30</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>59</ID>
+                      <Description>"Set Keys"</Description>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>[pdptr]+34</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>60</ID>
+                      <Description>"Set Eggs"</Description>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>[pdptr]+38</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>61</ID>
+                      <Description>"Set Medals"</Description>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>[pdptr]+3C</Address>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>36</ID>
+                  <Description>"Gold Doesn't Decrease"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>//Send@Sintrix
+[ENABLE]
+GameAssembly.dll+3C3903:
+db 90 90 90 90
+
+[DISABLE]
+GameAssembly.dll+3C3903:
+db F2 0F 5C C6
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>54</ID>
+                  <Description>"Amber Doesn't Decrease"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+GameAssembly.dll+3C1ACE:
+db 90 90 90
+
+[DISABLE]
+GameAssembly.dll+3C1ACE:
+db 29 5A 30
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>55</ID>
+                  <Description>"Elixir Doesn't Decrease"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>//Send@Sintrix
+[ENABLE]
+GameAssembly.dll+3C4013:
+db 90 90 90 90
+
+[DISABLE]
+GameAssembly.dll+3C4013:
+db F2 0F 5C C6
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>62</ID>
+                  <Description>"Medals Don't Decrease"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>//Send@Sintrix
+[ENABLE]
+GameAssembly.dll+3BC946:
+db 90 90 90 90
+
+[DISABLE]
+GameAssembly.dll+3BC946:
+db 41 29 58 3C
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>38</ID>
+                  <Description>"Infinite Samurai Frenzy "</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>//Send@Sintrix
+[ENABLE]
+
+aobscanmodule(skillcd,GameAssembly.dll,C1 F3 0F 11 80 F4 02 00 00)
+alloc(newmem,$1000,skillcd)
+label(code return)
+
+newmem:
+
+code:
+  movss xmm0,[new]
+  movss [rax+000002F4],xmm0
+  jmp return
+
+new:
+dd (float)336.4549561
+
+skillcd+01:
+  jmp newmem
+  nop 3
+return:
+registersymbol(skillcd)
+
+[DISABLE]
+
+skillcd+01:
+  db F3 0F 11 80 F4 02 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>65</ID>
+                  <Description>"Infinite Feathers (Open Collection Menu)"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>//Send@Sintrix
+[ENABLE]
+
+aobscanmodule(feathers,GameAssembly.dll,8B 44 99 20 48 83 C4 20 5B C3 E8 25)
+alloc(newmem,$1000,feathers)
+label(code return)
+
+newmem:
+
+code:
+  mov eax,[rcx+rbx*4+20]
+  mov eax,#10000000
+  add rsp,20
+  jmp return
+
+feathers:
+  jmp newmem
+  nop 3
+return:
+registersymbol(feathers)
+
+[DISABLE]
+
+feathers:
+  db 8B 44 99 20 48 83 C4 20
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>45</ID>
+                  <Description>"Easy Holiday Tasks"</Description>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>//Send@Sintrix
+[ENABLE]
+
+aobscanmodule(holiday,GameAssembly.dll,75 01 7C 99 20 B0 01)
+alloc(newmem,$1000,holiday)
+label(code return)
+
+newmem:
+
+code:
+  add [rcx+rbx*4+20],#25000
+  mov al,01
+  jmp return
+
+holiday+01:
+  jmp newmem
+  nop
+return:
+registersymbol(holiday)
+
+[DISABLE]
+
+holiday+01:
+  db 01 7C 99 20 B0 01
+
+unregistersymbol(*)
+dealloc(*)
+
+
+</AssemblerScript>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>67</ID>
+      <Description>"Join our Discord server for updates, tables, and more!"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+{$lua}
+shellExecute("https://discord.gg/NTFcdAUWxb")
+
+{$asm}
+[DISABLE]
+
+
+</AssemblerScript>
+    </CheatEntry>
+  </CheatEntries>
+  <CheatCodes>
+    <CodeEntry>
+      <Description>Change of jne PlayerEvents:EnemyInRange+20</Description>
+      <AddressString>1F3F0A6DE3C</AddressString>
+      <Before>
+        <Byte>8B</Byte>
+        <Byte>F1</Byte>
+        <Byte>48</Byte>
+        <Byte>85</Byte>
+        <Byte>C0</Byte>
+      </Before>
+      <Actual>
+        <Byte>75</Byte>
+        <Byte>02</Byte>
+      </Actual>
+      <After>
+        <Byte>EB</Byte>
+        <Byte>06</Byte>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>CE</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Change of jne PlayerEvents:AbilityResetCD+24</Description>
+      <AddressString>1F360602490</AddressString>
+      <Before>
+        <Byte>8B</Byte>
+        <Byte>F9</Byte>
+        <Byte>48</Byte>
+        <Byte>85</Byte>
+        <Byte>C0</Byte>
+      </Before>
+      <Actual>
+        <Byte>75</Byte>
+        <Byte>02</Byte>
+      </Actual>
+      <After>
+        <Byte>EB</Byte>
+        <Byte>0A</Byte>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>CF</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Change of call r11</Description>
+      <AddressString>1F3F0A6B470</AddressString>
+      <Before>
+        <Byte>EF</Byte>
+        <Byte>F3</Byte>
+        <Byte>01</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>41</Byte>
+        <Byte>FF</Byte>
+        <Byte>D3</Byte>
+      </Actual>
+      <After>
+        <Byte>C6</Byte>
+        <Byte>47</Byte>
+        <Byte>1A</Byte>
+        <Byte>01</Byte>
+        <Byte>0F</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Change of mov rdi,[rbp-08]</Description>
+      <AddressString>221F2B65367</AddressString>
+      <Before>
+        <Byte>D3</Byte>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>75</Byte>
+        <Byte>F0</Byte>
+      </Before>
+      <Actual>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>7D</Byte>
+        <Byte>F8</Byte>
+      </Actual>
+      <After>
+        <Byte>48</Byte>
+        <Byte>8D</Byte>
+        <Byte>65</Byte>
+        <Byte>00</Byte>
+        <Byte>5D</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Change of push rbp</Description>
+      <AddressString>221F2B65280</AddressString>
+      <Before>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>55</Byte>
+      </Actual>
+      <After>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>EC</Byte>
+        <Byte>48</Byte>
+        <Byte>83</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Change of jne PlayerEvents:EnemyInRange+20</Description>
+      <AddressString>1F3F0A6DE3C</AddressString>
+      <Before>
+        <Byte>8B</Byte>
+        <Byte>F1</Byte>
+        <Byte>48</Byte>
+        <Byte>85</Byte>
+        <Byte>C0</Byte>
+      </Before>
+      <Actual>
+        <Byte>75</Byte>
+        <Byte>02</Byte>
+      </Actual>
+      <After>
+        <Byte>EB</Byte>
+        <Byte>06</Byte>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>CE</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Change of jne PlayerEvents:AbilityResetCD+24</Description>
+      <AddressString>1F360602490</AddressString>
+      <Before>
+        <Byte>8B</Byte>
+        <Byte>F9</Byte>
+        <Byte>48</Byte>
+        <Byte>85</Byte>
+        <Byte>C0</Byte>
+      </Before>
+      <Actual>
+        <Byte>75</Byte>
+        <Byte>02</Byte>
+      </Actual>
+      <After>
+        <Byte>EB</Byte>
+        <Byte>0A</Byte>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+        <Byte>CF</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Change of call r11</Description>
+      <AddressString>1F3F0A6B470</AddressString>
+      <Before>
+        <Byte>EF</Byte>
+        <Byte>F3</Byte>
+        <Byte>01</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Before>
+      <Actual>
+        <Byte>41</Byte>
+        <Byte>FF</Byte>
+        <Byte>D3</Byte>
+      </Actual>
+      <After>
+        <Byte>C6</Byte>
+        <Byte>47</Byte>
+        <Byte>1A</Byte>
+        <Byte>01</Byte>
+        <Byte>0F</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Change of mov [rax+00000214],ecx</Description>
+      <AddressString>221F339DBBC</AddressString>
+      <Before>
+        <Byte>02</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>FF</Byte>
+        <Byte>C1</Byte>
+      </Before>
+      <Actual>
+        <Byte>89</Byte>
+        <Byte>88</Byte>
+        <Byte>14</Byte>
+        <Byte>02</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>41</Byte>
+        <Byte>FF</Byte>
+        <Byte>C6</Byte>
+        <Byte>48</Byte>
+        <Byte>8B</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Change of movsd [rax],xmm0</Description>
+      <AddressString>221F06050A5</AddressString>
+      <Before>
+        <Byte>48</Byte>
+        <Byte>8D</Byte>
+        <Byte>44</Byte>
+        <Byte>C8</Byte>
+        <Byte>20</Byte>
+      </Before>
+      <Actual>
+        <Byte>F2</Byte>
+        <Byte>0F</Byte>
+        <Byte>11</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>E9</Byte>
+        <Byte>85</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </After>
+    </CodeEntry>
+    <CodeEntry>
+      <Description>Change of subsd xmm0,xmm6</Description>
+      <AddressString>GameAssembly.dll+3C3903</AddressString>
+      <Before>
+        <Byte>F2</Byte>
+        <Byte>0F</Byte>
+        <Byte>10</Byte>
+        <Byte>40</Byte>
+        <Byte>10</Byte>
+      </Before>
+      <Actual>
+        <Byte>F2</Byte>
+        <Byte>0F</Byte>
+        <Byte>5C</Byte>
+        <Byte>C6</Byte>
+      </Actual>
+      <After>
+        <Byte>F2</Byte>
+        <Byte>0F</Byte>
+        <Byte>11</Byte>
+        <Byte>40</Byte>
+        <Byte>10</Byte>
+      </After>
+    </CodeEntry>
+  </CheatCodes>
+  <UserdefinedSymbols/>
+  <Comments>Info about this table:
+</Comments>
+</CheatTable>

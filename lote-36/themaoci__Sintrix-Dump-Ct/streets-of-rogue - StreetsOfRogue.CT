@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>769</ID>
+      <Description>"→ Initialize Mono"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+{$lua}
+mono_initialize()
+LaunchMonoDataCollector()
+{$asm}
+
+
+[DISABLE]
+
+
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>1</ID>
+          <Description>"Grab Money Data"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>//Send@FearlessRevolution|Sintrix
+[ENABLE]
+aobscanregion(moneydata,MoneySlot:LateUpdateMoneySlot+36,MoneySlot:LateUpdateMoneySlot+4e,48 63 80 F0 00 00 00 48 63 4E 58)
+alloc(newmem,$1000,moneydata)
+registersymbol(money)
+label(code return money)
+
+newmem:
+mov [money],rax
+
+code:
+  movsxd  rax,dword ptr [rax+000000F0]
+  jmp return
+
+money:
+dq 0
+
+moneydata:
+  jmp newmem
+  nop 2
+return:
+registersymbol(moneydata)
+
+[DISABLE]
+
+moneydata:
+  db 48 63 80 F0 00 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>22</ID>
+              <Description>"Invisible"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>//Send@ModEngine
+[ENABLE]
+
+aobscanregion(invisible,Agent:SetLightBrightness+4c6,Agent:SetLightBrightness+4df,0F B6 80 70 0B 00 00 85 C0 0F 85 CD)
+alloc(newmem,$1000,invisible)
+label(code return)
+
+
+newmem:
+mov byte ptr [rax+0B70],1
+
+code:
+  movzx eax,byte ptr [rax+00000B70]
+  jmp return
+
+invisible:
+  jmp newmem
+  nop 2
+return:
+registersymbol(invisible)
+
+[DISABLE]
+
+invisible:
+  db 0F B6 80 70 0B 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>32</ID>
+              <Description>"Infinite Health"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>//Send@ModEngine
+[ENABLE]
+aobscan(healthwrite,F3 0F 11 A8 A0 0A 00 00 33)
+alloc(newmem,$1000,healthwrite)
+registersymbol(EasyKills)
+label(code return EasyKills onehit)
+
+newmem:
+cmp dword ptr [rax+0ACC],#1
+jne onehit
+movss xmm5,[rax+0AD8]
+movss [rax+0AA0],xmm5
+
+onehit:
+cmp [EasyKills],1
+jne code
+cmp dword ptr [rax+0ACC],#0
+jne code
+xorps xmm5,xmm5
+jmp code
+
+code:
+  movss [rax+00000AA0],xmm5
+  jmp return
+
+EasyKills:
+dd 0
+
+healthwrite:
+  jmp newmem
+  nop 3
+return:
+registersymbol(healthwrite)
+
+[DISABLE]
+
+healthwrite:
+  db F3 0F 11 A8 A0 0A 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>33</ID>
+              <Description>"Easy Kills"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+EasyKills:
+dd 1
+
+[DISABLE]
+EasyKills:
+dd 0
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>36</ID>
+              <Description>"100% Critical Hit Chance"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>//Send@ModEngine
+[ENABLE]
+
+aobscan(critchance,49 63 94 24 FC 0A 00 00)
+alloc(newmem,$1000,critchance)
+label(code return)
+
+newmem:
+mov [r12+0AFC],#100
+
+code:
+  movsxd  rdx,dword ptr [r12+00000AFC]
+  jmp return
+
+critchance:
+  jmp newmem
+  nop 3
+return:
+registersymbol(critchance)
+
+[DISABLE]
+
+critchance:
+  db 49 63 94 24 FC 0A 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>27</ID>
+              <Description>"Set Money"</Description>
+              <VariableType>4 Bytes</VariableType>
+              <Address>[money]+F0</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>459</ID>
+      <Description>"--------------------------------"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>461</ID>
+      <Description>"💥 Author:  Send"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>772</ID>
+      <Description>"✔ Table Version: 1.0"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>460</ID>
+      <Description>"⚡ Discord "</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+{$lua}
+shellExecute("https://discord.gg/NTFcdAUWxb")
+
+{$asm}
+[DISABLE]
+
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>458</ID>
+      <Description>"--------------------------------"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+
+</CheatTable>

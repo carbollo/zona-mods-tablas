@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>44</ID>
+      <Description>"Enable (Auto-Attach Game Process)"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$Lua}
+if syntaxcheck then return end
+
+local process = 'BloonsTD6.exe'
+OpenProcess(process);
+if process ~= process or (readInteger(process) == nil) then
+   error(ShowMessage("Failed To Attach To Process"))
+end
+
+
+--Set Window Title
+local title = "Bloons TD6 v1.3 by Sintrix";
+if not((MainForm.Caption):match("Bloons TD 6")) then
+MainForm.Caption = title..' ~ '..MainForm.Caption
+end
+
+--Credits
+if MainForm.lblSigned.Caption:match('Sintrix / Build 16716048') == nil then
+  local Main = MainForm.lblSigned
+  local MadeBy = createPanel(Main.Parent)
+
+
+  MadeBy.AutoSize = true
+  MadeBy.Anchors = '[akTop,akRight,akLeft]'
+  MadeBy.AnchorSideTop.Control = MadeBy.Parent
+  MadeBy.AnchorSideTop.Side = asrCenter
+  MadeBy.AnchorSideRight.Control = MainForm.CommentButton
+  MadeBy.AnchorSideRight.Side = asrLeft
+  MadeBy.AnchorSideLeft.Control = MainForm.advancedbutton
+  MadeBy.AnchorSideLeft.Side = asrRight
+
+  Main.Parent = MadeBy
+  Main.Visible = true
+  Main.Caption = 'Sintrix / Build 16716048'
+  Main.Font.Size = 12
+  Main.Font.Style = '[fsBold]'
+  Main.Font.Quality = 'fqCleartypeNatural'
+  Main.AnchorSideTop.Control = MadeBy
+  Main.AnchorSideTop.Side = asrCenter
+  Main.AnchorSideLeft.Control = MadeBy
+  Main.AnchorSideLeft.Side = asrCenter
+end
+
+function cycleFullCompact(sender,force)     local state = not(compactmenuitem.Caption == 'Compact View Mode'); if force~=nil then state = not force end; compactmenuitem.Caption = state and 'Compact View Mode' or 'Full View Mode'; getMainForm().Splitter1.Visible = state; getMainForm().Panel4.Visible    = state; getMainForm().Panel5.Visible    = state; end; function addCompactMenu() if compactmenualreadyexists then return end; local parent = getMainForm().Menu.Items; compactmenuitem = createMenuItem(parent); parent.add(compactmenuitem); compactmenuitem.Caption = 'Compact View Mode'; compactmenuitem.OnClick = cycleFullCompact; compactmenualreadyexists = 'yes'; end; addCompactMenu(); cycleFullCompact(nil,true);
+
+getMainForm().Panel4.Visible = true;
+{$asm}
+[DISABLE]
+{$Lua}
+function cycleFullCompact(sender,force)     local state = not(compactmenuitem.Caption == 'Compact View Mode'); if force~=nil then state = not force end; compactmenuitem.Caption = state and 'Compact View Mode' or 'Full View Mode'; getMainForm().Splitter1.Visible = state; getMainForm().Panel4.Visible    = state; getMainForm().Panel5.Visible    = state; end; function addCompactMenu() if compactmenualreadyexists then return end; local parent = getMainForm().Menu.Items; compactmenuitem = createMenuItem(parent); parent.add(compactmenuitem); compactmenuitem.Caption = 'Compact View Mode'; compactmenuitem.OnClick = cycleFullCompact; compactmenualreadyexists = 'yes'; end; addCompactMenu(); cycleFullCompact(nil,false);
+
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>2245</ID>
+          <Description>"Initialize Mono (Required)"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+{$lua}
+mono_initialize()
+LaunchMonoDataCollector()
+{$asm}
+
+
+[DISABLE]
+
+
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>2239</ID>
+              <Description>"Cash Doesn't Decrease"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>//Send@Sintrix
+[ENABLE]
+Assets.Scripts.Simulation.Simulation.RemoveCash:
+db C3
+
+[DISABLE]
+Assets.Scripts.Simulation.Simulation.RemoveCash:
+db 48 89 4C 24 20
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>2251</ID>
+              <Description>"Place Anywhere"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>//Send@Sintrix
+define(address,Assets.Scripts.Simulation.Track.Map.CanPlace)
+define(bytes,48 8B C4 4C 89 48 20)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,Assets.Scripts.Simulation.Track.Map.CanPlace)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  mov al,1
+  ret
+  jmp return
+
+address:
+  jmp newmem
+  nop 2
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+dealloc(*)
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>2254</ID>
+              <Description>"Rapid Fire"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>//Send@Sintrix
+define(address,"GameAssembly.dll"+63D534) //Assets.Scripts.Simulation.Towers.Weapons.Weapon.CalcRateFrames
+
+define(bytes,F3 0F 10 70 70)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,"GameAssembly.dll"+63D534)
+
+label(code)
+label(return)
+
+newmem:
+mov [rax+70],(float)0
+mov [rax+74],#0
+
+code:
+  movss xmm6,[rax+70]
+  jmp return
+
+address:
+  jmp newmem
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+dealloc(*)
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>2253</ID>
+              <Description>"Unlock All Upgrades &amp; Towers"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>define(address,"GameAssembly.dll"+C23084)
+define(bytes,48 8B D9 75 1F)
+
+[ENABLE]
+
+//Assets.Scripts.Unity.Player.Btd6Player.HasUpgrade
+//Send@Sintrix
+
+assert(address,bytes)
+alloc(newmem,$1000,"GameAssembly.dll"+C23084)
+
+label(code)
+label(return)
+
+newmem:
+mov [rcx+98],1
+mov [rcx+99],1
+
+code:
+  mov rbx,rcx
+  jne GameAssembly.dll+C230A8
+  jmp return
+
+address:
+  jmp newmem
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+dealloc(*)
+
+</AssemblerScript>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>459</ID>
+      <Description>"--------------------------------"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>461</ID>
+      <Description>"💥 Author: Send"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>454</ID>
+      <Description>"🞂 Process: BloonsTD6.exe"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>455</ID>
+      <Description>"🞂 Build: 16716048"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>457</ID>
+      <Description>"✔ Verify Game Build"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+{$lua}
+shellExecute("https://steamdb.info/app/960090/patchnotes/")
+
+{$asm}
+[DISABLE]
+
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>460</ID>
+      <Description>"⚡ Discord"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+{$lua}
+shellExecute("https://discord.gg/NTFcdAUWxb")
+
+{$asm}
+[DISABLE]
+
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>458</ID>
+      <Description>"--------------------------------"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+  </CheatEntries>
+  <CheatCodes>
+    <CodeEntry>
+      <Description>Change of movss xmm0,[rbx+28]</Description>
+      <AddressString>GameAssembly.dll+E8304F</AddressString>
+      <Before>
+        <Byte>86</Byte>
+        <Byte>32</Byte>
+        <Byte>01</Byte>
+        <Byte>EB</Byte>
+        <Byte>77</Byte>
+      </Before>
+      <Actual>
+        <Byte>F3</Byte>
+        <Byte>0F</Byte>
+        <Byte>10</Byte>
+        <Byte>43</Byte>
+        <Byte>28</Byte>
+      </Actual>
+      <After>
+        <Byte>0F</Byte>
+        <Byte>2E</Byte>
+        <Byte>C6</Byte>
+        <Byte>7A</Byte>
+        <Byte>06</Byte>
+      </After>
+    </CodeEntry>
+  </CheatCodes>
+  <UserdefinedSymbols/>
+  <Comments>GET DUPLICATED METHOD -- TO DO
+mF = 0
+function getDuplicatedMethod(class, methodName,params)
+  local methods = mono_class_enumMethods(mono_findClass(string.match(class, "(.*):"),string.match(class, ":(.*)")))
+  for v=1,#methods do
+    --print(methods[v].name)
+    if methods[v].name == methodName then
+       if mF ~= 0 then end mF = mF .. '\n' .. methods[v].method
+       else mF = methods[v].method end
+    end
+  end
+  --if params ~= nil then
+  --end
+end
+getDuplicatedMethod('Assets.Scripts.Unity.Player:Btd6Player','ClaimRacePass',nil)
+--print(mF)
+--print(string.find(mF, "(.*)\n"))
+return mono_method_getSignature(mF)
+--return
+--mono_findMethod('Assets.Scripts.Unity.Player','Btd6Player','GetInstaTower')
+--mono_method_getSignature(mono_findMethod('Assets.Scripts.Unity.Player','Btd6Player','GetInstaTower'))
+</Comments>
+</CheatTable>

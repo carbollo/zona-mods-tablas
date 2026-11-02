@@ -1,0 +1,520 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>452</ID>
+      <Description>"Enable"</Description>
+      <Options moHideChildren="1"/>
+      <Color>00FF00</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$Lua}
+if syntaxcheck then return end
+
+local process = 'TheGreatCircle.exe'
+OpenProcess(process);
+if process ~= process or (readInteger(process) == nil) then
+   error(ShowMessage("Failed To Attach To Process"))
+end
+
+--Set Window Title
+local title = "Indiana Jones The Great Circle 1.0 by Sintrix";
+if not((MainForm.Caption):match("TheGreatCircle")) then
+MainForm.Caption = title..' ~ '..MainForm.Caption
+end
+
+--Credits
+if MainForm.lblSigned.Caption:match('By Sintrix') == nil then
+  local Main = MainForm.lblSigned
+  local MadeBy = createPanel(Main.Parent)
+
+
+  MadeBy.AutoSize = true
+  MadeBy.Anchors = '[akTop,akRight,akLeft]'
+  MadeBy.AnchorSideTop.Control = MadeBy.Parent
+  MadeBy.AnchorSideTop.Side = asrCenter
+  MadeBy.AnchorSideRight.Control = MainForm.CommentButton
+  MadeBy.AnchorSideRight.Side = asrLeft
+  MadeBy.AnchorSideLeft.Control = MainForm.advancedbutton
+  MadeBy.AnchorSideLeft.Side = asrRight
+
+  Main.Parent = MadeBy
+  Main.Visible = true
+  Main.Caption = 'By Sintrix'
+  Main.Font.Size = 12
+  Main.Font.Style = '[fsBold]'
+  Main.Font.Quality = 'fqCleartypeNatural'
+  Main.AnchorSideTop.Control = MadeBy
+  Main.AnchorSideTop.Side = asrCenter
+  Main.AnchorSideLeft.Control = MadeBy
+  Main.AnchorSideLeft.Side = asrCenter
+end
+
+[DISABLE]
+
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>461</ID>
+          <Description>"-&gt; [Health]"</Description>
+          <Options moHideChildren="1"/>
+          <Color>FFFF00</Color>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>460</ID>
+              <Description>"Infinite Health (Do not use with [Health Settings])"</Description>
+              <Color>00FF00</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>// CamoHax@sintrix.net
+[ENABLE]
+aobscanmodule(address,TheGreatCircle.exe,F3 0F 10 4E 44 42)
+alloc(newmem,1024,TheGreatCircle.exe)
+alloc(obytes_infhp, 10)
+label(return originalcode)
+
+registersymbol(obytes_infhp)
+
+obytes_infhp:
+readmem(address, 10)
+
+newmem:
+
+originalcode:
+ mov [rsi+44],(float)200
+ movss xmm1,[rsi+44]
+ jmp return
+
+address:
+ jmp newmem
+ return:
+
+
+[DISABLE]
+
+address:
+readmem(obytes_infhp, 10)
+
+dealloc(*)
+unregistersymbol(*)
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>8</ID>
+              <Description>"-&gt; [Health Settings]"</Description>
+              <Options moHideChildren="1"/>
+              <Color>FFFF00</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>// CamoHax@sintrix.net
+[ENABLE]
+aobscanmodule(address,TheGreatCircle.exe,F3 0F 10 4E 44 42)
+alloc(newmem,1024,TheGreatCircle.exe)
+alloc(obytes_HB, 10)
+label(return originalcode)
+
+registersymbol(obytes_HB healthbase)
+
+obytes_HB:
+readmem(address, 10)
+
+newmem:
+
+originalcode:
+ mov [healthbase],rsi
+ movss xmm1,[rsi+44]
+ jmp return
+
+
+healthbase:
+dd 0
+
+address:
+ jmp newmem
+ return:
+
+
+[DISABLE]
+
+address:
+readmem(obytes_HB, 10)
+
+dealloc(*)
+unregistersymbol(*)
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>9</ID>
+                  <Description>"Health"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>00FF00</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>[healthbase]+44</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>10</ID>
+                  <Description>"Food"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>00FF00</Color>
+                  <VariableType>Float</VariableType>
+                  <Address>[healthbase]+50</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>6</ID>
+          <Description>"-&gt; [Stamina]"</Description>
+          <Options moHideChildren="1"/>
+          <Color>FFFF00</Color>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>2</ID>
+              <Description>"Infinite Stamina (Do not use with [Stamina Settings])"</Description>
+              <Color>00FF00</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>// CamoHax@sintrix.net
+[ENABLE]
+aobscanmodule(Sprintnf,TheGreatCircle.exe,03 46 0C 66 0F 6E C0 0F 5B C0 F3 0F 58 46 18 0F 2F) // should be unique
+alloc(newmem,$1000,Sprintnf)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  mov [rsi+0c],#10
+  mov [rsi+8],#10
+  add eax,[rsi+0C]
+  movd xmm0,eax
+  jmp return
+
+Sprintnf:
+  jmp newmem
+  nop 2
+return:
+registersymbol(Sprintnf)
+
+[DISABLE]
+
+Sprintnf:
+  db 03 46 0C 66 0F 6E C0
+
+unregistersymbol(Sprintnf)
+dealloc(newmem)
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>3</ID>
+              <Description>"-&gt; [Stamina Settings]"</Description>
+              <Options moHideChildren="1"/>
+              <Color>FFFF00</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>// CamoHax@sintrix.net
+[ENABLE]
+aobscanmodule(SprintBase,TheGreatCircle.exe,03 46 0C 66 0F 6E C0 0F 5B C0 F3 0F 58 46 18 0F 2F) // should be unique
+alloc(newmem,$1000,SprintBase)
+
+label(code)
+label(return)
+registersymbol(Sprintobj)
+
+newmem:
+
+code:
+  mov [Sprintobj],rsi
+  add eax,[rsi+0C]
+  movd xmm0,eax
+  jmp return
+
+Sprintobj:
+dd 0
+
+SprintBase:
+  jmp newmem
+  nop 2
+return:
+registersymbol(SprintBase)
+
+[DISABLE]
+
+SprintBase:
+  db 03 46 0C 66 0F 6E C0
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>4</ID>
+                  <Description>"Stamina"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>00FF00</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[Sprintobj]+0c</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>5</ID>
+                  <Description>"Max Stamina"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>00FF00</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[Sprintobj]+8</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>464</ID>
+          <Description>"-&gt; [Ammo]"</Description>
+          <Options moHideChildren="1"/>
+          <Color>FFFF00</Color>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>463</ID>
+              <Description>"Infinite Ammo (Do not use with [Ammo Settings])"</Description>
+              <Color>00FF00</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>// CamoHax@sintrix.net
+[ENABLE]
+aobscanmodule(address,TheGreatCircle.exe,8B 56 20 48 8B CF)
+alloc(newmem,1024,TheGreatCircle.exe)
+alloc(obytes_infiammo, 10)
+label(return originalcode)
+
+registersymbol(obytes_infiammo)
+
+obytes_infiammo:
+readmem(address, 10)
+
+newmem:
+
+originalcode:
+ mov [rsi+14],#100
+ mov [rsi+20],#100
+ mov edx,[rsi+14]
+ mov rcx,rdi
+ jmp return
+
+address:
+ jmp newmem
+ nop
+return:
+
+
+[DISABLE]
+
+address:
+readmem(obytes_infiammo, 10)
+
+dealloc(*)
+unregistersymbol(*)
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>456</ID>
+              <Description>"-&gt; [Ammo Settings]"</Description>
+              <Options moHideChildren="1"/>
+              <Color>FFFF00</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>// CamoHax@sintrix.net
+[ENABLE]
+aobscanmodule(address,TheGreatCircle.exe,8B 56 20 48 8B CF)
+alloc(newmem,1024,TheGreatCircle.exe)
+alloc(obytes_WeaponBase, 10)
+label(return originalcode)
+
+registersymbol(obytes_WeaponBase weaponbase)
+
+obytes_WeaponBase:
+readmem(address, 10)
+
+newmem:
+
+originalcode:
+ mov [weaponbase],rsi
+ mov edx,[rsi+20]
+ mov rcx,rdi
+ jmp return
+
+weaponbase:
+dd 0
+
+address:
+ jmp newmem
+ nop
+return:
+
+
+[DISABLE]
+
+address:
+readmem(obytes_WeaponBase, 10)
+
+dealloc(*)
+unregistersymbol(*)
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>457</ID>
+                  <Description>"Gun Ammo (Freeze for infinite)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>00FF00</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[weaponbase]+14</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>458</ID>
+                  <Description>"Inventory Ammo (Need at least 1)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <Color>00FF00</Color>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[weaponbase]+20</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>454</ID>
+          <Description>"Infinite Melee Durability"</Description>
+          <Color>00FF00</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>// CamoHax@sintrix.net
+[ENABLE]
+aobscanmodule(address,TheGreatCircle.exe,F3 0F 58 46 08 33)
+alloc(newmem,1024,TheGreatCircle.exe)
+alloc(obytes_MDamage, 10)
+label(return originalcode)
+
+registersymbol(obytes_MDamage)
+
+obytes_MDamage:
+readmem(address, 10)
+
+newmem:
+
+originalcode:
+ mov [rsi+08],(float)10
+ addss xmm0,[rsi+08]
+ jmp return
+
+address:
+ jmp newmem
+ return:
+
+
+[DISABLE]
+
+address:
+readmem(obytes_MDamage, 10)
+
+dealloc(*)
+unregistersymbol(*)
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>465</ID>
+          <Description>"One Hit Kill"</Description>
+          <Color>00FF00</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>// CamoHax@sintrix.net
+[ENABLE]
+aobscanmodule(aob_scan1, $process, 07 00 00 F3 0F 10 40 44)
+aobscanmodule(aob_scan2, $process, F3 0F 10 43 44 B9)
+alloc(code, 256, aob_scan1)
+alloc(xyz, 256, aob_scan2)
+label(r1)
+label(r2)
+registersymbol(aob_scan1)
+registersymbol(aob_scan2)
+
+code:
+  mov [rax+44], (float)1
+  movss xmm0, [rax+44]
+  jmp r1
+aob_scan1+03:
+  jmp code
+r1:
+
+xyz:
+  mov [rbx+44], (float)1
+  movss xmm0, [rbx+44]
+  jmp r2
+aob_scan2:
+  jmp xyz
+r2:
+
+[DISABLE]
+dealloc(code)
+dealloc(xyz)
+unregistersymbol(aob_scan1)
+unregistersymbol(aob_scan2)
+aob_scan1+03:
+  db F3 0F 10 40 44
+aob_scan2:
+  db F3 0F 10 43 44
+
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>435</ID>
+      <Description>"-&gt; Extra"</Description>
+      <Options moHideChildren="1"/>
+      <Color>4080FF</Color>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>447</ID>
+          <Description>"Join Discord"</Description>
+          <Color>8000FF</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+{$lua}
+shellExecute("https://discord.gg/n7QPrYn7p5")
+ 
+{$asm}
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+  <Structures StructVersion="2">
+    <Structure Name="pdata?" AutoFill="0" AutoCreate="1" DefaultHex="0" AutoDestroy="0" DoNotSaveLocal="0" RLECompression="1" AutoCreateStructsize="4096">
+      <Elements>
+        <Element Offset="0" Vartype="Pointer" Bytesize="8" OffsetHex="00000000" Description="Pointer to instance of idDeclStamina" DisplayMethod="unsigned integer"/>
+        <Element Offset="8" Vartype="4 Bytes" Bytesize="4" RLECount="6" OffsetHex="00000008" DisplayMethod="unsigned integer"/>
+        <Element Offset="32" Vartype="4 Bytes" Bytesize="4" OffsetHex="00000020" DisplayMethod="hexadecimal"/>
+        <Element Offset="36" Vartype="4 Bytes" Bytesize="4" OffsetHex="00000024" DisplayMethod="unsigned integer"/>
+        <Element Offset="40" Vartype="4 Bytes" Bytesize="4" OffsetHex="00000028" DisplayMethod="hexadecimal"/>
+        <Element Offset="44" Vartype="4 Bytes" Bytesize="4" RLECount="3" OffsetHex="0000002C" DisplayMethod="unsigned integer"/>
+        <Element Offset="56" Vartype="Double" Bytesize="8" OffsetHex="00000038" DisplayMethod="unsigned integer"/>
+        <Element Offset="64" Vartype="4 Bytes" Bytesize="4" RLECount="2" OffsetHex="00000040" DisplayMethod="unsigned integer"/>
+        <Element Offset="72" Vartype="4 Bytes" Bytesize="4" OffsetHex="00000048" DisplayMethod="hexadecimal"/>
+        <Element Offset="76" Vartype="4 Bytes" Bytesize="4" RLECount="8" OffsetHex="0000004C" DisplayMethod="unsigned integer"/>
+        <Element Offset="108" Vartype="Double" Bytesize="8" OffsetHex="0000006C" DisplayMethod="unsigned integer"/>
+        <Element Offset="116" Vartype="4 Bytes" Bytesize="4" RLECount="3" OffsetHex="00000074" DisplayMethod="unsigned integer"/>
+        <Element Offset="128" Vartype="4 Bytes" Bytesize="4" OffsetHex="00000080" DisplayMethod="hexadecimal"/>
+        <Element Offset="132" Vartype="4 Bytes" Bytesize="4" OffsetHex="00000084" DisplayMethod="unsigned integer"/>
+        <Element Offset="136" Vartype="4 Bytes" Bytesize="4" OffsetHex="00000088" DisplayMethod="hexadecimal"/>
+        <Element Offset="140" Vartype="4 Bytes" Bytesize="4" RLECount="9" OffsetHex="0000008C" DisplayMethod="unsigned integer"/>
+        <Element Offset="176" Vartype="4 Bytes" Bytesize="4" OffsetHex="000000B0" DisplayMethod="hexadecimal"/>
+        <Element Offset="180" Vartype="Double" Bytesize="8" OffsetHex="000000B4" DisplayMethod="unsigned integer"/>
+        <Element Offset="188" Vartype="4 Bytes" Bytesize="4" RLECount="4" OffsetHex="000000BC" DisplayMethod="hexadecimal"/>
+        <Element Offset="204" Vartype="4 Bytes" Bytesize="4" RLECount="973" OffsetHex="000000CC" DisplayMethod="unsigned integer"/>
+      </Elements>
+    </Structure>
+  </Structures>
+</CheatTable>

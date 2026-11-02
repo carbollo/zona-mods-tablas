@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>44</ID>
+      <Description>"Enable (Auto-Attach Game Process)"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$Lua}
+if syntaxcheck then return end
+
+local process = 'GameProject-Win64-Shipping.exe'
+OpenProcess(process);
+if process ~= process or (readInteger(process) == nil) then
+   error(ShowMessage("Failed To Attach To Process"))
+end
+
+
+--Set Window Title
+local title = "Bronzebeard's Tavern 1.0.3";
+if not((MainForm.Caption):match("Bronzebeard's Tavern")) then
+MainForm.Caption = title..' ~ '..MainForm.Caption
+end
+
+--Credits
+if MainForm.lblSigned.Caption:match('Sintrix / Build 18427963') == nil then
+  local Main = MainForm.lblSigned
+  local MadeBy = createPanel(Main.Parent)
+
+
+  MadeBy.AutoSize = true
+  MadeBy.Anchors = '[akTop,akRight,akLeft]'
+  MadeBy.AnchorSideTop.Control = MadeBy.Parent
+  MadeBy.AnchorSideTop.Side = asrCenter
+  MadeBy.AnchorSideRight.Control = MainForm.CommentButton
+  MadeBy.AnchorSideRight.Side = asrLeft
+  MadeBy.AnchorSideLeft.Control = MainForm.advancedbutton
+  MadeBy.AnchorSideLeft.Side = asrRight
+
+  Main.Parent = MadeBy
+  Main.Visible = true
+  Main.Caption = 'Sintrix / Build 18427963'
+  Main.Font.Size = 12
+  Main.Font.Style = '[fsBold]'
+  Main.Font.Quality = 'fqCleartypeNatural'
+  Main.AnchorSideTop.Control = MadeBy
+  Main.AnchorSideTop.Side = asrCenter
+  Main.AnchorSideLeft.Control = MadeBy
+  Main.AnchorSideLeft.Side = asrCenter
+end
+
+
+getMainForm().Panel4.Visible = true;
+{$asm}
+[DISABLE]
+{$Lua}
+
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>26541</ID>
+          <Description>"Infinite Health"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : GameProject-Win64-Shipping.exe
+  Version: 
+  Date   : 2025-05-14
+  Author : 19199
+
+  This script does blah blah blah
+}
+
+define(address,"GameProject-Win64-Shipping.exe"+1B2999D)
+define(bytes,89 81 20 07 00 00)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,"GameProject-Win64-Shipping.exe"+1B2999D)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  mov [rcx+00000720],#5
+  jmp return
+
+address:
+  jmp newmem
+  nop
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+  // mov [rcx+00000720],eax
+
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameProject-Win64-Shipping.exe+1B2999D
+
+GameProject-Win64-Shipping.exe+1B2998A: 5E                             - pop rsi
+GameProject-Win64-Shipping.exe+1B2998B: C3                             - ret 
+GameProject-Win64-Shipping.exe+1B2998C: CC                             - int 3 
+GameProject-Win64-Shipping.exe+1B2998D: CC                             - int 3 
+GameProject-Win64-Shipping.exe+1B2998E: CC                             - int 3 
+GameProject-Win64-Shipping.exe+1B2998F: CC                             - int 3 
+GameProject-Win64-Shipping.exe+1B29990: 40 53                          - push rbx
+GameProject-Win64-Shipping.exe+1B29992: 48 83 EC 20                    - sub rsp,20
+GameProject-Win64-Shipping.exe+1B29996: F3 0F 2C C1                    - cvttss2si eax,xmm1
+GameProject-Win64-Shipping.exe+1B2999A: 48 8B D9                       - mov rbx,rcx
+// ---------- INJECTING HERE ----------
+GameProject-Win64-Shipping.exe+1B2999D: 89 81 20 07 00 00              - mov [rcx+00000720],eax
+// ---------- DONE INJECTING  ----------
+GameProject-Win64-Shipping.exe+1B299A3: 85 C0                          - test eax,eax
+GameProject-Win64-Shipping.exe+1B299A5: 7F 11                          - jg GameProject-Win64-Shipping.exe+1B299B8
+GameProject-Win64-Shipping.exe+1B299A7: B2 01                          - mov dl,01
+GameProject-Win64-Shipping.exe+1B299A9: C7 81 20 07 00 00 00 00 00 00  - mov [rcx+00000720],00000000
+GameProject-Win64-Shipping.exe+1B299B3: E8 F8 75 04 00                 - call GameProject-Win64-Shipping.exe+1B70FB0
+GameProject-Win64-Shipping.exe+1B299B8: 48 8B CB                       - mov rcx,rbx
+GameProject-Win64-Shipping.exe+1B299BB: 48 83 C4 20                    - add rsp,20
+GameProject-Win64-Shipping.exe+1B299BF: 5B                             - pop rbx
+GameProject-Win64-Shipping.exe+1B299C0: E9 FB 67 F5 FF                 - jmp GameProject-Win64-Shipping.exe+1A801C0
+GameProject-Win64-Shipping.exe+1B299C5: CC                             - int 3 
+}
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>26538</ID>
+          <Description>"Infinite Stamina"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>//Send@Sintrix
+define(address,"GameProject-Win64-Shipping.exe"+1B2B229)
+define(bytes,F3 0F 11 89 28 07 00 00)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,"GameProject-Win64-Shipping.exe"+1B2B229)
+
+label(code)
+label(return)
+
+newmem:
+//Send@Sintrix
+code:
+  mov [rcx+72C],0
+  movss [rcx+00000728],xmm1
+  jmp return
+
+address:
+  jmp newmem
+  nop 3
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+
+dealloc(*)
+//Send@Sintrix
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>26526</ID>
+          <Description>"Grab Tavern Data (Gain/Spend Money/Start Day)"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>//Send@Sintrix
+define(address,"GameProject-Win64-Shipping.exe"+1B4AF48)
+define(bytes,0F 2F 83 38 03 00 00)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,"GameProject-Win64-Shipping.exe"+1B4AF48)
+registersymbol(TavData)
+label(code return TavData)
+
+newmem:
+mov [TavData],rbx
+
+code:
+  comiss xmm0,[rbx+00000338]
+  jmp return
+//Send@Sintrix
+TavData:
+dw
+
+address:
+  jmp newmem
+  nop 2
+return:
+
+[DISABLE]
+//Send@Sintrix
+address:
+  db bytes
+unregistersymbol(*)
+dealloc(*)
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>26529</ID>
+              <Description>"Tavern Money"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>[TavData]+338</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>26530</ID>
+              <Description>"Tavern Bills"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Float</VariableType>
+              <Address>[TavData]+33C</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>459</ID>
+      <Description>"--------------------------------"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>461</ID>
+      <Description>"💥 Author: Send"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>454</ID>
+      <Description>"🞂 Process: GameProject-Win64-Shipping.exe"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>455</ID>
+      <Description>"🞂 Build: 18427963"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>457</ID>
+      <Description>"✔ Verify Game Build"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+{$lua}
+shellExecute("https://steamdb.info/app/2422870/patchnotes/")
+
+{$asm}
+[DISABLE]
+
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>460</ID>
+      <Description>"⚡ Discord "</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+{$lua}
+shellExecute("https://discord.gg/NTFcdAUWxb")
+
+{$asm}
+[DISABLE]
+
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>458</ID>
+      <Description>"--------------------------------"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols>
+    <SymbolEntry>
+      <Name>Temp</Name>
+      <Address>2D7B7C70000</Address>
+    </SymbolEntry>
+  </UserdefinedSymbols>
+</CheatTable>

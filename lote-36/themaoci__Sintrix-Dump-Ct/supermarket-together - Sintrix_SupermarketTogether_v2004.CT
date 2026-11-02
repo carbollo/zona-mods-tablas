@@ -1,0 +1,2885 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>44</ID>
+      <Description>"→ Enable (Auto-Attach Game Process)"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$Lua}
+if syntaxcheck then return end
+
+local process = 'Supermarket Together.exe'
+OpenProcess(process);
+if process ~= process or (readInteger(process) == nil) then
+   error(ShowMessage("Failed To Attach To Process"))
+end
+
+
+--Set Window Title
+local title = "SuperMarket Together Table v2.0.0.4 | https://sintrix.net";
+if not((MainForm.Caption):match("SuperMarket Together")) then
+MainForm.Caption = title..' ~ '..MainForm.Caption
+end
+
+--Credits
+if MainForm.lblSigned.Caption:match('Sintrix | Build 16558784') == nil then
+  local Main = MainForm.lblSigned
+  local MadeBy = createPanel(Main.Parent)
+
+
+  MadeBy.AutoSize = true
+  MadeBy.Anchors = '[akTop,akRight,akLeft]'
+  MadeBy.AnchorSideTop.Control = MadeBy.Parent
+  MadeBy.AnchorSideTop.Side = asrCenter
+  MadeBy.AnchorSideRight.Control = MainForm.CommentButton
+  MadeBy.AnchorSideRight.Side = asrLeft
+  MadeBy.AnchorSideLeft.Control = MainForm.advancedbutton
+  MadeBy.AnchorSideLeft.Side = asrRight
+
+  Main.Parent = MadeBy
+  Main.Visible = true
+  Main.Caption = 'Sintrix | Build 16558784'
+  Main.Font.Size = 12
+  Main.Font.Style = '[fsBold]'
+  Main.Font.Quality = 'fqCleartypeNatural'
+  Main.AnchorSideTop.Control = MadeBy
+  Main.AnchorSideTop.Side = asrCenter
+  Main.AnchorSideLeft.Control = MadeBy
+  Main.AnchorSideLeft.Side = asrCenter
+end
+
+getMainForm().Panel4.Visible = true;
+{$asm}
+[DISABLE]
+
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>45</ID>
+          <Description>"→ Scripts"</Description>
+          <Options moHideChildren="1"/>
+          <Color>FF8000</Color>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>46</ID>
+              <Description>"→ Initialize Mono (Required)"</Description>
+              <Options moHideChildren="1"/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+{$Lua}
+if syntaxcheck then return end
+if not monopipe then if LaunchMonoDataCollector() == 0 then
+
+if process == nil then ShowMessage('Process is not selected.')
+elseif readInteger(process) == 0 then ShowMessage('Process cannot be opened. Gone?')
+else
+  if (monopipe~=nil) and (monopipe.ProcessID~=getOpenedProcessID()) then
+    monopipe.destroy()
+    monopipe=nil
+  end
+  if (monopipe==nil) then
+    LaunchMonoDataCollector()
+    -- monoSymbolList is only available if the target is il2cpp and not normal mono
+    --while (monoSymbolList==nil) or (not monoSymbolList.FullyLoaded) do checkSynchronize(50) end -- checkSynchronize requires that memRec is ASynch.
+  end
+end
+end end
+ 
+{$asm}
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>173</ID>
+                  <Description>"→ [ Singleplayer ]"</Description>
+                  <Options moHideChildren="1"/>
+                  <Color>00FF00</Color>
+                  <GroupHeader>1</GroupHeader>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>317</ID>
+                      <Description>"Items marked with 🧨 must be re-enabled when joining a new lobby."</Description>
+                      <Color>0080FF</Color>
+                      <GroupHeader>1</GroupHeader>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>313</ID>
+                      <Description>"🧨 [ Lobby Functions ] (Singleplayer)"</Description>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>[ENABLE]
+{$Lua}
+if syntaxcheck then return end
+local Base= getAddress("UnityPlayer.dll");
+local mBase= Base+0x01c50e28;
+local npcmanPointer = readPointer(readPointer(readPointer(readPointer(readPointer(readPointer(mBase)+0x150)+0x28)+0x8)+0x88)+0x28)+0x0;
+registerSymbol("npcmanptr", npcmanPointer );
+npcmanptrstring = string.format("0x%X",npcmanPointer )
+
+{$asm}
+
+
+[DISABLE]
+
+//code from here till the end of the code will be used to disable the cheat
+</AssemblerScript>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>314</ID>
+                          <Description>"Debug: NPC_Manager Pointer"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>4 Bytes</VariableType>
+                          <Address>npcmanptr</Address>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>327</ID>
+                          <Description>"💣 Give Employees Unicorn Hats"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+{$Lua}
+if syntaxcheck then return end
+
+if not monopipe then if LaunchMonoDataCollector() == 0 then  error(MessageDialog('Failed to Launch Mono Data Collector', mtError, mbClose)) end end
+
+local method = mono_findMethod('', 'NPC_Manager', 'SetEmployeesHats')
+local args={}
+args[1]={}
+args[1].type=vtByte
+args[1].value = 5
+
+mono_invoke_method('', method, npcmanptrstring,args)
+
+if not syntaxcheck then
+   synchronize(createTimer,60,memrec.setActive,false)
+  end
+ 
+{$asm}
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+</AssemblerScript>
+                          <Hotkeys>
+                            <Hotkey>
+                              <Action>Toggle Activation</Action>
+                              <Keys>
+                                <Key>117</Key>
+                              </Keys>
+                              <ID>0</ID>
+                            </Hotkey>
+                          </Hotkeys>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>332</ID>
+                          <Description>"→ Experimental"</Description>
+                          <Options moHideChildren="1"/>
+                          <Color>0080FF</Color>
+                          <GroupHeader>1</GroupHeader>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>322</ID>
+                              <Description>"SpawnDummyNCP"</Description>
+                              <Color>0080FF</Color>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+{$Lua}
+if syntaxcheck then return end
+
+if not monopipe then if LaunchMonoDataCollector() == 0 then  error(MessageDialog('Failed to Launch Mono Data Collector', mtError, mbClose)) end end
+
+local method = mono_findMethod('', 'NPC_Manager', 'SpawnDummyNCP')
+
+mono_invoke_method('', method, npcmanptrstring,{})
+
+
+if not syntaxcheck then
+   synchronize(createTimer,60,memrec.setActive,false)
+  end
+ 
+{$asm}
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+</AssemblerScript>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>321</ID>
+                              <Description>"SpawnCustomerNCP"</Description>
+                              <Color>0080FF</Color>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+{$Lua}
+if syntaxcheck then return end
+
+if not monopipe then if LaunchMonoDataCollector() == 0 then  error(MessageDialog('Failed to Launch Mono Data Collector', mtError, mbClose)) end end
+
+local method = mono_findMethod('', 'NPC_Manager', 'SpawnCustomerNCP')
+
+mono_invoke_method('', method, npcmanptrstring,{})
+
+
+if not syntaxcheck then
+   synchronize(createTimer,60,memrec.setActive,false)
+  end
+ 
+{$asm}
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+</AssemblerScript>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>326</ID>
+                              <Description>"Update Employee Number In Blackboard"</Description>
+                              <Color>0080FF</Color>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+{$Lua}
+if syntaxcheck then return end
+
+if not monopipe then if LaunchMonoDataCollector() == 0 then  error(MessageDialog('Failed to Launch Mono Data Collector', mtError, mbClose)) end end
+
+local method = mono_findMethod('', 'NPC_Manager', 'UpdateEmployeesNumberInBlackboard')
+
+mono_invoke_method('', method, npcmanptrstring,{})
+
+
+if not syntaxcheck then
+   synchronize(createTimer,60,memrec.setActive,false)
+  end
+ 
+{$asm}
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+</AssemblerScript>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>319</ID>
+                              <Description>"Assign Priorities"</Description>
+                              <Color>0080FF</Color>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+{$Lua}
+if syntaxcheck then return end
+
+if not monopipe then if LaunchMonoDataCollector() == 0 then  error(MessageDialog('Failed to Launch Mono Data Collector', mtError, mbClose)) end end
+
+local method = mono_findMethod('', 'NPC_Manager', 'AssignEmployeePriorities')
+
+mono_invoke_method('', method, npcmanptrstring,{})
+
+
+if not syntaxcheck then
+   synchronize(createTimer,60,memrec.setActive,false)
+  end
+ 
+{$asm}
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+</AssemblerScript>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>325</ID>
+                              <Description>"Set Blackboard all to 10"</Description>
+                              <Color>0080FF</Color>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+{$Lua}
+if syntaxcheck then return end
+
+if not monopipe then if LaunchMonoDataCollector() == 0 then  error(MessageDialog('Failed to Launch Mono Data Collector', mtError, mbClose)) end end
+
+local method = mono_findMethod('', 'NPC_Manager', 'RpcUpdateBlackboard')
+local args={}
+args[1]={}
+args[1].type=vtDword
+args[1].value = 10
+args[2]={}
+args[2].type=vtDword
+args[2].value = 10
+args[3]={}
+args[3].type=vtDword
+args[3].value = 10
+local address = npcmanptrstring
+mono_invoke_method('', method, address,args)
+
+if not syntaxcheck then
+   synchronize(createTimer,60,memrec.setActive,false)
+  end
+ 
+{$asm}
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+</AssemblerScript>
+                              <Hotkeys>
+                                <Hotkey>
+                                  <Action>Toggle Activation</Action>
+                                  <Keys>
+                                    <Key>117</Key>
+                                  </Keys>
+                                  <ID>0</ID>
+                                </Hotkey>
+                              </Hotkeys>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>354</ID>
+                              <Description>"Hat Trick by C1PL"</Description>
+                              <Color>0080FF</Color>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+{$Lua}
+if syntaxcheck then return end
+
+if not monopipe then
+    if LaunchMonoDataCollector() == 0 then
+        error(MessageDialog('Failed to Launch Mono Data Collector', mtError, mbClose))
+    end
+end
+
+
+local method = mono_findMethod('', 'NPC_Manager', 'SetEmployeesHats')
+
+
+local hatIndex = 1
+local totalHats = 70
+
+
+local function changeHat()
+    local args = {}
+    args[1] = {}
+    args[1].type = vtByte
+    args[1].value = hatIndex
+
+
+    mono_invoke_method('', method, npcmanptrstring, args)
+
+
+    hatIndex = hatIndex + 1
+    if hatIndex &gt; totalHats then
+        hatIndex = 1
+    end
+end
+
+
+local hatTimer = createTimer(nil, true)
+hatTimer.Interval = 100 -- Set the interval to 100 ms
+hatTimer.OnTimer = changeHat -- Set the function to call on each timer tick
+
+
+hatTimer.Enabled = true
+
+
+function disableHatTimer()
+    hatTimer.Enabled = false
+    hatTimer.destroy()
+end
+
+
+registerSymbol("disableHatTimer", disableHatTimer)
+
+{$asm}
+[DISABLE]
+
+
+//code from here till the end of the code will be used to disable the cheat
+</AssemblerScript>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>303</ID>
+                              <Description>"SpawnEmployee"</Description>
+                              <Color>0080FF</Color>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+{$Lua}
+if syntaxcheck then return end
+
+if not monopipe then if LaunchMonoDataCollector() == 0 then  error(MessageDialog('Failed to Launch Mono Data Collector', mtError, mbClose)) end end
+
+local method = mono_findMethod('', 'NPC_Manager', 'SpawnEmployee')
+
+mono_invoke_method('', method, npcmanptrstring,{})
+
+
+if not syntaxcheck then
+   synchronize(createTimer,60,memrec.setActive,false)
+  end
+ 
+{$asm}
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+</AssemblerScript>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>320</ID>
+                              <Description>"Remove Customers"</Description>
+                              <Color>0080FF</Color>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+{$Lua}
+if syntaxcheck then return end
+
+if not monopipe then if LaunchMonoDataCollector() == 0 then  error(MessageDialog('Failed to Launch Mono Data Collector', mtError, mbClose)) end end
+
+local method = mono_findMethod('', 'NPC_Manager', 'RemoveCustomers')
+
+mono_invoke_method('', method, npcmanptrstring,{})
+
+
+if not syntaxcheck then
+   synchronize(createTimer,60,memrec.setActive,false)
+  end
+ 
+{$asm}
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+</AssemblerScript>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>316</ID>
+                  <Description>"→ [Singleplayer &amp; Multiplayer]"</Description>
+                  <Options moHideChildren="1"/>
+                  <Color>00FF00</Color>
+                  <GroupHeader>1</GroupHeader>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>238</ID>
+                      <Description>"Grab NetworkPlayer Data (Stand In Front Of DLC Room Mirror)"</Description>
+                      <Options moHideChildren="1"/>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>{ Game   : Supermarket Together.exe
+  Version: 
+  Date   : 2024-08-16
+  Author : User
+
+  This script does blah blah blah
+}
+
+define(address,TheCoolRoom:SetCharacter+3b9 )
+define(bytes,83 38 00 66 90)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,TheCoolRoom:SetCharacter+3b9 )
+
+label(code)
+label(return)
+
+alloc(playerNetwork,4)
+registersymbol(playerNetwork)
+
+newmem:
+
+code:
+  cmp dword ptr [rax],00
+  mov [playerNetwork], rax
+  nop 2
+  jmp return
+
+address:
+  jmp newmem
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+  // cmp dword ptr [rax],00
+  // nop 2
+
+dealloc(newmem)
+dealloc(playerNetwork)
+unregistersymbol(playerNetwork)
+{
+// ORIGINAL CODE - INJECTION POINT: TheCoolRoom:SetCharacter+3b9
+
+TheCoolRoom:SetCharacter+388: 41 FF D3                       - call r11
+TheCoolRoom:SetCharacter+38b: 48 B8 40 32 0E 26 24 02 00 00  - mov rax,00000224260E3240
+TheCoolRoom:SetCharacter+395: 48 8B 08                       - mov rcx,[rax]
+TheCoolRoom:SetCharacter+398: 83 39 00                       - cmp dword ptr [rcx],00
+TheCoolRoom:SetCharacter+39b: 49 BA C0 4A A5 DD 24 02 00 00  - mov r10,00000224DDA54AC0
+TheCoolRoom:SetCharacter+3a5: 90                             - nop 
+TheCoolRoom:SetCharacter+3a6: 49 BB 50 94 9B 3F 24 02 00 00  - mov r11,UnityEngine.Component:GetComponent
+TheCoolRoom:SetCharacter+3b0: 41 FF D3                       - call r11
+TheCoolRoom:SetCharacter+3b3: 48 8B C8                       - mov rcx,rax
+TheCoolRoom:SetCharacter+3b6: 48 8B D6                       - mov rdx,rsi
+// ---------- INJECTING HERE ----------
+TheCoolRoom:SetCharacter+3b9: 83 38 00                       - cmp dword ptr [rax],00
+// ---------- DONE INJECTING  ----------
+TheCoolRoom:SetCharacter+3bc: 66 90                          - nop 2
+TheCoolRoom:SetCharacter+3be: 49 BB 50 B7 9F 47 24 02 00 00  - mov r11,PlayerNetwork:CmdChangeCharacter
+TheCoolRoom:SetCharacter+3c8: 41 FF D3                       - call r11
+TheCoolRoom:SetCharacter+3cb: 48 8B 4F 48                    - mov rcx,[rdi+48]
+TheCoolRoom:SetCharacter+3cf: 83 39 00                       - cmp dword ptr [rcx],00
+TheCoolRoom:SetCharacter+3d2: 49 BA F0 4A A5 DD 24 02 00 00  - mov r10,00000224DDA54AF0
+TheCoolRoom:SetCharacter+3dc: 66 90                          - nop 2
+TheCoolRoom:SetCharacter+3de: 49 BB B0 C2 9B 3F 24 02 00 00  - mov r11,UnityEngine.GameObject:GetComponent
+TheCoolRoom:SetCharacter+3e8: 41 FF D3                       - call r11
+TheCoolRoom:SetCharacter+3eb: 48 8B C8                       - mov rcx,rax
+}
+</AssemblerScript>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>239</ID>
+                          <Description>"playerNetwork"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>Byte</VariableType>
+                          <Address>playerNetwork</Address>
+                          <Offsets>
+                            <Offset>0</Offset>
+                          </Offsets>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>289</ID>
+                              <Description>"98&gt; MainPlayer(Rewired.Player)"</Description>
+                              <ShowAsHex>1</ShowAsHex>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+98</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>468</ID>
+                              <Description>"140&gt; equippedItem"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+140</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>469</ID>
+                              <Description>"144&gt; characterID"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+144</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>470</ID>
+                              <Description>"148&gt; hatID"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+148</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>471</ID>
+                              <Description>"164&gt; playerId"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>+164</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>472</ID>
+                              <Description>"174&gt; dropCooldown"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>Byte</VariableType>
+                              <Address>+174</Address>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>154</ID>
+                      <Description>"Items marked with 🧨must be re-enabled when joining a new lobby."</Description>
+                      <Color>0080FF</Color>
+                      <GroupHeader>1</GroupHeader>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>485</ID>
+                      <Description>"🧨 Lobby Functions (Singleplayer | Multiplayer)"</Description>
+                      <Options moHideChildren="1"/>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>[ENABLE]
+{$Lua}
+if syntaxcheck then return end
+
+local Base = getAddress("UnityPlayer.dll");
+
+local gBase = Base + 0x01B3BE00;
+local mBase = Base + 0x01C50e28;
+
+-- Reading gdataPointer with error checking
+local gdataPointer = readPointer(readPointer(readPointer(readPointer(readPointer(readPointer(readPointer(readPointer(readPointer(gBase)+0x0)+0x0)+0x570)+0x330)+0x60)+0xF8)+0x38)+0x20)+0x0;
+
+
+-- Reading mbboardPointer with error checking
+local mbboardPointer = readPointer(readPointer(readPointer(readPointer(readPointer(readPointer(readPointer(mBase)+0x150)+0x28)+0x8)+0x8)+0x88)+0x28)+0x0;
+registerSymbol("gdataptr", gdataPointer );
+registerSymbol("mbboardptr", mbboardPointer );
+gdptrstring = string.format("0x%X",gdataPointer )
+mbptrstring = string.format("0x%X",mbboardPointer )
+
+{$asm}
+
+
+[DISABLE]
+
+//code from here till the end of the code will be used to disable the cheat
+</AssemblerScript>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>137</ID>
+                          <Description>"GameData"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>4 Bytes</VariableType>
+                          <Address>gdataptr</Address>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>229</ID>
+                          <Description>"ManagerBlackboard"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>4 Bytes</VariableType>
+                          <Address>mbboardptr</Address>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>171</ID>
+                          <Description>"========= Money =========="</Description>
+                          <GroupHeader>1</GroupHeader>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>133</ID>
+                          <Description>"[ Add $100 ]"</Description>
+                          <Color>00FF00</Color>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+{$Lua}
+if syntaxcheck then return end
+
+if not monopipe then if LaunchMonoDataCollector() == 0 then  error(MessageDialog('Failed to Launch Mono Data Collector', mtError, mbClose)) end end
+
+local method = mono_findMethod('', 'GameData', 'CmdAlterFunds')
+local args={}
+args[1]={}
+args[1].type=vtSingle
+args[1].value = 100
+local address = gdptrstring
+mono_invoke_method('', method, address,args)
+
+if not syntaxcheck then
+   synchronize(createTimer,60,memrec.setActive,false)
+  end
+ 
+{$asm}
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+</AssemblerScript>
+                          <Hotkeys>
+                            <Hotkey>
+                              <Action>Toggle Activation</Action>
+                              <Keys>
+                                <Key>117</Key>
+                              </Keys>
+                              <ID>0</ID>
+                            </Hotkey>
+                          </Hotkeys>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>150</ID>
+                          <Description>"[ Add $1000 ]"</Description>
+                          <Color>00FF00</Color>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+{$Lua}
+if syntaxcheck then return end
+
+if not monopipe then if LaunchMonoDataCollector() == 0 then  error(MessageDialog('Failed to Launch Mono Data Collector', mtError, mbClose)) end end
+
+local method = mono_findMethod('', 'GameData', 'CmdAlterFunds')
+local args={}
+args[1]={}
+args[1].type=vtSingle
+args[1].value = 1000
+local address = gdptrstring
+mono_invoke_method('', method, address,args)
+
+if not syntaxcheck then
+   synchronize(createTimer,60,memrec.setActive,false)
+  end
+ 
+{$asm}
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>151</ID>
+                          <Description>"[ Add $10,000 ]"</Description>
+                          <Color>00FF00</Color>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+{$Lua}
+if syntaxcheck then return end
+
+if not monopipe then if LaunchMonoDataCollector() == 0 then  error(MessageDialog('Failed to Launch Mono Data Collector', mtError, mbClose)) end end
+
+local method = mono_findMethod('', 'GameData', 'CmdAlterFunds')
+local args={}
+args[1]={}
+args[1].type=vtSingle
+args[1].value = 10000
+local address = gdptrstring
+mono_invoke_method('', method, address,args)
+
+if not syntaxcheck then
+   synchronize(createTimer,60,memrec.setActive,false)
+  end
+ 
+{$asm}
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>170</ID>
+                          <Description>"[ Spam Add $100  x 1000]"</Description>
+                          <Color>00FF00</Color>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+{$Lua}
+if syntaxcheck then return end
+
+if not monopipe then if LaunchMonoDataCollector() == 0 then  error(MessageDialog('Failed to Launch Mono Data Collector', mtError, mbClose)) end end
+
+local method = mono_findMethod('', 'GameData', 'CmdAlterFunds')
+local args={}
+args[1]={}
+args[1].type=vtSingle
+args[1].value = 100
+local address = gdptrstring
+mono_invoke_method('', method, address,args)
+
+for x=0, 50, 1 do
+  mono_invoke_method('', method, address,args)
+  sleep(100)
+end
+
+if not syntaxcheck then
+   synchronize(createTimer,60,memrec.setActive,false)
+  end
+ 
+{$asm}
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>218</ID>
+                          <Description>"[ Remove $100 ]"</Description>
+                          <Color>00FF00</Color>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+{$Lua}
+if syntaxcheck then return end
+
+if not monopipe then if LaunchMonoDataCollector() == 0 then  error(MessageDialog('Failed to Launch Mono Data Collector', mtError, mbClose)) end end
+
+local method = mono_findMethod('', 'GameData', 'CmdAlterFunds')
+local args={}
+args[1]={}
+args[1].type=vtSingle
+args[1].value = -100
+local address = gdptrstring
+mono_invoke_method('', method, address,args)
+
+if not syntaxcheck then
+   synchronize(createTimer,60,memrec.setActive,false)
+  end
+ 
+{$asm}
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>220</ID>
+                          <Description>"[ Remove $1000 ]"</Description>
+                          <Color>00FF00</Color>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+{$Lua}
+if syntaxcheck then return end
+
+if not monopipe then if LaunchMonoDataCollector() == 0 then  error(MessageDialog('Failed to Launch Mono Data Collector', mtError, mbClose)) end end
+
+local method = mono_findMethod('', 'GameData', 'CmdAlterFunds')
+local args={}
+args[1]={}
+args[1].type=vtSingle
+args[1].value = -1000
+local address = gdptrstring
+mono_invoke_method('', method, address,args)
+
+if not syntaxcheck then
+   synchronize(createTimer,60,memrec.setActive,false)
+  end
+ 
+{$asm}
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>219</ID>
+                          <Description>"[ Remove $10,000 ]"</Description>
+                          <Color>00FF00</Color>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+{$Lua}
+if syntaxcheck then return end
+
+if not monopipe then if LaunchMonoDataCollector() == 0 then  error(MessageDialog('Failed to Launch Mono Data Collector', mtError, mbClose)) end end
+
+local method = mono_findMethod('', 'GameData', 'CmdAlterFunds')
+local args={}
+args[1]={}
+args[1].type=vtSingle
+args[1].value = -10000
+local address = gdptrstring
+mono_invoke_method('', method, address,args)
+
+if not syntaxcheck then
+   synchronize(createTimer,60,memrec.setActive,false)
+  end
+ 
+{$asm}
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>346</ID>
+                          <Description>"[ Add/Remove Custom Amount ]"</Description>
+                          <Color>00FF00</Color>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+{$Lua}
+if syntaxcheck then return end
+
+if not monopipe then if LaunchMonoDataCollector() == 0 then  error(MessageDialog('Failed to Launch Mono Data Collector', mtError, mbClose)) end end
+
+local method = mono_findMethod('', 'GameData', 'CmdAlterFunds')
+local args={}
+args[1]={}
+args[1].type=vtSingle
+args[1].value = tonumber(inputQuery("Money to add (add - to remove money)", "amount:",""))
+local address = gdptrstring
+mono_invoke_method('', method, address,args)
+
+if not syntaxcheck then
+   synchronize(createTimer,60,memrec.setActive,false)
+  end
+ 
+{$asm}
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>153</ID>
+                          <Description>"========= Franchise =========="</Description>
+                          <GroupHeader>1</GroupHeader>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>152</ID>
+                          <Description>"[ Unlock All Franchise Upgrades ]"</Description>
+                          <Color>00FF00</Color>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+{$Lua}
+if syntaxcheck then return end
+
+if not monopipe then if LaunchMonoDataCollector() == 0 then  error(MessageDialog('Failed to Launch Mono Data Collector', mtError, mbClose)) end end
+
+local method = mono_findMethod('', 'GameData', 'CmdAcquireFranchise')
+local args={}
+args[1]={}
+args[1].type=vtByte
+args[1].value = 1
+local address = gdptrstring
+mono_invoke_method('', method, address,args)
+
+for x=0, 28, 1 do
+  args[1].value = x
+  mono_invoke_method('', method, address,args)
+end
+
+if not syntaxcheck then
+   synchronize(createTimer,60,memrec.setActive,false)
+  end
+ 
+{$asm}
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>162</ID>
+                          <Description>"========= Boxes =========="</Description>
+                          <GroupHeader>1</GroupHeader>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>156</ID>
+                          <Description>"[ Spawn 10 Boxes ]"</Description>
+                          <Color>00FF00</Color>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+{$Lua}
+if syntaxcheck then return end
+
+-- Ensure the Mono Data Collector is running
+if not monopipe then
+    if LaunchMonoDataCollector() == 0 then
+        error(MessageDialog('Failed to Launch Mono Data Collector', mtError, mbClose))
+    end
+end
+
+-- Find the method and prepare arguments
+local method = mono_findMethod('', 'ManagerBlackboard', 'CmdAddProductToSpawnList')
+local args = {}
+args[1] = {}
+args[1].type = vtByte
+args[1].value = 1 -- Example product ID, change as needed
+local address = mbptrstring
+
+-- Invoke the method multiple times
+for x = 0, 10, 1 do
+    mono_invoke_method('', method, address, args)
+end
+
+-- Automatically disable the cheat after execution
+if not syntaxcheck then
+    local timer = createTimer(nil, false)
+    timer.Interval = 60 -- Delay in milliseconds
+    timer.OnTimer = function(timer)
+        memrec.Active = false
+        timer.destroy()
+    end
+    timer.Enabled = true
+end
+
+{$asm}
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>165</ID>
+                          <Description>"[ Spawn 50 Boxes ]"</Description>
+                          <Color>00FF00</Color>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+{$Lua}
+if syntaxcheck then return end
+
+if not monopipe then if LaunchMonoDataCollector() == 0 then  error(MessageDialog('Failed to Launch Mono Data Collector', mtError, mbClose)) end end
+
+local method = mono_findMethod('', 'ManagerBlackboard', 'CmdAddProductToSpawnList')
+local args={}
+args[1]={}
+args[1].type=vtByte
+args[1].value = 42
+local address = mbptrstring
+mono_invoke_method('', method, address,args)
+
+for x=0, 50, 1 do
+  args[1].value = x
+  mono_invoke_method('', method, address,args)
+end
+
+if not syntaxcheck then
+   synchronize(createTimer,60,memrec.setActive,false)
+  end
+ 
+{$asm}
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>164</ID>
+                          <Description>"[ Spawn 250 Boxes ]"</Description>
+                          <Color>00FF00</Color>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+{$Lua}
+if syntaxcheck then return end
+
+if not monopipe then if LaunchMonoDataCollector() == 0 then  error(MessageDialog('Failed to Launch Mono Data Collector', mtError, mbClose)) end end
+
+local method = mono_findMethod('', 'ManagerBlackboard', 'CmdAddProductToSpawnList')
+local args={}
+args[1]={}
+args[1].type=vtByte
+local address = mbptrstring
+
+
+for x=0, 170, 1 do
+  args[1].value = x
+  mono_invoke_method('', method, address,args)
+end
+
+if not syntaxcheck then
+   synchronize(createTimer,60,memrec.setActive,false)
+  end
+ 
+{$asm}
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+</AssemblerScript>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>646</ID>
+                          <Description>"-&gt; Spawn Custom Box"</Description>
+                          <Options moHideChildren="1"/>
+                          <Color>00FF00</Color>
+                          <GroupHeader>1</GroupHeader>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>645</ID>
+                              <Description>"Item IDs (Activate to get list of IDs)"</Description>
+                              <Color>FFFF00</Color>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+{$Lua}
+if syntaxcheck then return end
+
+-- Open a webpage to display item IDs
+os.execute('start "" "https://rentry.co/SMT_itemIDs"')  -- Replace with the actual URL showing item IDs
+
+-- Inform the user that the page is opening
+messageDialog("The item IDs webpage has been opened in your browser.", mtInformation, mbOK)
+
+-- Disable the script after opening the webpage
+local cheatTable = getCheatEntry('OpenWebpage')  -- Replace 'OpenWebpage' with the name of the cheat
+if cheatTable then
+    cheatTable.Active = false
+end
+
+{$asm}
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+</AssemblerScript>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>566</ID>
+                              <Description>"[ Spawn Custom Box ]"</Description>
+                              <Color>00FF00</Color>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript>[ENABLE]
+
+{$Lua}
+if syntaxcheck then return end
+
+local method = mono_findMethod('', 'ManagerBlackboard', 'CmdAddProductToSpawnList')
+
+local itemID = tonumber(inputQuery("Item ID", "Enter the product ID:", ""))
+
+local amount = tonumber(inputQuery("Amount", "Enter the amount to spawn:", ""))
+
+local args = {}
+args[1] = {}
+args[1].type = vtByte
+args[1].value = itemID
+
+local address = mbptrstring
+
+for i = 1, amount do
+    mono_invoke_method('', method, address, args)
+end
+
+local cheatTable = getCheatEntry('SpawnItem')
+if cheatTable then
+    cheatTable.Active = false
+end
+
+{$asm}
+[DISABLE]
+</AssemblerScript>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>698</ID>
+                      <Description>"💣 Infinite Franchise Points (Singleplayer | Multiplayer)"</Description>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>//Send
+[ENABLE]
+{$lua}
+
+mono_compile_method(mono_getJitInfo(getAddress('GameData:get_NetworkgameFranchisePoints')).method)
+
+{$asm}
+aobscanregion(infp,GameData:get_NetworkgameFranchisePoints,GameData:get_NetworkgameFranchisePoints+1a,48 63 86 70 01 00 00 48 8B)
+alloc(newmem,$1000,infp)
+label(code return)
+
+newmem:
+mov [rsi+170],#100
+
+code:
+  movsxd  rax,dword ptr [rsi+00000170]
+  jmp return
+
+infp:
+  jmp newmem
+  nop 2
+return:
+registersymbol(infp)
+
+[DISABLE]
+
+infp:
+  db 48 63 86 70 01 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>599</ID>
+                      <Description>"💣 Grab Product-In-Hand Data (Singleplayer | Multiplayer)"</Description>
+                      <Options moHideChildren="1"/>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>//Send@FearlessRevolution|Sintrix
+[ENABLE]
+
+aobscanregion(playernetwork_boxdata,PlayerNetwork:Update,PlayerNetwork:Update+104,48 8B F1 C7 85 F8 F8 FF FF 00 00 00 00)
+alloc(newmem,$1000,playernetwork_boxdata)
+registersymbol(held_box)
+label(code return held_box)
+
+newmem:
+mov [held_box],rcx
+
+code:
+  mov rsi,rcx
+  mov [rbp-00000748],00000000
+  jmp return
+
+held_box:
+dq 0
+
+playernetwork_boxdata:
+  jmp newmem
+  nop 8
+return:
+registersymbol(playernetwork_boxdata)
+
+[DISABLE]
+
+playernetwork_boxdata:
+  db 48 8B F1 C7 85 F8 F8 FF FF 00 00 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+
+</AssemblerScript>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>600</ID>
+                          <Description>"Set Product ID"</Description>
+                          <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">0:Panzati Pasta Penne
+1:Montuq Water Bottle
+2:Honey Bees Cereal
+3:Elo Rice
+4:Labalaine Salt
+5:Daron Light Brown Sugar
+6:Etron Margarine
+7:Kraftung Flour
+8:Bio Apple Juice
+9:Tupgies Olive Oil
+10:Kekette Ketchup
+11:Ron's Sliced Bread
+12:Alei Pepper
+13:Bio Orange Juice
+14:HotHot Barbecue Sauce
+15:Maptite Mustard Sauce
+16:Elo Spaghetti
+17:Stark Tuna Pate
+18:Racoon Fiber Cereals
+19:Aio Supreme Flour
+20:NarValo Black Coffee
+21:Bio Egg Box
+22:Bibi Houmous
+23:Sublett White Flour
+24:Daron Cane Sugar
+25:Pablo Sugar
+26:Barillo Maccaroni
+27:Daron Ecologic Sugar
+28:Daron Brown Sugar
+29:Lespieds Sunflower Oil
+30:Puray Mash Potatoes
+31:Miamm Bag of Potatoes
+32:NarValo Espresso Coffee
+33:Lustupacru Basmati Rice
+34:Uncle Tony's Long Grain Rice
+35:NarValo Coffee
+36:Lustupacru Supreme Pasta
+37:Racoon Chocolate Cereal
+38:Fort-lacs Premium Water Bottle
+39:Flotte Spring Water
+40:Boully Powdered Sugar
+41:Susu Sugar (Big Box)
+42:Susu Brown Sugar (Big Box)
+43:Mimolette Emmental Cheese
+44:Mimolette Gruyere Cheese
+45:Comte Skimmed Cheese
+46:Frugen! Fruit Yoghurt
+47:Yowp Vanilla Yogurt
+48:Bourlait Milk Brick
+49:Paysans Butter
+50:Don Bernardo Parmigiano Cheese
+51:Stereoprice Reggiano Cheese
+52:Don Bernardo Mozzarella Cheese
+53:Madone Skimmed Yogurt
+54:PokaBola Cola Pack
+55:Zap-Soda Soda Pack
+56:Soda-Pop Decaf Soda Pack
+57:Zap-Soda Soda Bottle
+58:Koujeima Cola Bottle
+59:Soda-Pop Sugar Free Soda Bottle
+60:BokaBola Premium Soda
+61:ChezzyPizz Barbeque Pizza
+62:Prypiat Fondue
+63:Ronpoint Crocanti Ham
+64:Prypiat Ham &amp; Cheese Crepe
+65:Vandama French Fries
+66:Spok Crispy Potatoe Pos
+67:MrBean Green Beans
+68:BigTony Four Cheese Pizza
+69:Mafia Four Seasons Pizza
+70:Brrr Vegetable Mix
+71:Brrr Chicken Mix
+72:Moussaka Bolognaise Lasagna
+73:Moussaka Vegetable Lasagna
+74:Signoulos Toothpaste
+75:Petus Toilet Paper
+76:Pur Hand Soap
+77:MaPei Avocado Shampoo
+78:Dope Egg Shampoo
+79:MaPei Bath Gel
+80:Bidet Toilet Paper
+81:Sapu Mango Soap
+82:MaPei Extra Soft Shampoo
+83:ImotepBio Jojoba Honey Shampoo
+84:Koyo Argan Oil Shampoo
+85:Compact Paper Towel
+86:Doudou Double Side Toilet Paper
+87:Mouss Lemon Soap
+88:MaPei Premium Bath Gel
+89:MaPei Baby Shampoo
+90:MaPei Detergent
+91:Wesh Stain Remover
+92:Touprop Glass Cleaner
+93:Cemagik Detergent Tables
+94:Cleandish Dishwasher
+95:JajaVevel Bleach
+96:WCBoeff Bleach (Big Bottle)
+97:Souplesse Softener
+98:Toudou Premium Detergent
+99:Kilemol Insecticide
+100:LeTriangle Cleaning Cloths
+101:Boum Premium Capsules
+102:JajaVevel Premium Bleach
+103:JajaVevel Ammonia
+104:Delitout Cookie Jar
+105:Delitout Maxi Cone
+106:Patartine Chocolate Spread
+107:Boudain Chocolate Powder
+108:Vin's Chips
+109:Bonbek Sweet Bonbek
+110:Delitout Peach Jam
+111:Delitout Ice Cream Box
+112:Chocotte Chocolate Box
+113:Mabre Chocolate Biscuit
+114:Prairie Vanilate Biscuit
+115:StMichmich Madeleine
+116:Delitout Strawberry Jam
+117:Delitout Peanut Butter
+118:MacChipos Chipos
+119:Bonbek Marshmallows
+120:Gerbe Lemon Biscuit
+121:BonPapa Hazelnut Biscuit
+122:Extra Premium Ice Cream
+123:Delitout Honey
+124:Delitout Premium Chocolate Box
+125:Covidos Foditos
+126:Pepites Premium Cake
+127:HaveSomeBeef Chopped Beef
+128:HaveSomeBeef Pure Beef
+129:HaveSomeBeef Veal
+130:HaveSomeBeef Chicken Wings
+131:HaveSomeBeef Chicken
+132:HaveSomeBeef Parma Ham
+133:HaveSomeBeef Sliced Ham
+134:Bio Peas (Big)
+135:Captain Quintus Tuna (Big)
+136:Bio Red Beans
+137:Purr Purr Cat Food
+138:PatPat Cat Food
+139:PatPat Dog Food
+140:Bio Green Tea
+141:Bio Lemon Tea
+142:Bio Black Tea
+143:Bio Peppermint
+144:Bio Mint
+145:Bio Valerian
+146:Sushinet Sushi (Big)
+147:Sushinet Sushi (Small)
+148:Norway Smoked Salmon
+149:Sushinet Crab Sticks
+150:Bookapop Electromagnetic (Book)
+151:Bookapop Surprise (Book)
+152:Bookapop ABC (Book)
+153:Bookapop Mother &amp; Child (Book)
+154:Bookapop Colors (Book)
+155:Bookapop Piticha (Book)
+156:Bookapop OnceUpon (Book)
+157:Bookapop Krok (Book)
+158:Bookapop Adventures (Book)
+159:Bookapop Donnine (Book)
+160:Bookapop Vintage (Book)
+161:Bookapop I Won't Share (Book)
+162:BK Beer Pack
+163:Teochew Beer Pack
+164:Fess Beer Pack
+165:DEGL Beer Barrel
+166:Fess Beer Barrel
+167:Magnat Vodka
+168:Heng Heng Red Wine
+169:Chebon Rose Wine
+170:Chebon White Wine
+171:Teochew Teochew
+172:Eay Premium Vodka
+173:TeiaoChen Japanese Whiskey
+174:Grand Master Premium Whiskey
+175:Jack Sublett Premium Whiskey
+176:Farmanautics Hydrogen Perofxide
+177:Farmanautics Disinfectant
+178:Farmanautics Ibuprofen
+179:Farmanautics Paracetamol
+180:Farmanautics Bandaids
+181:Farmanautics Laxative
+182:Farmanautics Antihistamine
+183:Naturreach Zinc Supplement
+184:Naturreach Antioxidant
+185:Naturreach Fish Oil
+186:Naturreach Algae Pills
+187:Naturreach Vitamins
+188:Naturreach Melatonin
+189:Farmanautics Sunscreen
+190:Farmanautics Stretch Cream
+191:VegeBiz Red Apple Tray
+192:VegeBiz Green Apple Tray
+193:VegeBiz Clementine Tray
+194:VegeBiz Orange Tray
+195:VegeBiz Pear Tray
+196:VegeBiz Lemon Tray
+197:VegeBiz Mango Tray
+198:VegeBiz Avocado Tray
+199:VegeBiz Kiwi Tray
+200:VegeBiz Papaya Tray
+201:VegeBiz Strawberry Tray
+202:VegeBiz Cherry Tray
+203:VegeBiz Artichoke Tray
+204:VegeBiz Zucchini Tray
+205:VegeBiz Carrot Tray
+206:VegeBiz Tomato Tray
+207:VegeBiz Potato Tray
+208:VegeBiz Onion Tray
+209:VegeBiz Banana Pack
+210:VegeBiz Melon
+211:VegeBiz Pineapple
+212:VegeBiz Pumpkin
+213:VegeBiz Watermelon
+214:CaringTender BabyFood: Vegetables
+215:CaringTender BabyFood: Fish
+216:CaringTender BabyFood: Fruits
+217:CaringTender BabyFood: Meat
+218:CaringTender Nutritive Milk Mix
+219:CaringTender Nutritive Milk Powder
+220:CaringTender Ecologic Diapers
+221:CaringTender Basic Diapers
+222:CaringTender Toddler Diapers
+223:CaringTender Premium Diapers
+224:CaringTender Aloe Baby Wipes
+225:CaringTender Basic Baby Wipes
+226:CaringTender Baby Powder
+*:Your hands are empty! (Invalid Product)
+</DropDownList>
+                          <VariableType>4 Bytes</VariableType>
+                          <Address>[held_box]+150</Address>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>601</ID>
+                          <Description>"Set Amount"</Description>
+                          <DropDownList DescriptionOnly="1" DisplayValueAsItem="1">4294967295:Your hands are empty! (Invalid Amount)
+</DropDownList>
+                          <VariableType>4 Bytes</VariableType>
+                          <Address>[held_box]+154</Address>
+                          <Hotkeys>
+                            <Hotkey>
+                              <Action>Increase Value</Action>
+                              <Keys>
+                                <Key>17</Key>
+                                <Key>49</Key>
+                              </Keys>
+                              <Value>1</Value>
+                              <Description>Increase By x1</Description>
+                              <ID>0</ID>
+                            </Hotkey>
+                            <Hotkey>
+                              <Action>Decrease Value</Action>
+                              <Keys>
+                                <Key>17</Key>
+                                <Key>50</Key>
+                              </Keys>
+                              <Value>1</Value>
+                              <Description>Decrease By x1</Description>
+                              <ID>1</ID>
+                            </Hotkey>
+                            <Hotkey>
+                              <Action>Set Value</Action>
+                              <Keys>
+                                <Key>17</Key>
+                                <Key>52</Key>
+                              </Keys>
+                              <Value>0</Value>
+                              <Description>Empty Box</Description>
+                              <ID>2</ID>
+                            </Hotkey>
+                            <Hotkey>
+                              <Action>Toggle Activation</Action>
+                              <Keys>
+                                <Key>17</Key>
+                                <Key>51</Key>
+                              </Keys>
+                              <Description>Freeze Amount</Description>
+                              <ID>3</ID>
+                            </Hotkey>
+                          </Hotkeys>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>602</ID>
+                              <Description>"Ctrl+1 - Increase Amount x1"</Description>
+                              <GroupHeader>1</GroupHeader>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>603</ID>
+                              <Description>"Ctrl+2 - Decrease Amount x1"</Description>
+                              <GroupHeader>1</GroupHeader>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>604</ID>
+                              <Description>"Ctrl+3 - Freeze Amount"</Description>
+                              <GroupHeader>1</GroupHeader>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>605</ID>
+                              <Description>"Ctrl+4 - Empty Box"</Description>
+                              <GroupHeader>1</GroupHeader>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>110</ID>
+                      <Description>"💣 Grab Position Data  (Singleplayer | Multiplayer)"</Description>
+                      <Options moHideChildren="1"/>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>{ Game   : Supermarket Together.exe
+  Version: 
+  Date   : 2024-08-13
+  Author : User
+
+  This script does blah blah blah
+}
+
+define(address,"UnityPlayer.dll"+1336BE8)
+define(bytes,F2 0F 10 8E F8 01 00 00)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,"UnityPlayer.dll"+1336BE8)
+alloc(position,8)
+registersymbol(position)
+label(code)
+label(return)
+
+newmem:
+
+code:
+  mov [position], rsi
+  movsd xmm1,[rsi+000001F8]
+  jmp return
+
+address:
+  jmp newmem
+  nop 3
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+  // movsd xmm1,[rsi+000001F8]
+
+dealloc(newmem)
+dealloc(position)
+unregistersymbol(position)
+
+{
+// ORIGINAL CODE - INJECTION POINT: UnityPlayer.dll+1336BE8
+
+UnityPlayer.dll+1336BBD: F3 0F 59 C9              - mulss xmm1,xmm1
+UnityPlayer.dll+1336BC1: F3 0F 58 DA              - addss xmm3,xmm2
+UnityPlayer.dll+1336BC5: F3 0F 58 D9              - addss xmm3,xmm1
+UnityPlayer.dll+1336BC9: 41 0F 2E D9              - ucomiss xmm3,xmm9
+UnityPlayer.dll+1336BCD: 74 5C                    - je UnityPlayer.dll+1336C2B
+UnityPlayer.dll+1336BCF: 48 8B 01                 - mov rax,[rcx]
+UnityPlayer.dll+1336BD2: 48 8D 55 A0              - lea rdx,[rbp-60]
+UnityPlayer.dll+1336BD6: FF 90 90 00 00 00        - call qword ptr [rax+00000090]
+UnityPlayer.dll+1336BDC: F2 0F 10 86 F0 01 00 00  - movsd xmm0,[rsi+000001F0]
+UnityPlayer.dll+1336BE4: 48 8D 55 A0              - lea rdx,[rbp-60]
+// ---------- INJECTING HERE ----------
+UnityPlayer.dll+1336BE8: F2 0F 10 8E F8 01 00 00  - movsd xmm1,[rsi+000001F8]
+// ---------- DONE INJECTING  ----------
+UnityPlayer.dll+1336BF0: F2 0F 10 96 00 02 00 00  - movsd xmm2,[rsi+00000200]
+UnityPlayer.dll+1336BF8: 48 8B 8E E8 01 00 00     - mov rcx,[rsi+000001E8]
+UnityPlayer.dll+1336BFF: 66 0F 5A C0              - cvtpd2ps xmm0,xmm0
+UnityPlayer.dll+1336C03: 66 0F 5A C9              - cvtpd2ps xmm1,xmm1
+UnityPlayer.dll+1336C07: F3 0F 11 45 B0           - movss [rbp-50],xmm0
+UnityPlayer.dll+1336C0C: 0F 10 46 10              - movups xmm0,[rsi+10]
+UnityPlayer.dll+1336C10: 66 0F 5A D2              - cvtpd2ps xmm2,xmm2
+UnityPlayer.dll+1336C14: 0F 11 45 A0              - movups [rbp-60],xmm0
+UnityPlayer.dll+1336C18: F3 0F 11 4D B4           - movss [rbp-4C],xmm1
+UnityPlayer.dll+1336C1D: F3 0F 11 55 B8           - movss [rbp-48],xmm2
+}
+</AssemblerScript>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>111</ID>
+                          <Description>"Position"</Description>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>4 Bytes</VariableType>
+                          <Address>position</Address>
+                          <Offsets>
+                            <Offset>0</Offset>
+                          </Offsets>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>112</ID>
+                              <Description>"1f4&gt; X"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>Float</VariableType>
+                              <Address>+1f4</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>113</ID>
+                              <Description>"1fc&gt; Y"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>Float</VariableType>
+                              <Address>+1fc</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>114</ID>
+                              <Description>"204&gt; Z"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>Float</VariableType>
+                              <Address>+204</Address>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>766</ID>
+                      <Description>"💣 Super Sprint  (Singleplayer | Multiplayer"</Description>
+                      <Options moHideChildren="1"/>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>//Send@Sintrix
+[ENABLE]
+
+
+aobscanregion(super_sprint,StarterAssets.FirstPersonController:Move,StarterAssets.FirstPersonController:Move+bf,48 8B F1 C7 85 C0 FB FF FF 00 00 00 00)
+alloc(newmem,$1000,super_sprint)
+registersymbol(sprint_flag)
+label(code return sprint_flag)
+
+newmem:
+cmp [sprint_flag],1
+jne @f
+mov [rsi+48],(float)80
+movss xmm2,[rsi+48]
+jmp return
+
+@@:
+mov [rsi+48],(float)32
+
+code:
+  mov rsi,rcx
+  mov [rbp-00000440],00000000
+  jmp return
+
+sprint_flag:
+dd 0
+
+super_sprint:
+  jmp newmem
+  nop 8
+return:
+registersymbol(super_sprint)
+
+[DISABLE]
+
+super_sprint:
+  db 48 8B F1 C7 85 C0 FB FF FF 00 00 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>534</ID>
+                          <Description>"Toggle On/Off"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>//Send@FearlessRevolution
+[ENABLE]
+sprint_flag:
+dd 1
+
+[DISABLE]
+sprint_flag:
+dd 0
+
+</AssemblerScript>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>462</ID>
+                      <Description>"💣 Super Jump  (Singleplayer | Multiplayer)"</Description>
+                      <Options moHideChildren="1"/>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>//Send@Sintrix
+[ENABLE]
+
+
+aobscanregion(jumpheight,StarterAssets.FirstPersonController:JumpAndGravity+3d,StarterAssets.FirstPersonController:JumpAndGravity+166,F3 0F 10 46 54 F3 0F 5A C0 F3)
+alloc(newmem,$1000,jumpheight)
+label(code return)
+
+newmem:
+
+code:
+  movss xmm0,[njh]
+  jmp return
+
+njh:
+dd (float)15
+
+jumpheight:
+  jmp newmem
+return:
+registersymbol(jumpheight)
+
+[DISABLE]
+
+jumpheight:
+  db F3 0F 10 46 54
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>682</ID>
+                      <Description>"💣 Toggle Fly Mode (Hold Space - Singleplayer | Multiplayer)"</Description>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>//Send@Sintrix
+[ENABLE]
+
+
+aobscanregion(isgrounded,StarterAssets.FirstPersonController:JumpAndGravity,StarterAssets.FirstPersonController:JumpAndGravity+af,0F B6 46 64 85 C0 0F 84)
+alloc(newmem,$1000,isgrounded)
+label(code return)
+
+newmem:
+mov [rsi+64],1
+
+code:
+  movzx eax,byte ptr [rsi+64]
+  test eax,eax
+  jmp return
+
+isgrounded:
+  jmp newmem
+  nop
+return:
+registersymbol(isgrounded)
+
+[DISABLE]
+
+isgrounded:
+  db 0F B6 46 64 85 C0
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>571</ID>
+                      <Description>"💣 Set Product Price 10¢  (Only works with your client. - Singleplayer | Multiplayer)"</Description>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>//Send@Sintrix
+[ENABLE]
+{$lua}
+
+mono_compile_method(mono_getJitInfo(getAddress('ManagerBlackboard:AddShoppingListProduct')).method)
+
+{$asm}
+aobscanregion(productcost,ManagerBlackboard:AddShoppingListProduct,ManagerBlackboard:AddShoppingListProduct+1fd,F3 0F 11 95 60 FF FF FF)
+alloc(newmem,$1000,productcost)
+label(code return)
+
+newmem:
+movss xmm2,[newcost]
+
+code:
+  movss [rbp-000000A0],xmm2
+  jmp return
+
+newcost:
+dd (float)0.1
+
+productcost:
+  jmp newmem
+  nop 3
+return:
+registersymbol(productcost)
+
+[DISABLE]
+
+productcost:
+  db F3 0F 11 95 60 FF FF FF
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>761</ID>
+                      <Description>"💣 Employees Have Infinite Products  (Singleplayer | Multiplayer)"</Description>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>//Send@Sintrix
+define(address,NPC_Info:SerializeSyncVars+170)
+define(bytes,49 63 97 4C 01 00 00)
+
+[ENABLE]
+
+
+
+assert(address,bytes)
+alloc(newmem,$1000,NPC_Info:SerializeSyncVars+170)
+
+label(code)
+label(return)
+
+newmem:
+mov [r15+14C],#30
+
+code:
+  movsxd  rdx,dword ptr [r15+0000014C]
+  jmp return
+
+address:
+  jmp newmem
+  nop 2
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+
+dealloc(*)
+
+</AssemblerScript>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>697</ID>
+                      <Description>"💣 Fast Employee Restocking  (Singleplayer | Multiplayer)"</Description>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>//Send@Sintrix
+define(address,NPC_Manager:EmployeeNPCControl+38b2)
+define(bytes,F3 0F 10 80 AC 01 00 00)
+
+[ENABLE]
+assert(address,bytes)
+alloc(newmem,$1000,NPC_Manager:EmployeeNPCControl+38b2)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  movss xmm0,[rax+000001AC]
+  xorps xmm0,xmm0
+  jmp return
+
+address:
+  jmp newmem
+  nop 3
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+dealloc(*)
+
+</AssemblerScript>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>752</ID>
+                      <Description>"💣 Customers Instantly Place Items At Checkout  (Singleplayer | Multiplayer)"</Description>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>//Send@Sintrix
+[ENABLE]
+
+
+aobscanregion(productitemplacewait,NPC_Info:FixedUpdate+4,NPC_Info:FixedUpdate+113,0FB6??????????85??0F84????????4863??????????85??0F8E)
+alloc(newmem,$1000,productitemplacewait)
+label(code return)
+
+newmem:
+mov [rsi+164],(float)0
+code:
+  movzx eax,byte ptr [rsi+0000013C]
+  jmp return
+
+productitemplacewait:
+  jmp newmem
+  nop 2
+return:
+registersymbol(productitemplacewait)
+
+[DISABLE]
+
+productitemplacewait:
+  db 0F B6 86 3C 01 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>762</ID>
+                      <Description>"💣 Free Decorations In Builder Menu  (Singleplayer | Multiplayer)"</Description>
+                      <GroupHeader>1</GroupHeader>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>758</ID>
+                          <Description>"Activate 1 (Required)"</Description>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>//Send@Sintrix
+define(address,Builder_Main:RetrieveBuilderInfo+d9)
+define(bytes,F3 0F 11 AF 28 01 00 00)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,Builder_Main:RetrieveBuilderInfo+d9)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  xorps xmm5,xmm5
+  movss [rdi+00000128],xmm5
+  jmp return
+
+address:
+  jmp newmem
+  nop 3
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+dealloc(*)
+
+</AssemblerScript>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>760</ID>
+                              <Description>"Activate 2 (Required)"</Description>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript>//Send@Sintrix
+define(address,Builder_Main:RetrieveBuilderInfo+cc)
+define(bytes,F3 0F 10 46 34)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,Builder_Main:RetrieveBuilderInfo+cc)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  movss xmm0,[rsi+34]
+  xorps xmm0,xmm0
+  jmp return
+
+address:
+  jmp newmem
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+
+dealloc(*)
+
+</AssemblerScript>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>757</ID>
+                      <Description>"💣Place Buildables Anywhere  (Singleplayer | Multiplayer)"</Description>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>define(address,Builder_Main:BuildableBehaviour+c8)
+define(bytes,0F B6 86 00 01 00 00)
+
+define(address2,Builder_Main:BuildableBehaviour+17a)
+define(bytes2,0F B6 86 00 01 00 00)
+
+define(address3,Builder_Main:BuildableBehaviour+243)
+define(bytes3,0F B6 86 00 01 00 00)
+
+define(address4,Builder_Main:DecorationBehaviour+1bc)
+define(bytes4,C6 86 00 01 00 00 00)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,Builder_Main:BuildableBehaviour+c8)
+
+label(code)
+label(return)
+
+newmem:
+mov [rsi+100],1
+code:
+  movzx eax,byte ptr [rsi+00000100]
+  jmp return
+
+address:
+  jmp newmem
+  nop 2
+return:
+
+assert(address2,bytes2)
+alloc(newmem2,$1000,Builder_Main:BuildableBehaviour+17a)
+
+label(code2)
+label(return2)
+
+newmem2:
+mov [rsi+100],1
+code2:
+  movzx eax,byte ptr [rsi+00000100]
+  jmp return2
+
+address2:
+  jmp newmem2
+  nop 2
+return2:
+
+assert(address3,bytes3)
+alloc(newmem3,$1000,Builder_Main:BuildableBehaviour+243)
+
+label(code3)
+label(return3)
+
+newmem3:
+mov [rsi+100],1
+
+code3:
+  movzx eax,byte ptr [rsi+00000100]
+  jmp return3
+
+address3:
+  jmp newmem3
+  nop 2
+return3:
+
+assert(address4,bytes4)
+alloc(newmem4,$1000,Builder_Main:DecorationBehaviour+1bc)
+
+label(code4)
+label(return4)
+
+newmem4:
+
+code4:
+  mov byte ptr [rsi+00000100],01
+  jmp return4
+
+address4:
+  jmp newmem4
+  nop 2
+return4:
+
+[DISABLE]
+
+address:
+  db bytes
+
+address2:
+  db bytes2
+
+address3:
+  db bytes3
+
+
+address4:
+  db bytes4
+
+dealloc(*)
+
+</AssemblerScript>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>724</ID>
+                      <Description>"💣 Purchase Buildables Without Sufficient Funds  (Singleplayer | Multiplayer)"</Description>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>//Send@Sintrix
+[ENABLE]
+aobscanregion(buildfunds,Builder_Main:BuildableBehaviour,Builder_Main:BuildableBehaviour+801,F3??????????????F3??????66??????76??48B8)
+alloc(newmem,$1000,buildfunds)
+label(code return)
+
+newmem:
+
+code:
+  mov [rsi+100],(float)0
+  movss xmm1,[rsi+100]
+  jmp return
+
+buildfunds:
+  jmp newmem
+  nop 3
+return:
+registersymbol(buildfunds)
+
+[DISABLE]
+
+buildfunds:
+  db F3 0F 10 8E 00 01 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+
+</AssemblerScript>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>753</ID>
+                      <Description>"💣Free DLC Tablet Purchases  (Singleplayer | Multiplayer)"</Description>
+                      <VariableType>Auto Assembler Script</VariableType>
+                      <AssemblerScript>//Send@sintrix
+define(address,Builder_Paintables:SetPricesAndNumbers+9b)
+define(bytes,F3 0F 10 40 30)
+
+[ENABLE]
+
+
+assert(address,bytes)
+alloc(newmem,$1000,Builder_Paintables:SetPricesAndNumbers+9b)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  movss xmm0,[rax+30]
+  xorps xmm0,xmm0
+  jmp return
+
+address:
+  jmp newmem
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+
+dealloc(*)
+
+</AssemblerScript>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>331</ID>
+                      <Description>"→ Experimental"</Description>
+                      <Options moHideChildren="1"/>
+                      <Color>0080FF</Color>
+                      <GroupHeader>1</GroupHeader>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>448</ID>
+                          <Description>"Note: Must be re-enabled when joining a new lobby."</Description>
+                          <Color>0080FF</Color>
+                          <GroupHeader>1</GroupHeader>
+                        </CheatEntry>
+                        <CheatEntry>
+                          <ID>442</ID>
+                          <Description>"→ [ Experimental Lobby Functions ]"</Description>
+                          <Options moHideChildren="1"/>
+                          <Color>0080FF</Color>
+                          <VariableType>Auto Assembler Script</VariableType>
+                          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+alloc(newvec,16)
+registersymbol(newvec)
+
+newvec:
+dq (int)2402773133328
+
+newvec+10:
+dd (float)2
+
+newvec+14:
+dd (float)2
+
+newvec+18:
+dd (float)2
+
+
+{$Lua}
+if syntaxcheck then return end
+local Base= getAddress("UnityPlayer.dll");
+local nBase= Base + 0x01BD61c0;
+local mBase = Base + 0x01C50e28;
+
+local nspawnPointer = readPointer(readPointer(readPointer(readPointer(readPointer(readPointer(readPointer(nBase)+0x1f0)+0x0)+0x90)+0x110)+0xc0)+0x128)+0x0;
+local mbboardPointer = readPointer(readPointer(readPointer(readPointer(readPointer(readPointer(readPointer(mBase)+0x150)+0x28)+0x8)+0x8)+0x88)+0x28)+0x0;
+registerSymbol("mbboardptr2", mbboardPointer );
+registerSymbol("nspawnptr",nspawnPointer);
+nspawnptrstring = string.format("0x%X",nspawnPointer)
+mbptrstring2 = string.format("0x%X",mbboardPointer )
+
+{$asm}
+
+[DISABLE]
+{$lua}
+
+unregisterSymbol("nspawnptr")
+{$asm}
+dealloc(*)
+unregistersymbol(*)
+
+
+
+</AssemblerScript>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>443</ID>
+                              <Description>"Debug: NetworkSpawner Pointer"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>nspawnptr</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>565</ID>
+                              <Description>"Debug: ManagerBlackboard Pointer"</Description>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>4 Bytes</VariableType>
+                              <Address>mbboardptr2</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>422</ID>
+                              <Description>"Debug: Object (Vector3)"</Description>
+                              <Options moHideChildren="1"/>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>newvec</Address>
+                              <CheatEntries>
+                                <CheatEntry>
+                                  <ID>424</ID>
+                                  <Description>"10&gt; X"</Description>
+                                  <ShowAsSigned>0</ShowAsSigned>
+                                  <VariableType>Float</VariableType>
+                                  <Address>+10</Address>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>423</ID>
+                                  <Description>"14&gt; Y"</Description>
+                                  <ShowAsSigned>0</ShowAsSigned>
+                                  <VariableType>Float</VariableType>
+                                  <Address>+14</Address>
+                                </CheatEntry>
+                                <CheatEntry>
+                                  <ID>425</ID>
+                                  <Description>"18&gt; Z"</Description>
+                                  <ShowAsSigned>0</ShowAsSigned>
+                                  <VariableType>Float</VariableType>
+                                  <Address>+18</Address>
+                                </CheatEntry>
+                              </CheatEntries>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>420</ID>
+                              <Description>"💣 Spawn Props "</Description>
+                              <Color>00FF00</Color>
+                              <VariableType>Auto Assembler Script</VariableType>
+                              <AssemblerScript>[ENABLE]
+usemono()
+{$Lua}
+
+if syntaxcheck then return end
+
+if not monopipe then  error(MessageDialog('Failed to Launch Mono Data Collector', mtError, mbClose)) end
+
+local method = mono_findMethod('', 'NetworkSpawner', 'CmdSpawnProp')
+
+local vector = newvec
+local address = nspawnptrstring
+local propId = tonumber(inputQuery("Prop ID 2-5", "ID:",""))
+local amount = tonumber(inputQuery("Amount 1-500 (higher number wil get laggy)", "Amount:",""))
+
+
+local args={}
+args[1]={}
+args[1].type=vtDword
+args[1].value = propId
+args[2]={}
+args[2].type=vtPointer
+args[2].value = vector
+args[3]={}
+args[3].type=vtPointer
+args[3].value = vector
+
+mono_invoke_method('', method, address,args)
+
+for x=0, amount, 1 do
+  sleep(50)
+  args[1].value = propId
+  args[2].value = vector
+  args[3].value = vector
+  mono_invoke_method('', method, address,args)
+end
+
+
+if not syntaxcheck then
+   synchronize(createTimer,60,memrec.setActive,false)
+  end
+ 
+{$asm}
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+</AssemblerScript>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>42</ID>
+          <Description>"🌟 Pointers"</Description>
+          <Options moHideChildren="1"/>
+          <Color>FF8000</Color>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>674</ID>
+              <Description>"→ Game Data (Edit Money &amp; Franchise Points)"</Description>
+              <Options moHideChildren="1"/>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"UnityPlayer.dll"+01B3BE00</Address>
+              <Offsets>
+                <Offset>0</Offset>
+                <Offset>20</Offset>
+                <Offset>38</Offset>
+                <Offset>F8</Offset>
+                <Offset>60</Offset>
+                <Offset>330</Offset>
+                <Offset>570</Offset>
+                <Offset>0</Offset>
+                <Offset>0</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>486</ID>
+                  <Description>"Set Game Funds"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>+168</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>488</ID>
+                  <Description>"Set Franchise Points"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>+170</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>489</ID>
+                  <Description>"Set Game Day"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>+174</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>491</ID>
+                  <Description>"Set Franchise Level"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>+18c</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>490</ID>
+                  <Description>"Set Difficulty"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>+194</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>725</ID>
+              <Description>"→ (Alternative) Grab Game Data"</Description>
+              <Options moHideChildren="1"/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>//Send@Sintrix
+
+[ENABLE]
+aobscanregion(gamedata_alt,GameData:TrashManager+2,GameData:TrashManager+42,4863??????????83????0F8C????????0FB6)
+alloc(newmem,$1000,gamedata_alt)
+label(code return gamedata)
+
+newmem:
+mov [gamedata],rsi
+
+code:
+  movsxd  rax,dword ptr [rsi+00000174]
+  jmp return
+
+gamedata:
+dq 0
+
+gamedata_alt:
+  jmp newmem
+  nop 2
+return:
+registersymbol(gamedata_alt)
+registersymbol(gamedata)
+[DISABLE]
+
+gamedata_alt:
+  db 48 63 86 74 01 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>726</ID>
+                  <Description>"Funds"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>[gamedata]+168</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>727</ID>
+                  <Description>"Franchise Points"</Description>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[gamedata]+170</Address>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>728</ID>
+                      <Description>"Franchise Experience"</Description>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>[gamedata]+16C</Address>
+                    </CheatEntry>
+                    <CheatEntry>
+                      <ID>729</ID>
+                      <Description>"Franchise Level"</Description>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>[gamedata]+18C</Address>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>730</ID>
+                  <Description>"Game Day"</Description>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[gamedata]+174</Address>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>731</ID>
+                      <Description>"Time of Day"</Description>
+                      <VariableType>Float</VariableType>
+                      <Address>[gamedata]+17C</Address>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>732</ID>
+                  <Description>"Difficulty"</Description>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>[gamedata]+194</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>733</ID>
+                  <Description>"Electricity Cost"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>[gamedata]+1C0</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>734</ID>
+                  <Description>"Rent Cost"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>[gamedata]+1C4</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>735</ID>
+                  <Description>"Time Factor"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>[gamedata]+1D8</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>736</ID>
+                  <Description>"Employee Cost"</Description>
+                  <VariableType>Float</VariableType>
+                  <Address>[gamedata]+1C8</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>496</ID>
+              <Description>"→ NPC Manager"</Description>
+              <Options moHideChildren="1"/>
+              <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">??:Invalid Ptr
+</DropDownList>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"UnityPlayer.dll"+01C50E28</Address>
+              <Offsets>
+                <Offset>0</Offset>
+                <Offset>28</Offset>
+                <Offset>88</Offset>
+                <Offset>8</Offset>
+                <Offset>28</Offset>
+                <Offset>150</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>500</ID>
+                  <Description>"Set Max Employee #"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>+1A0</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>34</ID>
+              <Description>"→ Upgrades Manager"</Description>
+              <Options moHideChildren="1"/>
+              <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">??:Invalid Ptr
+</DropDownList>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"UnityPlayer.dll"+01B3BE00</Address>
+              <Offsets>
+                <Offset>D0</Offset>
+                <Offset>60</Offset>
+                <Offset>368</Offset>
+                <Offset>960</Offset>
+                <Offset>0</Offset>
+                <Offset>0</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>21</ID>
+                  <Description>"Space Bought"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>+b8</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>22</ID>
+                  <Description>"Storage Bought"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>+bc</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>25</ID>
+                  <Description>"Space Price"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>+c8</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>26</ID>
+                  <Description>"Storage Price"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>+cc</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>140</ID>
+              <Description>"→ Position (Shift+C - Teleport to DLC Room.  Shift+X - Teleport to Manager's Office.)"</Description>
+              <Options moHideChildren="1"/>
+              <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">??:Invalid Ptr
+</DropDownList>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"UnityPlayer.dll"+01B6CED0</Address>
+              <Offsets>
+                <Offset>0</Offset>
+                <Offset>0</Offset>
+                <Offset>60</Offset>
+                <Offset>0</Offset>
+                <Offset>48</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>146</ID>
+                  <Description>"X"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>+1f4</Address>
+                  <Hotkeys>
+                    <Hotkey>
+                      <Action>Set Value</Action>
+                      <Keys>
+                        <Key>16</Key>
+                        <Key>67</Key>
+                      </Keys>
+                      <Value>2.83</Value>
+                      <ID>0</ID>
+                    </Hotkey>
+                    <Hotkey>
+                      <Action>Set Value</Action>
+                      <Keys>
+                        <Key>16</Key>
+                        <Key>88</Key>
+                      </Keys>
+                      <Value>2.6</Value>
+                      <ID>1</ID>
+                    </Hotkey>
+                  </Hotkeys>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>147</ID>
+                  <Description>"Y"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>+1fc</Address>
+                  <Hotkeys>
+                    <Hotkey>
+                      <Action>Set Value</Action>
+                      <Keys>
+                        <Key>16</Key>
+                        <Key>67</Key>
+                      </Keys>
+                      <Value>1.8675</Value>
+                      <ID>0</ID>
+                    </Hotkey>
+                    <Hotkey>
+                      <Action>Set Value</Action>
+                      <Keys>
+                        <Key>16</Key>
+                        <Key>88</Key>
+                      </Keys>
+                      <Value>1.867</Value>
+                      <ID>1</ID>
+                    </Hotkey>
+                  </Hotkeys>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>148</ID>
+                  <Description>"Z"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>+204</Address>
+                  <Hotkeys>
+                    <Hotkey>
+                      <Action>Set Value</Action>
+                      <Keys>
+                        <Key>16</Key>
+                        <Key>67</Key>
+                      </Keys>
+                      <Value>2.5</Value>
+                      <ID>0</ID>
+                    </Hotkey>
+                    <Hotkey>
+                      <Action>Set Value</Action>
+                      <Keys>
+                        <Key>16</Key>
+                        <Key>88</Key>
+                      </Keys>
+                      <Value>1.7</Value>
+                      <ID>1</ID>
+                    </Hotkey>
+                  </Hotkeys>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>480</ID>
+              <Description>"→ ManagerBlackboard"</Description>
+              <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">??:Invalid Ptr
+</DropDownList>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"UnityPlayer.dll"+01C50E28</Address>
+              <Offsets>
+                <Offset>0</Offset>
+                <Offset>28</Offset>
+                <Offset>88</Offset>
+                <Offset>8</Offset>
+                <Offset>8</Offset>
+                <Offset>28</Offset>
+                <Offset>150</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>638</ID>
+              <Description>"→ PlayerNetwork"</Description>
+              <Options moHideChildren="1"/>
+              <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">??:Invalid Ptr
+</DropDownList>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"UnityPlayer.dll"+01C2E8C8</Address>
+              <Offsets>
+                <Offset>0</Offset>
+                <Offset>10</Offset>
+                <Offset>18</Offset>
+                <Offset>58</Offset>
+                <Offset>30</Offset>
+                <Offset>30</Offset>
+                <Offset>10</Offset>
+                <Offset>E8</Offset>
+                <Offset>48</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>522</ID>
+              <Description>"→ NetworkSpawner"</Description>
+              <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">??:Invalid Ptr
+</DropDownList>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"UnityPlayer.dll"+01BD61C0</Address>
+              <Offsets>
+                <Offset>0</Offset>
+                <Offset>128</Offset>
+                <Offset>C0</Offset>
+                <Offset>110</Offset>
+                <Offset>90</Offset>
+                <Offset>0</Offset>
+                <Offset>1F0</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>548</ID>
+              <Description>"→ FirstPersonController"</Description>
+              <Options moHideChildren="1"/>
+              <DropDownList ReadOnly="1" DescriptionOnly="1" DisplayValueAsItem="1">??:Invalid Ptr
+</DropDownList>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>4 Bytes</VariableType>
+              <Address>"UnityPlayer.dll"+01B6CCD8</Address>
+              <Offsets>
+                <Offset>0</Offset>
+                <Offset>148</Offset>
+                <Offset>10</Offset>
+                <Offset>0</Offset>
+                <Offset>78</Offset>
+                <Offset>628</Offset>
+                <Offset>5B0</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>459</ID>
+      <Description>"--------------------------------"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>461</ID>
+      <Description>"💥 Author: Sintrix (Shaggy, Send, CamoHax)"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>454</ID>
+      <Description>"🞂 Process: Supermarket Together.exe"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>455</ID>
+      <Description>"🞂 Build: 16558784"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>763</ID>
+      <Description>"✔ Verify Game Build"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+{$lua}
+shellExecute("https://steamdb.info/app/2709570/patchnotes/")
+
+{$asm}
+[DISABLE]
+
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>460</ID>
+      <Description>"⚡ Sintrix Discord"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+{$lua}
+shellExecute("https://discord.gg/NTFcdAUWxb")
+
+{$asm}
+[DISABLE]
+
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>458</ID>
+      <Description>"--------------------------------"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+  </CheatEntries>
+  <CheatCodes>
+    <CodeEntry>
+      <Description>Change of movss xmm1,[rsi+000000D8]</Description>
+      <AddressString>18611CC31E1</AddressString>
+      <Before>
+        <Byte>00</Byte>
+        <Byte>F3</Byte>
+        <Byte>0F</Byte>
+        <Byte>5A</Byte>
+        <Byte>C0</Byte>
+      </Before>
+      <Actual>
+        <Byte>F3</Byte>
+        <Byte>0F</Byte>
+        <Byte>10</Byte>
+        <Byte>8E</Byte>
+        <Byte>D8</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+        <Byte>00</Byte>
+      </Actual>
+      <After>
+        <Byte>F3</Byte>
+        <Byte>0F</Byte>
+        <Byte>5A</Byte>
+        <Byte>C9</Byte>
+        <Byte>66</Byte>
+      </After>
+    </CodeEntry>
+  </CheatCodes>
+  <UserdefinedSymbols>
+    <SymbolEntry>
+      <Name>mbboardptr2</Name>
+      <Address>2553CC8CD80</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>nspawnptr</Name>
+      <Address>25557846B00</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>npcmanptr</Name>
+      <Address>2017040DA80</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>gdataptr</Name>
+      <Address>2017040D7E0</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>mbboardptr</Name>
+      <Address>20137D9ED80</Address>
+    </SymbolEntry>
+  </UserdefinedSymbols>
+</CheatTable>

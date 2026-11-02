@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>769</ID>
+      <Description>"→ Initialize Mono"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+{$lua}
+mono_initialize()
+LaunchMonoDataCollector()
+{$asm}
+
+
+[DISABLE]
+
+
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>773</ID>
+          <Description>"→ Wallet"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+aobscanmodule(pWaller,GameAssembly.dll,F2 0F 10 40 10 48 83 C4 28 C3 E8 54)
+alloc(newmem,$1000,pWaller)
+registersymbol(wallet)
+label(code return wallet)
+
+newmem:
+mov [wallet],rax
+
+code:
+  movsd xmm0,[rax+10]
+  jmp return
+
+wallet:
+dw
+
+pWaller:
+  jmp newmem
+return:
+registersymbol(pWaller)
+
+[DISABLE]
+
+pWaller:
+  db F2 0F 10 40 10
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>774</ID>
+              <Description>"Current Cash"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Double</VariableType>
+              <Address>[wallet]+10</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>775</ID>
+          <Description>"Auto Complete Quests"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>{ Game   : Kink Inc Steam.exe
+  Version: 
+  Date   : 2025-04-03
+  Author : 19199
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(questState,GameAssembly.dll,F2 0F 10 48 18 76 17 48 8B 48) // should be unique
+alloc(newmem,$1000,questState)
+
+label(code)
+label(return)
+
+newmem:
+push r12
+mov r12,(double)0
+mov [rax+20],r12
+pop rax
+
+code:
+  movsd xmm1,[new]
+  jmp return
+
+new:
+dq (double)25
+
+questState:
+  jmp newmem
+return:
+registersymbol(questState)
+
+[DISABLE]
+
+questState:
+  db F2 0F 10 48 18
+
+unregistersymbol(questState)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+2266C5
+
+GameAssembly.dll+22669C: 33 FF              - xor edi,edi
+GameAssembly.dll+22669E: 48 89 74 24 48     - mov [rsp+48],rsi
+GameAssembly.dll+2266A3: 0F 29 74 24 20     - movaps [rsp+20],xmm6
+GameAssembly.dll+2266A8: 89 7C 24 40        - mov [rsp+40],edi
+GameAssembly.dll+2266AC: 89 7C 24 50        - mov [rsp+50],edi
+GameAssembly.dll+2266B0: 48 85 C0           - test rax,rax
+GameAssembly.dll+2266B3: 0F 84 F0 05 00 00  - je GameAssembly.dll+226CA9
+GameAssembly.dll+2266B9: F2 0F 10 40 20     - movsd xmm0,[rax+20]
+GameAssembly.dll+2266BE: 0F 57 F6           - xorps xmm6,xmm6
+GameAssembly.dll+2266C1: 66 0F 2F F0        - comisd xmm6,xmm0
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+2266C5: F2 0F 10 48 18     - movsd xmm1,[rax+18]
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+2266CA: 76 17              - jna GameAssembly.dll+2266E3
+GameAssembly.dll+2266CC: 48 8B 48 30        - mov rcx,[rax+30]
+GameAssembly.dll+2266D0: 48 85 C9           - test rcx,rcx
+GameAssembly.dll+2266D3: 0F 84 D0 05 00 00  - je GameAssembly.dll+226CA9
+GameAssembly.dll+2266D9: F2 0F 10 41 48     - movsd xmm0,[rcx+48]
+GameAssembly.dll+2266DE: F2 0F 11 40 20     - movsd [rax+20],xmm0
+GameAssembly.dll+2266E3: 66 0F 2F C8        - comisd xmm1,xmm0
+GameAssembly.dll+2266E7: 48 8B 4B 18        - mov rcx,[rbx+18]
+GameAssembly.dll+2266EB: 0F 83 94 05 00 00  - jae GameAssembly.dll+226C85
+GameAssembly.dll+2266F1: 48 85 C9           - test rcx,rcx
+}
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>459</ID>
+      <Description>"--------------------------------"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>461</ID>
+      <Description>"💥 Author:  Send"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>454</ID>
+      <Description>"🞂 Process: Kink Inc Steam.exe"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>772</ID>
+      <Description>"✔ Table Version: 1.0"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>460</ID>
+      <Description>"⚡ Discord "</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+{$lua}
+shellExecute("https://discord.gg/NTFcdAUWxb")
+
+{$asm}
+[DISABLE]
+
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>458</ID>
+      <Description>"--------------------------------"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

@@ -1,0 +1,432 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>1337317185</ID>
+      <Description>"Enable"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+define(midjumpmem,$process+500)
+
+fullaccess(midjumpmem, $1000)
+registersymbol(midjumpmem)
+[DISABLE]
+unregistersymbol(midjumpmem)
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>1337317178</ID>
+          <Description>"Grab Dungeon Data"</Description>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>// Game Executable   : Dungeon-Win64-Shipping.exe
+// Author            : rhark
+// Executable Version: 5.4.4.0
+// Module Version    : 
+// Script Date       : 2025-04-19
+{
+
+
+
+}
+[ENABLE]
+aobscanmodule(dungeonRun_AOB,$process,F2xxxxxxxxxxxxxxxx66xxxxxxxxF3xxxxxx66xxxxxx72) // should be unique
+registersymbol(dungeonRun_AOB)
+alloc(dungeonRunHook,0x1000)
+registersymbol(dungeonRunHook)
+
+label(code_dungeonRun)
+label(return_dungeonRun)
+label(exit_dungeonRun)
+label(dungeonPtr)
+
+registersymbol(code_dungeonRun)
+registersymbol(dungeonPtr)
+
+dungeonRunHook:
+  mov [dungeonPtr],r8
+
+exit_dungeonRun:
+
+code_dungeonRun:
+  readmem(dungeonRun_AOB,9)
+{
+  movsd xmm1,[r8+000003D8]
+}
+  jmp return_dungeonRun
+  
+align 10 CC
+  
+dungeonRunHook+200:
+dungeonPtr:
+  dq 0
+
+midjumpmem+10:
+ jmp dungeonRunHook
+
+dungeonRun_AOB:
+  jmp midjumpmem+10
+  nop 4
+return_dungeonRun:
+
+[DISABLE]
+dungeonRun_AOB:
+  readmem(code_dungeonRun,9) // db F2 41 0F 10 88 D8 03 00 00
+
+unregistersymbol(dungeonRun_AOB)
+unregistersymbol(dungeonRunHook)
+unregistersymbol(code_dungeonRun)
+unregistersymbol(dungeonPtr)
+unregistersymbol(midjumpmem)
+dealloc(dungeonRunHook)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "Dungeon-Win64-Shipping.exe"+46609F7
+
+"Dungeon-Win64-Shipping.exe"+46609A4: 45 8B CA                    - mov r9d,r10d
+"Dungeon-Win64-Shipping.exe"+46609A7: 49 8B 80 C8 02 00 00        - mov rax,[r8+000002C8]
+"Dungeon-Win64-Shipping.exe"+46609AE: 45 2B CB                    - sub r9d,r11d
+"Dungeon-Win64-Shipping.exe"+46609B1: 44 0F AF 4C 88 FC           - imul r9d,[rax+rcx*4-04]
+"Dungeon-Win64-Shipping.exe"+46609B7: 41 8D 5A FF                 - lea ebx,[r10-01]
+"Dungeon-Win64-Shipping.exe"+46609BB: 85 DB                       - test ebx,ebx
+"Dungeon-Win64-Shipping.exe"+46609BD: 78 38                       - js "Dungeon-Win64-Shipping.exe"+46609F7
+"Dungeon-Win64-Shipping.exe"+46609BF: 45 8B 98 E0 02 00 00        - mov r11d,[r8+000002E0]
+"Dungeon-Win64-Shipping.exe"+46609C6: 41 3B DB                    - cmp ebx,r11d
+"Dungeon-Win64-Shipping.exe"+46609C9: 7D 0E                       - jnl "Dungeon-Win64-Shipping.exe"+46609D9
+"Dungeon-Win64-Shipping.exe"+46609CB: 49 8B 80 D8 02 00 00        - mov rax,[r8+000002D8]
+"Dungeon-Win64-Shipping.exe"+46609D2: 42 8B 54 90 FC              - mov edx,[rax+r10*4-04]
+"Dungeon-Win64-Shipping.exe"+46609D7: EB 1E                       - jmp "Dungeon-Win64-Shipping.exe"+46609F7
+"Dungeon-Win64-Shipping.exe"+46609D9: 41 83 FB 01                 - cmp r11d,01
+"Dungeon-Win64-Shipping.exe"+46609DD: 7E 18                       - jle "Dungeon-Win64-Shipping.exe"+46609F7
+"Dungeon-Win64-Shipping.exe"+46609DF: 49 63 88 D0 02 00 00        - movsxd  rcx,dword ptr [r8+000002D0]
+"Dungeon-Win64-Shipping.exe"+46609E6: 8B D3                       - mov edx,ebx
+"Dungeon-Win64-Shipping.exe"+46609E8: 49 8B 80 C8 02 00 00        - mov rax,[r8+000002C8]
+"Dungeon-Win64-Shipping.exe"+46609EF: 41 2B D3                    - sub edx,r11d
+"Dungeon-Win64-Shipping.exe"+46609F2: 0F AF 54 88 FC              - imul edx,[rax+rcx*4-04]
+// ---------- INJECTING HERE ----------
+"Dungeon-Win64-Shipping.exe"+46609F7: F2 41 0F 10 88 D8 03 00 00  - movsd xmm1,[r8+000003D8]
+// ---------- DONE INJECTING  ----------
+"Dungeon-Win64-Shipping.exe"+4660A00: 66 41 0F 6E C1              - movd xmm0,r9d
+"Dungeon-Win64-Shipping.exe"+4660A05: F3 0F E6 C0                 - cvtdq2pd xmm0,xmm0
+"Dungeon-Win64-Shipping.exe"+4660A09: 66 0F 2F C8                 - comisd xmm1,xmm0
+"Dungeon-Win64-Shipping.exe"+4660A0D: 72 0E                       - jb "Dungeon-Win64-Shipping.exe"+4660A1D
+"Dungeon-Win64-Shipping.exe"+4660A0F: F3 0F 10 05 35 E9 AD 01     - movss xmm0,["Dungeon-Win64-Shipping.exe"+613F34C]
+"Dungeon-Win64-Shipping.exe"+4660A17: 48 8B 5C 24 08              - mov rbx,[rsp+08]
+"Dungeon-Win64-Shipping.exe"+4660A1C: C3                          - ret 
+"Dungeon-Win64-Shipping.exe"+4660A1D: 48 8B 5C 24 08              - mov rbx,[rsp+08]
+"Dungeon-Win64-Shipping.exe"+4660A22: 44 2B CA                    - sub r9d,edx
+"Dungeon-Win64-Shipping.exe"+4660A25: 66 0F 6E C2                 - movd xmm0,edx
+"Dungeon-Win64-Shipping.exe"+4660A29: F3 0F E6 C0                 - cvtdq2pd xmm0,xmm0
+"Dungeon-Win64-Shipping.exe"+4660A2D: F2 0F 5C C8                 - subsd xmm1,xmm0
+"Dungeon-Win64-Shipping.exe"+4660A31: 66 0F 5A C1                 - cvtpd2ps xmm0,xmm1
+"Dungeon-Win64-Shipping.exe"+4660A35: 66 41 0F 6E C9              - movd xmm1,r9d
+"Dungeon-Win64-Shipping.exe"+4660A3A: 0F 5B C9                    - cvtdq2ps xmm1,xmm1
+"Dungeon-Win64-Shipping.exe"+4660A3D: F3 0F 5E C1                 - divss xmm0,xmm1
+"Dungeon-Win64-Shipping.exe"+4660A41: 0F 57 C9                    - xorps xmm1,xmm1
+"Dungeon-Win64-Shipping.exe"+4660A44: F3 0F 5D 05 00 E9 AD 01     - minss xmm0,["Dungeon-Win64-Shipping.exe"+613F34C]
+"Dungeon-Win64-Shipping.exe"+4660A4C: F3 0F 5F C1                 - maxss xmm0,xmm1
+"Dungeon-Win64-Shipping.exe"+4660A50: C3                          - ret 
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>1337317179</ID>
+              <Description>"[ Debug ]Dungeon Run"</Description>
+              <ShowAsHex>1</ShowAsHex>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>8 Bytes</VariableType>
+              <Address>dungeonPtr</Address>
+              <Offsets>
+                <Offset>0</Offset>
+              </Offsets>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>1337317181</ID>
+                  <Description>"Level"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>+308</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1337317180</ID>
+                  <Description>"XP"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Double</VariableType>
+                  <Address>+3D8</Address>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1337317182</ID>
+                  <Description>"Gems Collected"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>+440</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>1337317186</ID>
+          <Description>"Grab Character Data"</Description>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>// Game Executable   : Dungeon-Win64-Shipping.exe
+// Author            : rhark
+// Executable Version: 5.4.4.0
+// Module Version    : 
+// Script Date       : 2025-04-19
+{
+
+RBX contains "Pawn"
+
+This affects all characters on the map (not enemies)
+
+}
+[ENABLE]
+aobscanmodule(health_AOB,$process,F3xxxxxx488BxxFFxxxxxxxxxxF3xxxxxx0F28) // should be unique
+registersymbol(health_AOB)
+alloc(healthHook,0x1000)
+registersymbol(healthHook)
+
+label(code_health)
+label(return_health)
+label(exit_health)
+label(hpflag)
+label(speedflag)
+
+registersymbol(code_health)
+registersymbol(hpflag)
+registersymbol(speedflag)
+
+healthHook:
+  cmp [hpflag],1
+  jne @f
+  mov [rax],0
+
+@@:
+  cmp [speedflag],1
+  jne @f
+  mov [rbx+68],(float)5 // CustomTimeDilation
+
+@@:
+  cmp [speedflag],2
+  jne @f
+  mov [rbx+68],(float)1
+  mov [speedflag],0
+
+exit_health:
+
+code_health:
+  readmem(health_AOB,7)
+{
+  movss xmm6,[rax]
+  mov rax,[rbx]
+}
+  jmp return_health
+  
+align 10 CC
+  
+healthHook+200:
+hpflag:
+  dd 0
+speedflag:
+  dd 0
+
+midjumpmem+20:
+ jmp healthHook
+
+health_AOB:
+  jmp midjumpmem+20
+  nop 2
+return_health:
+
+[DISABLE]
+health_AOB:
+  readmem(code_health,7) // db F3 0F 10 30 48 8B 03
+
+unregistersymbol(health_AOB)
+unregistersymbol(healthHook)
+unregistersymbol(code_health)
+unregistersymbol(hpflag)
+unregistersymbol(speedflag)
+dealloc(healthHook)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "Dungeon-Win64-Shipping.exe"+462E94F
+
+"Dungeon-Win64-Shipping.exe"+462E91B: CC                 - int 3 
+"Dungeon-Win64-Shipping.exe"+462E91C: CC                 - int 3 
+"Dungeon-Win64-Shipping.exe"+462E91D: CC                 - int 3 
+"Dungeon-Win64-Shipping.exe"+462E91E: CC                 - int 3 
+"Dungeon-Win64-Shipping.exe"+462E91F: CC                 - int 3 
+"Dungeon-Win64-Shipping.exe"+462E920: 40 53              - push rbx
+"Dungeon-Win64-Shipping.exe"+462E922: 48 83 EC 30        - sub rsp,30
+"Dungeon-Win64-Shipping.exe"+462E926: 48 8B 01           - mov rax,[rcx]
+"Dungeon-Win64-Shipping.exe"+462E929: 48 8B D9           - mov rbx,rcx
+"Dungeon-Win64-Shipping.exe"+462E92C: FF 90 B8 09 00 00  - call qword ptr [rax+000009B8]
+"Dungeon-Win64-Shipping.exe"+462E932: 84 C0              - test al,al
+"Dungeon-Win64-Shipping.exe"+462E934: 74 09              - je "Dungeon-Win64-Shipping.exe"+462E93F
+"Dungeon-Win64-Shipping.exe"+462E936: 0F 57 C0           - xorps xmm0,xmm0
+"Dungeon-Win64-Shipping.exe"+462E939: 48 83 C4 30        - add rsp,30
+"Dungeon-Win64-Shipping.exe"+462E93D: 5B                 - pop rbx
+"Dungeon-Win64-Shipping.exe"+462E93E: C3                 - ret 
+"Dungeon-Win64-Shipping.exe"+462E93F: 48 8B CB           - mov rcx,rbx
+"Dungeon-Win64-Shipping.exe"+462E942: 0F 29 74 24 20     - movaps [rsp+20],xmm6
+"Dungeon-Win64-Shipping.exe"+462E947: E8 14 F3 FF FF     - call "Dungeon-Win64-Shipping.exe"+462DC60
+"Dungeon-Win64-Shipping.exe"+462E94C: 48 8B CB           - mov rcx,rbx
+// ---------- INJECTING HERE ----------
+"Dungeon-Win64-Shipping.exe"+462E94F: F3 0F 10 30        - movss xmm6,[rax]
+// ---------- DONE INJECTING  ----------
+"Dungeon-Win64-Shipping.exe"+462E953: 48 8B 03           - mov rax,[rbx]
+"Dungeon-Win64-Shipping.exe"+462E956: FF 90 D0 09 00 00  - call qword ptr [rax+000009D0]
+"Dungeon-Win64-Shipping.exe"+462E95C: F3 0F 5C C6        - subss xmm0,xmm6
+"Dungeon-Win64-Shipping.exe"+462E960: 0F 28 74 24 20     - movaps xmm6,[rsp+20]
+"Dungeon-Win64-Shipping.exe"+462E965: 48 83 C4 30        - add rsp,30
+"Dungeon-Win64-Shipping.exe"+462E969: 5B                 - pop rbx
+"Dungeon-Win64-Shipping.exe"+462E96A: C3                 - ret 
+"Dungeon-Win64-Shipping.exe"+462E96B: CC                 - int 3 
+"Dungeon-Win64-Shipping.exe"+462E96C: CC                 - int 3 
+"Dungeon-Win64-Shipping.exe"+462E96D: CC                 - int 3 
+"Dungeon-Win64-Shipping.exe"+462E96E: CC                 - int 3 
+"Dungeon-Win64-Shipping.exe"+462E96F: CC                 - int 3 
+"Dungeon-Win64-Shipping.exe"+462E970: B2 09              - mov dl,09
+"Dungeon-Win64-Shipping.exe"+462E972: E9 69 B2 FF FF     - jmp "Dungeon-Win64-Shipping.exe"+4629BE0
+"Dungeon-Win64-Shipping.exe"+462E977: CC                 - int 3 
+"Dungeon-Win64-Shipping.exe"+462E978: CC                 - int 3 
+"Dungeon-Win64-Shipping.exe"+462E979: CC                 - int 3 
+"Dungeon-Win64-Shipping.exe"+462E97A: CC                 - int 3 
+"Dungeon-Win64-Shipping.exe"+462E97B: CC                 - int 3 
+"Dungeon-Win64-Shipping.exe"+462E97C: CC                 - int 3 
+}
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>1337317187</ID>
+              <Description>"Unlimited Health"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+hpflag:
+  dd 1
+
+[DISABLE]
+
+hpflag:
+  dd 0
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>1337317188</ID>
+              <Description>"Super Player Speed"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+speedflag:
+  dd 1
+
+[DISABLE]
+
+speedflag:
+  dd 2
+</AssemblerScript>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>1337317189</ID>
+          <Description>"Enable XP Multiplier"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>
+[ENABLE]
+//Send@FearlessRevolution|Sintrix
+aobscanmodule(xpMulti,Dungeon-Win64-Shipping.exe,F2 0F 11 80 D8 03 00 00)
+alloc(newmem,$1000,xpMulti)
+registersymbol(setxp)
+label(code return setxp)
+
+newmem:
+xorps xmm15,xmm15
+movsd xmm15,xmm0
+mulsd xmm15,[setxp]
+movsd xmm0,xmm15
+movsd [rax+3D8],xmm0
+
+code:
+  movsd [rax+000003D8],xmm0
+  jmp return
+
+setxp:
+dq (double)2
+
+xpMulti:
+  jmp newmem
+  nop 3
+return:
+registersymbol(xpMulti)
+
+[DISABLE]
+
+xpMulti:
+  db F2 0F 11 80 D8 03 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>1337317190</ID>
+              <Description>"Set XP Multiplier"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Double</VariableType>
+              <Address>setxp</Address>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>459</ID>
+      <Description>"--------------------------------"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>461</ID>
+      <Description>"💥 Author: Rhark &amp; Send"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>454</ID>
+      <Description>"🞂 Process: Dungeon-Win64-Shipping"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>772</ID>
+      <Description>"✔ Table Version: DEMO"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>460</ID>
+      <Description>"⚡ Discord "</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+{$lua}
+shellExecute("https://discord.gg/NTFcdAUWxb")
+
+{$asm}
+[DISABLE]
+
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>458</ID>
+      <Description>"--------------------------------"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

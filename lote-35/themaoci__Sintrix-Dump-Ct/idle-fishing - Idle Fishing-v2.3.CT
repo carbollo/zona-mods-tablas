@@ -1,0 +1,1550 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>104</ID>
+      <Description>"-&gt; Start Table &lt;-"</Description>
+      <Options moHideChildren="1"/>
+      <LastState Activated="1"/>
+      <Color>00FF00</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$Lua}
+if syntaxcheck then return end
+
+local process = 'Idle Fishing.exe'
+OpenProcess(process);
+if process ~= process or (readInteger(process) == nil) then
+   error(ShowMessage("Failed To Attach To Process"))
+end
+
+
+--Set Window Title
+local title = "Idle Fishing Table v2.3";
+if not((MainForm.Caption):match("Idle Fishing")) then
+MainForm.Caption = title..' ~ '..MainForm.Caption
+end
+
+--Credits
+if MainForm.lblSigned.Caption:match('By Sintrix / Build 16168684') == nil then
+  local Main = MainForm.lblSigned
+  local MadeBy = createPanel(Main.Parent)
+
+
+  MadeBy.AutoSize = true
+  MadeBy.Anchors = '[akTop,akRight,akLeft]'
+  MadeBy.AnchorSideTop.Control = MadeBy.Parent
+  MadeBy.AnchorSideTop.Side = asrCenter
+  MadeBy.AnchorSideRight.Control = MainForm.CommentButton
+  MadeBy.AnchorSideRight.Side = asrLeft
+  MadeBy.AnchorSideLeft.Control = MainForm.advancedbutton
+  MadeBy.AnchorSideLeft.Side = asrRight
+
+  Main.Parent = MadeBy
+  Main.Visible = true
+  Main.Caption = 'By Sintrix / Build 16168684'
+  Main.Font.Size = 12
+  Main.Font.Style = '[fsBold]'
+  Main.Font.Quality = 'fqCleartypeNatural'
+  Main.AnchorSideTop.Control = MadeBy
+  Main.AnchorSideTop.Side = asrCenter
+  Main.AnchorSideLeft.Control = MadeBy
+  Main.AnchorSideLeft.Side = asrCenter
+end
+
+function cycleFullCompact(sender,force)     local state = not(compactmenuitem.Caption == 'Compact View Mode'); if force~=nil then state = not force end; compactmenuitem.Caption = state and 'Compact View Mode' or 'Full View Mode'; getMainForm().Splitter1.Visible = state; getMainForm().Panel4.Visible    = state; getMainForm().Panel5.Visible    = state; end; function addCompactMenu() if compactmenualreadyexists then return end; local parent = getMainForm().Menu.Items; compactmenuitem = createMenuItem(parent); parent.add(compactmenuitem); compactmenuitem.Caption = 'Compact View Mode'; compactmenuitem.OnClick = cycleFullCompact; compactmenualreadyexists = 'yes'; end; addCompactMenu(); cycleFullCompact(nil,true);
+
+getMainForm().Panel4.Visible = true;
+
+[DISABLE]
+{$Lua}
+cycleFullCompact(nil,false);
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>44</ID>
+          <Description>"&lt;Scripts&gt;"</Description>
+          <Options moHideChildren="1"/>
+          <LastState Value="" Activated="1" RealAddress="00000000"/>
+          <Color>0080FF</Color>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>233</ID>
+              <Description>"-&gt; MONO"</Description>
+              <Options moHideChildren="1"/>
+              <LastState Activated="1"/>
+              <Color>FFFF00</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+{$Lua}
+if syntaxcheck then return end
+if not monopipe then if LaunchMonoDataCollector() == 0 then
+
+if process == nil then ShowMessage('Process is not selected.')
+elseif readInteger(process) == 0 then ShowMessage('Process cannot be opened. Gone?')
+else
+  if (monopipe~=nil) and (monopipe.ProcessID~=getOpenedProcessID()) then
+    monopipe.destroy()
+    monopipe=nil
+  end
+  if (monopipe==nil) then
+    LaunchMonoDataCollector()
+    -- monoSymbolList is only available if the target is il2cpp and not normal mono
+    --while (monoSymbolList==nil) or (not monoSymbolList.FullyLoaded) do checkSynchronize(50) end -- checkSynchronize requires that memRec is ASynch.
+  end
+end
+end end
+ 
+{$asm}
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>936</ID>
+                  <Description>"Disable Cheat Detection"</Description>
+                  <LastState Activated="1"/>
+                  <Color>00FF00</Color>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+IdleFishing.Core.AntiCheat.AntiCheatManager.OnMemoryHackDetected:
+ db c3
+
+IdleFishing.Core.AntiCheat.AntiCheatManager.OnSpeedHackDetected:
+ db c3
+ 
+ 
+[DISABLE]
+IdleFishing.Core.AntiCheat.AntiCheatManager.OnMemoryHackDetected:
+ db 48
+
+IdleFishing.Core.AntiCheat.AntiCheatManager.OnSpeedHackDetected:
+ db 48
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>227</ID>
+                  <Description>"Don't Spend Currency"</Description>
+                  <LastState Activated="1"/>
+                  <Color>00FF00</Color>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+
+aobscanregion(curded, IdleFishing.PlayerProgression.Managers.PlayerProgressManager.TryDeductCurrency,IdleFishing.PlayerProgression.Managers.PlayerProgressManager.TryDeductCurrency+1F0, e8 ? ? ? ? 40 84 f6)
+
+
+alloc(obytes_nocur,5)
+registersymbol(obytes_nocur)
+obytes_nocur:
+readmem(curded,5)
+
+curded:
+  db 90 90 90 90 90
+
+[DISABLE]
+
+curded:
+readmem(obytes_nocur,5)
+  // call IdleFishing.PlayerProgression.PlayerProgress.set_Currency
+
+
+dealloc(*)
+unregistersymbol(*)
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>228</ID>
+                  <Description>"Don't Spend Eggs"</Description>
+                  <LastState Activated="1"/>
+                  <Color>00FF00</Color>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+
+aobscanregion(eggded, IdleFishing.PlayerProgression.Managers.PlayerProgressManager.TryDeductEggsCurrency,IdleFishing.PlayerProgression.Managers.PlayerProgressManager.TryDeductEggsCurrency+1FF, e8 ? ? ? ? 40 84 f6 74 1c)
+
+
+alloc(obytes_eggded,5)
+registersymbol(obytes_eggded)
+
+obytes_eggded:
+readmem(eggded,5)
+
+eggded:
+  db 90 90 90 90 90
+
+[DISABLE]
+
+eggded:
+readmem(obytes_eggded,5)
+
+dealloc(*)
+unregistersymbol(*)
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>229</ID>
+                  <Description>"Don't Spend Fishing Contest Tickets"</Description>
+                  <LastState Activated="1"/>
+                  <Color>00FF00</Color>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+
+aobscanregion(fctded, IdleFishing.PlayerProgression.Managers.PlayerProgressManager.TryDeductKeysCurrency,IdleFishing.PlayerProgression.Managers.PlayerProgressManager.TryDeductKeysCurrency+2FF, e8 ? ? ? ? 40 84 f6)
+
+
+alloc(obytes_fctded,5)
+registersymbol(obytes_fctded)
+
+obytes_fctded:
+readmem(fctded,5)
+
+fctded:
+  db 90 90 90 90 90
+
+[DISABLE]
+
+fctded:
+readmem(obytes_fctded,5)
+
+
+dealloc(*)
+unregistersymbol(*)
+
+
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>230</ID>
+                  <Description>"Don't Spend Medals"</Description>
+                  <LastState Activated="1"/>
+                  <Color>00FF00</Color>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+
+aobscanregion(medded, IdleFishing.PlayerProgression.Managers.PlayerProgressManager.TryDeductMedalsCurrency,IdleFishing.PlayerProgression.Managers.PlayerProgressManager.TryDeductMedalsCurrency+2FF, e8 ? ? ? ? 40 84 f6 )
+
+
+alloc(obytes_medded,5)
+registersymbol(obytes_medded)
+
+obytes_medded:
+readmem(medded,5)
+
+medded:
+  db 90 90 90 90 90
+
+[DISABLE]
+
+medded:
+readmem(obytes_medded,5)
+
+
+dealloc(*)
+unregistersymbol(*)
+
+
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>232</ID>
+                  <Description>"Don't Spend Gems"</Description>
+                  <LastState Activated="1"/>
+                  <Color>00FF00</Color>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+
+aobscanregion(gemded, IdleFishing.PlayerProgression.Managers.PlayerProgressManager.TryDeductPremiumCurrency,IdleFishing.PlayerProgression.Managers.PlayerProgressManager.TryDeductPremiumCurrency+2FF, e8 ? ? ? ? 40 84 f6)
+
+
+alloc(obytes_nogem,5)
+registersymbol(obytes_nogem)
+
+obytes_nogem:
+readmem(gemded,5)
+
+gemded:
+  db 90 90 90 90 90
+
+[DISABLE]
+
+gemded:
+readmem(obytes_nogem,5)
+
+
+dealloc(*)
+unregistersymbol(*)
+
+
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>231</ID>
+                  <Description>"Don't Spend Pet Food"</Description>
+                  <LastState Activated="1"/>
+                  <Color>00FF00</Color>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+
+aobscanregion(petfded, IdleFishing.PlayerProgression.Managers.PlayerProgressManager.TryDeductPetFoodCurrency,IdleFishing.PlayerProgression.Managers.PlayerProgressManager.TryDeductPetFoodCurrency+2FF, e8 ? ? ? ? 40 84 f6)
+
+
+alloc(obytes_petfded,5)
+registersymbol(obytes_petfded)
+
+obytes_petfded:
+readmem(petfded,5)
+
+petfded:
+  db 90 90 90 90 90
+
+[DISABLE]
+
+petfded:
+readmem(obytes_petfded,5)
+
+
+dealloc(*)
+unregistersymbol(*)
+
+
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>234</ID>
+                  <Description>"Don't Spend Chest Hunt Currency"</Description>
+                  <LastState Activated="1"/>
+                  <Color>00FF00</Color>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+
+aobscanregion(chcded, IdleFishing.PlayerProgression.Managers.PlayerProgressManager.TryDeductChestHuntCurrency,IdleFishing.PlayerProgression.Managers.PlayerProgressManager.TryDeductCurrency+1F0, e8 ? ? ? ? 40 84 f6)
+
+
+alloc(obytes_chcded,5)
+registersymbol(obytes_chcded)
+
+obytes_chcded:
+readmem(chcded,5)
+
+chcded:
+  db 90 90 90 90 90
+
+[DISABLE]
+
+chcded:
+readmem(obytes_chcded,5)
+
+
+dealloc(*)
+unregistersymbol(*)
+
+
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1317</ID>
+                  <Description>"All Currencies Are Matched with money"</Description>
+                  <LastState Activated="1"/>
+                  <Color>00FF00</Color>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>{ Game   : Idle Fishing.exe
+  Version: 
+  Date   : 2024-10-18
+  Author : User
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanregion(forcecurs, IdleFishing.PlayerProgression.PlayerProgress.set_Currency,IdleFishing.PlayerProgression.PlayerProgress.set_Currency+2FF, 0f 11 43 10 f2 0f 10 46 20) // should be unique
+alloc(newmem,$1000,forcecurs)
+
+alloc(obytes_forcecurs,5)
+registersymbol(obytes_forcecurs)
+
+obytes_forcecurs:
+readmem(forcecurs,9)
+
+label(code)
+label(return)
+
+newmem:
+
+
+code:
+  push rbx
+  movups [rbx+10],xmm0
+  movups [rbx+38],xmm0
+  movups [rbx+60],xmm0
+  movups [rbx+88],xmm0
+  movups [rbx+b0],xmm0
+  movups [rbx+100],xmm0
+  movups [rbx+128],xmm0
+  movups [rbx+150],xmm0
+  movups [rbx+178],xmm0
+  movsd xmm0,[rsi+20]
+  jmp return
+
+forcecurs:
+  jmp newmem
+  nop 4
+return:
+
+registersymbol(forcecurs)
+
+[DISABLE]
+
+forcecurs:
+readmem(obytes_forcecurs,9)
+
+unregistersymbol(forcecurs)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+1ECED23
+
+GameAssembly.dll+1ECECEB: 0F 10 50 10              - movups xmm2,[rax+10]
+GameAssembly.dll+1ECECEF: 45 0F 28 4B C0           - movaps xmm9,[r11-40]
+GameAssembly.dll+1ECECF4: 45 0F 28 53 B0           - movaps xmm10,[r11-50]
+GameAssembly.dll+1ECECF9: 45 0F 28 5B A0           - movaps xmm11,[r11-60]
+GameAssembly.dll+1ECECFE: 0F 11 8F 90 00 00 00     - movups [rdi+00000090],xmm1
+GameAssembly.dll+1ECED05: 0F 11 97 A0 00 00 00     - movups [rdi+000000A0],xmm2
+GameAssembly.dll+1ECED0C: F2 0F 11 87 B0 00 00 00  - movsd [rdi+000000B0],xmm0
+GameAssembly.dll+1ECED14: 0F 10 06                 - movups xmm0,[rsi]
+GameAssembly.dll+1ECED17: 48 8B BC 24 20 01 00 00  - mov rdi,[rsp+00000120]
+GameAssembly.dll+1ECED1F: 0F 10 4E 10              - movups xmm1,[rsi+10]
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+1ECED23: 0F 11 43 10              - movups [rbx+10],xmm0
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+1ECED27: F2 0F 10 46 20           - movsd xmm0,[rsi+20]
+GameAssembly.dll+1ECED2C: 49 8B 73 20              - mov rsi,[r11+20]
+GameAssembly.dll+1ECED30: 0F 11 4B 20              - movups [rbx+20],xmm1
+GameAssembly.dll+1ECED34: F2 0F 11 43 30           - movsd [rbx+30],xmm0
+GameAssembly.dll+1ECED39: 49 8B 5B 18              - mov rbx,[r11+18]
+GameAssembly.dll+1ECED3D: 49 8B E3                 - mov rsp,r11
+GameAssembly.dll+1ECED40: 5D                       - pop rbp
+GameAssembly.dll+1ECED41: C3                       - ret 
+GameAssembly.dll+1ECED42: E8 99 9B 4A FE           - call GameAssembly.dll+3788E0
+GameAssembly.dll+1ECED47: CC                       - int 3 
+}
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1314</ID>
+                  <Description>"-&gt; Get PlayerProgressManager"</Description>
+                  <Options moHideChildren="1"/>
+                  <LastState/>
+                  <Color>00FF00</Color>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+{$lua}
+
+local classId = mono_findClass('IdleFishing.dll', 'PlayerProgressManager')
+local fields = mono_class_enumFields(classId, true)
+for i in pairs(fields) do
+  if fields[i].isStatic and fields[i].name == 'Instance' then
+    local instance = mono_class_getStaticFieldValue(classId, fields[i].field)
+    registerSymbol("ppmptr", instance)
+    local ppmString = string.format('0x%X', instance);
+  end
+end
+
+ 
+{$asm}
+[DISABLE]
+{$lua}
+unregisterSymbol("npcmanptr")
+
+</AssemblerScript>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>1315</ID>
+                      <Description>"PlayerProgressManager"</Description>
+                      <LastState Value="2192131664" RealAddress="1EF528F4BA0"/>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>ppmptr</Address>
+                      <CheatEntries>
+                        <CheatEntry>
+                          <ID>1313</ID>
+                          <Description>"28&gt; PlayerProgress"</Description>
+                          <LastState Value="000001EC82A57CB0" RealAddress="1EF80BD3320"/>
+                          <ShowAsHex>1</ShowAsHex>
+                          <ShowAsSigned>0</ShowAsSigned>
+                          <VariableType>8 Bytes</VariableType>
+                          <Address>+28</Address>
+                          <Offsets>
+                            <Offset>0</Offset>
+                          </Offsets>
+                          <CheatEntries>
+                            <CheatEntry>
+                              <ID>1141</ID>
+                              <Description>"_currency.currentCryptoKey"</Description>
+                              <LastState Value="9064336375930506443" RealAddress="1EF80BD3330"/>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+10</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1142</ID>
+                              <Description>"_currency.hiddenValue"</Description>
+                              <LastState Value="15351122994513270040" RealAddress="1EF80BD3338"/>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+18</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1151</ID>
+                              <Description>"_currency.fakeValue"</Description>
+                              <LastState Value="0" RealAddress="1EF80BD3348"/>
+                              <VariableType>Double</VariableType>
+                              <Address>+28</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1152</ID>
+                              <Description>"_currency.fakeValueActive"</Description>
+                              <LastState Value="0" RealAddress="1EF80BD3350"/>
+                              <VariableType>Byte</VariableType>
+                              <Address>+30</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1153</ID>
+                              <Description>"_currency.inited"</Description>
+                              <LastState Value="1" RealAddress="1EF80BD3351"/>
+                              <VariableType>Byte</VariableType>
+                              <Address>+31</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1154</ID>
+                              <Description>"_inAscensionCurrency.currentCryptoKey"</Description>
+                              <LastState Value="9064336375930506443" RealAddress="1EF80BD3358"/>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+38</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1155</ID>
+                              <Description>"_inAscensionCurrency.hiddenValue"</Description>
+                              <LastState Value="15351122994513270040" RealAddress="1EF80BD3360"/>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+40</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1164</ID>
+                              <Description>"_inAscensionCurrency.fakeValue"</Description>
+                              <LastState Value="0" RealAddress="1EF80BD3370"/>
+                              <VariableType>Double</VariableType>
+                              <Address>+50</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1165</ID>
+                              <Description>"_inAscensionCurrency.fakeValueActive"</Description>
+                              <LastState Value="0" RealAddress="1EF80BD3378"/>
+                              <VariableType>Byte</VariableType>
+                              <Address>+58</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1166</ID>
+                              <Description>"_inAscensionCurrency.inited"</Description>
+                              <LastState Value="1" RealAddress="1EF80BD3379"/>
+                              <VariableType>Byte</VariableType>
+                              <Address>+59</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1167</ID>
+                              <Description>"_outOfAscensionCurrency.currentCryptoKey"</Description>
+                              <LastState Value="9064336375930506443" RealAddress="1EF80BD3380"/>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+60</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1168</ID>
+                              <Description>"_outOfAscensionCurrency.hiddenValue"</Description>
+                              <LastState Value="15351122994513270040" RealAddress="1EF80BD3388"/>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+68</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1177</ID>
+                              <Description>"_outOfAscensionCurrency.fakeValue"</Description>
+                              <LastState Value="0" RealAddress="1EF80BD3398"/>
+                              <VariableType>Double</VariableType>
+                              <Address>+78</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1178</ID>
+                              <Description>"_outOfAscensionCurrency.fakeValueActive"</Description>
+                              <LastState Value="0" RealAddress="1EF80BD33A0"/>
+                              <VariableType>Byte</VariableType>
+                              <Address>+80</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1179</ID>
+                              <Description>"_outOfAscensionCurrency.inited"</Description>
+                              <LastState Value="1" RealAddress="1EF80BD33A1"/>
+                              <VariableType>Byte</VariableType>
+                              <Address>+81</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1180</ID>
+                              <Description>"_premiumCurrency.currentCryptoKey"</Description>
+                              <LastState Value="9064336375930506443" RealAddress="1EF80BD33A8"/>
+                              <ShowAsSigned>0</ShowAsSigned>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+88</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1181</ID>
+                              <Description>"_premiumCurrency.hiddenValue"</Description>
+                              <LastState Value="15351122994513270040" RealAddress="1EF80BD33B0"/>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+90</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1190</ID>
+                              <Description>"_premiumCurrency.fakeValue"</Description>
+                              <LastState Value="0" RealAddress="1EF80BD33C0"/>
+                              <VariableType>Double</VariableType>
+                              <Address>+A0</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1191</ID>
+                              <Description>"_premiumCurrency.fakeValueActive"</Description>
+                              <LastState Value="0" RealAddress="1EF80BD33C8"/>
+                              <VariableType>Byte</VariableType>
+                              <Address>+A8</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1192</ID>
+                              <Description>"_premiumCurrency.inited"</Description>
+                              <LastState Value="1" RealAddress="1EF80BD33C9"/>
+                              <VariableType>Byte</VariableType>
+                              <Address>+A9</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1193</ID>
+                              <Description>"_challengeKeysCurrency.currentCryptoKey"</Description>
+                              <LastState Value="9064336375930506443" RealAddress="1EF80BD33D0"/>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+B0</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1194</ID>
+                              <Description>"_challengeKeysCurrency.hiddenValue"</Description>
+                              <LastState Value="15351122994513270040" RealAddress="1EF80BD33D8"/>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+B8</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1203</ID>
+                              <Description>"_challengeKeysCurrency.fakeValue"</Description>
+                              <LastState Value="1" RealAddress="1EF80BD33E8"/>
+                              <VariableType>Double</VariableType>
+                              <Address>+C8</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1204</ID>
+                              <Description>"_challengeKeysCurrency.fakeValueActive"</Description>
+                              <LastState Value="1" RealAddress="1EF80BD33F0"/>
+                              <VariableType>Byte</VariableType>
+                              <Address>+D0</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1205</ID>
+                              <Description>"_challengeKeysCurrency.inited"</Description>
+                              <LastState Value="1" RealAddress="1EF80BD33F1"/>
+                              <VariableType>Byte</VariableType>
+                              <Address>+D1</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1206</ID>
+                              <Description>"_medalsCurrency.currentCryptoKey"</Description>
+                              <LastState Value="2334284797250486156" RealAddress="1EF80BD33F8"/>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+D8</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1207</ID>
+                              <Description>"_medalsCurrency.hiddenValue"</Description>
+                              <LastState Value="10434404809883654993" RealAddress="1EF80BD3400"/>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+E0</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1216</ID>
+                              <Description>"_medalsCurrency.fakeValue"</Description>
+                              <LastState Value="0" RealAddress="1EF80BD3410"/>
+                              <VariableType>Double</VariableType>
+                              <Address>+F0</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1217</ID>
+                              <Description>"_medalsCurrency.fakeValueActive"</Description>
+                              <LastState Value="0" RealAddress="1EF80BD3418"/>
+                              <VariableType>Byte</VariableType>
+                              <Address>+F8</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1218</ID>
+                              <Description>"_medalsCurrency.inited"</Description>
+                              <LastState Value="1" RealAddress="1EF80BD3419"/>
+                              <VariableType>Byte</VariableType>
+                              <Address>+F9</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1219</ID>
+                              <Description>"_eggsCurrency.currentCryptoKey"</Description>
+                              <LastState Value="9064336375930506443" RealAddress="1EF80BD3420"/>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+100</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1220</ID>
+                              <Description>"_eggsCurrency.hiddenValue"</Description>
+                              <LastState Value="15351122994513270040" RealAddress="1EF80BD3428"/>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+108</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1229</ID>
+                              <Description>"_eggsCurrency.fakeValue"</Description>
+                              <LastState Value="0" RealAddress="1EF80BD3438"/>
+                              <VariableType>Double</VariableType>
+                              <Address>+118</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1230</ID>
+                              <Description>"_eggsCurrency.fakeValueActive"</Description>
+                              <LastState Value="0" RealAddress="1EF80BD3440"/>
+                              <VariableType>Byte</VariableType>
+                              <Address>+120</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1231</ID>
+                              <Description>"_eggsCurrency.inited"</Description>
+                              <LastState Value="1" RealAddress="1EF80BD3441"/>
+                              <VariableType>Byte</VariableType>
+                              <Address>+121</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1232</ID>
+                              <Description>"_chestHuntGemSavers.currentCryptoKey"</Description>
+                              <LastState Value="9064336375930506443" RealAddress="1EF80BD3448"/>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+128</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1233</ID>
+                              <Description>"_chestHuntGemSavers.hiddenValue"</Description>
+                              <LastState Value="15351122994513270040" RealAddress="1EF80BD3450"/>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+130</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1242</ID>
+                              <Description>"_chestHuntGemSavers.fakeValue"</Description>
+                              <LastState Value="0" RealAddress="1EF80BD3460"/>
+                              <VariableType>Double</VariableType>
+                              <Address>+140</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1243</ID>
+                              <Description>"_chestHuntGemSavers.fakeValueActive"</Description>
+                              <LastState Value="0" RealAddress="1EF80BD3468"/>
+                              <VariableType>Byte</VariableType>
+                              <Address>+148</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1244</ID>
+                              <Description>"_chestHuntGemSavers.inited"</Description>
+                              <LastState Value="1" RealAddress="1EF80BD3469"/>
+                              <VariableType>Byte</VariableType>
+                              <Address>+149</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1245</ID>
+                              <Description>"_chestHuntCurrency.currentCryptoKey"</Description>
+                              <LastState Value="9064336375930506443" RealAddress="1EF80BD3470"/>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+150</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1246</ID>
+                              <Description>"_chestHuntCurrency.hiddenValue"</Description>
+                              <LastState Value="15351122994513270040" RealAddress="1EF80BD3478"/>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+158</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1255</ID>
+                              <Description>"_chestHuntCurrency.fakeValue"</Description>
+                              <LastState Value="0" RealAddress="1EF80BD3488"/>
+                              <VariableType>Double</VariableType>
+                              <Address>+168</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1256</ID>
+                              <Description>"_chestHuntCurrency.fakeValueActive"</Description>
+                              <LastState Value="0" RealAddress="1EF80BD3490"/>
+                              <VariableType>Byte</VariableType>
+                              <Address>+170</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1257</ID>
+                              <Description>"_chestHuntCurrency.inited"</Description>
+                              <LastState Value="1" RealAddress="1EF80BD3491"/>
+                              <VariableType>Byte</VariableType>
+                              <Address>+171</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1258</ID>
+                              <Description>"_petFoodCurrency.currentCryptoKey"</Description>
+                              <LastState Value="9064336375930506443" RealAddress="1EF80BD3498"/>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+178</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1259</ID>
+                              <Description>"_petFoodCurrency.hiddenValue"</Description>
+                              <LastState Value="15351122994513270040" RealAddress="1EF80BD34A0"/>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+180</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1268</ID>
+                              <Description>"_petFoodCurrency.fakeValue"</Description>
+                              <LastState Value="1.16538308763565E95" RealAddress="1EF80BD34B0"/>
+                              <VariableType>Double</VariableType>
+                              <Address>+190</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1269</ID>
+                              <Description>"_petFoodCurrency.fakeValueActive"</Description>
+                              <LastState Value="1" RealAddress="1EF80BD34B8"/>
+                              <VariableType>Byte</VariableType>
+                              <Address>+198</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1270</ID>
+                              <Description>"_petFoodCurrency.inited"</Description>
+                              <LastState Value="1" RealAddress="1EF80BD34B9"/>
+                              <VariableType>Byte</VariableType>
+                              <Address>+199</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1271</ID>
+                              <Description>"_playTimeHoursInSave.currentCryptoKey"</Description>
+                              <LastState Value="4395125653428674400" RealAddress="1EF80BD34C0"/>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+1A0</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1272</ID>
+                              <Description>"_playTimeHoursInSave.hiddenValue"</Description>
+                              <LastState Value="18096874229841016319" RealAddress="1EF80BD34C8"/>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+1A8</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1281</ID>
+                              <Description>"_playTimeHoursInSave.fakeValue"</Description>
+                              <LastState Value="0" RealAddress="1EF80BD34D8"/>
+                              <VariableType>Double</VariableType>
+                              <Address>+1B8</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1282</ID>
+                              <Description>"_playTimeHoursInSave.fakeValueActive"</Description>
+                              <LastState Value="0" RealAddress="1EF80BD34E0"/>
+                              <VariableType>Byte</VariableType>
+                              <Address>+1C0</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1283</ID>
+                              <Description>"_playTimeHoursInSave.inited"</Description>
+                              <LastState Value="1" RealAddress="1EF80BD34E1"/>
+                              <VariableType>Byte</VariableType>
+                              <Address>+1C1</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1295</ID>
+                              <Description>"_timeToTrackPlaytimeFrom.currentCryptoKey"</Description>
+                              <LastState Value="5899571916865676094" RealAddress="1EF80BD3540"/>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+220</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1296</ID>
+                              <Description>"_timeToTrackPlaytimeFrom.hiddenValue"</Description>
+                              <LastState Value="1802437823846452366" RealAddress="1EF80BD3548"/>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+228</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1297</ID>
+                              <Description>"_timeToTrackPlaytimeFrom.fakeValue"</Description>
+                              <LastState Value="0" RealAddress="1EF80BD3550"/>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+230</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1298</ID>
+                              <Description>"_timeToTrackPlaytimeFrom.fakeValueActive"</Description>
+                              <LastState Value="0" RealAddress="1EF80BD3558"/>
+                              <VariableType>Byte</VariableType>
+                              <Address>+238</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1299</ID>
+                              <Description>"_timeToTrackPlaytimeFrom.inited"</Description>
+                              <LastState Value="1" RealAddress="1EF80BD3559"/>
+                              <VariableType>Byte</VariableType>
+                              <Address>+239</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1284</ID>
+                              <Description>"AllStatistics"</Description>
+                              <LastState Value="000001EF804A4030" RealAddress="1EF80BD34E8"/>
+                              <ShowAsHex>1</ShowAsHex>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+1C8</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1285</ID>
+                              <Description>"GeneratorsProgress"</Description>
+                              <LastState Value="000001EF804A9E40" RealAddress="1EF80BD34F0"/>
+                              <ShowAsHex>1</ShowAsHex>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+1D0</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1286</ID>
+                              <Description>"T1UpgradesProgress"</Description>
+                              <LastState Value="000001EF804A9C60" RealAddress="1EF80BD34F8"/>
+                              <ShowAsHex>1</ShowAsHex>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+1D8</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1287</ID>
+                              <Description>"T2UpgradesProgress"</Description>
+                              <LastState Value="000001EF809D5280" RealAddress="1EF80BD3500"/>
+                              <ShowAsHex>1</ShowAsHex>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+1E0</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1288</ID>
+                              <Description>"AchievementProgress"</Description>
+                              <LastState Value="000001EF804A9B70" RealAddress="1EF80BD3508"/>
+                              <ShowAsHex>1</ShowAsHex>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+1E8</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1289</ID>
+                              <Description>"Timestamps"</Description>
+                              <LastState Value="000001EF8084DE40" RealAddress="1EF80BD3510"/>
+                              <ShowAsHex>1</ShowAsHex>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+1F0</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1290</ID>
+                              <Description>"FishIndexProgress"</Description>
+                              <LastState Value="000001EF809D5260" RealAddress="1EF80BD3518"/>
+                              <ShowAsHex>1</ShowAsHex>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+1F8</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1291</ID>
+                              <Description>"Counters"</Description>
+                              <LastState Value="000001EF80A4A8D0" RealAddress="1EF80BD3520"/>
+                              <ShowAsHex>1</ShowAsHex>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+200</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1292</ID>
+                              <Description>"Preferences"</Description>
+                              <LastState Value="000001EF80A4A8A0" RealAddress="1EF80BD3528"/>
+                              <ShowAsHex>1</ShowAsHex>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+208</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1293</ID>
+                              <Description>"CrewState"</Description>
+                              <LastState Value="000001EF80B49280" RealAddress="1EF80BD3530"/>
+                              <ShowAsHex>1</ShowAsHex>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+210</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1294</ID>
+                              <Description>"MainCharacterSkins"</Description>
+                              <LastState Value="000001EF804A9A80" RealAddress="1EF80BD3538"/>
+                              <ShowAsHex>1</ShowAsHex>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+218</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1300</ID>
+                              <Description>"WeatherState"</Description>
+                              <LastState Value="000001EF80A4A840" RealAddress="1EF80BD3560"/>
+                              <ShowAsHex>1</ShowAsHex>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+240</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1301</ID>
+                              <Description>"TimedBonusesSave"</Description>
+                              <LastState Value="000001EF804A9A20" RealAddress="1EF80BD3568"/>
+                              <ShowAsHex>1</ShowAsHex>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+248</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1302</ID>
+                              <Description>"PremiumProgression"</Description>
+                              <LastState Value="000001EF80B49240" RealAddress="1EF80BD3570"/>
+                              <ShowAsHex>1</ShowAsHex>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+250</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1303</ID>
+                              <Description>"QuestsProgress"</Description>
+                              <LastState Value="000001EF52942CC0" RealAddress="1EF80BD3578"/>
+                              <ShowAsHex>1</ShowAsHex>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+258</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1304</ID>
+                              <Description>"HolidayTasksProgress"</Description>
+                              <LastState Value="000001EF809760A0" RealAddress="1EF80BD3580"/>
+                              <ShowAsHex>1</ShowAsHex>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+260</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1305</ID>
+                              <Description>"AudioProgress"</Description>
+                              <LastState Value="000001EF80AAFF60" RealAddress="1EF80BD3588"/>
+                              <ShowAsHex>1</ShowAsHex>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+268</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1306</ID>
+                              <Description>"GuideProgress"</Description>
+                              <LastState Value="000001EF809D5200" RealAddress="1EF80BD3590"/>
+                              <ShowAsHex>1</ShowAsHex>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+270</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1307</ID>
+                              <Description>"CodeRedeemProgress"</Description>
+                              <LastState Value="000001EF809D51E0" RealAddress="1EF80BD3598"/>
+                              <ShowAsHex>1</ShowAsHex>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+278</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1308</ID>
+                              <Description>"&lt;FishingContestProgress&gt;k__BackingField"</Description>
+                              <LastState Value="000001EF80B490C0" RealAddress="1EF80BD35A0"/>
+                              <ShowAsHex>1</ShowAsHex>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+280</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1309</ID>
+                              <Description>"&lt;MedalShopProgress&gt;k__BackingField"</Description>
+                              <LastState Value="000001EF80AC3FA0" RealAddress="1EF80BD35A8"/>
+                              <ShowAsHex>1</ShowAsHex>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+288</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1310</ID>
+                              <Description>"PetsProgress"</Description>
+                              <LastState Value="000001EF80B49080" RealAddress="1EF80BD35B0"/>
+                              <ShowAsHex>1</ShowAsHex>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+290</Address>
+                            </CheatEntry>
+                            <CheatEntry>
+                              <ID>1311</ID>
+                              <Description>"SeagullProgress"</Description>
+                              <LastState Value="000001EF80AAFF20" RealAddress="1EF80BD35B8"/>
+                              <ShowAsHex>1</ShowAsHex>
+                              <VariableType>8 Bytes</VariableType>
+                              <Address>+298</Address>
+                            </CheatEntry>
+                          </CheatEntries>
+                        </CheatEntry>
+                      </CheatEntries>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>235</ID>
+              <Description>"-&gt; AOB"</Description>
+              <Options moHideChildren="1"/>
+              <LastState Value="" Activated="1" RealAddress="00000000"/>
+              <Color>0080FF</Color>
+              <GroupHeader>1</GroupHeader>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>951</ID>
+                  <Description>"All Bundles Unlocked"</Description>
+                  <LastState Activated="1"/>
+                  <Color>00FF00</Color>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+aobscanmodule(hasbundle,GameAssembly.dll,32 c0 48 83 c4 ? c3 49 8b 40 ? 45 33 c0 44 8b 49 ? 48 8b 49 ? 48 8b 90 ? ? ? ? 48 8b 82 ? ? ? ? 48 8b 50 ? 48 8b 82 ? ? ? ? 48 8b 90 ? ? ? ? 48 89 54 24 ? 41 8b d2 e8 ? ? ? ? 83 f8 ? 0f 95 c0 48 83 c4 ? c3 cc cc cc cc cc 48 83 ec)
+
+
+hasbundle:
+ mov al,1
+
+[DISABLE]
+
+hasbundle:
+ xor al,al
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>1326</ID>
+                  <Description>"Super Seagull Spawner"</Description>
+                  <LastState Activated="1"/>
+                  <Color>00FF00</Color>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>//Target:  Idle Fishing.exe
+//Author:  Salis
+//Credit to METHOS for custom Template LUA
+
+[ENABLE]
+
+////////////////////////  seagulls  \\\\\\\\\\\\\\\\\\\\\\\\
+
+aobscanmodule(address,GameAssembly.dll,83 78 10 00 7E 66)
+alloc(newmem,1024,GameAssembly.dll)
+alloc(obytes_seagulls, 10)
+label(return originalcode)
+
+registersymbol(obytes_seagulls)
+
+obytes_seagulls:
+readmem(address, 10)
+
+newmem:
+
+originalcode:
+ mov [rax+10],#50
+ cmp dword ptr [rax+10],00
+ jle GameAssembly.dll+1921050
+ jmp return
+
+address:
+ jmp newmem
+ nop
+return:
+
+
+[DISABLE]
+
+address:
+readmem(obytes_seagulls, 10)
+
+dealloc(*)
+unregistersymbol(*)
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>152</ID>
+                  <Description>"Income Multiplier"</Description>
+                  <Options moHideChildren="1"/>
+                  <LastState Activated="1"/>
+                  <Color>00FF00</Color>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+
+aobscanmodule(incbuy,GameAssembly.dll,89 59 ? 41 89 00 e9 ? ? ? ? e8 ? ? ? ? cc e8 ? ? ? ? cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc 44 88 4c 24)
+alloc(newmem,$1000,incbuy)
+alloc(mulval,4)
+registersymbol(mulval)
+label(code)
+label(return)
+
+mulval:
+dw (int)10
+
+
+newmem:
+
+code:
+  imul ebx,[mulval]
+  mov [rcx+0C],ebx
+  mov [r8],eax
+  jmp return
+
+incbuy:
+  jmp newmem
+  nop
+return:
+registersymbol(incbuy)
+
+[DISABLE]
+
+incbuy:
+  db 89 59 0C 41 89 00
+
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+                  <CheatEntries>
+                    <CheatEntry>
+                      <ID>4</ID>
+                      <Description>"Multiplication Factor"</Description>
+                      <LastState Value="10" RealAddress="7FFE44AE1000"/>
+                      <ShowAsSigned>0</ShowAsSigned>
+                      <VariableType>4 Bytes</VariableType>
+                      <Address>mulval</Address>
+                    </CheatEntry>
+                  </CheatEntries>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>938</ID>
+                  <Description>"Super Acension Bonus"</Description>
+                  <LastState Activated="1"/>
+                  <Color>00FF00</Color>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>//Target:  Idle Fishing.exe
+//Author:  Salis
+//Credit to METHOS for custom Template LUA
+
+[ENABLE]
+
+////////////////////////  superacbonus  \\\\\\\\\\\\\\\\\\\\\\\\
+
+aobscanmodule(address,GameAssembly.dll,8B 59 24 33 D2)
+alloc(newmem,1024,GameAssembly.dll)
+alloc(obytes_superacbonus, 10)
+label(return originalcode)
+
+registersymbol(obytes_superacbonus)
+
+obytes_superacbonus:
+readmem(address, 10)
+
+newmem:
+
+originalcode:
+ mov ebx,(int)9999
+ xor edx,edx
+ jmp return
+
+address:
+ jmp newmem
+ return:
+
+
+[DISABLE]
+
+address:
+readmem(obytes_superacbonus, 10)
+
+dealloc(*)
+unregistersymbol(*)
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>3</ID>
+                  <Description>"Free Tier Upgrades"</Description>
+                  <LastState Activated="1"/>
+                  <Color>00FF00</Color>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>//Send
+[ENABLE]
+
+aobscanmodule(upgrade_free,GameAssembly.dll,F2 0F 10 57 30 8B)
+alloc(newmem,$1000,upgrade_free)
+label(code return)
+
+newmem:
+
+code:
+  movsd xmm2,[rdi+30]
+  xorps xmm2,xmm2
+  jmp return
+
+upgrade_free:
+  jmp newmem
+return:
+registersymbol(upgrade_free)
+
+[DISABLE]
+
+upgrade_free:
+  db F2 0F 10 57 30
+
+unregistersymbol(*)
+dealloc(*)
+//Tier1UpgradeConfigs -&gt; Base Cost -&gt; Access
+//MCLECMIDKAH.GGPOBJDIDAB
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>170</ID>
+                  <Description>"Infinite Collect Achievement Gem"</Description>
+                  <LastState Activated="1"/>
+                  <Color>00FF00</Color>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>[ENABLE]
+
+aobscanmodule(infachgem,GameAssembly.dll,0f 84 ? ? ? ? 33 d2 e8 ? ? ? ? 48 85 c0 0f 84 ? ? ? ? 45 33 c0 48 8b d3 48 8b c8 e8 ? ? ? ? 84 c0)
+
+registersymbol(infachgem)
+infachgem:
+  db EB 22 90 90 90 90
+[DISABLE]
+
+infachgem:
+  db 0F 84 68 01 00 00
+
+unregistersymbol(infachgem)
+dealloc(newmem)
+
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>148</ID>
+                  <Description>"Hired Crew Have Max Stats"</Description>
+                  <LastState Activated="1"/>
+                  <Color>00FF00</Color>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>{ Game   : Idle Fishing.exe
+  Version: 
+  Date   : 2024-07-15
+  Author : User
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(maxstats,GameAssembly.dll,8b 5c da ? 48 c7 44 24 ? ? ? ? ? f6 80 ? ? ? ? ? 75 ? 48 8b c8 e8 ? ? ? ? 4c 8b 88 ? ? ? ? 48 8d 4c 24 ? 44 8b c3 8b d6 4d 8b 49 ? e8 ? ? ? ? 48 8b 44 24 ? 48 8b 74 24 ? 48 89 47 ? b0 ? 48 8b 5c 24 ? 48 8b 6c 24 ? 48 83 c4 ? 5f c3 48 85 c9 74 ? 48 8b 5c 24 ? ff c0 48 8b 6c 24 ? 89 47 ? 33 c0 48 89 47 ? 48 83 c4 ? 5f c3 e8 ? ? ? ? cc e8 ? ? ? ? cc cc) // should be unique
+alloc(newmem,$1000,maxstats)
+
+label(code)
+label(ocode)
+label(return)
+
+newmem:
+
+code:
+  cmp r13,00
+  jne ocode
+  mov [rdx+rbx*8+0C], (int)999
+  mov ebx,[rdx+rbx*8+0C]
+  mov qword ptr [rsp+30],00000000
+  jmp return
+
+ocode:
+  mov ebx,[rdx+rbx*8+0C]
+  mov qword ptr [rsp+30],00000000
+  jmp return
+
+maxstats:
+  jmp newmem
+  nop 8
+return:
+registersymbol(maxstats)
+
+[DISABLE]
+
+maxstats:
+  db 8B 5C DA 0C 48 C7 44 24 30 00 00 00 00
+
+unregistersymbol(maxstats)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: GameAssembly.dll+1429391
+
+GameAssembly.dll+1429367: 0F 84 9C 00 00 00           - je GameAssembly.dll+1429409
+GameAssembly.dll+142936D: 44 3B 42 18                 - cmp r8d,[rdx+18]
+GameAssembly.dll+1429371: 0F 83 98 00 00 00           - jae GameAssembly.dll+142940F
+GameAssembly.dll+1429377: 49 8D 58 02                 - lea rbx,[r8+02]
+GameAssembly.dll+142937B: 48 03 DB                    - add rbx,rbx
+GameAssembly.dll+142937E: 83 3C DA 00                 - cmp dword ptr [rdx+rbx*8],00
+GameAssembly.dll+1429382: 7C BC                       - jl GameAssembly.dll+1429340
+GameAssembly.dll+1429384: 48 8B 45 20                 - mov rax,[rbp+20]
+GameAssembly.dll+1429388: 48 89 74 24 38              - mov [rsp+38],rsi
+GameAssembly.dll+142938D: 8B 74 DA 08                 - mov esi,[rdx+rbx*8+08]
+// ---------- INJECTING HERE ----------
+GameAssembly.dll+1429391: 8B 5C DA 0C                 - mov ebx,[rdx+rbx*8+0C]
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+1429395: 48 C7 44 24 30 00 00 00 00  - mov qword ptr [rsp+30],00000000
+GameAssembly.dll+142939E: F6 80 35 01 00 00 01        - test byte ptr [rax+00000135],01
+GameAssembly.dll+14293A5: 75 08                       - jne GameAssembly.dll+14293AF
+GameAssembly.dll+14293A7: 48 8B C8                    - mov rcx,rax
+GameAssembly.dll+14293AA: E8 81 A1 F0 FE              - call GameAssembly.dll+333530
+GameAssembly.dll+14293AF: 4C 8B 88 C0 00 00 00        - mov r9,[rax+000000C0]
+GameAssembly.dll+14293B6: 48 8D 4C 24 30              - lea rcx,[rsp+30]
+GameAssembly.dll+14293BB: 44 8B C3                    - mov r8d,ebx
+GameAssembly.dll+14293BE: 8B D6                       - mov edx,esi
+GameAssembly.dll+14293C0: 4D 8B 49 38                 - mov r9,[r9+38]
+}
+</AssemblerScript>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>166</ID>
+                  <Description>"Instant Pet Bond"</Description>
+                  <LastState Activated="1"/>
+                  <Color>00FF00</Color>
+                  <VariableType>Auto Assembler Script</VariableType>
+                  <AssemblerScript>{ Game   : Idle Fishing.exe
+  Version: 
+  Date   : 2024-08-10
+  Author : User
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+define(instabond,IdleFishing.Pets.Config.BondLevelConfig.get_SecondsToNextBondLevel) // should be unique
+alloc(newmem,$1000,instabond)
+alloc(bmul,4)
+label(code)
+label(return)
+
+bmul:
+dw (float)0.0000001
+
+newmem:
+
+code:
+  movsd xmm0,[bmul]
+  jmp return
+
+instabond:
+  jmp newmem
+return:
+registersymbol(instabond)
+
+[DISABLE]
+
+instabond:
+  db F2 0F 10 41 18
+
+unregistersymbol(instabond)
+dealloc(newmem)
+
+{
+// ORIGINAL CODE - INJECTION POINT: IdleFishing.Pets.Config.BondLevelConfig.get_SecondsToNextBondLevel
+
+IdleFishing.Pets.Config.BondLevelConfig.PFFJFFHEOHL: F2 0F 10 41 18           - movsd xmm0,[rcx+18]
+GameAssembly.dll+1EDD435: F2 0F 59 05 63 48 42 01  - mulsd xmm0,[GameAssembly.dll+3301CA0]
+GameAssembly.dll+1EDD43D: C3                       - ret 
+GameAssembly.dll+1EDD43E: CC                       - int 3 
+GameAssembly.dll+1EDD43F: CC                       - int 3 
+IdleFishing.Pets.Config.BondLevelConfig.PJOFJGNFJJK: F2 0F 10 41 18           - movsd xmm0,[rcx+18]
+GameAssembly.dll+1EDD445: F2 0F 59 05 DB 48 42 01  - mulsd xmm0,[GameAssembly.dll+3301D28]
+GameAssembly.dll+1EDD44D: C3                       - ret 
+GameAssembly.dll+1EDD44E: CC                       - int 3 
+GameAssembly.dll+1EDD44F: CC                       - int 3 
+// ---------- INJECTING HERE ----------
+IdleFishing.Pets.Config.BondLevelConfig.get_SecondsToNextBondLevel: F2 0F 10 41 18           - movsd xmm0,[rcx+18]
+// ---------- DONE INJECTING  ----------
+GameAssembly.dll+1EDD455: F2 0F 59 05 2B 49 42 01  - mulsd xmm0,[GameAssembly.dll+3301D88]
+GameAssembly.dll+1EDD45D: C3                       - ret 
+GameAssembly.dll+1EDD45E: CC                       - int 3 
+GameAssembly.dll+1EDD45F: CC                       - int 3 
+CHCCAJKBDNA.OLDAAJMJIJM: 48 89 74 24 10           - mov [rsp+10],rsi
+GameAssembly.dll+1EDD465: 57                       - push rdi
+GameAssembly.dll+1EDD466: 48 83 EC 20              - sub rsp,20
+GameAssembly.dll+1EDD46A: 33 FF                    - xor edi,edi
+GameAssembly.dll+1EDD46C: 48 8B F1                 - mov rsi,rcx
+GameAssembly.dll+1EDD46F: 8B C7                    - mov eax,edi
+}
+</AssemblerScript>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>435</ID>
+      <Description>"-&gt; Extra"</Description>
+      <Options moHideChildren="1"/>
+      <LastState Value="" RealAddress="00000000"/>
+      <Color>4080FF</Color>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>436</ID>
+          <Description>"Extra Credits For Contributing: Send"</Description>
+          <LastState Value="" RealAddress="00000000"/>
+          <GroupHeader>1</GroupHeader>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>447</ID>
+          <Description>"Join Discord"</Description>
+          <LastState/>
+          <Color>8000FF</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+{$lua}
+shellExecute("https://discord.gg/n7QPrYn7p5")
+ 
+{$asm}
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols>
+    <SymbolEntry>
+      <Name>ppmptr</Name>
+      <Address>1EF528F4BA0</Address>
+    </SymbolEntry>
+    <SymbolEntry>
+      <Name>speedhack_wantedspeed</Name>
+      <Address>1EE24A40000</Address>
+    </SymbolEntry>
+  </UserdefinedSymbols>
+  <Comments>Info about this table:
+</Comments>
+  <DisassemblerComments>
+    <DisassemblerComment>
+      <Address>80A1592D</Address>
+      <Header>CHECK OWNED
+</Header>
+    </DisassemblerComment>
+  </DisassemblerComments>
+</CheatTable>

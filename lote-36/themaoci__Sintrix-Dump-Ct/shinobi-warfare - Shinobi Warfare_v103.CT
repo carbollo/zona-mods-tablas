@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>44</ID>
+      <Description>"Enable (Auto-Attach Game Process)"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$Lua}
+if syntaxcheck then return end
+
+local process = 'Shinobi Warfare.exe'
+OpenProcess(process);
+if process ~= process or (readInteger(process) == nil) then
+   error(ShowMessage("Failed To Attach To Process"))
+end
+
+
+--Set Window Title
+local title = "Shinobi Warfare 1.0.0.3";
+if not((MainForm.Caption):match("Shinobi Warfare")) then
+MainForm.Caption = title..' ~ '..MainForm.Caption
+end
+
+--Credits
+if MainForm.lblSigned.Caption:match('Sintrix / Build 16329980') == nil then
+  local Main = MainForm.lblSigned
+  local MadeBy = createPanel(Main.Parent)
+
+
+  MadeBy.AutoSize = true
+  MadeBy.Anchors = '[akTop,akRight,akLeft]'
+  MadeBy.AnchorSideTop.Control = MadeBy.Parent
+  MadeBy.AnchorSideTop.Side = asrCenter
+  MadeBy.AnchorSideRight.Control = MainForm.CommentButton
+  MadeBy.AnchorSideRight.Side = asrLeft
+  MadeBy.AnchorSideLeft.Control = MainForm.advancedbutton
+  MadeBy.AnchorSideLeft.Side = asrRight
+
+  Main.Parent = MadeBy
+  Main.Visible = true
+  Main.Caption = 'Sintrix / Build 16329980'
+  Main.Font.Size = 12
+  Main.Font.Style = '[fsBold]'
+  Main.Font.Quality = 'fqCleartypeNatural'
+  Main.AnchorSideTop.Control = MadeBy
+  Main.AnchorSideTop.Side = asrCenter
+  Main.AnchorSideLeft.Control = MadeBy
+  Main.AnchorSideLeft.Side = asrCenter
+end
+
+getMainForm().Panel4.Visible = true;
+{$asm}
+[DISABLE]
+{$Lua}
+
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>3</ID>
+          <Description>"Enable Modifiers (Note: Must take damage before enabling script.)"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>//Sintrix
+[ENABLE]
+
+aobscan(test,89 42 2C 8B 4A 2C)
+alloc(newmem,$1000)
+registersymbol(player_health ai_health)
+label(code return player_health ai_health)
+
+newmem:
+cmp [player_health],1
+jne @f
+cmp dword ptr [edx+28],#1
+jne @f
+mov eax,[edx+2C]
+mov [edx+2C],eax
+mov ecx,[edx+2C]
+jmp return
+
+@@:
+cmp [ai_health],1
+jne code
+cmp dword ptr [edx+28],#0
+jne code
+xor eax,eax
+mov [edx+2C],eax
+mov ecx,[edx+20]
+jmp code
+
+code:
+  mov [edx+2C],eax
+  mov ecx,[edx+2C]
+  jmp return
+
+player_health:
+dd 0
+
+ai_health:
+dd 0
+
+test:
+  jmp newmem
+  nop
+return:
+registersymbol(test)
+
+[DISABLE]
+
+test:
+  db 89 42 2C 8B 4A 2C
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>4</ID>
+              <Description>"Infinite Health"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>//Sintrix
+[ENABLE]
+player_health:
+dd 1
+
+[DISABLE]
+player_health:
+dd 0
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>69</ID>
+              <Description>"Infinite Chakra"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>//Send@Sintrix
+[ENABLE]
+
+aobscan(chakra,89 4A 34 8B 4A 68)
+alloc(newmem,$1000)
+
+label(code)
+label(return)
+
+newmem:
+
+code:
+  mov ecx,[edx+34]
+  mov [edx+34],ecx
+  mov ecx,[edx+68]
+  jmp return
+
+chakra:
+  jmp newmem
+  nop
+return:
+registersymbol(chakra)
+
+[DISABLE]
+
+chakra:
+  db 89 4A 34 8B 4A 68
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>5</ID>
+              <Description>"One Hit Kill"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>//Sintrix
+[ENABLE]
+ai_health:
+dd 1
+
+[DISABLE]
+ai_health:
+dd 0
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>68</ID>
+              <Description>"No Skill Cooldown"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>//Sintrix
+[ENABLE]
+
+aobscan(skillcd,C3 8B 41 68 8B 4D F0)
+alloc(newmem,$1000)
+label(code return)
+
+newmem:
+mov [ecx+68],#0
+
+code:
+  mov eax,[ecx+68]
+  mov ecx,[ebp-10]
+  jmp return
+
+skillcd+01:
+  jmp newmem
+  nop
+return:
+registersymbol(skillcd)
+
+[DISABLE]
+
+skillcd+01:
+  db 8B 41 68 8B 4D F0
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>45</ID>
+              <Description>"Note: These modifiers are for singleplayer missions only. Sintrix is not responsible for any loss of account and/or data."</Description>
+              <GroupHeader>1</GroupHeader>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>458</ID>
+      <Description>"--------------------------------"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>460</ID>
+      <Description>"⚡ Join Discord"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+{$lua}
+shellExecute("https://discord.gg/NTFcdAUWxb")
+
+{$asm}
+[DISABLE]
+
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>457</ID>
+      <Description>"✔ Verify Game Build"</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+{$lua}
+shellExecute("https://steamdb.info/app/1895300/patchnotes/")
+
+{$asm}
+[DISABLE]
+
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>455</ID>
+      <Description>"🞂 Build: 16329980"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>454</ID>
+      <Description>"🞂 Process: Shinobi Warfare.exe"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>461</ID>
+      <Description>"💥 Author: Send"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>459</ID>
+      <Description>"--------------------------------"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

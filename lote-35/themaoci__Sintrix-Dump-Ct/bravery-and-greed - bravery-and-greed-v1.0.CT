@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>452</ID>
+      <Description>"Enable (Auto-Attach Game Process)"</Description>
+      <Options moHideChildren="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+{$Lua}
+if syntaxcheck then return end
+
+local process = 'Bravery and Greed.exe'
+OpenProcess(process);
+if process ~= process or (readInteger(process) == nil) then
+   error(ShowMessage("Failed To Attach To Process"))
+end
+
+--Set Window Title
+local title = "Bravery and Greed | Sintrix";
+if not((MainForm.Caption):match("Bravery and Greed")) then
+MainForm.Caption = title..' ~ '..MainForm.Caption
+end
+
+[DISABLE]
+
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>769</ID>
+          <Description>"Initialize Mono"</Description>
+          <Options moHideChildren="1"/>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+{$lua}
+mono_initialize()
+LaunchMonoDataCollector()
+{$asm}
+
+
+[DISABLE]
+
+
+</AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>2</ID>
+              <Description>"Disable Enemy Attacks"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>//Send@Sintrix
+[ENABLE]
+AiEntity.ActAttack:
+db C3
+
+[DISABLE]
+AiEntity.ActAttack:
+db 48 89 5C 24 08
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>18</ID>
+              <Description>"Increased Attack Speed"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>//Send@Sintrix
+define(address,"GameAssembly.dll"+18144DC)
+define(bytes,F3 0F 10 B7 70 05 00 00)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,"GameAssembly.dll"+18144DC)
+label(code return)
+
+newmem:
+
+code:
+  movss xmm6,[atkspd]
+  jmp return
+
+atkspd:
+dd (float)99999
+
+address:
+  jmp newmem
+  nop 3
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+
+dealloc(*)
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>15</ID>
+              <Description>"One Hit Kill"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>//Send@Sintrix
+define(address,"GameAssembly.dll"+180CBCF)
+define(bytes,48 8B 8B 30 07 00 00)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,"GameAssembly.dll"+180CBCF)
+
+label(code)
+label(return)
+
+newmem:
+mov [rcx+560],(float)999999
+
+code:
+  mov rcx,[rbx+00000730]
+  jmp return
+
+address:
+  jmp newmem
+  nop 2
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+
+dealloc(*)
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>13</ID>
+              <Description>"Infinite Stamina"</Description>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>//Send@Sintrix
+define(address,"GameAssembly.dll"+180CB8D)
+define(bytes,48 8B D9 0F 29 74 24 20)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,"GameAssembly.dll"+180CB8D)
+label(code return)
+
+newmem:
+push rcx
+mov rcx,[rcx+838]
+mov [rcx+34],(float)100
+
+code:
+  pop rcx
+  mov rbx,rcx
+  movaps [rsp+20],xmm6
+  jmp return
+
+address:
+  jmp newmem
+  nop 3
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+
+dealloc(*)
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>5</ID>
+              <Description>"Enemy Gold Drop Modifier"</Description>
+              <Options moHideChildren="1"/>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>//Send@Sintrix
+define(address,"GameAssembly.dll"+16C5267)
+define(bytes,48 8B E9 75 12)
+
+[ENABLE]
+
+assert(address,bytes)
+alloc(newmem,$1000,"GameAssembly.dll"+16C5267)
+registersymbol(setgold)
+label(code return setgold)
+
+newmem:
+push rsi
+mov rsi,[setgold]
+mov [rcx+10],rsi
+mov [rcx+14],rsi
+
+code:
+  pop rsi
+  mov rbp,rcx
+  jne GameAssembly.dll+16C527E
+  jmp return
+
+setgold:
+dd #200
+
+address:
+  jmp newmem
+return:
+
+[DISABLE]
+
+address:
+  db bytes
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>6</ID>
+                  <Description>"Set Amount Dropped By Enemy"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>setgold</Address>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>68</ID>
+      <Description>"Extra"</Description>
+      <Options moHideChildren="1"/>
+      <GroupHeader>1</GroupHeader>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>67</ID>
+          <Description>"Join our Discord server for updates, tables, and more!"</Description>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+
+{$lua}
+shellExecute("https://discord.gg/NTFcdAUWxb")
+
+{$asm}
+[DISABLE]
+
+
+</AssemblerScript>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+
+</CheatTable>

@@ -1,0 +1,1418 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>3</ID>
+      <Description>"→ Activate Trainer"</Description>
+      <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+      <Color>80FF00</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+////////////////////////////////////////////////////////////////////////////////
+
+aobscanmodule(findpBase,$process,F3 * * * * * * * EB * F3 * * * * * * * EB * F3 * * * * * * * 41 * * E8)
+alloc(newmemfindpBase,$100,findpBase)
+alloc(pBase,8,findpBase)
+alloc(infStamFlag,8,findpBase)
+alloc(infHealthFlag,8,findpBase)
+alloc(infMagikaFlag,8,findpBase)
+label(codefindpBase returnfindpBase check1 check2)
+
+infStamFlag:
+dd 0
+
+infHealthFlag:
+dd 0
+
+infMagikaFlag:
+dd 0
+
+newmemfindpBase:
+mov [pBase],rcx
+cmp [infStamFlag],1
+jne check1
+mov [rcx+6AC],(float)0
+
+check1:
+cmp [infHealthFlag],1
+jne check2
+mov [rcx+6A4],(float)0
+
+check2:
+cmp [infMagikaFlag],1
+jne codefindpBase
+mov [rcx+6A8],(float)0
+
+codefindpBase:
+movss xmm6,[rcx+000006AC]
+jmp returnfindpBase
+
+findpBase:
+jmp newmemfindpBase
+nop 3
+returnfindpBase:
+registersymbol(findpBase pBase infStamFlag infHealthFlag infMagikaFlag)
+
+////////////////////////////////////////////////////////////////////////////////
+
+aobscanmodule(getGold,$process,83 * * * 7E * 48 * * 03 * * 48 * * * 48 * * 75 * 48)
+define(jleAddress,getGold+C)
+alloc(newmemgetGold,$100,getGold)
+alloc(gold_,8,getGold)
+label(codegetGold returngetGold)
+newmemgetGold:
+mov [gold_],rax
+codegetGold:
+cmp dword ptr [rax+08],00
+//jle 7FF65D4BD3A8 // OblivionRemastered-WinGDK-Shipping.exe.text+5FAC3A0
+jle jleAddress
+jmp returngetGold
+getGold:
+jmp newmemgetGold
+nop 1
+returngetGold:
+registersymbol(getGold gold_)
+
+////////////////////////////////////////////////////////////////////////////////
+
+aobscanmodule(FindpCords,$process,0F * * * * * * 0F * * * 0F * * * * * * F2 * * * * EB * 0F * * * F2 * * * * 48 * * * 0F * * 0F * * * 48)
+alloc(newmemFindpCords,$100,FindpCords)
+alloc(pCords,8,FindpCords)
+alloc(freezeOppsFlag,8,FindpCords)
+label(codeFindpCords returnFindpCords freezeOps)
+
+freezeOppsFlag:
+dd 0
+
+newmemFindpCords:
+cmp [rcx+C8],#11
+jne freezeOps
+mov [pCords],rcx
+movups xmm0,[rcx+00000260]
+jmp returnFindpCords
+
+freezeOps:
+cmp [freezeOppsFlag],1
+jne codeFindpCords
+push rbx
+mov rbx,[rcx+00000264]
+mov [rcx+00000264],rbx
+mov rbx,[rcx+0000026C]
+mov [rcx+0000026C],rbx
+mov rbx,[rcx+00000274]
+mov [rcx+00000274],rbx
+pop rbx
+
+
+codeFindpCords:
+movups xmm0,[rcx+00000260]
+jmp returnFindpCords
+
+FindpCords:
+jmp newmemFindpCords
+nop 2
+returnFindpCords:
+registersymbol(FindpCords pCords freezeOppsFlag)
+
+////////////////////////////////////////////////////////////////////////////////
+
+aobscanmodule(getHighlightedItem,$process,41 * * * 41 * * 85 * 0F * * * * * 8D * * E8 * * * * 48)
+alloc(newmemgetHighlightedItem,$100,getHighlightedItem)
+alloc(highlighted_Item,8,getHighlightedItem)
+label(codegetHighlightedItem returngetHighlightedItem)
+
+newmemgetHighlightedItem:
+mov [highlighted_Item],r15
+
+codegetHighlightedItem:
+mov eax,[r15+08]
+sub eax,r13d
+jmp returngetHighlightedItem
+
+getHighlightedItem:
+jmp newmemgetHighlightedItem
+nop 2
+returngetHighlightedItem:
+registersymbol(getHighlightedItem highlighted_Item)
+
+////////////////////////////////////////////////////////////////////////////////
+
+aobscanmodule(findVirtues,$process,8B * * * * * 84 * 74 * 8B * 41 * * EB * 42 * * * 3B * 74)
+alloc(newmemfindVirtues,$100,findVirtues)
+alloc(virtues,8,findVirtues)
+label(codefindVirtues returnfindVirtues)
+
+newmemfindVirtues:
+mov [virtues],rcx
+
+codefindVirtues:
+mov eax,[rcx+00000120]
+jmp returnfindVirtues
+
+findVirtues:
+jmp newmemfindVirtues
+nop 1
+returnfindVirtues:
+registersymbol(findVirtues virtues)
+
+[DISABLE]
+
+findpBase:
+db F3 0F 10 B1 AC 06 00 00
+unregistersymbol(findpBase pBase infStamFlag infHealthFlag infMagikaFlag)
+dealloc(newmemfindpBase pBase infStamFlag infHealthFlag infMagikaFlag)
+
+getGold:
+db 83 78 08 00 7E 06
+unregistersymbol(getGold gold_)
+dealloc(newmemgetGold gold_)
+
+FindpCords:
+db 0F 10 81 60 02 00 00
+unregistersymbol(FindpCords pCords freezeOppsFlag)
+dealloc(newmemFindpCords pCords freezeOppsFlag)
+
+getHighlightedItem:
+db 41 8B 47 08 41 2B C5
+unregistersymbol(getHighlightedItem highlighted_Item)
+dealloc(newmemgetHighlightedItem highlighted_Item)
+
+findVirtues:
+db 8B 81 20 01 00 00
+unregistersymbol(findVirtues virtues)
+dealloc(newmemfindVirtues virtues)
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>35</ID>
+          <Description>"→ Data"</Description>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>367387</ID>
+              <Description>"Highlighted Item Count"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>808040</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>highlighted_Item</Address>
+              <Offsets>
+                <Offset>8</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>367398</ID>
+              <Description>"gold"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>808040</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>gold_</Address>
+              <Offsets>
+                <Offset>8</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>55</ID>
+              <Description>"stamina"</Description>
+              <DropDownListLink>magika</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>808040</Color>
+              <VariableType>Float</VariableType>
+              <Address>pBase</Address>
+              <Offsets>
+                <Offset>6AC</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>57</ID>
+              <Description>"health"</Description>
+              <DropDownListLink>magika</DropDownListLink>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>808040</Color>
+              <VariableType>Float</VariableType>
+              <Address>pBase</Address>
+              <Offsets>
+                <Offset>6A4</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>58</ID>
+              <Description>"magika"</Description>
+              <DropDownList DescriptionOnly="1" DisplayValueAsItem="1">0:Full
+</DropDownList>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>808040</Color>
+              <VariableType>Float</VariableType>
+              <Address>pBase</Address>
+              <Offsets>
+                <Offset>6A8</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>225</ID>
+              <Description>"x"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>808040</Color>
+              <VariableType>Float</VariableType>
+              <Address>pCords</Address>
+              <Offsets>
+                <Offset>264</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>226</ID>
+              <Description>"y"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>808040</Color>
+              <VariableType>Float</VariableType>
+              <Address>pCords</Address>
+              <Offsets>
+                <Offset>26C</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>227</ID>
+              <Description>"z"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>808040</Color>
+              <VariableType>Float</VariableType>
+              <Address>pCords</Address>
+              <Offsets>
+                <Offset>274</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>367390</ID>
+              <Description>"standing height"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>808040</Color>
+              <VariableType>Float</VariableType>
+              <Address>pCords</Address>
+              <Offsets>
+                <Offset>598</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>367391</ID>
+              <Description>"unknown"</Description>
+              <ShowAsSigned>0</ShowAsSigned>
+              <Color>808040</Color>
+              <VariableType>Float</VariableType>
+              <Address>pCords</Address>
+              <Offsets>
+                <Offset>59C</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>367484</ID>
+              <Description>"virtues"</Description>
+              <Color>808040</Color>
+              <VariableType>4 Bytes</VariableType>
+              <Address>[virtues]+120</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>367417</ID>
+              <Description>"Find Skills"</Description>
+              <Options moHideChildren="1"/>
+              <Color>808040</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+aobscanmodule(NearStats,$process,F3 * * * * * * * 45 * * * F3 * * * * * * * F3 * * * * * * * 45 * * 0F)
+alloc(newmemNearStats,$100,NearStats)
+alloc(skill_,8,NearStats)
+label(codeNearStats returnNearStats)
+
+newmemNearStats:
+mov [skill_],rsi
+
+codeNearStats:
+movss xmm1,[rsi+00000310]
+jmp returnNearStats
+
+NearStats+0:  
+jmp newmemNearStats
+nop 3
+returnNearStats:
+registersymbol(NearStats skill_)
+
+
+
+[DISABLE]
+
+NearStats+0:
+db F3 0F 10 8E 10 03 00 00
+unregistersymbol(NearStats skill_)
+dealloc(newmemNearStats skill_)
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>367418</ID>
+                  <Description>"skill_0"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>skill_</Address>
+                  <Offsets>
+                    <Offset>360</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367438</ID>
+                  <Description>"skill_1"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>skill_</Address>
+                  <Offsets>
+                    <Offset>364</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367419</ID>
+                  <Description>"skill_2"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>skill_</Address>
+                  <Offsets>
+                    <Offset>368</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367420</ID>
+                  <Description>"skill_3"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>skill_</Address>
+                  <Offsets>
+                    <Offset>36C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367421</ID>
+                  <Description>"skill_4"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>skill_</Address>
+                  <Offsets>
+                    <Offset>370</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367422</ID>
+                  <Description>"skill_5"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>skill_</Address>
+                  <Offsets>
+                    <Offset>374</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367423</ID>
+                  <Description>"skill_6"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>skill_</Address>
+                  <Offsets>
+                    <Offset>378</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367424</ID>
+                  <Description>"skill_7"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>skill_</Address>
+                  <Offsets>
+                    <Offset>37C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367425</ID>
+                  <Description>"skill_8"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>skill_</Address>
+                  <Offsets>
+                    <Offset>380</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367426</ID>
+                  <Description>"skill_9"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>skill_</Address>
+                  <Offsets>
+                    <Offset>384</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367427</ID>
+                  <Description>"skill_10"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>skill_</Address>
+                  <Offsets>
+                    <Offset>388</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367428</ID>
+                  <Description>"skill_11"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>skill_</Address>
+                  <Offsets>
+                    <Offset>38C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367429</ID>
+                  <Description>"skill_12"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>skill_</Address>
+                  <Offsets>
+                    <Offset>390</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367430</ID>
+                  <Description>"skill_13"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>skill_</Address>
+                  <Offsets>
+                    <Offset>394</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367431</ID>
+                  <Description>"skill_14"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>skill_</Address>
+                  <Offsets>
+                    <Offset>398</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367432</ID>
+                  <Description>"skill_15"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>skill_</Address>
+                  <Offsets>
+                    <Offset>39C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367433</ID>
+                  <Description>"skill_16 (marksman)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>skill_</Address>
+                  <Offsets>
+                    <Offset>3A0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367434</ID>
+                  <Description>"skill_17"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>skill_</Address>
+                  <Offsets>
+                    <Offset>3A4</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367435</ID>
+                  <Description>"skill_18"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>skill_</Address>
+                  <Offsets>
+                    <Offset>3A8</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367436</ID>
+                  <Description>"skill_19 (sneak)"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>skill_</Address>
+                  <Offsets>
+                    <Offset>3AC</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367437</ID>
+                  <Description>"skill_20"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>Float</VariableType>
+                  <Address>skill_</Address>
+                  <Offsets>
+                    <Offset>3B0</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>36</ID>
+          <Description>"→ Scripts"</Description>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>367383</ID>
+              <Description>"Teleport menu"</Description>
+              <Color>80FF00</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$lua}
+if syntaxcheck then return end
+
+tpm_s = getAddressList().getMemoryRecordByDescription('Teleport menu')
+
+[ENABLE]
+
+-- Main form setup
+tpFRM = createForm(false)
+tpFRM.Caption = "Teleport Menu"
+tpFRM.Width = 300
+tpFRM.Height = 45
+tpFRM.Position = 'poScreenCenter'
+tpFRM.Color = 0x000000 tpFRM.AlphaBlend = true tpFRM.AlphaBlendValue = 200
+--tpFRM.FormStyle = 'fsSystemStayOnTop'
+tpFRM.BorderStyle = 'bsDialog'
+
+local filePath = getCheatEngineDir() .. "Oblivion_locations.txt"
+
+local defaultLocations = [[
+
+]]
+
+local function createLocationsFile() if not fileExists(filePath) then local file = io.open(filePath, "w") if file then file:write(defaultLocations) file:close() end end end createLocationsFile()
+local function readLocationsFromFile() local locations = {} if fileExists(filePath) then for line in io.lines(filePath) do local name, x, y, z = line:match("([^,]+),([^,]+),([^,]+),([^,]+)") if name and x and y and z then table.insert(locations, {name = name, x = tonumber(x), y = tonumber(y), z = tonumber(z)}) end end end return locations end
+local function saveLocation(name, x, y, z) local file = io.open(filePath, "a") if file then file:write(string.format("%s,%.3f,%.3f,%.3f\n", name, x, y, z)) file:close() else print("Failed to open file: " .. filePath) end end
+
+--Init vals
+local coordx = 0 local coordy = 0 local coordz = 0
+
+--Location Dropdown
+local locations = readLocationsFromFile()
+local TeleportSelectiondropdown = createComboBox(tpFRM)
+TeleportSelectiondropdown.Left = 1
+TeleportSelectiondropdown.Top = 20
+TeleportSelectiondropdown.Width = 150
+TeleportSelectiondropdown.Height = 25
+for _, loc in ipairs(locations) do TeleportSelectiondropdown.Items.add(loc.name) end
+
+local TeleportSelectionEditor = createCheckBox(tpFRM)
+TeleportSelectionEditor.Caption = 'Edit Dropdown Menu'
+TeleportSelectionEditor.Left = 5
+TeleportSelectionEditor.Top = TeleportSelectiondropdown.Top - 20
+TeleportSelectionEditor.Width = 150
+TeleportSelectionEditor.Height = 20
+TeleportSelectionEditor.onClick=function()
+  shellExecute(filePath)
+  TeleportSelectionEditor.Checked=false
+end
+
+
+-- Teleport button
+local TeleportButton = createButton(tpFRM)
+TeleportButton.Caption = "Teleport"
+TeleportButton.Left = TeleportSelectiondropdown.Left + TeleportSelectiondropdown.Width
+TeleportButton.Top = TeleportSelectiondropdown.Top - 1
+TeleportButton.Width = 75
+TeleportButton.Height = 25
+TeleportButton.OnClick = function()
+    local selectedIndex = TeleportSelectiondropdown.ItemIndex
+    if selectedIndex &gt;= 0 then
+        locations = readLocationsFromFile()
+        local loc = locations[selectedIndex + 1]
+        if loc then
+            writeFloat('[pCords]+264', loc.x)
+            writeFloat('[pCords]+26C', loc.y)
+            writeFloat('[pCords]+274', loc.z)
+        end
+    end
+end
+
+-- Save location button
+local TeleportSaveButton = createButton(tpFRM)
+TeleportSaveButton.Caption = "Save"
+TeleportSaveButton.Left = TeleportButton.Left + TeleportButton.Width - 1
+TeleportSaveButton.Top = TeleportButton.Top
+TeleportSaveButton.Width = TeleportButton.Width
+TeleportSaveButton.Height = 25
+TeleportSaveButton.OnClick = function()
+    local name = inputQuery("Save Location", "Enter location name:", "")
+    if name then
+        coordx = readFloat('[pCords]+264') or 0
+        coordy = readFloat('[pCords]+26C') or 0
+        coordz = readFloat('[pCords]+274') or 0
+        saveLocation(name, coordx, coordy, coordz)
+        TeleportSelectiondropdown.Items.add(name)
+    end
+end
+
+tpFRM.OnClose = function()
+    tpFRM.hide()
+    tpm_s.Active = false
+    return caFree
+end
+
+tpFRM.show()
+
+[DISABLE]
+
+tpFRM.hide()
+tpm_s=nil
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>367388</ID>
+              <Description>"Right click highlighted Item to Inc"</Description>
+              <Options moHideChildren="1"/>
+              <Color>80FF00</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$lua}
+if syntaxcheck then return end
+
+[ENABLE]
+
+shiftClickTmr=createTimer() shiftClickTmr.Interval=100 shiftClickTmr.onTimer=function()
+local highlightedItem=getAddressSafe('[highlighted_Item]+08')
+  if highlightedItem and isKeyPressed(VK_RBUTTON) then
+    writeInteger(highlightedItem,readInteger(highlightedItem) + 1)
+  end
+end
+
+[DISABLE]
+if shiftClickTmr then shiftClickTmr.destroy() shiftClickTmr=nil end
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>367389</ID>
+                  <Description>"Highlighted Item"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>highlighted_Item</Address>
+                  <Offsets>
+                    <Offset>8</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>367400</ID>
+              <Description>"Null carry weight"</Description>
+              <Color>80FF00</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+aobscanmodule(noweighttestt,$process,F3 * * * * * F3 * * * * * * * 0F * * 0F * * * * * 0F * * * * * 49)
+alloc(newmemnoweighttestt,$100,noweighttestt)
+label(codenoweighttestt returnnoweighttestt)
+newmemnoweighttestt:
+codenoweighttestt:
+movss xmm0,[r14+10]
+xorps xmm0,xmm0
+jmp returnnoweighttestt
+
+noweighttestt:
+jmp newmemnoweighttestt
+nop 1
+returnnoweighttestt:
+registersymbol(noweighttestt)
+
+
+[DISABLE]
+
+noweighttestt:
+db F3 41 0F 10 46 10
+unregistersymbol(noweighttestt)
+dealloc(newmemnoweighttestt)
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>59</ID>
+              <Description>"Inf health"</Description>
+              <Color>80FF00</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+infHealthFlag:
+dd 1
+ 
+ 
+[DISABLE]
+infHealthFlag:
+dd 0
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>56</ID>
+              <Description>"Inf stamina"</Description>
+              <Color>80FF00</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+infStamFlag:
+dd 1
+ 
+ 
+[DISABLE]
+infStamFlag:
+dd 0
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>60</ID>
+              <Description>"Inf magika"</Description>
+              <Color>80FF00</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+infMagikaFlag:
+dd 1
+ 
+ 
+[DISABLE]
+infMagikaFlag:
+dd 0
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>74</ID>
+              <Description>"Inf gold"</Description>
+              <Color>80FF00</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{$lua}
+if syntaxcheck then return end
+
+[ENABLE]
+
+local gold=getAddressSafe('[gold_]+08')
+goldTmr=createTimer() goldTmr.Interval=1000 goldTmr.onTimer=function()
+  if gold then writeInteger(gold,999999999) end
+end
+
+[DISABLE]
+if goldTmr then goldTmr.destroy() goldTmr=nil end
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>367415</ID>
+              <Description>"Fast Skills"</Description>
+              <Color>80FF00</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{ Game   : OblivionRemastered-WinGDK-Shipping.exe
+  Version: 
+  Date   : 2025-04-30
+  Author : Bytrl
+
+  This script does blah blah blah
+}
+
+[ENABLE]
+
+aobscanmodule(FindStatss,OblivionRemastered-WinGDK-Shipping.exe,F3 0F 58 B4 8F 60 03 00 00) // should be unique
+alloc(newmem_stats,$100,FindStatss)
+alloc(statss,8,FindStatss)
+label(code_stats return_stats)
+
+newmem_stats:
+push rbx
+lea rbx,[rdi+rcx*4+00000360]
+mov [statss],rbx
+pop rbx
+
+mov [rdi+rcx*4+00000360],(float)9999 //max all stats
+
+code_stats:
+  addss xmm6,[rdi+rcx*4+00000360]
+  jmp return_stats
+
+FindStatss:
+  jmp newmem_stats
+  nop 4
+return_stats:
+registersymbol(FindStatss statss)
+
+[DISABLE]
+
+FindStatss:
+  db F3 0F 58 B4 8F 60 03 00 00
+
+unregistersymbol(FindStatss statss)
+dealloc(newmem_stats statss)
+
+{
+// ORIGINAL CODE - INJECTION POINT: OblivionRemastered-WinGDK-Shipping.exe.text+605EACE
+
+OblivionRemastered-WinGDK-Shipping.exe.text+605EAAC: 76 0A                       - jna OblivionRemastered-WinGDK-Shipping.exe.text+605EAB8
+OblivionRemastered-WinGDK-Shipping.exe.text+605EAAE: 41 0F 28 F0                 - movaps xmm6,xmm8
+OblivionRemastered-WinGDK-Shipping.exe.text+605EAB2: F3 0F 58 F7                 - addss xmm6,xmm7
+OblivionRemastered-WinGDK-Shipping.exe.text+605EAB6: EB 3A                       - jmp OblivionRemastered-WinGDK-Shipping.exe.text+605EAF2
+OblivionRemastered-WinGDK-Shipping.exe.text+605EAB8: 8B D6                       - mov edx,esi
+OblivionRemastered-WinGDK-Shipping.exe.text+605EABA: B9 02 00 00 00              - mov ecx,00000002
+OblivionRemastered-WinGDK-Shipping.exe.text+605EABF: E8 AC 17 31 00              - call OblivionRemastered-WinGDK-Shipping.exe.text+6370270
+OblivionRemastered-WinGDK-Shipping.exe.text+605EAC4: 48 0F BE C8                 - movsx rcx,al
+OblivionRemastered-WinGDK-Shipping.exe.text+605EAC8: 41 0F 28 F0                 - movaps xmm6,xmm8
+OblivionRemastered-WinGDK-Shipping.exe.text+605EACC: 8B D6                       - mov edx,esi
+// ---------- INJECTING HERE ----------
+OblivionRemastered-WinGDK-Shipping.exe.text+605EACE: F3 0F 58 B4 8F 60 03 00 00  - addss xmm6,[rdi+rcx*4+00000360]
+// ---------- DONE INJECTING  ----------
+OblivionRemastered-WinGDK-Shipping.exe.text+605EAD7: B9 02 00 00 00              - mov ecx,00000002
+OblivionRemastered-WinGDK-Shipping.exe.text+605EADC: F3 0F 5F FE                 - maxss xmm7,xmm6
+OblivionRemastered-WinGDK-Shipping.exe.text+605EAE0: E8 8B 17 31 00              - call OblivionRemastered-WinGDK-Shipping.exe.text+6370270
+OblivionRemastered-WinGDK-Shipping.exe.text+605EAE5: 48 0F BE C8                 - movsx rcx,al
+OblivionRemastered-WinGDK-Shipping.exe.text+605EAE9: F3 0F 11 BC 8F 60 03 00 00  - movss [rdi+rcx*4+00000360],xmm7
+OblivionRemastered-WinGDK-Shipping.exe.text+605EAF2: F3 0F 10 3D 72 63 E3 01     - movss xmm7,[OblivionRemastered-WinGDK-Shipping.exe.rdata+1805E6C]
+OblivionRemastered-WinGDK-Shipping.exe.text+605EAFA: 48 8B CF                    - mov rcx,rdi
+OblivionRemastered-WinGDK-Shipping.exe.text+605EAFD: E8 2E 22 FA FF              - call OblivionRemastered-WinGDK-Shipping.exe.text+6000D30
+OblivionRemastered-WinGDK-Shipping.exe.text+605EB02: 48 85 C0                    - test rax,rax
+OblivionRemastered-WinGDK-Shipping.exe.text+605EB05: 74 22                       - je OblivionRemastered-WinGDK-Shipping.exe.text+605EB29
+}
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>367486</ID>
+              <Description>"Max Skills"</Description>
+              <Color>80FF00</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{ Game   : OblivionRemastered-WinGDK-Shipping.exe
+  Version: 
+  Date   : 2025-05-02
+  Author : Bytrl
+}
+
+[ENABLE]
+
+aobscanmodule(max_skills,$process,0F B6 84 1A B8 01 00 00)
+alloc(newmem_skillss,$100,max_skills)
+label(code_skillss return_skillss)
+
+newmem_skillss:
+mov [rdx+rbx+000001B8],#255
+
+code_skillss:
+  movzx eax,byte ptr [rdx+rbx+000001B8]
+  jmp return_skillss
+
+max_skills:
+  jmp newmem_skillss
+  nop 3
+return_skillss:
+registersymbol(max_skills)
+
+[DISABLE]
+
+max_skills:
+  db 0F B6 84 1A B8 01 00 00
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>367483</ID>
+              <Description>"Max Attributes"</Description>
+              <Color>80FF00</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>{ Game   : OblivionRemastered-WinGDK-Shipping.exe
+  Version: 
+  Date   : 2025-05-02
+  Author : Bytrl
+}
+
+[ENABLE]
+
+aobscanmodule(getAttributes,$process,0F B6 44 1A 08)
+alloc(newmem_atribts,$100,getAttributes)
+label(code_atribts return_atribts)
+
+newmem_atribts:
+mov [rdx+rbx+08],#255
+
+code_atribts:
+  movzx eax,byte ptr [rdx+rbx+08]
+  jmp return_atribts
+
+getAttributes:
+  jmp newmem_atribts
+return_atribts:
+registersymbol(getAttributes)
+
+[DISABLE]
+
+getAttributes:
+  db 0F B6 44 1A 08
+
+unregistersymbol(*)
+dealloc(*)
+
+</AssemblerScript>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>367440</ID>
+              <Description>"Edit player details"</Description>
+              <Options moHideChildren="1"/>
+              <Color>80FF00</Color>
+              <VariableType>Auto Assembler Script</VariableType>
+              <AssemblerScript>[ENABLE]
+
+aobscanmodule(find_details,$process,FF * * * * * 48 * * 48 * * * * * * E8 * * * * 84 * 0F * * * * * 48 * * 41 * * * * * 44)
+alloc(newmemfind_details,$100,find_details)
+alloc(details,8,find_details)
+label(codefind_details returnfind_details)
+
+newmemfind_details:
+mov [details],rax
+
+codefind_details:
+inc [rax+00000964]
+jmp returnfind_details
+
+find_details+0:  
+jmp newmemfind_details
+nop 1
+returnfind_details:
+registersymbol(find_details details)
+
+
+
+[DISABLE]
+
+find_details+0:
+db FF 80 64 09 00 00
+unregistersymbol(*)
+dealloc(*)
+</AssemblerScript>
+              <CheatEntries>
+                <CheatEntry>
+                  <ID>367467</ID>
+                  <Description>"skill increases"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>details</Address>
+                  <Offsets>
+                    <Offset>940</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367466</ID>
+                  <Description>"training sessions"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>details</Address>
+                  <Offsets>
+                    <Offset>944</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367468</ID>
+                  <Description>"days jailed"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>details</Address>
+                  <Offsets>
+                    <Offset>938</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367469</ID>
+                  <Description>"items stolen"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>details</Address>
+                  <Offsets>
+                    <Offset>9A8</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367470</ID>
+                  <Description>"items pickpocketed"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>details</Address>
+                  <Offsets>
+                    <Offset>9AC</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367471</ID>
+                  <Description>"trespasses"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>details</Address>
+                  <Offsets>
+                    <Offset>9B0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367472</ID>
+                  <Description>"assaults"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>details</Address>
+                  <Offsets>
+                    <Offset>9B4</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367473</ID>
+                  <Description>"murders"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>details</Address>
+                  <Offsets>
+                    <Offset>9B8</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367474</ID>
+                  <Description>"horses stolen"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>details</Address>
+                  <Offsets>
+                    <Offset>9BC</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367465</ID>
+                  <Description>"largest bounty"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>details</Address>
+                  <Offsets>
+                    <Offset>948</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367464</ID>
+                  <Description>"creatures killed"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>details</Address>
+                  <Offsets>
+                    <Offset>94C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367463</ID>
+                  <Description>"people killed"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>details</Address>
+                  <Offsets>
+                    <Offset>950</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367462</ID>
+                  <Description>"places found"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>details</Address>
+                  <Offsets>
+                    <Offset>954</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367461</ID>
+                  <Description>"locks picked"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>details</Address>
+                  <Offsets>
+                    <Offset>958</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367460</ID>
+                  <Description>"lockpicks broken"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>details</Address>
+                  <Offsets>
+                    <Offset>95C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367459</ID>
+                  <Description>"souls trapped"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>details</Address>
+                  <Offsets>
+                    <Offset>960</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367458</ID>
+                  <Description>"ingredients eaten"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>details</Address>
+                  <Offsets>
+                    <Offset>964</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367442</ID>
+                  <Description>"potions made"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>details</Address>
+                  <Offsets>
+                    <Offset>968</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367443</ID>
+                  <Description>"oblivion gates shut"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>details</Address>
+                  <Offsets>
+                    <Offset>96C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367444</ID>
+                  <Description>"horses owned"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>details</Address>
+                  <Offsets>
+                    <Offset>970</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367445</ID>
+                  <Description>"houses owned"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>details</Address>
+                  <Offsets>
+                    <Offset>974</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367446</ID>
+                  <Description>"stores invested in"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>details</Address>
+                  <Offsets>
+                    <Offset>978</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367447</ID>
+                  <Description>"books read"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>details</Address>
+                  <Offsets>
+                    <Offset>97C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367448</ID>
+                  <Description>"skill books read"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>details</Address>
+                  <Offsets>
+                    <Offset>980</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367449</ID>
+                  <Description>"artifacts found"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>details</Address>
+                  <Offsets>
+                    <Offset>984</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367450</ID>
+                  <Description>"hours slept"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>details</Address>
+                  <Offsets>
+                    <Offset>988</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367451</ID>
+                  <Description>"hours waited"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>details</Address>
+                  <Offsets>
+                    <Offset>98C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367452</ID>
+                  <Description>"days as a vampire"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>details</Address>
+                  <Offsets>
+                    <Offset>990</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367453</ID>
+                  <Description>"unknown"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>details</Address>
+                  <Offsets>
+                    <Offset>994</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367454</ID>
+                  <Description>"necks biten"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>details</Address>
+                  <Offsets>
+                    <Offset>998</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367455</ID>
+                  <Description>"jokes told"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>details</Address>
+                  <Offsets>
+                    <Offset>99C</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367456</ID>
+                  <Description>"diseases contracted"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>details</Address>
+                  <Offsets>
+                    <Offset>9A0</Offset>
+                  </Offsets>
+                </CheatEntry>
+                <CheatEntry>
+                  <ID>367457</ID>
+                  <Description>"nirnroots found"</Description>
+                  <ShowAsSigned>0</ShowAsSigned>
+                  <VariableType>4 Bytes</VariableType>
+                  <Address>details</Address>
+                  <Offsets>
+                    <Offset>9A4</Offset>
+                  </Offsets>
+                </CheatEntry>
+              </CheatEntries>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>459</ID>
+      <Description>"--------------------------------"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>461</ID>
+      <Description>"💥 Author:  Bytrl"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>454</ID>
+      <Description>"🞂 Process: OblivionRemastered-WinGDK-Shipping.exe / OblivionRemastered-Win64-Shipping.exe"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>772</ID>
+      <Description>"✔ Game Build: 18144098 ( https://steamdb.info/app/2623190/patchnotes/ )"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>460</ID>
+      <Description>"⚡ Discord "</Description>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+{$lua}
+shellExecute("https://discord.gg/NTFcdAUWxb")
+
+{$asm}
+[DISABLE]
+
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>458</ID>
+      <Description>"--------------------------------"</Description>
+      <GroupHeader>1</GroupHeader>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+  <DisassemblerComments>
+    <DisassemblerComment>
+      <Address>"mcc-win64-shipping.exe"+E98DC6</Address>
+      <Comment>Jumps To 140701984918985</Comment>
+      <Header>Intercepted Opcode</Header>
+    </DisassemblerComment>
+    <DisassemblerComment>
+      <Address>"mcc-win64-shipping.exe"+E9F716</Address>
+      <Comment>Jumps To 140699801155354</Comment>
+      <Header>Intercepted Opcode</Header>
+    </DisassemblerComment>
+    <DisassemblerComment>
+      <Address>"halo3.dll"+E2050</Address>
+      <Comment>Jumps To 140735068381267</Comment>
+      <Header>Intercepted Opcode</Header>
+    </DisassemblerComment>
+    <DisassemblerComment>
+      <Address>"halo3.dll"+1317E0</Address>
+      <Comment>3rd person (nop here)
+</Comment>
+    </DisassemblerComment>
+    <DisassemblerComment>
+      <Address>"halo3.dll"+131838</Address>
+      <Comment>cam follows vehicles
+</Comment>
+    </DisassemblerComment>
+    <DisassemblerComment>
+      <Address>"halo3.dll"+17EB84</Address>
+      <Comment>detach cam entirely
+</Comment>
+    </DisassemblerComment>
+    <DisassemblerComment>
+      <Address>"ntdll.dll"+32B26</Address>
+      <Comment>Jumps To 140726732204842</Comment>
+      <Header>Intercepted Opcode</Header>
+    </DisassemblerComment>
+    <DisassemblerComment>
+      <Address>1A4D77969D2</Address>
+      <Comment>Controls unicode string
+</Comment>
+    </DisassemblerComment>
+  </DisassemblerComments>
+</CheatTable>
